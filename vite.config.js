@@ -8,13 +8,14 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.tsx'],
+            input: ['resources/css/app.css', 'resources/js/app.jsx'],
             ssr: 'resources/js/ssr.jsx',
             refresh: true,
         }),
         react(),
         tailwindcss(),
     ],
+
     server: {
         port: 5173,
         host: '0.0.0.0',
@@ -22,6 +23,7 @@ export default defineConfig({
             host: 'spark.localhost'
         },
     },
+
     esbuild: {
         jsx: 'automatic',
     },

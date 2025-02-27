@@ -1,1 +1,1 @@
-Spark is a enthusiastic clone of the app X
+Spark is a enthusiastic clone of the app X.
