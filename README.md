@@ -64,15 +64,11 @@ Ensure you have the following installed:
    ```
 
 ### Frontend Setup
-1. Navigate to the `frontend` folder:
-   ```sh
-   cd frontend
-   ```
-2. Install dependencies:
+1. Install dependencies:
    ```sh
    npm install
    ```
-3. Start the development server:
+2. Start the development server:
    ```sh
    npm run dev
    ```
