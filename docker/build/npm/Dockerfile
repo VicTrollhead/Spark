@@ -9,3 +9,4 @@ WORKDIR /var/www/html
 #ENTRYPOINT [""]
 
 CMD ["entrypoint.sh"]
+

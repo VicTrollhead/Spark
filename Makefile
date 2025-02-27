@@ -18,5 +18,6 @@ fixperm:
 	sudo chmod -R g+w bootstrap storage/app storage/framework storage/logs
 dump:
 	@docker compose exec -u www-data php php artisan dump
+
 pint:
 	@docker compose exec -u www-data php ./vendor/bin/pint .

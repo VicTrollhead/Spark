@@ -1,6 +1,7 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Link } from '@inertiajs/react';
 import { Fragment } from 'react';
+import { SidebarTrigger } from './ui/sidebar.jsx';
 
 export function Breadcrumbs({ breadcrumbs }) {
     return (<>
