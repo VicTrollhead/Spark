@@ -52,7 +52,7 @@ class PostController extends Controller
             'is_public' => $validated['is_public'],
         ]);
 
-        return Redirect::route('posts.index')->with('success', 'Пост создан.');
+        return Redirect::route('posts.index')->with('success', 'Post created successfully.');
     }
 
     /**
@@ -88,7 +88,7 @@ class PostController extends Controller
 
         $post->update($validated);
 
-        return Redirect::route('posts.index')->with('success', 'Пост обновлён.');
+        return Redirect::route('posts.index')->with('success', 'Post updated successfully.');
     }
 
     /**
@@ -97,6 +97,6 @@ class PostController extends Controller
     public function destroy(Post $post): RedirectResponse
     {
         $post->update(['is_deleted' => true]);
-        return Redirect::route('posts.index')->with('success', 'Пост удалён.');
+        return Redirect::route('posts.index')->with('success', 'Post deleted successfully.');
     }
 }

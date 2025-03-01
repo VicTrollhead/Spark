@@ -47,7 +47,7 @@ class LikeController extends Controller
             'is_deleted' => $validated['is_deleted'] ?? false,
         ]);
 
-        return Redirect::route('likes.index')->with('success', 'Лайк добавлен.');
+        return Redirect::route('likes.index')->with('success', 'Like added successfully.');
     }
 
     /**
@@ -81,7 +81,7 @@ class LikeController extends Controller
 
         $like->update($validated);
 
-        return Redirect::route('likes.index')->with('success', 'Лайк обновлён.');
+        return Redirect::route('likes.index')->with('success', 'Like updated successfully.');
     }
 
     /**
@@ -90,6 +90,6 @@ class LikeController extends Controller
     public function destroy(Like $like): RedirectResponse
     {
         $like->delete();
-        return Redirect::route('likes.index')->with('success', 'Лайк удалён.');
+        return Redirect::route('likes.index')->with('success', 'Like deleted successfully.');
     }
 }

@@ -48,7 +48,7 @@ class CommentController extends Controller
             'parent_comment_id' => $validated['parent_comment_id'] ?? null,
         ]);
 
-        return Redirect::route('comments.index')->with('success', 'Комментарий добавлен.');
+        return Redirect::route('comments.index')->with('success', 'Comment added successfully.');
     }
 
     /**
@@ -82,7 +82,7 @@ class CommentController extends Controller
 
         $comment->update($validated);
 
-        return Redirect::route('comments.index')->with('success', 'Комментарий обновлён.');
+        return Redirect::route('comments.index')->with('success', 'Comment updated successfully.');
     }
 
     /**
@@ -91,6 +91,6 @@ class CommentController extends Controller
     public function destroy(Comment $comment): RedirectResponse
     {
         $comment->delete();
-        return Redirect::route('comments.index')->with('success', 'Комментарий удалён.');
+        return Redirect::route('comments.index')->with('success', 'Comment deleted successfully.');
     }
 }
