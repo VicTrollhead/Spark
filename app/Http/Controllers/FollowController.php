@@ -47,7 +47,7 @@ class FollowController extends Controller
             'is_accepted' => $validated['is_accepted'] ?? false,
         ]);
 
-        return Redirect::route('follows.index')->with('success', 'Подписка отправлена.');
+        return Redirect::route('follows.index')->with('success', 'Followed successfully.');
     }
 
     /**
@@ -81,7 +81,7 @@ class FollowController extends Controller
 
         $follow->update($validated);
 
-        return Redirect::route('follows.index')->with('success', 'Статус подписки обновлён.');
+        return Redirect::route('follows.index')->with('success', 'Follow updated successfully.');
     }
 
     /**
@@ -90,6 +90,6 @@ class FollowController extends Controller
     public function destroy(Follow $follow): RedirectResponse
     {
         $follow->delete();
-        return Redirect::route('follows.index')->with('success', 'Подписка удалена.');
+        return Redirect::route('follows.index')->with('success', 'Follow deleted successfully.');
     }
 }
