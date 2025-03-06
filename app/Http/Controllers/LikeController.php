@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -10,6 +9,7 @@ use Inertia\Response;
 use App\Models\Like;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\Rule;
 
 class LikeController extends Controller
 {
@@ -37,8 +37,8 @@ class LikeController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'post_id' => 'required|exists:posts,id',
-            'is_deleted' => 'boolean'
+            'post_id' => ['required', Rule::exists('posts', 'id')],
+            'is_deleted' => ['boolean'],
         ]);
 
         Like::create([
@@ -56,7 +56,7 @@ class LikeController extends Controller
     public function show(Like $like): Response
     {
         return Inertia::render('Likes/Show', [
-            'like' => $like->load(['user', 'post'])
+            'like' => $like->load(['user', 'post']),
         ]);
     }
 
@@ -66,7 +66,7 @@ class LikeController extends Controller
     public function edit(Like $like): Response
     {
         return Inertia::render('Likes/Edit', [
-            'like' => $like
+            'like' => $like,
         ]);
     }
 
@@ -76,7 +76,7 @@ class LikeController extends Controller
     public function update(Request $request, Like $like): RedirectResponse
     {
         $validated = $request->validate([
-            'is_deleted' => 'required|boolean'
+            'is_deleted' => ['required', 'boolean'],
         ]);
 
         $like->update($validated);

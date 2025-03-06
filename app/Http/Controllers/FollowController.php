@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -10,6 +9,7 @@ use Inertia\Response;
 use App\Models\Follow;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\Rule;
 
 class FollowController extends Controller
 {
@@ -37,8 +37,12 @@ class FollowController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'followee_id' => 'required|exists:users,id|not_in:' . Auth::id(),
-            'is_accepted' => 'boolean'
+            'followee_id' => [
+                'required',
+                Rule::exists('users', 'id'),
+                Rule::notIn([Auth::id()]),
+            ],
+            'is_accepted' => ['boolean'],
         ]);
 
         Follow::create([
@@ -56,7 +60,7 @@ class FollowController extends Controller
     public function show(Follow $follow): Response
     {
         return Inertia::render('Follows/Show', [
-            'follow' => $follow->load(['follower', 'followee'])
+            'follow' => $follow->load(['follower', 'followee']),
         ]);
     }
 
@@ -66,7 +70,7 @@ class FollowController extends Controller
     public function edit(Follow $follow): Response
     {
         return Inertia::render('Follows/Edit', [
-            'follow' => $follow
+            'follow' => $follow,
         ]);
     }
 
@@ -76,7 +80,7 @@ class FollowController extends Controller
     public function update(Request $request, Follow $follow): RedirectResponse
     {
         $validated = $request->validate([
-            'is_accepted' => 'required|boolean'
+            'is_accepted' => ['required', 'boolean'],
         ]);
 
         $follow->update($validated);

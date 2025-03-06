@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -10,6 +9,7 @@ use Inertia\Response;
 use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\Rule;
 
 class PostController extends Controller
 {
@@ -37,10 +37,10 @@ class PostController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'content' => 'required|string|max:5000',
-            'parent_post_id' => 'nullable|exists:posts,id',
-            'post_type' => 'required|string',
-            'is_public' => 'required|boolean'
+            'content' => ['required', 'string', 'max:5000'],
+            'parent_post_id' => ['nullable', Rule::exists('posts', 'id')],
+            'post_type' => ['required', 'string'],
+            'is_public' => ['required', 'boolean'],
         ]);
 
         Post::create([
@@ -61,7 +61,7 @@ class PostController extends Controller
     public function show(Post $post): Response
     {
         return Inertia::render('Posts/Show', [
-            'post' => $post->load(['user', 'parentPost', 'replies', 'likes', 'comments'])
+            'post' => $post->load(['user', 'parentPost', 'replies', 'likes', 'comments']),
         ]);
     }
 
@@ -71,7 +71,7 @@ class PostController extends Controller
     public function edit(Post $post): Response
     {
         return Inertia::render('Posts/Edit', [
-            'post' => $post
+            'post' => $post,
         ]);
     }
 
@@ -81,9 +81,9 @@ class PostController extends Controller
     public function update(Request $request, Post $post): RedirectResponse
     {
         $validated = $request->validate([
-            'content' => 'required|string|max:5000',
-            'post_type' => 'required|string',
-            'is_public' => 'required|boolean'
+            'content' => ['required', 'string', 'max:5000'],
+            'post_type' => ['required', 'string'],
+            'is_public' => ['required', 'boolean'],
         ]);
 
         $post->update($validated);

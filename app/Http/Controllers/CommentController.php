@@ -9,6 +9,7 @@ use Inertia\Response;
 use App\Models\Comment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\Rule;
 
 class CommentController extends Controller
 {
@@ -33,12 +34,12 @@ class CommentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request) : RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'post_id' => 'required|exists:posts,id',
-            'content' => 'required|string',
-            'parent_comment_id' => 'nullable|exists:comments,id'
+            'post_id' => ['required', Rule::exists('posts', 'id')],
+            'content' => ['required', 'string'],
+            'parent_comment_id' => ['nullable', Rule::exists('comments', 'id')],
         ]);
 
         Comment::create([
@@ -57,7 +58,7 @@ class CommentController extends Controller
     public function show(Comment $comment): Response
     {
         return Inertia::render('Comments/Show', [
-            'comment' => $comment->load(['user', 'replies'])
+            'comment' => $comment->load(['user', 'replies']),
         ]);
     }
 
@@ -67,7 +68,7 @@ class CommentController extends Controller
     public function edit(Comment $comment): Response
     {
         return Inertia::render('Comments/Edit', [
-            'comment' => $comment
+            'comment' => $comment,
         ]);
     }
 
@@ -77,7 +78,7 @@ class CommentController extends Controller
     public function update(Request $request, Comment $comment): RedirectResponse
     {
         $validated = $request->validate([
-            'content' => 'required|string'
+            'content' => ['required', 'string'],
         ]);
 
         $comment->update($validated);
