@@ -1,70 +1,127 @@
-import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
+import backgroundImg from "../../assets/images/background.png";
+import titleLogin from "../../assets/images/title_login.png";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import googleIcon from "../../assets/images/google_icon.png";
+import visibilityIcon from "../../assets/images/visibility.png";
+export default function Login() {
+    return (
+        <div className="relative flex h-screen flex-col">
+            <div className="flex flex-grow">
 
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
+                <div className="relative w-1/2 bg-cover bg-center" style={{ backgroundImage: `url(${backgroundImg})` }}>
+          
+                    <img src={titleLogin} alt="Title" className="absolute top-20 left-20 h-auto w-3/4" />
+                </div>
 
-export default function Login({ status, canResetPassword }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
-        password: '',
-        remember: false,
-    });
 
-    const submit = (e) => {
-        e.preventDefault();
-        post(route('login'), {
-            onFinish: () => reset('password'),
-        });
-    };
-
-    return (<AuthLayout title="Log in to your account" description="Enter your email and password below to log in">
-            <Head title="Log in"/>
-
-            <form className="flex flex-col gap-6" onSubmit={submit}>
-                <div className="grid gap-6">
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email address</Label>
-                        <Input id="email" type="email" required autoFocus tabIndex={1} autoComplete="email" value={data.email} onChange={(e) => setData('email', e.target.value)} placeholder="email@example.com"/>
-                        <InputError message={errors.email}/>
-                    </div>
-
-                    <div className="grid gap-2">
-                        <div className="flex items-center">
-                            <Label htmlFor="password">Password</Label>
-                            {canResetPassword && (<TextLink href={route('password.request')} className="ml-auto text-sm" tabIndex={5}>
-                                    Forgot password?
-                                </TextLink>)}
+                <div className="flex w-1/2 items-center justify-center bg-white">
+                    <div className="w-96 rounded-2xl p-8">
+                        <h1 className="mb-4 text-4xl font-bold text-black">У зоні комфорту</h1>
+                        <h2 className="mb-6 text-2xl font-bold text-gray-700">Приєднуйтесь до Spark.</h2>
+                        <p className="mb-4 font-bold text-black">Увійдіть в обліковий запис</p>
+                        <Button className="bg-primary mb-4 w-full rounded-2xl text-white" disabled={false}>
+                            <img src={googleIcon} alt="Google Icon" className="h-5 w-5" />
+                            Увійти через акаунт Google
+                        </Button>
+                        <div className="my-4 flex items-center">
+                            <div className="flex-grow border-t border-gray-700"></div>
+                            <span className="px-2 font-bold text-gray-500">або</span>
+                            <div className="flex-grow border-t border-gray-700"></div>
                         </div>
-                        <Input id="password" type="password" required tabIndex={2} autoComplete="current-password" value={data.password} onChange={(e) => setData('password', e.target.value)} placeholder="Password"/>
-                        <InputError message={errors.password}/>
+
+                        <Input
+                            type="text"
+                            placeholder="Телефон або пошта"
+                            className="mb-4 w-full rounded-2xl text-black selection:bg-blue-600 selection:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        />
+                        <div className="relative mb-4 w-full">
+                            <Input
+                                type="password"
+                                placeholder="Пароль"
+                                className="w-full rounded-2xl pr-10 text-black selection:bg-blue-600 selection:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                            />
+                            <button type="button" className="absolute inset-y-0 right-3 flex items-center" onClick={togglePasswordVisibility}>
+                                <img src={visibilityIcon} alt="Toggle Visibility" className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        <Button className="bg-primary mb-2 w-full rounded-2xl text-white" disabled={false}>
+                            Увійти
+                        </Button>
+                        <div className="flex items-center">
+                            <input type="checkbox" className="mr-2" />
+                            <span className="font-bold text-gray-900">Запам’ятати</span>
+                            <a href="#" className="ml-auto text-blue-600 hover:underline">
+                                Забули пароль?
+                            </a>
+                        </div>
+
+                        <div className="mt-4 text-left">
+                            <span className="font-bold text-gray-900">Не маєте акаунту?</span>
+                            <Button className="bg-primary mt-2 w-full rounded-2xl text-white" disabled={false}>
+                                Зареєструватися
+                            </Button>
+                            <p className="mt-2 text-sm text-gray-500">
+                                Реєструючись, ви погоджуєтесь і приймаєте наші{' '}
+                                <a href="#" className="text-blue-600 hover:underline">
+                                    Умови надання послуг
+                                </a>
+                                ,{' '}
+                                <a href="#" className="text-blue-600 hover:underline">
+                                    Політику конфіденційності
+                                </a>{' '}
+                                та{' '}
+                                <a href="#" className="text-blue-600 hover:underline">
+                                    Політику використання cookie
+                                </a>
+                                .
+                            </p>
+                        </div>
                     </div>
-
-                    <div className="flex items-center space-x-3">
-                        <Checkbox id="remember" name="remember" tabIndex={3}/>
-                        <Label htmlFor="remember">Remember me</Label>
-                    </div>
-
-                    <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
-                        {processing && <LoaderCircle className="h-4 w-4 animate-spin"/>}
-                        Log in
-                    </Button>
                 </div>
+            </div>
 
-                <div className="text-muted-foreground text-center text-sm">
-                    Don't have an account?{' '}
-                    <TextLink href={route('register')} tabIndex={5}>
-                        Sign up
-                    </TextLink>
+            {/* Footer */}
+            <footer className="absolute bottom-0 left-0 w-full bg-transparent p-4 text-center text-sm text-gray-500">
+                <div className="flex flex-wrap justify-center gap-4">
+                    <a href="#" className="hover:underline">
+                        Про нас
+                    </a>
+                    <a href="#" className="hover:underline">
+                        Умови надання послуг
+                    </a>
+                    <a href="#" className="hover:underline">
+                        Політика конфіденційності
+                    </a>
+                    <a href="#" className="hover:underline">
+                        Політика щодо файлів cookie
+                    </a>
+                    <a href="#" className="hover:underline">
+                        Контактні та реєстраційні дані
+                    </a>
+                    <a href="#" className="hover:underline">
+                        Спеціальні можливості
+                    </a>
+                    <a href="#" className="hover:underline">
+                        Інформація про рекламу
+                    </a>
+                    <a href="#" className="hover:underline">
+                        Блог
+                    </a>
+                    <a href="#" className="hover:underline">
+                        Реклама
+                    </a>
+                    <a href="#" className="hover:underline">
+                        Налаштування
+                    </a>
+                    © 2025 SparkCorp.
                 </div>
-            </form>
-
-            {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
-        </AuthLayout>);
+            </footer>
+        </div>
+    );
 }
 
+function togglePasswordVisibility() {
+
+}

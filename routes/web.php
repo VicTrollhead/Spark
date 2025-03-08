@@ -13,6 +13,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
+
 //// 🏠 Public Routes
 //Route::get('/', function () {
 //    return Inertia::render('Welcome', [
