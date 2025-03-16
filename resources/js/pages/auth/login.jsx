@@ -9,7 +9,7 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import AuthLayout from '../../layouts/auth-layout';
 
-export default function Login({ status, canResetPassword }) {
+export default function Login({ status, canResetPassword, googleClientId }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -64,10 +64,36 @@ export default function Login({ status, canResetPassword }) {
                         Sign up
                     </TextLink>
                 </div>
+                {/* Google Sign-In */}
+                <div id="g_id_onload"
+                     data-client_id={googleClientId}
+                     data-callback="handleCredentialResponse">
+                </div>
+                <div className="g_id_signin" data-type="standard"></div>
+
+                <script src="https://accounts.google.com/gsi/client" async defer></script>
             </form>
 
             {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
         </AuthLayout>
     );
 }
+
+window.handleCredentialResponse = function (response) {
+    fetch('/api/auth/google/callback', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        },
+        body: JSON.stringify({ token: response.credential }),
+    })
+        .then((res) => res.json())
+        .then((data) => {
+            console.log(data)
+            window.location.href = '/dashboard';
+        })
+        .catch((error) => console.error('Error:', error));
+
+};
 
