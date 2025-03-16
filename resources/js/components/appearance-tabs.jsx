@@ -1,5 +1,5 @@
-import { useAppearance } from '@/hooks/use-appearance';
-import { cn } from '@/lib/utils';
+import { useAppearance } from '../hooks/use-appearance';
+import { cn } from '../lib/utils';
 import { Monitor, Moon, Sun } from 'lucide-react';
 
 export default function AppearanceToggleTab({ className = '', ...props }) {

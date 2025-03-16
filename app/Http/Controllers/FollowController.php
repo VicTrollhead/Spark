@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,86 +15,77 @@ use Illuminate\Validation\Rule;
 class FollowController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Follow a user.
      */
-    public function index(): Response
+    public function follow(User $user): RedirectResponse
     {
-        return Inertia::render('Follows/Index', [
-            'follows' => Follow::with(['follower', 'followee'])->get(),
-        ]);
-    }
+        $followerId = Auth::id();
+        $followeeId = $user->id;
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(): Response
-    {
-        return Inertia::render('Follows/Create');
-    }
+        if ($followerId === $followeeId) {
+            return back()->with('error', 'You cannot follow yourself.');
+        }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            'followee_id' => [
-                'required',
-                Rule::exists('users', 'id'),
-                Rule::notIn([Auth::id()]),
-            ],
-            'is_accepted' => ['boolean'],
-        ]);
+        $alreadyFollowing = Follow::where('follower_id', $followerId)
+            ->where('followee_id', $followeeId)
+            ->exists();
+
+        if ($alreadyFollowing) {
+            return back()->with('error', 'Already following this user.');
+        }
 
         Follow::create([
-            'follower_id' => Auth::id(),
-            'followee_id' => $validated['followee_id'],
-            'is_accepted' => $validated['is_accepted'] ?? false,
+            'follower_id' => $followerId,
+            'followee_id' => $followeeId,
         ]);
 
-        return Redirect::route('follows.index')->with('success', 'Followed successfully.');
+        return back()->with('success', 'Followed successfully.');
     }
 
     /**
-     * Display the specified resource.
+     * Unfollow a user.
      */
-    public function show(Follow $follow): Response
+    public function unfollow(User $user): RedirectResponse
     {
-        return Inertia::render('Follows/Show', [
-            'follow' => $follow->load(['follower', 'followee']),
-        ]);
+        $followerId = Auth::id();
+        $followeeId = $user->id;
+
+        $deleted = Follow::where('follower_id', $followerId)
+            ->where('followee_id', $followeeId)
+            ->delete();
+
+        if ($deleted) {
+            return back()->with('success', 'Unfollowed successfully.');
+        }
+
+        return back()->with('error', 'You are not following this user.');
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Check if the authenticated user is following another user.
      */
-    public function edit(Follow $follow): Response
+    public function isFollowing(User $user)
     {
-        return Inertia::render('Follows/Edit', [
-            'follow' => $follow,
-        ]);
+        $followerId = Auth::id();
+        $followeeId = $user->id;
+
+        $isFollowing = Follow::where('follower_id', $followerId)
+            ->where('followee_id', $followeeId)
+            ->exists();
+
+        return response()->json(['following' => $isFollowing]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Follow $follow): RedirectResponse
+    public function followers(User $user)
     {
-        $validated = $request->validate([
-            'is_accepted' => ['required', 'boolean'],
-        ]);
-
-        $follow->update($validated);
-
-        return Redirect::route('follows.index')->with('success', 'Follow updated successfully.');
+        $followers = $user->followers()->select('id', 'name', 'username', 'profile_image_url as avatar')->get();
+        return inertia('user/followers', ['title' => 'Followers', 'users' => $followers]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Follow $follow): RedirectResponse
+    public function following(User $user)
     {
-        $follow->delete();
-        return Redirect::route('follows.index')->with('success', 'Follow deleted successfully.');
+        $following = $user->following()->select('id', 'name', 'username', 'profile_image_url as avatar')->get();
+        return inertia('user/following', ['title' => 'Following', 'users' => $following]);
     }
+
 }

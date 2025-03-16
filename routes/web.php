@@ -1,5 +1,8 @@
 <?php
 
+//use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\FollowController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -11,7 +14,38 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+
+    Route::get('/user', [UserController::class, 'show'])->name('user.show');
+    Route::get('/user/{user}', [UserController::class, 'show'])->name('user.show');
+
+    Route::post('/user/{user}/follow', [FollowController::class, 'follow'])->name('user.follow');
+    Route::post('/user/{user}/unfollow', [FollowController::class, 'unfollow'])->name('user.unfollow');
+    Route::get('/is-following/{user}', [FollowController::class, 'isFollowing'])->name('isFollowing');
+    Route::get('/user/{user}/followers', [FollowController::class, 'followers'])->name('user.followers');
+    Route::get('/user/{user}/following', [FollowController::class, 'following'])->name('user.following');
+
+    Route::get('/dashboard', [UserController::class, 'index'])->name('dashboard.users');
+
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //// 🏠 Public Routes
 //Route::get('/', function () {
