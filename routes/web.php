@@ -1,6 +1,7 @@
 <?php
 
 //use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -9,6 +10,8 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
+
+Route::post('/api/auth/google/callback', [GoogleAuthController::class, 'callback']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
