@@ -11,9 +11,10 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+//    Route::get('dashboard', function () {
+//        return Inertia::render('dashboard');
+//    })->name('dashboard');]
+    Route::get('dashboard', [UserController::class, 'index'])->name('dashboard');
 
     Route::get('/user', [UserController::class, 'show'])->name('user.show');
     Route::get('/user/{user}', [UserController::class, 'show'])->name('user.show');
@@ -24,7 +25,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/user/{user}/followers', [FollowController::class, 'followers'])->name('user.followers');
     Route::get('/user/{user}/following', [FollowController::class, 'following'])->name('user.following');
 
-    Route::get('/dashboard', [UserController::class, 'index'])->name('dashboard.users');
+
 
 });
 
