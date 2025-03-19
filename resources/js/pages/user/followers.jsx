@@ -3,12 +3,18 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar'
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
 export default function Followers() {
-    const { title, users } = usePage().props;
+    const { title, users, user, auth } = usePage().props;
     const getInitials = useInitials();
+    const isOwnProfile = auth.user && auth.user.id === user.id;
+
+    const breadcrumbs = [
+        { title: isOwnProfile ? 'My Profile' : user.name + "'s Profile", href: `/user/${user.username}` },
+        { title:  'Followers', href: `/user/${user.username}` },
+    ];
 
     return (
-        <AppLayout>
-            <Head title="Followers" />
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title={isOwnProfile ? 'Followers' : user.name + "'s Followers"} />
             <div className="max-w-lg p-6">
                 <h1 className="text-2xl font-bold mb-4">{title}</h1>
                 {users.length === 0 ? (
@@ -24,7 +30,7 @@ export default function Followers() {
                                     </AvatarFallback>
                                 </Avatar>
                                 <div>
-                                    <Link href={`/user/${user.id}`} className="font-medium text-blue-500 hover:underline">
+                                    <Link href={`/user/${user.username}`} className="font-medium text-blue-500 hover:underline">
                                         {user.name}
                                     </Link>
                                     <p className="text-gray-500 dark:text-gray-400">@{user.username}</p>

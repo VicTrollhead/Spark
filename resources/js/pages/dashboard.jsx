@@ -19,9 +19,9 @@ export default function Dashboard() {
             <div className="p-6">
                 <h1 className="text-2xl font-bold mb-4">All Users</h1>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {users.map((user) => (
-                        <Link key={user.id} href={`/user/${user.id}`} className="block p-4 border rounded-md hover:shadow-md transition-shadow dark:border-gray-700 dark:bg-gray-800">
+                        <Link key={user.id} href={`/user/${user.username}`} className="block p-4 border rounded-md hover:shadow-md transition-shadow dark:border-gray-700 dark:bg-gray-800">
                             <div className="flex items-center space-x-3">
                                 <Avatar className="h-10 w-10">
                                     <AvatarImage src={user.profile_image_url} alt={user.name} />

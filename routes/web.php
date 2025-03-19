@@ -14,12 +14,11 @@ Route::get('/', function () {
 Route::post('/api/auth/google/callback', [GoogleAuthController::class, 'callback']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
-//    Route::get('dashboard', function () {
-//        return Inertia::render('dashboard');
-//    })->name('dashboard');]
     Route::get('dashboard', [UserController::class, 'index'])->name('dashboard');
 
     Route::get('/user', [UserController::class, 'show'])->name('user.show');
+    Route::get('/user/{user}/edit', [UserController::class, 'edit'])->name('user.edit');
+    Route::patch('/user/{user}/update', [UserController::class, 'update'])->name('user.update');
     Route::get('/user/{user}', [UserController::class, 'show'])->name('user.show');
 
     Route::post('/user/{user}/follow', [FollowController::class, 'follow'])->name('user.follow');
@@ -27,6 +26,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/is-following/{user}', [FollowController::class, 'isFollowing'])->name('isFollowing');
     Route::get('/user/{user}/followers', [FollowController::class, 'followers'])->name('user.followers');
     Route::get('/user/{user}/following', [FollowController::class, 'following'])->name('user.following');
+
+
 
 
 

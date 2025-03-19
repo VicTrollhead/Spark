@@ -1,4 +1,4 @@
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider } from './ui/sidebar';
 import { useState } from 'react';
 
 export function AppShell({ children, variant = 'header' }) {
