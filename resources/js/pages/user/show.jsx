@@ -3,12 +3,13 @@ import { Check, MapPin, Globe, Calendar, UserCheck, AlertCircle } from 'lucide-r
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
+import Post from '../post/post';
 
 export default function Show() {
-    const { user, auth } = usePage().props;
+    const { user, auth, posts } = usePage().props;
     const getInitials = useInitials();
-
     const { get, post, processing } = useForm();
+
 
     const handleFollow = () => {
         if (user.is_following) {
@@ -63,7 +64,6 @@ export default function Show() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${user.name} (@${user.username})`} />
 
-            {/* Profile Header */}
             <div className="relative h-48 w-full bg-gray-200 sm:h-56 dark:bg-gray-800">
                 {user.cover_image_url && (
                     <img src={user.cover_image_url} alt="Cover Image" className="h-full w-full object-cover" />
@@ -78,11 +78,10 @@ export default function Show() {
                 </div>
             </div>
 
-            {/* Profile Info */}
             <div className="space-y-2 p-6 pt-12 sm:pt-16">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-x-5">
                     <div>
-                        <div className="flex items-center">
+                        <div className="flex items-center mt-2">
                             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user.name}</h1>
                             {user.is_verified && (
                                 <div className="group relative ml-2">
@@ -95,8 +94,7 @@ export default function Show() {
                                 </div>
                             )}
                         </div>
-
-                        <p className="text-gray-500 dark:text-gray-400">@{user.username}</p>
+                        <p className="text-gray-500 dark:text-gray-400 mt-1">@{user.username}</p>
                     </div>
                     {!isOwnProfile && (
                         <button
@@ -112,18 +110,30 @@ export default function Show() {
                         </button>
                     )}
                     {isOwnProfile && (
-                        <button
-                            onClick={handleEditProfile}
-                            className="px-4 py-2 border-2 rounded-3xl text-ray-800 hover:bg-gray-300 dark:text-gray-200 dark:hover:bg-gray-700"
-                        >
-                            Edit Profile
-                        </button>
+                        <div className="flex flex-col items-center sm:items-end ml-6 sm:ml-10 space-y-2">
+                            <button
+                                onClick={handleEditProfile}
+                                className="px-4 py-2 border-2 rounded-3xl text-gray-800 hover:bg-gray-300 dark:text-gray-200 dark:hover:bg-gray-700"
+                            >
+                                Edit Profile
+                            </button>
+
+                            {(!user.bio || !user.location || !user.website || !user.date_of_birth) && (
+                                <div className="flex items-center gap-2 bg-blue-100 text-blue-600 px-3 py-2 rounded-lg text-sm dark:bg-gray-800 dark:text-blue-400 sm:w-auto w-full">
+                                    <AlertCircle className="h-4 w-4" />
+                                    <p className="leading-tight">
+                                        Complete your profile.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
                     )}
+
+
                 </div>
 
                 {user.bio && <p className="text-gray-700 dark:text-gray-300">{user.bio}</p>}
 
-                {/* User Details */}
                 <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                     {user.location && (
                         <div className="flex items-center gap-1">
@@ -165,7 +175,6 @@ export default function Show() {
                     )}
                 </div>
 
-                {/* Followers and Following Links */}
                 <div className="flex gap-4 text-gray-700 dark:text-gray-300 mt-4">
                     <Link href={`/user/${user.username}/followers`} className="hover:underline">
                         <strong>{user.followers_count}</strong> Followers
@@ -173,6 +182,16 @@ export default function Show() {
                     <Link href={`/user/${user.username}/following`} className="hover:underline">
                         <strong>{user.following_count}</strong> Following
                     </Link>
+                </div>
+            </div>
+            <div className="mt-6">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white px-6">Posts</h2>
+                <div className="divide-y divide-gray-200 dark:divide-gray-800">
+                    {posts.length > 0 ? (
+                        posts.map((post) => <Post key={post.id} post={post} auth={auth} />)
+                    ) : (
+                        <p className="text-gray-500 dark:text-gray-400 px-6 py-4">No posts yet.</p>
+                    )}
                 </div>
             </div>
         </AppLayout>

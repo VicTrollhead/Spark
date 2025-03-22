@@ -32,6 +32,22 @@ class UserController extends Controller
 
         $user->loadCount(['followers', 'following']);
 
+        $posts = $user->posts()
+            ->with(['user', 'comments', 'likes'])
+            ->latest()
+            ->get()
+            ->map(function ($post) use ($currentUser) {
+                return [
+                    'id' => $post->id,
+                    'content' => $post->content,
+                    'created_at' => $post->created_at,
+                    'user' => $post->user,
+                    'likes_count' => $post->likes->count(),
+                    'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                    'comments_count' => $post->comments->count(),
+                ];
+            });
+
         return Inertia::render('user/show', [
             'user' => [
                 'id' => $user->id,
@@ -49,10 +65,10 @@ class UserController extends Controller
                 'created_at' => $canViewFullProfile ? $user->created_at->format('F j, Y') : null,
                 'followers_count' => $user->followers_count,
                 'following_count' => $user->following_count,
-//                'is_following' => $currentUser && $user->followers()->where('follower_id', $currentUser->id)->exists(),
                 'is_following' => Auth::check() && $user->followers()->where('follower_id', Auth::id())->exists(),
                 'canViewFullProfile' => $canViewFullProfile,
             ],
+            'posts' => $posts
         ]);
     }
 
@@ -96,6 +112,8 @@ class UserController extends Controller
             'date_of_birth' => ['nullable', 'date'],
             'profile_image' => ['nullable', 'image', 'mimes:jpg,png,jpeg,gif', 'max:2048'],
             'cover_image' => ['nullable', 'image', 'mimes:jpg,png,jpeg,gif', 'max:4096'],
+            'is_private' => ['required', 'boolean'],
+            'status' => ['required', Rule::in(['active', 'suspended', 'deactivated'])],
         ]);
 
         if ($request->hasFile('profile_image')) {
@@ -115,6 +133,6 @@ class UserController extends Controller
         $user->update($validated);
 
 
-        return redirect()->route('user.show', $user)->with('success', 'Profile updated successfully.');
+        return redirect()->route('user.show', $user->username)->with('success', 'Profile updated successfully.');
     }
 }

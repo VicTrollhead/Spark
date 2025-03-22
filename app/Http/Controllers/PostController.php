@@ -19,7 +19,7 @@ class PostController extends Controller
     public function index(): Response
     {
         return Inertia::render('Posts/Index', [
-            'posts' => Post::with(['user', 'parentPost', 'replies', 'likes', 'comments'])->get(),
+            'posts' => Post::with(['user', 'parentPost', 'likes', 'comments'])->get(),
         ]);
     }
 
@@ -60,10 +60,23 @@ class PostController extends Controller
      */
     public function show(Post $post): Response
     {
+        $user = Auth::user();
+
+        $post->load(['user', 'parentPost', 'replies', 'likes', 'comments']);
+
         return Inertia::render('Posts/Show', [
-            'post' => $post->load(['user', 'parentPost', 'replies', 'likes', 'comments']),
+            'post' => [
+                'id' => $post->id,
+                'content' => $post->content,
+                'created_at' => $post->created_at,
+                'user' => $post->user,
+                'likes_count' => $post->likes()->count(),
+                'is_liked' => $user && $post->likes()->where('user_id', $user->id)->exists(),
+                'comments_count' => $post->comments()->count(),
+            ],
         ]);
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -96,7 +109,12 @@ class PostController extends Controller
      */
     public function destroy(Post $post): RedirectResponse
     {
+        if (Auth::id() !== $post->user_id) {
+            return Redirect::back()->with(['error' => 'Unauthorized'], 403);
+        }
+
         $post->update(['is_deleted' => true]);
-        return Redirect::route('posts.index')->with('success', 'Post deleted successfully.');
+
+        return Redirect::back()->with(['message' => 'Post deleted successfully']);
     }
 }

@@ -3,6 +3,8 @@
 //use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\FollowController;
+use App\Http\Controllers\LikeController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -26,6 +28,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/is-following/{user}', [FollowController::class, 'isFollowing'])->name('isFollowing');
     Route::get('/user/{user}/followers', [FollowController::class, 'followers'])->name('user.followers');
     Route::get('/user/{user}/following', [FollowController::class, 'following'])->name('user.following');
+
+    Route::get('/posts', [PostController::class, 'index']);
+    Route::post('/posts', [PostController::class, 'store']);
+    Route::get('/post/{post}', [PostController::class, 'show'])->name('post.show');
+    Route::delete('/posts/{post}', [PostController::class, 'destroy']);
+
+    Route::post('/post/{post}/like', [LikeController::class, 'like'])->name('post.like');
+    Route::post('/post/{post}/unlike', [LikeController::class, 'unlike'])->name('post.unlike');
+    Route::get('/post/{post}/is-liked', [LikeController::class, 'isLiked'])->name('post.isLiked');
+
 
 
 
