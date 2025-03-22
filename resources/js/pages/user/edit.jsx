@@ -41,7 +41,7 @@ export default function Edit() {
             ]}
         >
             <Head title="Edit My Profile" />
-            <div className="mx-auto max-w-5xl w-3/4 p-10">
+            <div className="mx-auto w-3/4 max-w-5xl p-10">
                 <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Edit Profile</h1>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="flex items-center gap-4">
@@ -49,18 +49,21 @@ export default function Edit() {
                             <AvatarImage src={user.profile_image_url} alt={user.name} />
                             <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                         </Avatar>
-                        <input type="file" onChange={(e) => setData('profile_image', e.target.files[0])} className="text-sm text-gray-500" />
+                        <div>
+                            <label className="mb-2 block text-gray-700 dark:text-gray-200">
+                                Profile Image
+                                <span className="text-gray-500"> ({user.profile_image_url || 'Not Set'})</span>
+                            </label>
+                            <input type="file" onChange={(e) => setData('profile_image', e.target.files[0])} className="text-sm text-gray-500" />
+                        </div>
                     </div>
 
                     <div>
                         <label className="mb-2 block text-gray-700 dark:text-gray-200">
                             Cover Image
+                            <span className="text-gray-500"> ({user.cover_image_url || 'Not Set'})</span>
                         </label>
-                        <input
-                            type="file"
-                            onChange={(e) => setData('cover_image', e.target.files[0])}
-                            className="text-sm text-gray-500"
-                        />
+                        <input type="file" onChange={(e) => setData('cover_image', e.target.files[0])} className="text-sm text-gray-500" />
                     </div>
 
                     <div>
@@ -120,7 +123,9 @@ export default function Edit() {
 
                     {/* Private Account Toggle */}
                     <div className="flex items-center justify-between">
-                        <label className="text-gray-700 dark:text-gray-200">Private Account</label>
+                        <label className="text-gray-700 dark:text-gray-200">
+                            Private Account <span className="text-gray-500">({user.is_private ? 'Yes' : 'No'})</span>
+                        </label>
                         <Switch checked={data.is_private} onChange={(value) => setData('is_private', value)} />
                     </div>
 
@@ -133,7 +138,9 @@ export default function Edit() {
                     {/*</div>*/}
 
                     <div>
-                        <label className="mb-1 block text-gray-700 dark:text-gray-300">Status</label>
+                        <label className="mb-1 block text-gray-700 dark:text-gray-300">
+                            Status <span className="text-gray-500">({user.status})</span>
+                        </label>
                         <Select value={data.status} onValueChange={(value) => setData('status', value)}>
                             <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Select Status" />
