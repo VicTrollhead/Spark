@@ -8,7 +8,7 @@ export default function Followers() {
     const isOwnProfile = auth.user && auth.user.id === user.id;
 
     const breadcrumbs = [
-        { title: isOwnProfile ? 'My Profile' : user.name + "'s Profile", href: `/user/${user.username}` },
+        { title: isOwnProfile ? 'My Profile' : "@" + user.username + "'s Profile", href: `/user/${user.username}` },
         { title:  'Followers', href: `/user/${user.username}` },
     ];
 

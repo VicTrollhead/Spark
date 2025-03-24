@@ -58,22 +58,46 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Post $post): Response
+    public function show(Post $post)
     {
-        $user = Auth::user();
+        $currentUser = Auth::user();
 
-        $post->load(['user', 'parentPost', 'replies', 'likes', 'comments']);
+        $post->load(['user', 'likes']);
 
-        return Inertia::render('Posts/Show', [
+        $comments = $post->comments()
+            ->with('user')
+            ->latest()
+            ->get()
+            ->map(function ($comment) {
+                return [
+                    'id' => $comment->id,
+                    'content' => $comment->content,
+                    'created_at' => $comment->created_at->format('n/j/Y'),
+                    'user' => [
+                        'id' => $comment->user->id,
+                        'name' => $comment->user->name,
+                        'username' => $comment->user->username,
+                        'profile_image_url' => $comment->user->profile_image_url,
+                    ],
+                ];
+            });
+
+        return Inertia::render('post/show-post', [
             'post' => [
                 'id' => $post->id,
                 'content' => $post->content,
-                'created_at' => $post->created_at,
-                'user' => $post->user,
-                'likes_count' => $post->likes()->count(),
-                'is_liked' => $user && $post->likes()->where('user_id', $user->id)->exists(),
-                'comments_count' => $post->comments()->count(),
-            ],
+                'created_at' => $post->created_at->format('n/j/Y'),
+                'user' => [
+                    'id' => $post->user->id,
+                    'name' => $post->user->name,
+                    'username' => $post->user->username,
+                    'profile_image_url' => $post->user->profile_image_url,
+                ],
+                'likes_count' => $post->likes->count(),
+                'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                'comments_count' => $comments->count(),
+                'comments' => $comments,
+            ]
         ]);
     }
 

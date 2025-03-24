@@ -40,7 +40,7 @@ class UserController extends Controller
                 return [
                     'id' => $post->id,
                     'content' => $post->content,
-                    'created_at' => $post->created_at,
+                    'created_at' => $post->created_at->format('n/j/Y'),
                     'user' => $post->user,
                     'likes_count' => $post->likes->count(),
                     'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,

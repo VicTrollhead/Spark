@@ -3,7 +3,7 @@ import { Check, MapPin, Globe, Calendar, UserCheck, AlertCircle } from 'lucide-r
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
-import Post from '../post/post';
+import PostComponent from '../post/post-component';
 
 export default function Show() {
     const { user, auth, posts } = usePage().props;
@@ -26,7 +26,7 @@ export default function Show() {
     const isOwnProfile = auth.user && auth.user.id === user.id;
 
     const breadcrumbs = [
-        { title: isOwnProfile ? 'My Profile' : user.name + "'s Profile", href: `/user/${user.username}` },
+        { title: isOwnProfile ? 'My Profile' : "@" + user.username + "'s Profile", href: `/user/${user.username}` },
     ];
 
     if (!user.canViewFullProfile) {
@@ -184,11 +184,11 @@ export default function Show() {
                     </Link>
                 </div>
             </div>
-            <div className="mt-6">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white px-6">Posts</h2>
+            <div className="mt-3">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white px-6 py-1">Posts</h2>
                 <div className="divide-y divide-gray-200 dark:divide-gray-800">
                     {posts.length > 0 ? (
-                        posts.map((post) => <Post key={post.id} post={post} auth={auth} />)
+                        posts.map((post) => <PostComponent key={post.id} post={post} auth={auth} />)
                     ) : (
                         <p className="text-gray-500 dark:text-gray-400 px-6 py-4">No posts yet.</p>
                     )}

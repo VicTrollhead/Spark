@@ -41,7 +41,7 @@ export default function Edit() {
             ]}
         >
             <Head title="Edit My Profile" />
-            <div className="mx-auto w-3/4 max-w-5xl p-10">
+            <div className="mx-auto w-11/12 max-w-7xl py-2">
                 <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Edit Profile</h1>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="flex items-center gap-4">
@@ -160,7 +160,7 @@ export default function Edit() {
                         >
                             Cancel
                         </Link>
-                        <Button type="submit" disabled={processing} className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+                        <Button type="submit" disabled={processing} className="rounded-md bg-blue-600 px-4 py-5 text-white hover:bg-blue-700">
                             Save Changes
                         </Button>
                     </div>
