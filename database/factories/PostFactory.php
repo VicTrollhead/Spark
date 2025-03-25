@@ -22,7 +22,8 @@ class PostFactory extends Factory
         return [
             'user_id' => User::factory(),
             'content' => $this->faker->paragraph,
-//            'post_type' => $this->faker->randomElement(['text', 'image', 'video', 'poll']),
+            'parent_post_id' => null,
+            'media_url' => null,
             'is_deleted' => false,
             'is_public' => true,
         ];

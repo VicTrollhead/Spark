@@ -32,10 +32,9 @@ class UserController extends Controller
         $canViewFullProfile = Gate::allows('view', $user);
 
         $user->loadCount(['followers', 'following']);
-        $user->load(['profileImage', 'coverImage']);
 
         $posts = $user->posts()
-            ->with(['user', 'comments', 'likes', 'media'])
+            ->with(['user', 'comments', 'likes'])
             ->latest()
             ->get()
             ->map(function ($post) use ($currentUser) {
@@ -43,11 +42,11 @@ class UserController extends Controller
                     'id' => $post->id,
                     'content' => $post->content,
                     'created_at' => $post->created_at->format('n/j/Y'),
+                    'media_url' => $post->media_url,
                     'user' => $post->user,
                     'likes_count' => $post->likes->count(),
                     'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
                     'comments_count' => $post->comments->count(),
-                    'media_urls' => $post->media->pluck('file_path'),
                 ];
             });
 
@@ -57,8 +56,8 @@ class UserController extends Controller
                 'username' => $user->username,
                 'name' => $canViewFullProfile ? $user->name : null,
                 'bio' => $canViewFullProfile ? $user->bio : null,
-                'profile_image_url' => optional($user->profileImage)->file_path,
-                'cover_image_url' => $canViewFullProfile ? optional($user->coverImage)->file_path : null,
+                'profile_image_url' => $user->profile_image_url,
+                'cover_image_url' => $canViewFullProfile ? $user->cover_image_url : null,
                 'location' => $canViewFullProfile ? $user->location : null,
                 'website' => $canViewFullProfile ? $user->website : null,
                 'date_of_birth' => $canViewFullProfile ? optional($user->date_of_birth)->format('F j, Y') : null,
@@ -95,6 +94,7 @@ class UserController extends Controller
                         'username' => $post->user->username,
                         'profile_image_url' => $post->user->profile_image_url,
                     ],
+                    'media_url' => $post->media_url,
                     'likes_count' => $post->likes->count(),
                     'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
                     'comments_count' => $post->comments->count(),

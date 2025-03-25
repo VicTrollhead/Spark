@@ -44,6 +44,7 @@ class PostController extends Controller
             'content' => $request->content_,
             'parent_post_id' => $request->parent_post_id,
 //            'post_type' => $request->post_type,
+            'media_url' => $request->media_url,
             'is_public' => $request->is_public,
         ]);
 
@@ -81,6 +82,7 @@ class PostController extends Controller
             'post' => [
                 'id' => $post->id,
                 'content' => $post->content,
+                'media_url' => $post->media_url,
                 'created_at' => $post->created_at->format('n/j/Y'),
                 'user' => [
                     'id' => $post->user->id,

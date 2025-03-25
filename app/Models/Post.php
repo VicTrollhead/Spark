@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Post extends Model
 {
@@ -16,6 +15,7 @@ class Post extends Model
         'content',
         'parent_post_id',
 //        'post_type',
+        'media_url',
         'is_deleted',
         'is_public',
         'likes_count',
@@ -48,33 +48,5 @@ class Post extends Model
     public function comments() : HasMany
     {
         return $this->hasMany(Comment::class);
-    }
-
-    public function media(): MorphMany
-    {
-        return $this->morphMany(Media::class, 'mediable');
-    }
-
-    /**
-     * Get all images related to the post.
-     */
-    public function images()
-    {
-        return $this->media()->where('file_type', 'image');
-    }
-
-    /**
-     * Get all videos related to the post.
-     */
-    public function videos()
-    {
-        return $this->media()->where('file_type', 'video');
-    }
-
-    public function toArray()
-    {
-        return array_merge(parent::toArray(), [
-            'media_urls' => $this->media->pluck('file_path'),
-        ]);
     }
 }
