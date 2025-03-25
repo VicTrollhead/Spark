@@ -14,7 +14,6 @@ class Post extends Model
         'user_id',
         'content',
         'parent_post_id',
-//        'post_type',
         'media_url',
         'is_deleted',
         'is_public',

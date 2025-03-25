@@ -24,7 +24,6 @@ class StorePostRequest extends FormRequest
         return [
             'content_' => ['required', 'string', 'max:5000'],
             'parent_post_id' => ['nullable', 'exists:posts,id'],
-//            'post_type' => ['required', 'string'],
             'media_url' => ['nullable', 'string', 'max:255'],
             'is_public' => ['required', 'boolean'],
         ];

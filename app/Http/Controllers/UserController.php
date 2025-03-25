@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Gate;
 class UserController extends Controller
 {
     use AuthorizesRequests;
+
     /**
      * Display the specified user's profile.
      */
@@ -151,17 +152,17 @@ class UserController extends Controller
             'status' => ['required', Rule::in(['active', 'suspended', 'deactivated'])],
         ]);
 
-        // Save profile image
+// Save profile image
         if ($request->hasFile('profile_image')) {
             $path = $request->file('profile_image')->store('profiles');
 
-            // Delete old profile image if exists
+// Delete old profile image if exists
             if ($user->profileImage) {
                 Storage::delete($user->profileImage->file_path);
                 $user->profileImage()->delete();
             }
 
-            // Store new profile image in media table
+// Store new profile image in media table
             $user->media()->create([
                 'file_path' => $path,
                 'type' => 'image',
@@ -169,17 +170,17 @@ class UserController extends Controller
             ]);
         }
 
-        // Save cover image
+// Save cover image
         if ($request->hasFile('cover_image')) {
             $path = $request->file('cover_image')->store('covers');
 
-            // Delete old cover image if exists
+// Delete old cover image if exists
             if ($user->coverImage) {
                 Storage::delete($user->coverImage->file_path);
                 $user->coverImage()->delete();
             }
 
-            // Store new cover image in media table
+// Store new cover image in media table
             $user->media()->create([
                 'file_path' => $path,
                 'type' => 'image',
