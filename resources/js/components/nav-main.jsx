@@ -1,10 +1,10 @@
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from './ui/sidebar.jsx';
 import { Link, usePage } from '@inertiajs/react';
 
 export function NavMain({ items = [] }) {
     const page = usePage();
-    return (<SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel>Platform</SidebarGroupLabel>
+    return (<SidebarGroup className="px-2 py-2">
+            {/*<SidebarGroupLabel></SidebarGroupLabel>*/}
             <SidebarMenu>
                 {items.map((item) => (<SidebarMenuItem key={item.title}>
                         <SidebarMenuButton asChild isActive={item.url === page.url}>

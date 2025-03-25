@@ -13,8 +13,6 @@ class Like extends Model
         'user_id',
         'post_id',
         'is_deleted',
-//        'created_at',
-//        'updated_at',
     ];
 
     public $timestamps = false;

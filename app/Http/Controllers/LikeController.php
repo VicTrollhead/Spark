@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,85 +12,49 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rule;
 
+
 class LikeController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Like a post.
      */
-    public function index(): Response
+    public function like(Post $post): RedirectResponse
     {
-        return Inertia::render('Likes/Index', [
-            'likes' => Like::with(['user', 'post'])->get(),
-        ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(): Response
-    {
-        return Inertia::render('Likes/Create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            'post_id' => ['required', Rule::exists('posts', 'id')],
-            'is_deleted' => ['boolean'],
-        ]);
-
-        Like::create([
+        Like::firstOrCreate([
             'user_id' => Auth::id(),
-            'post_id' => $validated['post_id'],
-            'is_deleted' => $validated['is_deleted'] ?? false,
+            'post_id' => $post->id,
         ]);
 
-        return Redirect::route('likes.index')->with('success', 'Like added successfully.');
+        return back()->with('success', 'Post liked successfully.');
     }
 
+
     /**
-     * Display the specified resource.
+     * Unlike a post.
      */
-    public function show(Like $like): Response
+    public function unlike(Post $post): RedirectResponse
     {
-        return Inertia::render('Likes/Show', [
-            'like' => $like->load(['user', 'post']),
-        ]);
+        Like::where([
+            'user_id' => Auth::id(),
+            'post_id' => $post->id,
+        ])->delete();
+
+        return back()->with('success', 'Post unliked successfully.');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Like $like): Response
-    {
-        return Inertia::render('Likes/Edit', [
-            'like' => $like,
-        ]);
-    }
 
     /**
-     * Update the specified resource in storage.
+     * Check if the authenticated user has liked a post.
      */
-    public function update(Request $request, Like $like): RedirectResponse
+    public function isLiked(Post $post, Request $request)
     {
-        $validated = $request->validate([
-            'is_deleted' => ['required', 'boolean'],
-        ]);
+        $userId = Auth::id();
+        $postId = $post->post_id;
 
-        $like->update($validated);
+        $isLiked = Like::where('user_id', $userId)
+            ->where('post_id', $postId)
+            ->exists();
 
-        return Redirect::route('likes.index')->with('success', 'Like updated successfully.');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Like $like): RedirectResponse
-    {
-        $like->delete();
-        return Redirect::route('likes.index')->with('success', 'Like deleted successfully.');
+        return back()->with(['liked' => $isLiked]);
     }
 }
