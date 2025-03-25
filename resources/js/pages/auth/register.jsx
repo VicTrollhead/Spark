@@ -1,5 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
+import { EyeOff, LoaderCircle } from 'lucide-react';
 
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { useState } from 'react';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -15,6 +16,17 @@ export default function Register() {
         password: '',
         password_confirmation: '',
     });
+
+    const [passwordVisible, setPasswordVisible] = useState(false);
+    const [cpasswordVisible, setCPasswordVisible] = useState(false);
+    function togglePasswordVisibility() {
+        setPasswordVisible((prev) => !prev);
+    }
+
+    function toggleCPasswordVisibility() {
+        setCPasswordVisible((prev) => !prev);
+    }
+
 
     const submit = (e) => {
         e.preventDefault();
@@ -41,13 +53,26 @@ export default function Register() {
 
                     <div className="grid gap-2">
                         <Label htmlFor="password">Password</Label>
-                        <Input id="password" type="password" required tabIndex={3} autoComplete="new-password" value={data.password} onChange={(e) => setData('password', e.target.value)} disabled={processing} placeholder="Password"/>
+                        <div className="flex gap-1.5">
+                            <Input id="password" type={passwordVisible ? "text" : "password"} required tabIndex={2} autoComplete="current-password" value={data.password}
+                                   onChange={(e) => setData('password', e.target.value)} placeholder="Password"/>
+                            <button type="button" className=" flex items-center" onClick={togglePasswordVisibility}>
+                                <EyeOff className="h-5 w-5 hover:cursor-pointer"/>
+                            </button>
+                        </div>
+
                         <InputError message={errors.password}/>
                     </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="password_confirmation">Confirm password</Label>
-                        <Input id="password_confirmation" type="password" required tabIndex={4} autoComplete="new-password" value={data.password_confirmation} onChange={(e) => setData('password_confirmation', e.target.value)} disabled={processing} placeholder="Confirm password"/>
+                        <div className="flex gap-1.5">
+                            <Input id="password_confirmation" type={cpasswordVisible ? "text" : "password"} required tabIndex={4} autoComplete="new-password" value={data.password_confirmation}
+                                   onChange={(e) => setData('password_confirmation', e.target.value)} disabled={processing} placeholder="Confirm password"/>
+                            <button type="button" className=" flex items-center" onClick={toggleCPasswordVisibility}>
+                                <EyeOff className="h-5 w-5 hover:cursor-pointer"/>
+                            </button>
+                        </div>
                         <InputError message={errors.password_confirmation}/>
                     </div>
 

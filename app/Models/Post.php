@@ -16,7 +16,7 @@ class Post extends Model
         'parent_post_id',
         'media_url',
         'is_deleted',
-        'is_public',
+        'is_private',
         'likes_count',
         'is_liked',
         'comments_count',

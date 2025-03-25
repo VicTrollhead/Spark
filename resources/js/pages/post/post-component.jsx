@@ -27,7 +27,7 @@ export default function PostComponent({ post }) {
     return (
         <div className="border-b border-gray-200 p-4 dark:border-gray-800">
             <div className="flex items-start space-x-3">
-                <Avatar className="h-12 w-12">
+                <Avatar className="h-16 w-16">
                     <AvatarImage src={post.user.profile_image_url} alt={post.user.name} />
                     <AvatarFallback className="rounded-full bg-gray-300 text-black dark:bg-gray-700 dark:text-white">
                         {getInitials(post.user.name)}

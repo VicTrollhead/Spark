@@ -96,6 +96,7 @@ class UserController extends Controller
                         'profile_image_url' => $post->user->profile_image_url,
                     ],
                     'media_url' => $post->media_url,
+                    'is_private' => $post->is_private,
                     'likes_count' => $post->likes->count(),
                     'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
                     'comments_count' => $post->comments->count(),

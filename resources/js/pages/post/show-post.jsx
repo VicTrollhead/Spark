@@ -13,7 +13,7 @@ export default function Show() {
     const isOwnPost = auth.user && auth.user.id === post.user.id;
 
     const breadcrumbs = [
-        { title: isOwnPost ? 'My Profile' : '@'+ post.user.username + "'s Profile", href: isOwnPost ? `/user/${auth.user.username}` : `/user/${post.user.username}` },
+        { title: isOwnPost ? 'My Profile' : '@'+ post.user.username + "'s Profile", href:`/user/${post.user.username}` },
         { title: "Post by @"+ post.user.username, href: `/post/${post.id}` },
     ];
 

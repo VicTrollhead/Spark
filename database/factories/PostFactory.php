@@ -25,7 +25,7 @@ class PostFactory extends Factory
             'parent_post_id' => null,
             'media_url' => null,
             'is_deleted' => false,
-            'is_public' => true,
+            'is_private' => false,
         ];
     }
 }

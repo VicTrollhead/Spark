@@ -52,7 +52,7 @@ export default function Edit() {
                         <div>
                             <label className="mb-2 block text-gray-700 dark:text-gray-200">
                                 Profile Image
-                                <span className="text-gray-500"> ({user.profile_image_url || 'Not Set'})</span>
+                                <span className="text-gray-500 break-all"> ({user.profile_image_url || 'Not Set'})</span>
                             </label>
                             <input type="file" onChange={(e) => setData('profile_image', e.target.files[0])} className="text-sm text-gray-500" />
                         </div>
@@ -129,13 +129,6 @@ export default function Edit() {
                         <Switch checked={data.is_private} onChange={(value) => setData('is_private', value)} />
                     </div>
 
-                    {/*<div className="flex items-center justify-between">*/}
-                    {/*    <label className="text-gray-700 dark:text-gray-300">Private Account</label>*/}
-                    {/*    <Switch*/}
-                    {/*        checked={data.is_private}*/}
-                    {/*        onChange={(value) => setData("is_private", value)}*/}
-                    {/*    />*/}
-                    {/*</div>*/}
 
                     <div>
                         <label className="mb-1 block text-gray-700 dark:text-gray-300">

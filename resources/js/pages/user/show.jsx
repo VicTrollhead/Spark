@@ -64,12 +64,12 @@ export default function Show() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${user.name} (@${user.username})`} />
 
-            <div className="relative h-48 w-full bg-gray-200 sm:h-56 dark:bg-gray-800">
+            <div className="relative h-56 w-full bg-gray-200 sm:h-72 dark:bg-gray-800">
                 {user.cover_image_url && (
                     <img src={user.cover_image_url} alt="Cover Image" className="h-full w-full object-cover" />
                 )}
-                <div className="absolute bottom-[-40px] left-4 sm:left-6">
-                    <Avatar className="h-24 w-24 border-4 border-white sm:h-28 sm:w-28 dark:border-gray-900">
+                <div className="absolute bottom-[-55px] left-4 sm:left-6">
+                    <Avatar className="h-32 w-32 border-4 border-white sm:h-36 sm:w-36 dark:border-gray-900">
                         <AvatarImage src={user.profile_image_url} alt={user.name} />
                         <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
                             {getInitials(user.name)}

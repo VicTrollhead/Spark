@@ -45,7 +45,7 @@ class PostController extends Controller
             'parent_post_id' => $request->parent_post_id,
 //            'post_type' => $request->post_type,
             'media_url' => $request->media_url,
-            'is_public' => $request->is_public,
+            'is_private' => $request->is_private,
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Post created successfully!');
@@ -117,7 +117,7 @@ class PostController extends Controller
         $validated = $request->validate([
             'content' => ['required', 'string', 'max:5000'],
             'post_type' => ['required', 'string'],
-            'is_public' => ['required', 'boolean'],
+            'is_private' => ['required', 'boolean'],
         ]);
 
         $post->update($validated);

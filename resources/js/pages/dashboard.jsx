@@ -11,7 +11,8 @@ export default function Dashboard() {
         content_: '',
         parent_post_id: null,
         // post_type: 'text',
-        is_public: true,
+        media_url: null,
+        is_private: false,
     });
 
     const breadcrumbs = [
@@ -25,10 +26,9 @@ export default function Dashboard() {
             content_: data.content_,
             parent_post_id: data.parent_post_id,
             post_type: data.post_type,
-            is_public: data.is_public,
+            is_private: data.is_private,
         });
-        setData({ content_: '', parent_post_id: null, is_public: true });
-        //setData({ content_: '', parent_post_id: null, post_type: 'text', is_public: true });
+        setData({ content_: '', parent_post_id: null, media_url: null, is_private: false });
     };
 
     return (
@@ -50,24 +50,14 @@ export default function Dashboard() {
                     />
                     {errors.content_ && <p className="text-red-500 text-sm">{errors.content_}</p>}
 
-                    {/*<select*/}
-                    {/*    value={data.post_type}*/}
-                    {/*    onChange={(e) => setData('post_type', e.target.value)}*/}
-                    {/*    className="p-3 bg-gray-100 dark:bg-gray-700 rounded-md text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600"*/}
-                    {/*>*/}
-                    {/*    <option value="status">Text</option>*/}
-                    {/*    <option value="image">Image</option>*/}
-                    {/*    <option value="link">Link</option>*/}
-                    {/*</select>*/}
-
                     <label>
                         <input
                             type="checkbox"
-                            checked={data.is_public}
-                            onChange={(e) => setData('is_public', e.target.checked)}
+                            checked={data.is_private}
+                            onChange={(e) => setData('is_private', e.target.checked)}
                             className="mr-2"
                         />
-                        Public
+                        Private (Only for subscribers)
                     </label>
 
                     <button
@@ -86,10 +76,13 @@ export default function Dashboard() {
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white px-6 py-2">Posts</h2>
                 <div className="divide-y divide-gray-200 dark:divide-gray-800">
                     {posts.length > 0 ? (
-                        posts.map((post) => <PostComponent key={post.id} post={post} />)
+                        posts
+                            .filter((post) => !post.is_private)
+                            .map((post) => <PostComponent key={post.id} post={post} />)
                     ) : (
                         <p className="text-gray-500 dark:text-gray-400 px-6 py-4">No posts yet.</p>
                     )}
+
                 </div>
             </div>
         </AppLayout>
