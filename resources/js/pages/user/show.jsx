@@ -184,8 +184,8 @@ export default function Show() {
                     </Link>
                 </div>
             </div>
-            <div className="mt-3">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white px-6 py-1">Posts</h2>
+            <div className="mt-1">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white px-6 py-2">Posts</h2>
                 <div className="divide-y divide-gray-200 dark:divide-gray-800">
                     {posts.length > 0 ? (
                         posts.map((post) => <PostComponent key={post.id} post={post} auth={auth} />)

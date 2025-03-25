@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePostRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -34,25 +35,20 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StorePostRequest $request)
     {
-        $validated = $request->validate([
-            'content' => ['required', 'string', 'max:5000'],
-            'parent_post_id' => ['nullable', Rule::exists('posts', 'id')],
-            'post_type' => ['required', 'string'],
-            'is_public' => ['required', 'boolean'],
-        ]);
+        $request->validated();
 
-        Post::create([
+        $post = Post::create([
             'user_id' => Auth::id(),
-            'content' => $validated['content'],
-            'parent_post_id' => $validated['parent_post_id'] ?? null,
-            'post_type' => $validated['post_type'],
-            'is_deleted' => false,
-            'is_public' => $validated['is_public'],
+            'content' => $request->content_,
+            'parent_post_id' => $request->parent_post_id,
+//            'post_type' => $request->post_type,
+            'media_url' => $request->media_url,
+            'is_public' => $request->is_public,
         ]);
 
-        return Redirect::route('posts.index')->with('success', 'Post created successfully.');
+        return redirect()->route('dashboard')->with('success', 'Post created successfully!');
     }
 
     /**
@@ -86,6 +82,7 @@ class PostController extends Controller
             'post' => [
                 'id' => $post->id,
                 'content' => $post->content,
+                'media_url' => $post->media_url,
                 'created_at' => $post->created_at->format('n/j/Y'),
                 'user' => [
                     'id' => $post->user->id,

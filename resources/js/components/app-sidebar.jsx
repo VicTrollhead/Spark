@@ -3,7 +3,7 @@ import { NavMain } from './nav-main';
 import { NavUser } from './nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton } from './ui/sidebar';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, Home, User } from 'lucide-react';
+import { BookOpen, Folder, Home, User, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
@@ -17,6 +17,11 @@ export function AppSidebar() {
             title: 'Dashboard',
             url: '/dashboard',
             icon: Home,
+        },
+        {
+            title: 'Users',
+            url: '/dashboard/users',
+            icon: Users,
         },
         {
             title: 'Profile',

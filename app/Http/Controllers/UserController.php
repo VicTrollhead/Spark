@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Gate;
 class UserController extends Controller
 {
     use AuthorizesRequests;
+
     /**
      * Display the specified user's profile.
      */
@@ -41,6 +43,7 @@ class UserController extends Controller
                     'id' => $post->id,
                     'content' => $post->content,
                     'created_at' => $post->created_at->format('n/j/Y'),
+                    'media_url' => $post->media_url,
                     'user' => $post->user,
                     'likes_count' => $post->likes->count(),
                     'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
@@ -72,19 +75,39 @@ class UserController extends Controller
         ]);
     }
 
-
-
-    /**
-     * Display a list of users.
-     */
     public function index(): Response
     {
+        $currentUser = Auth::user();
+
         $users = User::select('id', 'name', 'username', 'profile_image_url')->get();
+
+        $posts = Post::with(['user', 'comments', 'likes'])
+            ->latest()
+            ->get()
+            ->map(function ($post) use ($currentUser) {
+                return [
+                    'id' => $post->id,
+                    'content' => $post->content,
+                    'created_at' => $post->created_at->format('n/j/Y'),
+                    'user' => [
+                        'id' => $post->user->id,
+                        'name' => $post->user->name,
+                        'username' => $post->user->username,
+                        'profile_image_url' => $post->user->profile_image_url,
+                    ],
+                    'media_url' => $post->media_url,
+                    'likes_count' => $post->likes->count(),
+                    'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                    'comments_count' => $post->comments->count(),
+                ];
+            });
 
         return Inertia::render('dashboard', [
             'users' => $users,
+            'posts' => $posts,
         ]);
     }
+
 
     /**
      * Show the edit profile page.
@@ -98,11 +121,24 @@ class UserController extends Controller
     }
 
     /**
+     * Display a list of users.
+     */
+    public function users(): Response
+    {
+        $users = User::select('id', 'name', 'username', 'profile_image_url')->get();
+
+        return Inertia::render('user-dashboard', [
+            'users' => $users,
+        ]);
+    }
+
+    /**
      * Update the user profile.
      */
     public function update(Request $request, User $user)
     {
         $this->authorize('update', $user);
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($user->id)],
@@ -116,22 +152,43 @@ class UserController extends Controller
             'status' => ['required', Rule::in(['active', 'suspended', 'deactivated'])],
         ]);
 
+// Save profile image
         if ($request->hasFile('profile_image')) {
-            if ($user->profile_image_url) {
-                Storage::delete($user->profile_image_url);
+            $path = $request->file('profile_image')->store('profiles');
+
+// Delete old profile image if exists
+            if ($user->profileImage) {
+                Storage::delete($user->profileImage->file_path);
+                $user->profileImage()->delete();
             }
-            $validated['profile_image_url'] = $request->file('profile_image')->store('profiles');
+
+// Store new profile image in media table
+            $user->media()->create([
+                'file_path' => $path,
+                'type' => 'image',
+                'category' => 'profile',
+            ]);
         }
 
+// Save cover image
         if ($request->hasFile('cover_image')) {
-            if ($user->cover_image_url) {
-                Storage::delete($user->cover_image_url);
+            $path = $request->file('cover_image')->store('covers');
+
+// Delete old cover image if exists
+            if ($user->coverImage) {
+                Storage::delete($user->coverImage->file_path);
+                $user->coverImage()->delete();
             }
-            $validated['cover_image_url'] = $request->file('cover_image')->store('covers');
+
+// Store new cover image in media table
+            $user->media()->create([
+                'file_path' => $path,
+                'type' => 'image',
+                'category' => 'cover',
+            ]);
         }
 
         $user->update($validated);
-
 
         return redirect()->route('user.show', $user->username)->with('success', 'Profile updated successfully.');
     }

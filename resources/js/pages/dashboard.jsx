@@ -1,44 +1,97 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { useState } from 'react';
+import { Head, usePage, useForm } from '@inertiajs/react';
 import AppLayout from '../layouts/app-layout';
-import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-import { useInitials } from '../hooks/use-initials';
+import PostComponent from './post/post-component';
 
 export default function Dashboard() {
-    const { users } = usePage().props;
-    const getInitials = useInitials();
+    const { users, posts } = usePage().props;
+
+    // Initialize the useForm hook with all required fields
+    const { data, setData, post, errors } = useForm({
+        content_: '',
+        parent_post_id: null,
+        // post_type: 'text',
+        is_public: true,
+    });
 
     const breadcrumbs = [
         { title: 'Dashboard', href: '/dashboard' },
-        { title: 'Users', href: '/dashboard/users' },
     ];
+
+    // Handle the form submission
+    const handlePostSubmit = (e) => {
+        e.preventDefault();
+        post('/dashboard', {
+            content_: data.content_,
+            parent_post_id: data.parent_post_id,
+            post_type: data.post_type,
+            is_public: data.is_public,
+        });
+        setData({ content_: '', parent_post_id: null, is_public: true });
+        //setData({ content_: '', parent_post_id: null, post_type: 'text', is_public: true });
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users Dashboard" />
 
-            <div className="p-6">
-                <h1 className="text-2xl font-bold mb-4">All Users</h1>
+            <div className="p-6 text-2xl font-extrabold">
+                What's new?
+            </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {users.map((user) => (
-                        <Link key={user.id} href={`/user/${user.username}`} className="block p-4 border rounded-md hover:shadow-md transition-shadow dark:border-gray-700 dark:bg-gray-800">
-                            <div className="flex items-center space-x-3">
-                                <Avatar className="h-10 w-10">
-                                    <AvatarImage src={user.profile_image_url} alt={user.name} />
-                                    <AvatarFallback className="rounded-full bg-gray-300 text-lg text-black dark:bg-gray-700 dark:text-white">
-                                        {getInitials(user.name)}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                    <h2 className="text-lg font-semibold">{user.name}</h2>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">@{user.username}</p>
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
+            <div className="p-4 bg-white dark:bg-gray-800 border rounded-lg">
+                <form onSubmit={handlePostSubmit} className="flex flex-col space-y-4">
+                    <textarea
+                        value={data.content_}
+                        onChange={(e) => setData('content_', e.target.value)}
+                        rows={3}
+                        placeholder="What's on your mind?"
+                        className="resize-none p-3 bg-gray-100 dark:bg-gray-700 rounded-md text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600"
+                    />
+                    {errors.content_ && <p className="text-red-500 text-sm">{errors.content_}</p>}
+
+                    {/*<select*/}
+                    {/*    value={data.post_type}*/}
+                    {/*    onChange={(e) => setData('post_type', e.target.value)}*/}
+                    {/*    className="p-3 bg-gray-100 dark:bg-gray-700 rounded-md text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600"*/}
+                    {/*>*/}
+                    {/*    <option value="status">Text</option>*/}
+                    {/*    <option value="image">Image</option>*/}
+                    {/*    <option value="link">Link</option>*/}
+                    {/*</select>*/}
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={data.is_public}
+                            onChange={(e) => setData('is_public', e.target.checked)}
+                            className="mr-2"
+                        />
+                        Public
+                    </label>
+
+                    <button
+                        type="submit"
+                        disabled={!data.content_}
+                        className={`self-end py-2 px-4 rounded-lg text-white ${
+                            data.content_ ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400'
+                        }`}
+                    >
+                        Post
+                    </button>
+                </form>
+            </div>
+
+            <div className="mt-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white px-6 py-2">Posts</h2>
+                <div className="divide-y divide-gray-200 dark:divide-gray-800">
+                    {posts.length > 0 ? (
+                        posts.map((post) => <PostComponent key={post.id} post={post} />)
+                    ) : (
+                        <p className="text-gray-500 dark:text-gray-400 px-6 py-4">No posts yet.</p>
+                    )}
                 </div>
             </div>
         </AppLayout>
     );
 }
-
