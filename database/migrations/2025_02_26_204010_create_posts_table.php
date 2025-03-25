@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->text('content');
             $table->foreignId('parent_post_id')->nullable()->constrained('posts')->onDelete('cascade');
-            $table->enum('post_type', ['text', 'image', 'video', 'poll', 'combined'])->default('text');
+//            $table->enum('post_type', ['text', 'image', 'video', 'poll', 'combined'])->default('text');
             $table->boolean('is_deleted')->default(false);
             $table->boolean('is_public')->default(true);
             $table->timestamps();

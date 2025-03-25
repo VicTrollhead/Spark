@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -24,8 +25,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'name',
         'bio',
-        'profile_image_url',
-        'cover_image_url',
+//        'profile_image_url',
+//        'cover_image_url',
         'location',
         'website',
         'date_of_birth',
@@ -61,15 +62,6 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    /**
-     * Automatically hash password when setting it.
-     */
-//    protected function password(): Attribute
-//    {
-//        return Attribute::make(
-//            set: fn ($value) => bcrypt($value),
-//        );
-//    }
 
     public function followers() : BelongsToMany
     {
@@ -92,6 +84,35 @@ class User extends Authenticatable implements MustVerifyEmail
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class, 'user_id');
+    }
+
+    public function media(): MorphMany
+    {
+        return $this->morphMany(Media::class, 'mediable');
+    }
+
+    /**
+     * Get the profile image for the user.
+     */
+    public function profileImage()
+    {
+        return $this->media()->where('file_type', 'image')->where('mediable_type', User::class)->first(); // Or you can adjust based on the 'file_type' logic you prefer.
+    }
+
+    /**
+     * Get the cover image for the user.
+     */
+    public function coverImage()
+    {
+        return $this->media()->where('file_type', 'image')->where('mediable_type', User::class)->first(); // Same here.
+    }
+
+    public function toArray()
+    {
+        return array_merge(parent::toArray(), [
+            'cover_image_url' => $this->coverImage()?->file_path,
+            'profile_image_url' => $this->profileImage()?->file_path,
+        ]);
     }
 
 }
