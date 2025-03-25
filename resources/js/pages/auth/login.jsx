@@ -41,7 +41,8 @@ export default function Login({ status, canResetPassword, googleClientId }) {
             })
                 .then((res) => res.json())
                 .then((data) => {
-                    window.location.href = "/dashboard";
+                    if(data.success)
+                        window.location.href = "/dashboard";
                 })
                 .catch((error) => console.error("Error:", error));
         };
