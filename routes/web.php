@@ -16,7 +16,7 @@ Route::get('/', function () {
 Route::post('/api/auth/google/callback', [GoogleAuthController::class, 'callback']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', [UserController::class, 'index'])->name('dashboard');
+    Route::get('dashboard', [PostController::class, 'index'])->name('dashboard');
     Route::get('dashboard/users', [UserController::class, 'users'])->name('dashboard.users');
 
     Route::get('/user', [UserController::class, 'show'])->name('user.show');
@@ -30,7 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/user/{user}/followers', [FollowController::class, 'followers'])->name('user.followers');
     Route::get('/user/{user}/following', [FollowController::class, 'following'])->name('user.following');
 
-    Route::get('/posts', [PostController::class, 'index']);
+//    Route::get('/posts', [PostController::class, 'index']);
     Route::post('/dashboard', [PostController::class, 'store'])->name('posts.store');
     Route::get('/post/{post}', [PostController::class, 'show'])->name('post.show');
     Route::delete('/posts/{post}', [PostController::class, 'destroy']);

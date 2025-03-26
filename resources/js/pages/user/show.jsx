@@ -110,7 +110,7 @@ export default function Show() {
                         </button>
                     )}
                     {isOwnProfile && (
-                        <div className="flex flex-col items-center sm:items-end ml-6 sm:ml-10 space-y-2">
+                        <div className="flex flex-col items-center sm:items-end pl-1 sm:ml-10 space-y-2">
                             <button
                                 onClick={handleEditProfile}
                                 className="px-4 py-2 border-2 rounded-3xl text-gray-800 hover:bg-gray-300 dark:text-gray-200 dark:hover:bg-gray-700"
@@ -119,7 +119,7 @@ export default function Show() {
                             </button>
 
                             {(!user.bio || !user.location || !user.website || !user.date_of_birth) && (
-                                <div className="flex items-center gap-2 bg-blue-100 text-blue-600 px-3 py-2 rounded-lg text-sm dark:bg-gray-800 dark:text-blue-400 sm:w-auto w-full">
+                                <div className="flex items-center gap-2 bg-blue-100 text-blue-600 px-2 py-2 rounded-lg text-sm dark:bg-gray-800 dark:text-blue-400 sm:w-auto w-full">
                                     <AlertCircle className="h-4 w-4" />
                                     <p className="leading-tight">
                                         Complete your profile.

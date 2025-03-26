@@ -2,7 +2,7 @@ import { Head, usePage, Link, useForm } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
-import { Heart, MessageCircle } from 'lucide-react';
+import { EyeOff, Heart, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Show() {
@@ -44,17 +44,17 @@ export default function Show() {
 
             <div className="p-6">
                 <div className="flex items-center space-x-3">
-                    <Avatar className="h-12 w-12 border border-gray-300 dark:border-gray-700">
+                    <Avatar className="h-20 w-20 border border-gray-300 dark:border-gray-700">
                         <AvatarImage src={post.user.profile_image_url} alt={post.user.name} />
                         <AvatarFallback className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white">
                             {getInitials(post.user.name)}
                         </AvatarFallback>
                     </Avatar>
                     <div>
-                        <Link href={`/user/${post.user.username}`} className="font-semibold text-gray-900 dark:text-white hover:underline">
+                        <Link href={`/user/${post.user.username}`} className="text-lg font-semibold text-gray-900 dark:text-white hover:underline">
                             {post.user.name}
                         </Link>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username}</p>
+                        <p className="text-md text-gray-500 dark:text-gray-400">@{post.user.username}</p>
                     </div>
                 </div>
 
@@ -74,13 +74,17 @@ export default function Show() {
                             {/*{post.likes_count === 1 ? 'Like' : 'Likes'}*/}
                         </p>
                     </div>
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center space-x-0.5">
                         <MessageCircle className="h-6 w-6 text-gray-600 dark:text-gray-400" />
                         <p>
                             <strong>{post.comments_count}</strong>
                             {/*{post.comments_count === 1 ? 'Comment' : 'Comments'}*/}
                         </p>
                     </div>
+                    <div className="flex items-center space-x-1">
+                        {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
+                    </div>
+
                 </div>
             </div>
 

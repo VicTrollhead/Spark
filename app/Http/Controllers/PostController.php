@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePostRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 use App\Models\Post;
@@ -19,18 +20,54 @@ class PostController extends Controller
      */
     public function index(): Response
     {
-        return Inertia::render('Posts/Index', [
-            'posts' => Post::with(['user', 'parentPost', 'likes', 'comments'])->get(),
+        $currentUser = Auth::user();
+
+        $posts = Post::with(['user', 'comments', 'likes'])
+            ->where(function ($query) use ($currentUser) {
+                $query->where('is_private', false);
+
+                if ($currentUser) {
+                    $query->orWhereHas('user.followers', function ($subQuery) use ($currentUser) {
+                        $subQuery->where('follower_id', $currentUser->id);
+                    });
+
+                    $query->orWhere('user_id', $currentUser->id);
+                }
+            })
+            ->latest()
+            ->get()
+            ->map(function ($post) use ($currentUser) {
+                return [
+                    'id' => $post->id,
+                    'content' => $post->content,
+                    'created_at' => $post->created_at->format('n/j/Y'),
+                    'user' => [
+                        'id' => $post->user->id,
+                        'name' => $post->user->name,
+                        'username' => $post->user->username,
+                        'profile_image_url' => $post->user->profile_image_url,
+                    ],
+                    'media_url' => $post->media_url,
+                    'is_private' => $post->is_private,
+                    'likes_count' => $post->likes->count(),
+                    'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                    'comments_count' => $post->comments->count(),
+                ];
+            });
+
+        return Inertia::render('dashboard', [
+            'posts' => $posts,
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): Response
-    {
-        return Inertia::render('Posts/Create');
-    }
+//    public function create(): Response
+//    {
+//        return Inertia::render('Posts/Create');
+//    }
 
     /**
      * Store a newly created resource in storage.
@@ -43,7 +80,6 @@ class PostController extends Controller
             'user_id' => Auth::id(),
             'content' => $request->content_,
             'parent_post_id' => $request->parent_post_id,
-//            'post_type' => $request->post_type,
             'media_url' => $request->media_url,
             'is_private' => $request->is_private,
         ]);
@@ -56,6 +92,10 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
+        if (Gate::denies('view', $post)) {
+            abort(403, 'Unauthorized to view this post.');
+        }
+
         $currentUser = Auth::user();
 
         $post->load(['user', 'likes']);
@@ -79,6 +119,7 @@ class PostController extends Controller
             });
 
         return Inertia::render('post/show-post', [
+
             'post' => [
                 'id' => $post->id,
                 'content' => $post->content,
@@ -90,6 +131,7 @@ class PostController extends Controller
                     'username' => $post->user->username,
                     'profile_image_url' => $post->user->profile_image_url,
                 ],
+                'is_private' => $post->is_private,
                 'likes_count' => $post->likes->count(),
                 'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
                 'comments_count' => $comments->count(),
@@ -116,7 +158,6 @@ class PostController extends Controller
     {
         $validated = $request->validate([
             'content' => ['required', 'string', 'max:5000'],
-            'post_type' => ['required', 'string'],
             'is_private' => ['required', 'boolean'],
         ]);
 

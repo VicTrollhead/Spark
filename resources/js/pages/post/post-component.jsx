@@ -1,5 +1,5 @@
 import { Link, useForm } from '@inertiajs/react';
-import { Heart, MessageCircle } from 'lucide-react';
+import { Heart, MessageCircle, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
@@ -10,6 +10,7 @@ export default function PostComponent({ post }) {
 
     const [isLiked, setIsLiked] = useState(post.is_liked);
     const [likesCount, setLikesCount] = useState(post.likes_count);
+
 
     const handleLike = async () => {
         setIsLiked(!isLiked);
@@ -59,6 +60,9 @@ export default function PostComponent({ post }) {
                             <MessageCircle className="h-5 w-5" />
                             <span>{post.comments_count}</span>
                         </Link>
+
+                        {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
+
                     </div>
                 </div>
             </div>

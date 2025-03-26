@@ -1,5 +1,6 @@
 import AppLogoIcon from '../../components/app-logo-icon';
 import { Link } from '@inertiajs/react';
+import AppearanceToggle from "../../components/appearance-toggle";
 
 export default function AuthSimpleLayout({ children, title, description, imageSrc }) {
     return (

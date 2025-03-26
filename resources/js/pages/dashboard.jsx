@@ -33,20 +33,20 @@ export default function Dashboard() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Users Dashboard" />
+            <Head title="Dashboard" />
 
             <div className="p-6 text-2xl font-extrabold">
                 What's new?
             </div>
 
-            <div className="p-4 bg-white dark:bg-gray-800 border rounded-lg">
+            <div className="p-4 bg-white dark:bg-neutral-950 border dark:border-neutral-900 rounded-lg">
                 <form onSubmit={handlePostSubmit} className="flex flex-col space-y-4">
                     <textarea
                         value={data.content_}
                         onChange={(e) => setData('content_', e.target.value)}
                         rows={3}
                         placeholder="What's on your mind?"
-                        className="resize-none p-3 bg-gray-100 dark:bg-gray-700 rounded-md text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600"
+                        className="resize-none p-3 bg-gray-100 dark:bg-neutral-900 rounded-md text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600"
                     />
                     {errors.content_ && <p className="text-red-500 text-sm">{errors.content_}</p>}
 
@@ -64,7 +64,7 @@ export default function Dashboard() {
                         type="submit"
                         disabled={!data.content_}
                         className={`self-end py-2 px-4 rounded-lg text-white ${
-                            data.content_ ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400'
+                            data.content_ ? 'bg-blue-600 hover:bg-blue-700' : 'bg-neutral-400 dark:hover:bg-neutral-600 cursor-not-allowed'
                         }`}
                     >
                         Post
@@ -77,7 +77,6 @@ export default function Dashboard() {
                 <div className="divide-y divide-gray-200 dark:divide-gray-800">
                     {posts.length > 0 ? (
                         posts
-                            .filter((post) => !post.is_private)
                             .map((post) => <PostComponent key={post.id} post={post} />)
                     ) : (
                         <p className="text-gray-500 dark:text-gray-400 px-6 py-4">No posts yet.</p>
