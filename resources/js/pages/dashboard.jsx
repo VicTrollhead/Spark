@@ -39,7 +39,7 @@ export default function Dashboard() {
                 What's new?
             </div>
 
-            <div className="p-4 bg-white dark:bg-neutral-950 border dark:border-neutral-900 rounded-lg">
+            <div className="p-4 bg-white dark:bg-neutral-950 border-y dark:border-gray-800">
                 <form onSubmit={handlePostSubmit} className="flex flex-col space-y-4">
                     <textarea
                         value={data.content_}
@@ -55,7 +55,7 @@ export default function Dashboard() {
                             type="checkbox"
                             checked={data.is_private}
                             onChange={(e) => setData('is_private', e.target.checked)}
-                            className="mr-2"
+                            className="mx-2"
                         />
                         Private (Only for subscribers)
                     </label>
@@ -64,7 +64,7 @@ export default function Dashboard() {
                         type="submit"
                         disabled={!data.content_}
                         className={`self-end py-2 px-4 rounded-lg text-white ${
-                            data.content_ ? 'bg-blue-600 hover:bg-blue-700' : 'bg-neutral-400 dark:hover:bg-neutral-600 cursor-not-allowed'
+                            data.content_ ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 cursor-not-allowed'
                         }`}
                     >
                         Post

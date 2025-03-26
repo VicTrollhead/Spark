@@ -66,7 +66,7 @@ export default function Show() {
                 <div className="mt-3 flex items-center space-x-6 text-md text-gray-600 dark:text-gray-400">
                     <div className="flex items-center space-x-1">
                         <Heart
-                            className={`h-6 w-6 ${post.is_liked ? 'text-red-500' : 'text-gray-500'}`}
+                            className={`h-6 w-6 hover:text-red-500 ${post.is_liked ? 'text-red-500' : 'text-gray-500'}`}
                             onClick={handleLike}
                         />
                         <p>
@@ -75,7 +75,7 @@ export default function Show() {
                         </p>
                     </div>
                     <div className="flex items-center space-x-0.5">
-                        <MessageCircle className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+                        <MessageCircle className="h-6 w-6 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-500" />
                         <p>
                             <strong>{post.comments_count}</strong>
                             {/*{post.comments_count === 1 ? 'Comment' : 'Comments'}*/}
