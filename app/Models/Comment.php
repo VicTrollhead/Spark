@@ -14,11 +14,7 @@ class Comment extends Model
         'post_id',
         'parent_comment_id',
         'content',
-//        'created_at',
-//        'updated_at',
     ];
-
-    //public $timestamps = false;
 
     public function user()
     {

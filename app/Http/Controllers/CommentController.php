@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCommentRequest;
+use App\Models\Post;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -34,22 +36,18 @@ class CommentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreCommentRequest $request, Post $post): RedirectResponse
     {
-        $validated = $request->validate([
-            'post_id' => ['required', Rule::exists('posts', 'id')],
-            'content' => ['required', 'string'],
-            'parent_comment_id' => ['nullable', Rule::exists('comments', 'id')],
-        ]);
+        $request->validated();
 
         Comment::create([
             'user_id' => Auth::id(),
-            'post_id' => $validated['post_id'],
-            'content' => $validated['content'],
-            'parent_comment_id' => $validated['parent_comment_id'] ?? null,
+            'post_id' => $request['post_id'],
+            'parent_comment_id' =>  $request['parent_comment_id'],
+            'content' => $request['content'],
         ]);
 
-        return Redirect::route('comments.index')->with('success', 'Comment added successfully.');
+        return redirect()->back()->with('success', 'Comment added successfully.');
     }
 
     /**
@@ -83,7 +81,7 @@ class CommentController extends Controller
 
         $comment->update($validated);
 
-        return Redirect::route('comments.index')->with('success', 'Comment updated successfully.');
+        return redirect()->route('comments.index')->with('success', 'Comment updated successfully.');
     }
 
     /**
@@ -91,7 +89,10 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment): RedirectResponse
     {
+        if (Auth::id() !== $comment->user_id) {
+            return Redirect::back()->with(['error' => 'Unauthorized'], 403);
+        }
         $comment->delete();
-        return Redirect::route('comments.index')->with('success', 'Comment deleted successfully.');
+        return redirect()->back()->with(['message' => 'Comment deleted successfully']);
     }
 }

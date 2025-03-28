@@ -18,11 +18,12 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $currentUser = Auth::user();
+        $sort = $request->query('sort', 'latest');
 
-        $posts = Post::with(['user', 'comments', 'likes'])
+        $postsQuery = Post::with(['user', 'comments', 'likes'])
             ->where(function ($query) use ($currentUser) {
                 $query->where('is_private', false);
 
@@ -33,32 +34,52 @@ class PostController extends Controller
 
                     $query->orWhere('user_id', $currentUser->id);
                 }
-            })
-            ->latest()
-            ->get()
-            ->map(function ($post) use ($currentUser) {
-                return [
-                    'id' => $post->id,
-                    'content' => $post->content,
-                    'created_at' => $post->created_at->format('n/j/Y'),
-                    'user' => [
-                        'id' => $post->user->id,
-                        'name' => $post->user->name,
-                        'username' => $post->user->username,
-                        'profile_image_url' => $post->user->profile_image_url,
-                    ],
-                    'media_url' => $post->media_url,
-                    'is_private' => $post->is_private,
-                    'likes_count' => $post->likes->count(),
-                    'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
-                    'comments_count' => $post->comments->count(),
-                ];
             });
+
+        switch ($sort) {
+            case 'likes':
+                $postsQuery->withCount('likes')->orderByDesc('likes_count');
+                break;
+            case 'oldest':
+                $postsQuery->oldest();
+                break;
+            case 'friends':
+                if ($currentUser) {
+                    $postsQuery->whereHas('user.followers', function ($query) use ($currentUser) {
+                        $query->where('follower_id', $currentUser->id);
+                    });
+                }
+                break;
+            default:
+                $postsQuery->latest();
+                break;
+        }
+
+        $posts = $postsQuery->get()->map(function ($post) use ($currentUser) {
+            return [
+                'id' => $post->id,
+                'content' => $post->content,
+                'created_at' => $post->created_at->format('n/j/Y'),
+                'user' => [
+                    'id' => $post->user->id,
+                    'name' => $post->user->name,
+                    'username' => $post->user->username,
+                    'profile_image_url' => $post->user->profile_image_url,
+                ],
+                'media_url' => $post->media_url,
+                'is_private' => $post->is_private,
+                'likes_count' => $post->likes->count(),
+                'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                'comments_count' => $post->comments->count(),
+            ];
+        });
 
         return Inertia::render('dashboard', [
             'posts' => $posts,
+            'sort' => $sort,
         ]);
     }
+
 
 
     /**
@@ -76,12 +97,12 @@ class PostController extends Controller
     {
         $request->validated();
 
-        $post = Post::create([
+        Post::create([
             'user_id' => Auth::id(),
-            'content' => $request->content_,
-            'parent_post_id' => $request->parent_post_id,
-            'media_url' => $request->media_url,
-            'is_private' => $request->is_private,
+            'content' => $request['content'],
+            'parent_post_id' => $request['parent_post_id'],
+            'media_url' => $request['media_url'],
+            'is_private' => $request['is_private'],
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Post created successfully!');
@@ -90,36 +111,45 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Post $post)
+    public function show(Post $post, Request $request)
     {
         if (Gate::denies('view', $post)) {
             abort(403, 'Unauthorized to view this post.');
         }
 
-        $currentUser = Auth::user();
+        $sort = $request->query('sort', 'latest');
 
-        $post->load(['user', 'likes']);
+        $post->load(['user', 'comments', 'likes']);
 
-        $comments = $post->comments()
-            ->with('user')
-            ->latest()
-            ->get()
-            ->map(function ($comment) {
-                return [
-                    'id' => $comment->id,
-                    'content' => $comment->content,
-                    'created_at' => $comment->created_at->format('n/j/Y'),
-                    'user' => [
-                        'id' => $comment->user->id,
-                        'name' => $comment->user->name,
-                        'username' => $comment->user->username,
-                        'profile_image_url' => $comment->user->profile_image_url,
-                    ],
-                ];
-            });
+        $commentsQuery = $post->comments()->with('user');
+
+        switch ($sort) {
+            case 'likes':
+                $commentsQuery->withCount('likes')->orderByDesc('likes_count');
+                break;
+            case 'oldest':
+                $commentsQuery->oldest();
+                break;
+            default:
+                $commentsQuery->latest();
+                break;
+        }
+
+        $comments = $commentsQuery->get()->map(function ($comment) {
+            return [
+                'id' => $comment->id,
+                'content' => $comment->content,
+                'created_at' => $comment->created_at->diffForHumans(),
+                'user' => [
+                    'id' => $comment->user->id,
+                    'name' => $comment->user->name,
+                    'username' => $comment->user->username,
+                    'profile_image_url' => $comment->user->profile_image_url,
+                ],
+            ];
+        });
 
         return Inertia::render('post/show-post', [
-
             'post' => [
                 'id' => $post->id,
                 'content' => $post->content,
@@ -133,12 +163,14 @@ class PostController extends Controller
                 ],
                 'is_private' => $post->is_private,
                 'likes_count' => $post->likes->count(),
-                'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                'is_liked' => auth()->check() ? $post->likes->contains('user_id', auth()->id()) : false,
                 'comments_count' => $comments->count(),
                 'comments' => $comments,
-            ]
+            ],
+            'sort' => $sort
         ]);
     }
+
 
 
     /**
@@ -163,7 +195,7 @@ class PostController extends Controller
 
         $post->update($validated);
 
-        return Redirect::route('posts.index')->with('success', 'Post updated successfully.');
+        return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
     }
 
     /**
@@ -177,6 +209,6 @@ class PostController extends Controller
 
         $post->update(['is_deleted' => true]);
 
-        return Redirect::back()->with(['message' => 'Post deleted successfully']);
+        return redirect()->back()->with(['message' => 'Post deleted successfully']);
     }
 }

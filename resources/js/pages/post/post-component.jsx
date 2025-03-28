@@ -1,4 +1,4 @@
-import { Link, useForm } from '@inertiajs/react';
+import { Link, useForm, router } from '@inertiajs/react';
 import { Heart, MessageCircle, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
@@ -16,7 +16,7 @@ export default function PostComponent({ post }) {
         setIsLiked(!isLiked);
         setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
 
-        await sendPost(isLiked ? `/post/${post.id}/unlike` : `/post/${post.id}/like`, {
+        await router.post(isLiked ? `/post/${post.id}/unlike` : `/post/${post.id}/like`, {
             preserveScroll: true,
             onError: () => {
                 setIsLiked(post.is_liked);

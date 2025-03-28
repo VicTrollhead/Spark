@@ -13,14 +13,23 @@ export default function Show() {
 
     const handleFollow = () => {
         if (user.is_following) {
-           post(`/user/${user.username}/unfollow`);
+            router.post(`/user/${user.username}/unfollow`, {}, {
+                onSuccess: () => {
+                    router.reload({ only: ['posts'] });
+                }
+            });
         } else {
-            post(`/user/${user.username}/follow`);
+            router.post(`/user/${user.username}/follow`, {}, {
+                onSuccess: () => {
+                    router.reload({ only: ['posts'] });
+                }
+            });
         }
     };
 
+
     const handleEditProfile = () => {
-        get(`/user/${user.username}/edit`);
+        router.get(`/user/${user.username}/edit`);
     };
 
     const isOwnProfile = auth.user && auth.user.id === user.id;
@@ -31,8 +40,8 @@ export default function Show() {
 
     if (!user.canViewFullProfile) {
         return (
-            <AppLayout breadcrumbs={[{ title: `${user.username} (Private Account)`, href: `/user/${user.username}` }]}>
-                <Head title={`${user.username} (Private Account)`} />
+            <AppLayout breadcrumbs={[{ title: `@${user.username} (Private Account)`, href: `/user/${user.username}` }]}>
+                <Head title={`@${user.username} (Private Account)`} />
 
                 <div className="p-6 text-center">
                     <Avatar className="h-24 w-24 mx-auto border-4 border-white dark:border-gray-900">
