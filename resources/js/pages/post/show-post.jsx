@@ -135,7 +135,7 @@ export default function Show() {
                     <button
                         type="submit"
                         disabled={!data.content || processing}
-                        className={`self-end py-2 px-4 rounded-lg text-white ${
+                        className={`self-end py-2 mr-0.5 px-4 rounded-lg text-white ${
                             data.content ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 cursor-not-allowed'
                         }`}
                     >
