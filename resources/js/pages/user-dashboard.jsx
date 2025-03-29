@@ -1,11 +1,18 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head, usePage, Link, router } from '@inertiajs/react';
 import AppLayout from '../layouts/app-layout';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { useInitials } from '../hooks/use-initials';
+import { useEffect } from 'react';
 
 export default function Dashboard() {
     const { users } = usePage().props;
     const getInitials = useInitials();
+
+    useEffect(() => {
+        setInterval(() => {
+            router.reload({ only: ['posts'] });
+        }, 20000)
+    });
 
     const breadcrumbs = [
         { title: 'Dashboard', href: '/dashboard' },
