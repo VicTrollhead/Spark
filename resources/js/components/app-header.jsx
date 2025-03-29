@@ -3,14 +3,13 @@ import { Icon } from '@/components/icon';
 import { Button } from '@/components/ui/button';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, Menu, Search } from 'lucide-react';
+import { Bookmark, Folder, Home, LogOut, Mail, Menu, Search, Settings, User, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 import { Input } from '@/components/ui/input.jsx';
-import AppearanceToggle from '@/components/appearance-toggle.jsx';
+import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu.jsx';
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
@@ -30,8 +29,41 @@ export function AppHeader({ breadcrumbs = [] }) {
             url: `/user/${user.username}/following`,
         },
         {
-            title: 'Liked',
+            title: 'Liked posts',
             url: '#',
+        },
+    ];
+
+    const sideBarNavItems = [
+        {
+            title: 'Dashboard',
+            url: '/dashboard',
+            icon: Home,
+        },
+        {
+            title: 'Friends',
+            url: '/dashboard/users',
+            icon: Users,
+        },
+        {
+            title: 'Notifications',
+            url: '#',
+            icon: Mail,
+        },
+        {
+            title: 'Favourites',
+            url: '#',
+            icon: Bookmark,
+        },
+        {
+            title: 'Profile',
+            url: user.username ? `/user/${user.username}` : '/user',
+            icon: User,
+        },
+        {
+            title: 'Settings',
+            url: '/settings/profile',
+            icon: Settings,
         },
     ];
 
@@ -50,7 +82,7 @@ export function AppHeader({ breadcrumbs = [] }) {
 
     return (<>
             <div className="border-sidebar-border/80 border-b">
-                <div className="mx-4 flex h-16  px-4 ">
+                <div className="mx-4 flex h-16 ">
                     {/* Mobile Menu */}
                     <div className="lg:hidden">
                         <Sheet>
@@ -67,10 +99,20 @@ export function AppHeader({ breadcrumbs = [] }) {
                                 <div className="mt-6 flex h-full flex-1 flex-col space-y-4">
                                     <div className="flex h-full flex-col justify-between text-sm">
                                         <div className="flex flex-col space-y-4">
-                                            {mainNavItems.map((item) => (<Link key={item.title} href={item.url} className="flex items-center space-x-2 font-medium">
+                                            {sideBarNavItems.map((item) => (
+                                                <Link key={item.title} href={item.url} className="flex items-center space-x-2 font-medium">
                                                     {item.icon && <Icon iconNode={item.icon} className="h-5 w-5"/>}
                                                     <span>{item.title}</span>
                                                 </Link>))}
+                                           <DropdownMenuSeparator className="mb-5"/>
+                                            <a className="flex items-center space-x-2 font-medium" href="https://github.com/VicTrollhead/Spark">
+                                                <Folder className="h-5 w-5"/>
+                                                <span>Repository</span>
+                                            </a>
+                                            <Link className="flex items-center space-x-2 font-medium cursor-pointer" method="post" href={route('logout')} as="button">
+                                                <LogOut className="h-5 w-5"/>
+                                                <span>Log out</span>
+                                            </Link>
                                         </div>
                                     </div>
                                 </div>
@@ -78,7 +120,7 @@ export function AppHeader({ breadcrumbs = [] }) {
                         </Sheet>
                     </div>
 
-                    <Link href="/dashboard" prefetch className="flex items-center space-x-2 w-1/4">
+                    <Link href="/dashboard" prefetch className="flex items-center space-x-2 w-1/6">
                         <AppLogo />
                     </Link>
 
@@ -101,9 +143,6 @@ export function AppHeader({ breadcrumbs = [] }) {
                             <div className="flex items-center space-x-3">
                                 <Search className="size-1/8 opacity-80 group-hover:opacity-100"/>
                                 <Input placeholder="Search" className="w-full" />
-                            </div>
-                            <div>
-                                <AppearanceToggle className="justify-center p-2.5"/>
                             </div>
                         </div>
                     </div>
