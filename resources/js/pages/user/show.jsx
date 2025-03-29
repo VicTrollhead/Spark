@@ -4,23 +4,38 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar'
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
 import PostComponent from '../post/post-component';
+import { useEffect } from 'react';
 
 export default function Show() {
     const { user, auth, posts } = usePage().props;
     const getInitials = useInitials();
     const { get, post, processing } = useForm();
 
+    // useEffect(() => {
+    //     setInterval(() => {
+    //         router.reload({ only: ['posts'] });
+    //     }, 20000)
+    // });
 
     const handleFollow = () => {
         if (user.is_following) {
-           post(`/user/${user.username}/unfollow`);
+            router.post(`/user/${user.username}/unfollow`, {}, {
+                onSuccess: () => {
+                    router.reload({ only: ['posts'] });
+                }
+            });
         } else {
-            post(`/user/${user.username}/follow`);
+            router.post(`/user/${user.username}/follow`, {}, {
+                onSuccess: () => {
+                    router.reload({ only: ['posts'] });
+                }
+            });
         }
     };
 
+
     const handleEditProfile = () => {
-        get(`/user/${user.username}/edit`);
+        router.get(`/user/${user.username}/edit`);
     };
 
     const isOwnProfile = auth.user && auth.user.id === user.id;
@@ -31,8 +46,8 @@ export default function Show() {
 
     if (!user.canViewFullProfile) {
         return (
-            <AppLayout breadcrumbs={[{ title: `${user.username} (Private Account)`, href: `/user/${user.username}` }]}>
-                <Head title={`${user.username} (Private Account)`} />
+            <AppLayout breadcrumbs={[{ title: `@${user.username} (Private Account)`, href: `/user/${user.username}` }]}>
+                <Head title={`@${user.username} (Private Account)`} />
 
                 <div className="p-6 text-center">
                     <Avatar className="h-24 w-24 mx-auto border-4 border-white dark:border-gray-900">
@@ -64,12 +79,12 @@ export default function Show() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${user.name} (@${user.username})`} />
 
-            <div className="relative h-48 w-full bg-gray-200 sm:h-56 dark:bg-gray-800">
+            <div className="relative h-56 w-full bg-gray-200 sm:h-72 dark:bg-gray-800">
                 {user.cover_image_url && (
                     <img src={user.cover_image_url} alt="Cover Image" className="h-full w-full object-cover" />
                 )}
-                <div className="absolute bottom-[-40px] left-4 sm:left-6">
-                    <Avatar className="h-24 w-24 border-4 border-white sm:h-28 sm:w-28 dark:border-gray-900">
+                <div className="absolute bottom-[-55px] left-4 sm:left-6">
+                    <Avatar className="h-32 w-32 border-4 border-white sm:h-36 sm:w-36 dark:border-gray-900">
                         <AvatarImage src={user.profile_image_url} alt={user.name} />
                         <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
                             {getInitials(user.name)}
@@ -110,7 +125,7 @@ export default function Show() {
                         </button>
                     )}
                     {isOwnProfile && (
-                        <div className="flex flex-col items-center sm:items-end ml-6 sm:ml-10 space-y-2">
+                        <div className="flex flex-col items-center sm:items-end pl-1 sm:ml-10 space-y-2">
                             <button
                                 onClick={handleEditProfile}
                                 className="px-4 py-2 border-2 rounded-3xl text-gray-800 hover:bg-gray-300 dark:text-gray-200 dark:hover:bg-gray-700"
@@ -119,7 +134,7 @@ export default function Show() {
                             </button>
 
                             {(!user.bio || !user.location || !user.website || !user.date_of_birth) && (
-                                <div className="flex items-center gap-2 bg-blue-100 text-blue-600 px-3 py-2 rounded-lg text-sm dark:bg-gray-800 dark:text-blue-400 sm:w-auto w-full">
+                                <div className="flex items-center gap-2 bg-blue-100 text-blue-600 px-2 py-2 rounded-lg text-sm dark:bg-gray-800 dark:text-blue-400 sm:w-auto w-full">
                                     <AlertCircle className="h-4 w-4" />
                                     <p className="leading-tight">
                                         Complete your profile.
@@ -184,8 +199,8 @@ export default function Show() {
                     </Link>
                 </div>
             </div>
-            <div className="mt-3">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white px-6 py-1">Posts</h2>
+            <div className="mt-1">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white px-6 pb-4 pt-2">Posts</h2>
                 <div className="divide-y divide-gray-200 dark:divide-gray-800">
                     {posts.length > 0 ? (
                         posts.map((post) => <PostComponent key={post.id} post={post} auth={auth} />)

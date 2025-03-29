@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePostRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 use App\Models\Post;
@@ -16,74 +18,45 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): Response
-    {
-        return Inertia::render('Posts/Index', [
-            'posts' => Post::with(['user', 'parentPost', 'likes', 'comments'])->get(),
-        ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(): Response
-    {
-        return Inertia::render('Posts/Create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            'content' => ['required', 'string', 'max:5000'],
-            'parent_post_id' => ['nullable', Rule::exists('posts', 'id')],
-            'post_type' => ['required', 'string'],
-            'is_public' => ['required', 'boolean'],
-        ]);
-
-        Post::create([
-            'user_id' => Auth::id(),
-            'content' => $validated['content'],
-            'parent_post_id' => $validated['parent_post_id'] ?? null,
-            'post_type' => $validated['post_type'],
-            'is_deleted' => false,
-            'is_public' => $validated['is_public'],
-        ]);
-
-        return Redirect::route('posts.index')->with('success', 'Post created successfully.');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Post $post)
+    public function index(Request $request): Response
     {
         $currentUser = Auth::user();
+        $sort = $request->query('sort', 'latest');
 
-        $post->load(['user', 'likes']);
+        $postsQuery = Post::with(['user', 'comments', 'likes'])
+            ->where(function ($query) use ($currentUser) {
+                $query->where('is_private', false);
 
-        $comments = $post->comments()
-            ->with('user')
-            ->latest()
-            ->get()
-            ->map(function ($comment) {
-                return [
-                    'id' => $comment->id,
-                    'content' => $comment->content,
-                    'created_at' => $comment->created_at->format('n/j/Y'),
-                    'user' => [
-                        'id' => $comment->user->id,
-                        'name' => $comment->user->name,
-                        'username' => $comment->user->username,
-                        'profile_image_url' => $comment->user->profile_image_url,
-                    ],
-                ];
+                if ($currentUser) {
+                    $query->orWhereHas('user.followers', function ($subQuery) use ($currentUser) {
+                        $subQuery->where('follower_id', $currentUser->id);
+                    });
+
+                    $query->orWhere('user_id', $currentUser->id);
+                }
             });
 
-        return Inertia::render('post/show-post', [
-            'post' => [
+        switch ($sort) {
+            case 'likes':
+                $postsQuery->withCount('likes')->orderByDesc('likes_count');
+                break;
+            case 'oldest':
+                $postsQuery->oldest();
+                break;
+            case 'friends':
+                if ($currentUser) {
+                    $postsQuery->whereHas('user.followers', function ($query) use ($currentUser) {
+                        $query->where('follower_id', $currentUser->id);
+                    });
+                }
+                break;
+            default:
+                $postsQuery->latest();
+                break;
+        }
+
+        $posts = $postsQuery->get()->map(function ($post) use ($currentUser) {
+            return [
                 'id' => $post->id,
                 'content' => $post->content,
                 'created_at' => $post->created_at->format('n/j/Y'),
@@ -93,13 +66,111 @@ class PostController extends Controller
                     'username' => $post->user->username,
                     'profile_image_url' => $post->user->profile_image_url,
                 ],
+                'media_url' => $post->media_url,
+                'is_private' => $post->is_private,
                 'likes_count' => $post->likes->count(),
                 'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
-                'comments_count' => $comments->count(),
-                'comments' => $comments,
-            ]
+                'comments_count' => $post->comments->count(),
+            ];
+        });
+
+        return Inertia::render('dashboard', [
+            'posts' => $posts,
+            'sort' => $sort,
         ]);
     }
+
+
+
+    /**
+     * Show the form for creating a new resource.
+     */
+//    public function create(): Response
+//    {
+//        return Inertia::render('Posts/Create');
+//    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StorePostRequest $request)
+    {
+        $request->validated();
+
+        Post::create([
+            'user_id' => Auth::id(),
+            'content' => $request['content'],
+            'parent_post_id' => $request['parent_post_id'],
+            'media_url' => $request['media_url'],
+            'is_private' => $request['is_private'],
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'Post created successfully!');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Post $post, Request $request)
+    {
+        if (Gate::denies('view', $post)) {
+            abort(403, 'Unauthorized to view this post.');
+        }
+
+        $sort = $request->query('sort', 'latest');
+
+        $post->load(['user', 'comments', 'likes']);
+
+        $commentsQuery = $post->comments()->with('user');
+
+        switch ($sort) {
+            case 'likes':
+                $commentsQuery->withCount('likes')->orderByDesc('likes_count');
+                break;
+            case 'oldest':
+                $commentsQuery->oldest();
+                break;
+            default:
+                $commentsQuery->latest();
+                break;
+        }
+
+        $comments = $commentsQuery->get()->map(function ($comment) {
+            return [
+                'id' => $comment->id,
+                'content' => $comment->content,
+                'created_at' => $comment->created_at->diffForHumans(),
+                'user' => [
+                    'id' => $comment->user->id,
+                    'name' => $comment->user->name,
+                    'username' => $comment->user->username,
+                    'profile_image_url' => $comment->user->profile_image_url,
+                ],
+            ];
+        });
+
+        return Inertia::render('post/show-post', [
+            'post' => [
+                'id' => $post->id,
+                'content' => $post->content,
+                'media_url' => $post->media_url,
+                'created_at' => $post->created_at->format('n/j/Y'),
+                'user' => [
+                    'id' => $post->user->id,
+                    'name' => $post->user->name,
+                    'username' => $post->user->username,
+                    'profile_image_url' => $post->user->profile_image_url,
+                ],
+                'is_private' => $post->is_private,
+                'likes_count' => $post->likes->count(),
+                'is_liked' => auth()->check() ? $post->likes->contains('user_id', auth()->id()) : false,
+                'comments_count' => $comments->count(),
+                'comments' => $comments,
+            ],
+            'sort' => $sort
+        ]);
+    }
+
 
 
     /**
@@ -119,13 +190,12 @@ class PostController extends Controller
     {
         $validated = $request->validate([
             'content' => ['required', 'string', 'max:5000'],
-            'post_type' => ['required', 'string'],
-            'is_public' => ['required', 'boolean'],
+            'is_private' => ['required', 'boolean'],
         ]);
 
         $post->update($validated);
 
-        return Redirect::route('posts.index')->with('success', 'Post updated successfully.');
+        return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
     }
 
     /**
@@ -139,6 +209,6 @@ class PostController extends Controller
 
         $post->update(['is_deleted' => true]);
 
-        return Redirect::back()->with(['message' => 'Post deleted successfully']);
+        return redirect()->back()->with(['message' => 'Post deleted successfully']);
     }
 }

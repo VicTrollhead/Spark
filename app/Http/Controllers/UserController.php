@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateUserRequest;
+use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
@@ -16,6 +18,7 @@ use Illuminate\Support\Facades\Gate;
 class UserController extends Controller
 {
     use AuthorizesRequests;
+
     /**
      * Display the specified user's profile.
      */
@@ -36,11 +39,14 @@ class UserController extends Controller
             ->with(['user', 'comments', 'likes'])
             ->latest()
             ->get()
+            ->filter(fn ($post) => Gate::allows('view', $post))
             ->map(function ($post) use ($currentUser) {
                 return [
                     'id' => $post->id,
                     'content' => $post->content,
                     'created_at' => $post->created_at->format('n/j/Y'),
+                    'media_url' => $post->media_url,
+                    'is_private' => $post->is_private,
                     'user' => $post->user,
                     'likes_count' => $post->likes->count(),
                     'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
@@ -72,19 +78,41 @@ class UserController extends Controller
         ]);
     }
 
-
-
-    /**
-     * Display a list of users.
-     */
     public function index(): Response
     {
+        $currentUser = Auth::user();
+
         $users = User::select('id', 'name', 'username', 'profile_image_url')->get();
+
+        $posts = Post::with(['user', 'comments', 'likes'])
+            ->latest()
+            ->get()
+            ->filter(fn ($post) => Gate::allows('view', $post))
+            ->map(function ($post) use ($currentUser) {
+                return [
+                    'id' => $post->id,
+                    'content' => $post->content,
+                    'created_at' => $post->created_at->format('n/j/Y'),
+                    'user' => [
+                        'id' => $post->user->id,
+                        'name' => $post->user->name,
+                        'username' => $post->user->username,
+                        'profile_image_url' => $post->user->profile_image_url,
+                    ],
+                    'media_url' => $post->media_url,
+                    'is_private' => $post->is_private,
+                    'likes_count' => $post->likes->count(),
+                    'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                    'comments_count' => $post->comments->count(),
+                ];
+            });
 
         return Inertia::render('dashboard', [
             'users' => $users,
+            'posts' => $posts,
         ]);
     }
+
 
     /**
      * Show the edit profile page.
@@ -98,41 +126,27 @@ class UserController extends Controller
     }
 
     /**
+     * Display a list of users.
+     */
+    public function users(): Response
+    {
+        $users = User::select('id', 'name', 'username', 'profile_image_url')->get();
+
+        return Inertia::render('user-dashboard', [
+            'users' => $users,
+        ]);
+    }
+
+    /**
      * Update the user profile.
      */
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
         $this->authorize('update', $user);
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'bio' => ['nullable', 'string', 'max:500'],
-            'location' => ['nullable', 'string', 'max:255'],
-            'website' => ['nullable', 'string', 'max:255'],
-            'date_of_birth' => ['nullable', 'date'],
-            'profile_image' => ['nullable', 'image', 'mimes:jpg,png,jpeg,gif', 'max:2048'],
-            'cover_image' => ['nullable', 'image', 'mimes:jpg,png,jpeg,gif', 'max:4096'],
-            'is_private' => ['required', 'boolean'],
-            'status' => ['required', Rule::in(['active', 'suspended', 'deactivated'])],
-        ]);
 
-        if ($request->hasFile('profile_image')) {
-            if ($user->profile_image_url) {
-                Storage::delete($user->profile_image_url);
-            }
-            $validated['profile_image_url'] = $request->file('profile_image')->store('profiles');
-        }
+        $user->update($request->validated());
 
-        if ($request->hasFile('cover_image')) {
-            if ($user->cover_image_url) {
-                Storage::delete($user->cover_image_url);
-            }
-            $validated['cover_image_url'] = $request->file('cover_image')->store('covers');
-        }
-
-        $user->update($validated);
-
-
-        return redirect()->route('user.show', $user->username)->with('success', 'Profile updated successfully.');
+        return redirect()->route('user.show', $user->username)
+            ->with('success', 'Profile updated successfully.');
     }
 }

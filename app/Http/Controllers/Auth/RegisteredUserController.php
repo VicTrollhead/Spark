@@ -80,7 +80,7 @@ class RegisteredUserController extends Controller
         $nouns = ['Tiger', 'Falcon', 'Panda', 'Wolf', 'Dragon', 'Hawk', 'Phoenix', 'Bear', 'Lion', 'Shark'];
 
         do {
-            $username = $adjectives[array_rand($adjectives)] . $nouns[array_rand($nouns)] . rand(10000000, 99999999);
+            $username = $adjectives[array_rand($adjectives)] . $nouns[array_rand($nouns)] . rand(1000, 9999);
         } while (User::where('username', $username)->exists());
 
         return $username;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useForm } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 import { Heart } from "lucide-react";
 
 export default function LikeButton({ postId, isLiked, likesCount }) {
@@ -9,7 +9,7 @@ export default function LikeButton({ postId, isLiked, likesCount }) {
 
     const toggleLike = () => {
         console.log(`Attempting to ${liked ? "unlike" : "like"} post ${postId}`);
-        post(`/post/${postId}/${liked ? "unlike" : "like"}`, {post_id: postId},{
+        router.post(`/post/${postId}/${liked ? "unlike" : "like"}`, {post_id: postId},{
             preserveScroll: true,
             onSuccess: (page) => {
                 console.log("Updated page props:", page.props);

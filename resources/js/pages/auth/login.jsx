@@ -9,6 +9,7 @@ import { Label } from '../../components/ui/label';
 import AuthLayout from '../../layouts/auth-layout';
 import { useState, useEffect } from 'react';
 
+
 export default function Login({ status, canResetPassword, googleClientId }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: "",
@@ -41,7 +42,8 @@ export default function Login({ status, canResetPassword, googleClientId }) {
             })
                 .then((res) => res.json())
                 .then((data) => {
-                    window.location.href = "/dashboard";
+                    if(data.success)
+                        window.location.href = "/dashboard";
                 })
                 .catch((error) => console.error("Error:", error));
         };

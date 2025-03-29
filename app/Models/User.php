@@ -30,6 +30,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'website',
         'date_of_birth',
         'is_verified',
+        'email_verified_at',
         'is_private',
         'status',
     ];
@@ -93,5 +94,6 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Post::class, 'user_id');
     }
+
 
 }

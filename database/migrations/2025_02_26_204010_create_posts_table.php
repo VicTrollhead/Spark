@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->text('content');
+            $table->text('content')->nullable();
             $table->foreignId('parent_post_id')->nullable()->constrained('posts')->onDelete('cascade');
-            $table->enum('post_type', ['text', 'image', 'video', 'poll', 'combined'])->default('text');
+            $table->string('media_url', 255)->nullable();
             $table->boolean('is_deleted')->default(false);
-            $table->boolean('is_public')->default(true);
+            $table->boolean('is_private')->default(false);
             $table->timestamps();
         });
     }

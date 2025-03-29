@@ -1,5 +1,5 @@
-import { Link, useForm } from '@inertiajs/react';
-import { Heart, MessageCircle } from 'lucide-react';
+import { Link, useForm, router } from '@inertiajs/react';
+import { Heart, MessageCircle, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
@@ -11,11 +11,12 @@ export default function PostComponent({ post }) {
     const [isLiked, setIsLiked] = useState(post.is_liked);
     const [likesCount, setLikesCount] = useState(post.likes_count);
 
+
     const handleLike = async () => {
         setIsLiked(!isLiked);
         setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
 
-        await sendPost(isLiked ? `/post/${post.id}/unlike` : `/post/${post.id}/like`, {
+        await router.post(isLiked ? `/post/${post.id}/unlike` : `/post/${post.id}/like`, {
             preserveScroll: true,
             onError: () => {
                 setIsLiked(post.is_liked);
@@ -27,7 +28,7 @@ export default function PostComponent({ post }) {
     return (
         <div className="border-b border-gray-200 p-4 dark:border-gray-800">
             <div className="flex items-start space-x-3">
-                <Avatar className="h-12 w-12">
+                <Avatar className="h-16 w-16">
                     <AvatarImage src={post.user.profile_image_url} alt={post.user.name} />
                     <AvatarFallback className="rounded-full bg-gray-300 text-black dark:bg-gray-700 dark:text-white">
                         {getInitials(post.user.name)}
@@ -59,6 +60,9 @@ export default function PostComponent({ post }) {
                             <MessageCircle className="h-5 w-5" />
                             <span>{post.comments_count}</span>
                         </Link>
+
+                        {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
+
                     </div>
                 </div>
             </div>
