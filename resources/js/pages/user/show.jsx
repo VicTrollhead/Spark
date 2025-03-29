@@ -4,12 +4,18 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar'
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
 import PostComponent from '../post/post-component';
+import { useEffect } from 'react';
 
 export default function Show() {
     const { user, auth, posts } = usePage().props;
     const getInitials = useInitials();
     const { get, post, processing } = useForm();
 
+    useEffect(() => {
+        setInterval(() => {
+            router.reload({ only: ['posts'] });
+        }, 20000)
+    });
 
     const handleFollow = () => {
         if (user.is_following) {
@@ -194,7 +200,7 @@ export default function Show() {
                 </div>
             </div>
             <div className="mt-1">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white px-6 py-2">Posts</h2>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white px-6 pb-4 pt-2">Posts</h2>
                 <div className="divide-y divide-gray-200 dark:divide-gray-800">
                     {posts.length > 0 ? (
                         posts.map((post) => <PostComponent key={post.id} post={post} auth={auth} />)

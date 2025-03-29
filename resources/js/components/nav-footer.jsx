@@ -1,4 +1,4 @@
-import { Icon } from '@/components/icon';
+import { Icon } from './icon';
 import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 
 export function NavFooter({ items, className, ...props }) {
