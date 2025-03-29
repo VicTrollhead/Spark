@@ -36,11 +36,6 @@ export function AppSidebar() {
             url: 'https://github.com/VicTrollhead/Spark',
             icon: Folder,
         },
-        {
-            title: 'Documentation',
-            url: 'https://laravel.com/docs/starter-kits',
-            icon: BookOpen,
-        },
     ];
 
     return (
@@ -56,12 +51,13 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
+                <NavUser />
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 
             <SidebarFooter>
                 <NavFooter items={footerNavItems} className="mt-auto" />
-                <NavUser />
+
             </SidebarFooter>
         </Sidebar>
     );
