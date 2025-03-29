@@ -11,11 +11,11 @@ export default function Show() {
     const getInitials = useInitials();
     const { get, post, processing } = useForm();
 
-    useEffect(() => {
-        setInterval(() => {
-            router.reload({ only: ['posts'] });
-        }, 20000)
-    });
+    // useEffect(() => {
+    //     setInterval(() => {
+    //         router.reload({ only: ['posts'] });
+    //     }, 20000)
+    // });
 
     const handleFollow = () => {
         if (user.is_following) {

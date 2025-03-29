@@ -8,11 +8,11 @@ export default function Dashboard() {
     const { users } = usePage().props;
     const getInitials = useInitials();
 
-    useEffect(() => {
-        setInterval(() => {
-            router.reload({ only: ['posts'] });
-        }, 20000)
-    });
+    // useEffect(() => {
+    //     setInterval(() => {
+    //         router.reload({ only: ['posts'] });
+    //     }, 20000)
+    // });
 
     const breadcrumbs = [
         { title: 'Dashboard', href: '/dashboard' },

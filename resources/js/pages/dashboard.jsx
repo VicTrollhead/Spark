@@ -9,11 +9,11 @@ export default function Dashboard() {
     const [sortOption, setSortOption] = useState(sort || 'latest');
     const [isLoading, setIsLoading] = useState(false);
 
-   useEffect(() => {
-       setInterval(() => {
-           router.reload({ only: ['posts'] });
-       }, 20000)
-   });
+   // useEffect(() => {
+   //     setInterval(() => {
+   //         router.reload({ only: ['posts'] });
+   //     }, 20000)
+   // });
 
     const { data, setData, post, errors } = useForm({
         content: '',

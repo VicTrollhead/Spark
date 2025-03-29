@@ -83,7 +83,6 @@ export function AppHeader({ breadcrumbs = [] }) {
     return (<>
             <div className="border-sidebar-border/80 border-b">
                 <div className="mx-4 flex h-16 ">
-                    {/* Mobile Menu */}
                     <div className="lg:hidden">
                         <Sheet>
                             <SheetTrigger asChild>
@@ -124,7 +123,6 @@ export function AppHeader({ breadcrumbs = [] }) {
                         <AppLogo />
                     </Link>
 
-                    {/* Desktop Navigation */}
                     <div className="hidden w-full h-full items-center justify-around lg:flex">
                         <NavigationMenu className="flex h-full w-full items-stretch">
                             <NavigationMenuList className="flex h-full items-stretch space-x-70 w-full">
