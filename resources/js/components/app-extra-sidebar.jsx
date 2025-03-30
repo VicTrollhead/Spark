@@ -28,7 +28,6 @@ export function AppExtraSidebar() {
         <Sidebar
             side="right"
             variant="inset"
-            collapsible="none"
             className="hidden lg:block pr-2.5"
         >
             <SidebarHeader>

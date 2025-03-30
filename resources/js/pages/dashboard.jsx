@@ -90,7 +90,7 @@ export default function Dashboard() {
                     </select>
                     <button
                         onClick={handleReload}
-                        className=" p-2 text-sm font-semibold bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center"
+                        className=" p-2 text-sm font-semibold bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 transition flex items-center"
                     >
                         <RefreshCw
                             className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`}
