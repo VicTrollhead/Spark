@@ -24,16 +24,13 @@ export default function Dashboard() {
 
     const handlePostSubmit = (e) => {
         e.preventDefault();
-        router.post('/dashboard', {
+        post('/dashboard', {
             content: data.content,
             parent_post_id: data.parent_post_id,
-            is_private: data.is_private,
-        }, {
-            onSuccess: () => {
-                setData({ content: '', parent_post_id: null, media_url: null, is_private: false });
-                router.reload({ only: ['posts'] });
-            }
+            post_type: data.post_type,
+            is_private: data.is_private
         });
+        setData({ content: '', parent_post_id: null, media_url: null, is_private: false });
     };
 
     const handleReload = () => {
@@ -71,7 +68,15 @@ export default function Dashboard() {
                         />
                         Private (Only for subscribers)
                     </label>
-
+                    <button
+                        type="submit"
+                        disabled={!data.content}
+                        className={`self-end py-2 px-4 mr-0.5 rounded-lg text-white ${
+                            data.content ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 cursor-not-allowed'
+                        }`}
+                    >
+                        Post
+                    </button>
                 </form>
             </div>
 

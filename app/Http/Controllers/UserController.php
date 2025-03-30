@@ -50,6 +50,8 @@ class UserController extends Controller
                     'user' => $post->user,
                     'likes_count' => $post->likes->count(),
                     'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                    'favorites_count' => $post->favorites->count(),
+                    'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
                     'comments_count' => $post->comments->count(),
                 ];
             });
@@ -103,6 +105,8 @@ class UserController extends Controller
                     'is_private' => $post->is_private,
                     'likes_count' => $post->likes->count(),
                     'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                    'favorites_count' => $post->favorites->count(),
+                    'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
                     'comments_count' => $post->comments->count(),
                 ];
             });
@@ -110,6 +114,45 @@ class UserController extends Controller
         return Inertia::render('dashboard', [
             'users' => $users,
             'posts' => $posts,
+        ]);
+    }
+
+    public function favorites(): Response
+    {
+        $currentUser = Auth::user();
+
+        if (!$currentUser) {
+            abort(403, 'Unauthorized');
+        }
+
+        $favoritedPosts = $currentUser->favorites()
+            ->with(['user', 'comments', 'likes', 'favorites'])
+            ->latest()
+            ->get()
+            ->map(function ($post) use ($currentUser) {
+                return [
+                    'id' => $post->id,
+                    'content' => $post->content,
+                    'created_at' => $post->created_at->format('n/j/Y'),
+                    'user' => [
+                        'id' => $post->user->id,
+                        'name' => $post->user->name,
+                        'username' => $post->user->username,
+                        'profile_image_url' => $post->user->profile_image_url,
+                    ],
+                    'media_url' => $post->media_url,
+                    'is_private' => $post->is_private,
+                    'likes_count' => $post->likes->count(),
+                    'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                    'favorites_count' => $post->favorites->count(),
+                    'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
+                    'comments_count' => $post->comments->count(),
+                ];
+            });
+
+        return Inertia::render('user/favorites', [
+            'user' => $currentUser,
+            'posts' => $favoritedPosts,
         ]);
     }
 

@@ -32,8 +32,8 @@ export function AppSidebar() {
             icon: Mail,
         },
         {
-            title: 'Favourites',
-            url: '#',
+            title: 'Favorites',
+            url: '/user/favorites',
             icon: Bookmark,
         },
         {

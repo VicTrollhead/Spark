@@ -73,7 +73,7 @@ export default function Show() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${user.name} (@${user.username})`} />
 
-            <div className="relative h-56 w-full bg-gray-200 sm:h-72 dark:bg-gray-800">
+            <div className="relative w-full bg-gray-200 h-72 dark:bg-gray-800">
                 {user.cover_image_url && (
                     <img src={user.cover_image_url} alt="Cover Image" className="h-full w-full object-cover" />
                 )}
@@ -119,7 +119,7 @@ export default function Show() {
                         </button>
                     )}
                     {isOwnProfile && (
-                        <div className="flex flex-col items-center sm:items-end pl-1 sm:ml-10 space-y-2">
+                        <div className="flex flex-col lg:items-end sm:items-center pl-1 sm:ml-10 space-y-2">
                             <button
                                 onClick={handleEditProfile}
                                 className="px-4 py-2 border-2 rounded-3xl text-gray-800 hover:bg-gray-300 dark:text-gray-200 dark:hover:bg-gray-700"
@@ -193,8 +193,8 @@ export default function Show() {
                     </Link>
                 </div>
             </div>
-            <div className="mt-1">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white px-6 py-2">Posts</h2>
+            <div className="divide-y">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white px-6 py-3">Posts</h2>
                 <div className="divide-y divide-gray-200 dark:divide-gray-800">
                     {posts.length > 0 ? (
                         posts.map((post) => <PostComponent key={post.id} post={post} auth={auth} />)

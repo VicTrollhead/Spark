@@ -70,6 +70,8 @@ class PostController extends Controller
                 'is_private' => $post->is_private,
                 'likes_count' => $post->likes->count(),
                 'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                'favorites_count' => $post->favorites->count(),
+                'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
                 'comments_count' => $post->comments->count(),
             ];
         });
@@ -113,6 +115,7 @@ class PostController extends Controller
      */
     public function show(Post $post, Request $request)
     {
+        $currentUser = Auth::user();
         if (Gate::denies('view', $post)) {
             abort(403, 'Unauthorized to view this post.');
         }
@@ -163,7 +166,9 @@ class PostController extends Controller
                 ],
                 'is_private' => $post->is_private,
                 'likes_count' => $post->likes->count(),
-                'is_liked' => auth()->check() ? $post->likes->contains('user_id', auth()->id()) : false,
+                'is_liked' => $currentUser ? $post->likes->contains('user_id', auth()->id()) : false,
+                'favorites_count' => $post->favorites->count(),
+                'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
                 'comments_count' => $comments->count(),
                 'comments' => $comments,
             ],
