@@ -31,7 +31,7 @@ export default function Dashboard() {
                         <Link
                             key={user.id}
                             href={`/user/${user.username}`}
-                            className="block p-4 border rounded-md hover:shadow-md transition-shadow dark:border-gray-700 dark:bg-gray-800"
+                            className="block p-4 border rounded-md hover:shadow-md transition-shadow dark:border-gray-700 dark:bg-transparent"
                         >
                             <div className="flex items-center space-x-3 min-w-0">
                                 <Avatar className="h-10 w-10 flex-shrink-0">

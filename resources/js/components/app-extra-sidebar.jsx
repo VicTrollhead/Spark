@@ -1,7 +1,10 @@
+import { NavFooter } from './nav-footer';
 import { NavMain } from './nav-main';
-import { Sidebar, SidebarContent } from './ui/sidebar';
+import { NavUser } from './nav-user';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton } from './ui/sidebar';
 import { usePage } from '@inertiajs/react';
-import { Home, User } from 'lucide-react';
+import { BookOpen, Folder, Home, User } from 'lucide-react';
+import { Input } from './ui/input';
 
 export function AppExtraSidebar() {
     const { auth } = usePage().props;
@@ -26,7 +29,16 @@ export function AppExtraSidebar() {
             side="right"
             variant="inset"
             collapsible="none"
-            className="bg-transparent hidden xl:flex">
+            className="hidden lg:block pr-2.5"
+        >
+            <SidebarHeader>
+                <SidebarMenu className="pt-3">
+                    <SidebarMenuButton size="lg" asChild className="flex-3/4">
+                        <Input placeholder="Search..." className="w-full" />
+                    </SidebarMenuButton>
+                </SidebarMenu>
+            </SidebarHeader>
+
             <SidebarContent>
                 <NavMain items={mainNavItems} />
             </SidebarContent>
