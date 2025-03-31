@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Head, usePage, useForm, router } from '@inertiajs/react';
 import AppLayout from '../layouts/app-layout';
 import PostComponent from './post/post-component';
@@ -40,6 +40,12 @@ export default function Dashboard() {
             setIsLoading(false);
         }, 1000);
     };
+
+    useEffect(() => {
+        setInterval(() => {
+            router.reload({ only: ['posts'] });
+        }, 120000)
+    });
 
 
     return (
@@ -95,10 +101,10 @@ export default function Dashboard() {
                     </select>
                     <button
                         onClick={handleReload}
-                        className=" p-2 text-sm font-semibold bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 transition flex items-center"
+                        className="p-2 text-sm font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition flex items-center"
                     >
                         <RefreshCw
-                            className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`}
+                            className={`w-6 h-6 ${isLoading ? 'animate-spin' : ''}`}
                         />
                     </button>
                 </div>

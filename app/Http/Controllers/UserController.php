@@ -171,14 +171,54 @@ class UserController extends Controller
     /**
      * Display a list of users.
      */
-    public function users(): Response
+    public function users(Request $request): Response
     {
-        $users = User::select('id', 'name', 'username', 'profile_image_url')->get();
+        $currentUser = Auth::user();
+        $sort = $request->query('sort', 'newest');
+
+        $usersQuery = User::select('id', 'name', 'username', 'profile_image_url')
+            ->withCount('followers');
+
+        switch ($sort) {
+            case 'oldest':
+                $usersQuery->oldest();
+                break;
+            case 'popular':
+                $usersQuery->orderByDesc('followers_count');
+                break;
+            case 'least_followed':
+                $usersQuery->orderBy('followers_count');
+                break;
+            case 'following':
+                if ($currentUser) {
+                    $usersQuery->whereHas('followers', function ($query) use ($currentUser) {
+                        $query->where('follower_id', $currentUser->id);
+                    });
+                }
+                break;
+            case 'mutual_subscribers':
+                if ($currentUser) {
+                    $usersQuery->whereHas('followers', function ($query) use ($currentUser) {
+                        $query->where('follower_id', $currentUser->id);
+                    })->whereHas('following', function ($query) use ($currentUser) {
+                        $query->where('followee_id', $currentUser->id);
+                    });
+                }
+                break;
+            default:
+                $usersQuery->latest();
+                break;
+        }
+
+        $users = $usersQuery->get();
 
         return Inertia::render('user-dashboard', [
             'users' => $users,
+            'sort' => $sort,
         ]);
     }
+
+
 
     /**
      * Update the user profile.

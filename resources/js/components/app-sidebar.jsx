@@ -60,7 +60,7 @@ export function AppSidebar() {
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
                 <SidebarMenu>
-                    <SidebarMenuButton size="lg" asChild className="flex-3/4 ">
+                    <SidebarMenuButton size="lg" asChild >
                         <Link href="/dashboard" prefetch>
                             <AppLogo />
                         </Link>
