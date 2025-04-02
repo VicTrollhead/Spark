@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -36,14 +37,27 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
+        [$message, $author] = Str::of(Inspiring::quotes()->random())->explode('-');
+
+        $user = $request->user();
 
         return [
             ...parent::share($request),
             'name' => config('app.name'),
-            'quote' => ['message' => trim($message), 'author' => trim($author)],
+            'quote' => [
+                'message' => trim($message),
+                'author' => trim($author),
+            ],
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user ? [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'email' => $user->email,
+                    'profile_image_url' => $user->profileImage
+                        ? asset('storage/' . $user->profileImage->file_path)
+                        : null,
+                ] : null,
             ],
         ];
     }

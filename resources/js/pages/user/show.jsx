@@ -10,7 +10,6 @@ export default function Show() {
     const getInitials = useInitials();
     const { get, post, processing } = useForm();
 
-
     const handleFollow = () => {
         if (user.is_following) {
             router.post(`/user/${user.username}/unfollow`, {}, {
@@ -26,7 +25,6 @@ export default function Show() {
             });
         }
     };
-
 
     const handleEditProfile = () => {
         router.get(`/user/${user.username}/edit`);
@@ -45,7 +43,7 @@ export default function Show() {
 
                 <div className="p-6 text-center">
                     <Avatar className="h-24 w-24 mx-auto border-4 border-white dark:border-gray-900">
-                        <AvatarImage src={user.profile_image_url} alt={user.username} />
+                        <AvatarImage src={user.profileImage?.file_path || ''} alt={user.username} />
                         <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
                             {getInitials(user.username)}
                         </AvatarFallback>
@@ -68,23 +66,23 @@ export default function Show() {
         );
     }
 
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${user.name} (@${user.username})`} />
 
             <div className="relative w-full bg-gray-200 h-72 dark:bg-gray-800">
                 {user.cover_image_url && (
-                    <img src={user.cover_image_url} alt="Cover Image" className="h-full w-full object-cover" />
+                    <img src={user.cover_image_url} alt="Cover Image" className="h-full w-full object-fill object-center" />
                 )}
                 <div className="absolute bottom-[-55px] left-4 sm:left-6">
                     <Avatar className="h-32 w-32 border-4 border-white sm:h-36 sm:w-36 dark:border-gray-900">
-                        <AvatarImage src={user.profile_image_url} alt={user.name} />
+                        <AvatarImage src={user.profile_image_url || ''} alt={user.name} />
                         <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
                             {getInitials(user.name)}
                         </AvatarFallback>
                     </Avatar>
                 </div>
+
             </div>
 
             <div className="space-y-2 p-6 pt-12 sm:pt-16">
@@ -137,12 +135,11 @@ export default function Show() {
                             )}
                         </div>
                     )}
-
-
                 </div>
 
                 {user.bio && <p className="text-gray-700 dark:text-gray-300">{user.bio}</p>}
 
+                {/* Additional User Info */}
                 <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                     {user.location && (
                         <div className="flex items-center gap-1">
@@ -184,6 +181,7 @@ export default function Show() {
                     )}
                 </div>
 
+                {/* Followers & Following */}
                 <div className="flex gap-4 text-gray-700 dark:text-gray-300 mt-4">
                     <Link href={`/user/${user.username}/followers`} className="hover:underline">
                         <strong>{user.followers_count}</strong> Followers
@@ -193,11 +191,13 @@ export default function Show() {
                     </Link>
                 </div>
             </div>
+
+            {/* Posts */}
             <div className="divide-y">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white px-6 py-3">Posts</h2>
                 <div className="divide-y divide-gray-200 dark:divide-gray-800">
                     {posts.length > 0 ? (
-                        posts.map((post) => <PostComponent key={post.id} post={post} auth={auth} />)
+                        posts.map((post) => <PostComponent key={post.id} post={post} user={user} auth={auth} />)
                     ) : (
                         <p className="text-gray-500 dark:text-gray-400 px-6 py-4">No posts yet.</p>
                     )}
@@ -206,7 +206,3 @@ export default function Show() {
         </AppLayout>
     );
 }
-
-//                                user.is_following
-//                                     ? 'bg-gray-700 hover:bg-gray-600 text-white dark:bg-gray-800 dark:hover:bg-gray-700'
-//                                     : 'bg-gray-300 hover:bg-gray-400 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200'

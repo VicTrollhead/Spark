@@ -3,25 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateUserRequest;
+use App\Models\Media;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
     use AuthorizesRequests;
 
-    /**
-     * Display the specified user's profile.
-     */
     public function show(User $user = null): Response
     {
         $currentUser = Auth::user();
@@ -32,22 +28,26 @@ class UserController extends Controller
         }
 
         $canViewFullProfile = Gate::allows('view', $user);
-
         $user->loadCount(['followers', 'following']);
 
         $posts = $user->posts()
-            ->with(['user', 'comments', 'likes'])
+            ->with(['user', 'comments', 'likes', 'media'])
             ->latest()
             ->get()
-            ->filter(fn ($post) => Gate::allows('view', $post))
+            ->filter(fn($post) => Gate::allows('view', $post))
             ->map(function ($post) use ($currentUser) {
                 return [
                     'id' => $post->id,
                     'content' => $post->content,
                     'created_at' => $post->created_at->format('n/j/Y'),
-                    'media_url' => $post->media_url,
+                    'media' => $post->media->map(fn($media) => $media->url),
                     'is_private' => $post->is_private,
-                    'user' => $post->user,
+                    'user' => [
+                        'id' => $post->user->id,
+                        'name' => $post->user->name,
+                        'username' => $post->user->username,
+                        'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
+                    ],
                     'likes_count' => $post->likes->count(),
                     'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
                     'favorites_count' => $post->favorites->count(),
@@ -62,8 +62,8 @@ class UserController extends Controller
                 'username' => $user->username,
                 'name' => $canViewFullProfile ? $user->name : null,
                 'bio' => $canViewFullProfile ? $user->bio : null,
-                'profile_image_url' => $user->profile_image_url,
-                'cover_image_url' => $canViewFullProfile ? $user->cover_image_url : null,
+                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'cover_image_url' => $canViewFullProfile && $user->coverImage ? $user->coverImage->url : null,
                 'location' => $canViewFullProfile ? $user->location : null,
                 'website' => $canViewFullProfile ? $user->website : null,
                 'date_of_birth' => $canViewFullProfile ? optional($user->date_of_birth)->format('F j, Y') : null,
@@ -84,12 +84,12 @@ class UserController extends Controller
     {
         $currentUser = Auth::user();
 
-        $users = User::select('id', 'name', 'username', 'profile_image_url')->get();
+        $users = User::with(['profileImage'])->get();
 
-        $posts = Post::with(['user', 'comments', 'likes'])
+        $posts = Post::with(['user.profileImage', 'comments', 'likes', 'media'])
             ->latest()
             ->get()
-            ->filter(fn ($post) => Gate::allows('view', $post))
+            ->filter(fn($post) => Gate::allows('view', $post))
             ->map(function ($post) use ($currentUser) {
                 return [
                     'id' => $post->id,
@@ -99,9 +99,9 @@ class UserController extends Controller
                         'id' => $post->user->id,
                         'name' => $post->user->name,
                         'username' => $post->user->username,
-                        'profile_image_url' => $post->user->profile_image_url,
+                        'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
                     ],
-                    'media_url' => $post->media_url,
+                    'media' => $post->media->map(fn($media) => $media->url),
                     'is_private' => $post->is_private,
                     'likes_count' => $post->likes->count(),
                     'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
@@ -117,6 +117,55 @@ class UserController extends Controller
         ]);
     }
 
+    public function users(Request $request): Response
+    {
+        $currentUser = Auth::user();
+        $sort = $request->query('sort', 'newest');
+
+        $usersQuery = User::with('profileImage')->withCount('followers');
+
+        switch ($sort) {
+            case 'oldest':
+                $usersQuery->oldest();
+                break;
+            case 'popular':
+                $usersQuery->orderByDesc('followers_count');
+                break;
+            case 'least_followed':
+                $usersQuery->orderBy('followers_count');
+                break;
+            case 'following':
+                if ($currentUser) {
+                    $usersQuery->whereHas('followers', fn($query) => $query->where('follower_id', $currentUser->id));
+                }
+                break;
+            case 'followers':
+                if ($currentUser) {
+                    $usersQuery->whereHas('following', fn($query) => $query->where('followee_id', $currentUser->id));
+                }
+                break;
+            default:
+                $usersQuery->latest();
+                break;
+        }
+
+        $users = $usersQuery->get()->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'followers_count' => $user->followers_count,
+            ];
+        });
+
+        return Inertia::render('user-dashboard', [
+            'users' => $users,
+            'sort' => $sort,
+        ]);
+    }
+
+
     public function favorites(): Response
     {
         $currentUser = Auth::user();
@@ -126,7 +175,7 @@ class UserController extends Controller
         }
 
         $favoritedPosts = $currentUser->favorites()
-            ->with(['user', 'comments', 'likes', 'favorites'])
+            ->with(['user.profileImage', 'comments', 'likes', 'media'])
             ->latest()
             ->get()
             ->map(function ($post) use ($currentUser) {
@@ -138,9 +187,9 @@ class UserController extends Controller
                         'id' => $post->user->id,
                         'name' => $post->user->name,
                         'username' => $post->user->username,
-                        'profile_image_url' => $post->user->profile_image_url,
+                        'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
                     ],
-                    'media_url' => $post->media_url,
+                    'media' => $post->media->map(fn($media) => $media->url),
                     'is_private' => $post->is_private,
                     'likes_count' => $post->likes->count(),
                     'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
@@ -157,75 +206,61 @@ class UserController extends Controller
     }
 
 
-    /**
-     * Show the edit profile page.
-     */
     public function edit(User $user): Response
     {
         $this->authorize('update', $user);
         return Inertia::render('user/edit', [
-            'user' => $user,
+            'user' => [
+                'id' => $user->id,
+                'username' => $user->username,
+                'name' => $user->name,
+                'bio' => $user->bio,
+                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'cover_image_url' => $user->coverImage ? $user->coverImage->url : null,
+                'location' => $user->location,
+                'website' => $user->website,
+                'date_of_birth' => optional($user->date_of_birth)->format('F j, Y'),
+                'is_verified' => $user->is_verified,
+                'is_private' => $user->is_private,
+                'status' => $user->status,
+            ],
         ]);
     }
 
-    /**
-     * Display a list of users.
-     */
-    public function users(Request $request): Response
-    {
-        $currentUser = Auth::user();
-        $sort = $request->query('sort', 'newest');
-
-        $usersQuery = User::select('id', 'name', 'username', 'profile_image_url')
-            ->withCount('followers');
-
-        switch ($sort) {
-            case 'oldest':
-                $usersQuery->oldest();
-                break;
-            case 'popular':
-                $usersQuery->orderByDesc('followers_count');
-                break;
-            case 'least_followed':
-                $usersQuery->orderBy('followers_count');
-                break;
-            case 'following':
-                if ($currentUser) {
-                    $usersQuery->whereHas('followers', function ($query) use ($currentUser) {
-                        $query->where('follower_id', $currentUser->id);
-                    });
-                }
-                break;
-            case 'mutual_subscribers':
-                if ($currentUser) {
-                    $usersQuery->whereHas('followers', function ($query) use ($currentUser) {
-                        $query->where('follower_id', $currentUser->id);
-                    })->whereHas('following', function ($query) use ($currentUser) {
-                        $query->where('followee_id', $currentUser->id);
-                    });
-                }
-                break;
-            default:
-                $usersQuery->latest();
-                break;
-        }
-
-        $users = $usersQuery->get();
-
-        return Inertia::render('user-dashboard', [
-            'users' => $users,
-            'sort' => $sort,
-        ]);
-    }
-
-
-
-    /**
-     * Update the user profile.
-     */
     public function update(UpdateUserRequest $request, User $user)
     {
         $this->authorize('update', $user);
+
+        if ($request->hasFile('profile_image')) {
+            if ($user->profileImage) {
+                Storage::disk('public')->delete($user->profileImage->file_path);
+                $user->profileImage()->delete();
+            }
+
+            $media = new Media([
+                'file_path' => $request->file('profile_image')->store('profile_images', 'public'),
+                'file_type' => 'profile',
+                'mediable_id' => $user->id,
+                'mediable_type' => User::class,
+            ]);
+
+            $media->save();
+        }
+        if ($request->hasFile('cover_image')) {
+            if ($user->coverImage) {
+                Storage::disk('public')->delete($user->coverImage->file_path);
+                $user->coverImage()->delete();
+            }
+
+            $media = new Media([
+                'file_path' => $request->file('cover_image')->store('cover_images', 'public'),
+                'file_type' => 'cover',
+                'mediable_id' => $user->id,
+                'mediable_type' => User::class,
+            ]);
+
+            $media->save();
+        }
 
         $user->update($request->validated());
 

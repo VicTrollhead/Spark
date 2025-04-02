@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useInitials } from '../hooks/use-initials';
 
 export function UserInfo({ user, showEmail = false }) {
+    console.log("UserInfo Component - Received user:", user);
     const getInitials = useInitials();
 
     return (<div className="flex items-center gap-2">
