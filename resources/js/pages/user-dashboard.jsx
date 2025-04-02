@@ -49,6 +49,7 @@ export default function Dashboard() {
                             <option value="popular">Most Followed</option>
                             <option value="least_followed">Least Followed</option>
                             <option value="following">Following</option>
+                            <option value="followers">Followers</option>
                             <option value="mutual_subscribers">Mutual Subscribers</option>
                         </select>
                         <button

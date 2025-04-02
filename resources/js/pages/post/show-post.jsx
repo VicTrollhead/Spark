@@ -191,7 +191,7 @@ export default function Show() {
                     {post.comments.length > 0 ? (
                         post.comments.map((comment) => (
                             <div key={comment.id} className="py-4 flex items-center space-x-3">
-                                <Avatar className="h-10 w-10 border border-gray-300 dark:border-gray-700">
+                                <Avatar className="h-12 w-12 border border-gray-300 dark:border-gray-700">
                                     <AvatarImage src={comment.user.profile_image_url} alt={comment.user.name} />
                                     <AvatarFallback className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white">
                                         {getInitials(comment.user.name)}

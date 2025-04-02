@@ -40,12 +40,12 @@ export default function Dashboard() {
             setIsLoading(false);
         }, 1000);
     };
-
-    useEffect(() => {
-        setInterval(() => {
-            router.reload({ only: ['posts'] });
-        }, 120000)
-    });
+    //
+    // useEffect(() => {
+    //     setInterval(() => {
+    //         router.reload({ only: ['posts'] });
+    //     }, 120000)
+    // });
 
 
     return (
