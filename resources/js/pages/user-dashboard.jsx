@@ -37,12 +37,12 @@ export default function Dashboard() {
 
             <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-2xl font-bold">All Users</h1>
-                    <div className="flex items-center gap-2">
+                    <h1 className="text-2xl font-bold mr-2">All Users</h1>
+                    <div className="flex items-center gap-1.5">
                         <select
                             value={sortOption}
                             onChange={handleSortChange}
-                            className="p-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
+                            className="px-1 py-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
                         >
                             <option value="latest">Latest</option>
                             <option value="oldest">Oldest</option>

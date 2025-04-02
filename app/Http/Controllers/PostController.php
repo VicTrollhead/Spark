@@ -22,16 +22,19 @@ class PostController extends Controller
 
         $postsQuery = Post::with(['user.profileImage', 'comments', 'likes', 'media'])
             ->where(function ($query) use ($currentUser) {
-                $query->where('is_private', false);
+                $query->where('is_private', 0);
 
                 if ($currentUser) {
-                    $query->orWhereHas('user.followers', function ($subQuery) use ($currentUser) {
-                        $subQuery->where('follower_id', $currentUser->id);
+                    $query->orWhere(function ($subQuery) use ($currentUser) {
+                        $subQuery->where('user_id', $currentUser->id)
+                        ->orWhereHas('user.followers', function ($followersQuery) use ($currentUser) {
+                            $followersQuery->where('follower_id', $currentUser->id);
+                        });
                     });
-
-                    $query->orWhere('user_id', $currentUser->id);
                 }
             });
+
+
 
         switch ($sort) {
             case 'likes':

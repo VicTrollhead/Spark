@@ -78,14 +78,60 @@ class FollowController extends Controller
 
     public function followers(User $user)
     {
-        $followers = $user->followers()->select('id', 'name', 'username', 'profile_image_url as avatar')->get();
-        return inertia('user/followers', ['title' => 'Followers', 'users' => $followers, 'user' => $user]);
+        $followers = $user->followers()
+            ->with('profileImage')
+            ->withCount('followers')
+            ->get()
+            ->map(function ($follower) {
+                return [
+                    'id' => $follower->id,
+                    'name' => $follower->name,
+                    'username' => $follower->username,
+                    'profile_image_url' => $follower->profileImage ? $follower->profileImage->url : null,
+                    'followers_count' => $follower->followers_count,
+                ];
+            });
+
+        return inertia('user/followers', [
+            'title' => 'Followers',
+            'users' => $followers,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+            ],
+        ]);
     }
 
     public function following(User $user)
     {
-        $following = $user->following()->select('id', 'name', 'username', 'profile_image_url as avatar')->get();
-        return inertia('user/following', ['title' => 'Following', 'users' => $following, 'user' => $user]);
+        $following = $user->following()
+            ->with('profileImage')
+            ->withCount('followers')
+            ->get()
+            ->map(function ($followingUser) {
+                return [
+                    'id' => $followingUser->id,
+                    'name' => $followingUser->name,
+                    'username' => $followingUser->username,
+                    'profile_image_url' => $followingUser->profileImage ? $followingUser->profileImage->url : null,
+                    'followers_count' => $followingUser->followers_count,
+                ];
+            });
+
+        return inertia('user/following', [
+            'title' => 'Following',
+            'users' => $following,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+            ],
+        ]);
     }
+
+
 
 }
