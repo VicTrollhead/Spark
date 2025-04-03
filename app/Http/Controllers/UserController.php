@@ -173,6 +173,15 @@ class UserController extends Controller
                     $usersQuery->whereHas('following', fn($query) => $query->where('followee_id', $currentUser->id));
                 }
                 break;
+            case 'mutual_subscribers':
+                if ($currentUser) {
+                    $usersQuery->whereHas('followers', function ($query) use ($currentUser) {
+                        $query->where('follower_id', $currentUser->id);
+                    })->whereHas('following', function ($query) use ($currentUser) {
+                        $query->where('followee_id', $currentUser->id);
+                    });
+                }
+                break;
             default:
                 $usersQuery->latest();
                 break;
@@ -206,10 +215,9 @@ class UserController extends Controller
         $favoritedPosts = $currentUser->favorites()
             ->with(['user.profileImage', 'comments', 'likes', 'media'])
             ->where(function ($query) use ($currentUser) {
-                // Explicitly specify the table for the `user_id` column
-                $query->where('posts.is_private', 0) // Public posts
+                $query->where('posts.is_private', 0)
                 ->orWhere(function ($subQuery) use ($currentUser) {
-                    $subQuery->where('posts.user_id', $currentUser->id) // Posts by the user
+                    $subQuery->where('posts.user_id', $currentUser->id)
                     ->orWhereHas('user.followers', function ($followersQuery) use ($currentUser) {
                         $followersQuery->where('follower_id', $currentUser->id);
                     });

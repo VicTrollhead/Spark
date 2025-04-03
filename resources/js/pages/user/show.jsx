@@ -43,7 +43,7 @@ export default function Show() {
 
                 <div className="p-6 text-center">
                     <Avatar className="h-24 w-24 mx-auto border-4 border-white dark:border-gray-900">
-                        <AvatarImage src={user.profileImage?.file_path || ''} alt={user.username} />
+                        <AvatarImage src={user.profile_image_url || ''} alt={user.username} />
                         <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
                             {getInitials(user.username)}
                         </AvatarFallback>
