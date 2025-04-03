@@ -2,24 +2,18 @@ import { useEffect, useState } from 'react';
 import { Head, usePage, useForm, router } from '@inertiajs/react';
 import AppLayout from '../layouts/app-layout';
 import PostComponent from './post/post-component';
-import { RefreshCw } from 'lucide-react';
+import {RefreshCw} from 'lucide-react';
 
 export default function Dashboard() {
     const { users, posts, sort } = usePage().props;
     const [sortOption, setSortOption] = useState(sort || 'latest');
     const [isLoading, setIsLoading] = useState(false);
 
-   useEffect(() => {
-       setInterval(() => {
-           router.reload({ only: ['posts'] });
-       }, 20000)
-   });
-
     const { data, setData, post, errors } = useForm({
         content: '',
         parent_post_id: null,
         media_url: null,
-        is_private: false
+        is_private: false,
     });
 
     const handleSortChange = (e) => {
@@ -39,7 +33,6 @@ export default function Dashboard() {
         setData({ content: '', parent_post_id: null, media_url: null, is_private: false });
     };
 
-
     const handleReload = () => {
         setIsLoading(true);
         router.reload({ only: ['posts'] });
@@ -47,6 +40,12 @@ export default function Dashboard() {
             setIsLoading(false);
         }, 1000);
     };
+    //
+    // useEffect(() => {
+    //     setInterval(() => {
+    //         router.reload({ only: ['posts'] });
+    //     }, 120000)
+    // });
 
 
     return (
@@ -66,33 +65,28 @@ export default function Dashboard() {
                     />
                     {errors.content && <p className="text-red-500 text-sm">{errors.content}</p>}
 
-                    <div className="flex items-center justify-between ">
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={data.is_private}
-                                onChange={(e) => setData('is_private', e.target.checked)}
-                                className="mx-2"
-                            />
-                            Private (Only for subscribers)
-                        </label>
-
-                        <button
-                            type="submit"
-                            disabled={!data.content}
-                            className={`self-end py-2 px-4 mr-0.5 rounded-lg text-white ${
-                                data.content ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 cursor-not-allowed'
-                            }`}
-                        >
-                            Post
-                        </button>
-                    </div>
-
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={data.is_private}
+                            onChange={(e) => setData('is_private', e.target.checked)}
+                            className="mx-2"
+                        />
+                        Private (Only for subscribers)
+                    </label>
+                    <button
+                        type="submit"
+                        disabled={!data.content}
+                        className={`self-end py-2 px-4 mr-0.5 rounded-lg text-white ${
+                            data.content ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 cursor-not-allowed'
+                        }`}
+                    >
+                        Post
+                    </button>
                 </form>
             </div>
 
-            <div
-                className="flex items-center justify-between p-4 bg-white dark:bg-neutral-950 border-b dark:border-gray-800">
+            <div className="flex items-center justify-between p-4 bg-white dark:bg-neutral-950 border-b dark:border-gray-800">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Posts</h2>
                 <div className="flex items-center gap-2">
                     <select
@@ -107,10 +101,10 @@ export default function Dashboard() {
                     </select>
                     <button
                         onClick={handleReload}
-                        className=" p-2 text-sm font-semibold bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 text-white rounded-md  transition flex items-center"
+                        className="p-2 text-sm font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition flex items-center"
                     >
                         <RefreshCw
-                            className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`}
+                            className={`w-6 h-6 ${isLoading ? 'animate-spin' : ''}`}
                         />
                     </button>
                 </div>

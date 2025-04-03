@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
-import { PanelLeftIcon } from "lucide-react";
+import { PanelLeftIcon, Menu } from "lucide-react";
 
 import { useIsMobile } from "../../hooks/use-mobile";
 import { cn } from "../../lib/utils";
@@ -14,7 +14,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from './too
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-const SIDEBAR_WIDTH = "16rem";
+const SIDEBAR_WIDTH = "17rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
@@ -101,10 +101,21 @@ function Sidebar({ side = "left", variant = "sidebar", collapsible = "offcanvas"
     const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
 
     if (collapsible === "none") {
-        return (<div data-slot="sidebar" className={cn("bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col", className)} {...props}>
-        {children}
-      </div>);
+        return (
+            <div
+                data-slot="sidebar"
+                className={cn(
+                    "bg-sidebar text-sidebar-foreground flex flex-col h-full w-[--sidebar-width] overflow-hidden",
+                    className
+                )}
+                {...props}
+            >
+                {children}
+            </div>
+        );
     }
+
+
 
     if (isMobile) {
         return (<Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
@@ -146,7 +157,7 @@ function SidebarTrigger({ className, onClick, ...props }) {
             onClick?.(event);
             toggleSidebar();
         }} {...props}>
-      <PanelLeftIcon />
+      <Menu />
         {/*<span>Dashboard</span>*/}
       <span className="sr-only">Toggle Sidebar</span>
     </Button>);

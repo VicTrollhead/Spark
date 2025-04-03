@@ -31,7 +31,7 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:20'],
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
@@ -80,7 +80,7 @@ class RegisteredUserController extends Controller
         $nouns = ['Tiger', 'Falcon', 'Panda', 'Wolf', 'Dragon', 'Hawk', 'Phoenix', 'Bear', 'Lion', 'Shark'];
 
         do {
-            $username = $adjectives[array_rand($adjectives)] . $nouns[array_rand($nouns)] . rand(10000000, 99999999);
+            $username = $adjectives[array_rand($adjectives)] . $nouns[array_rand($nouns)] . rand(1000, 9999);
         } while (User::where('username', $username)->exists());
 
         return $username;

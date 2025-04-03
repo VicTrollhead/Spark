@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('username', 50)->unique()->nullable()->after('id');
             $table->text('bio')->nullable()->after('name');
-            $table->string('profile_image_url', 255)->nullable()->after('bio');
-            $table->string('cover_image_url', 255)->nullable()->after('profile_image_url');
-            $table->string('location', 100)->nullable()->after('cover_image_url');
+//            $table->string('profile_image_url', 255)->nullable()->after('bio');
+//            $table->string('cover_image_url', 255)->nullable()->after('profile_image_url');
+            $table->string('location', 100)->nullable()->after('bio');
             $table->string('website', 255)->nullable()->after('location');
             $table->date('date_of_birth')->nullable()->after('website');
             $table->boolean('is_verified')->default(false)->after('date_of_birth');

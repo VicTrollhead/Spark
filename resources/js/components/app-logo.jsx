@@ -1,13 +1,13 @@
 import AppLogoIcon from './app-logo-icon';
 
 export default function AppLogo() {
-    return (<>
-            <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-md">
-                <AppLogoIcon className="size-5 fill-current text-white dark:text-black"/>
+    return (<div className="flex items-center gap-x-2 justify-start py-2">
+            <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-9 items-center justify-center rounded-md">
+                <AppLogoIcon className="size-6 fill-current text-white dark:text-black"/>
             </div>
-            <div className="ml-1 grid flex-1 text-left text-sm">
-                <span className="mb-0.5 truncate leading-none font-semibold">Spark</span>
+            <div className="grid flex-1 text-left text-xl font-extrabold">
+                <span className="leading-none ">Spark</span>
             </div>
-        </>);
+        </div>);
 }
 

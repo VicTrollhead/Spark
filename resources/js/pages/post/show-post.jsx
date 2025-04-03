@@ -2,7 +2,7 @@ import { Head, usePage, Link, useForm, router } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
-import { EyeOff, Heart, MessageCircle, Trash2 } from 'lucide-react';
+import { Bookmark, EyeOff, Heart, MessageCircle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 
@@ -31,6 +31,9 @@ export default function Show() {
     const [isLiked, setIsLiked] = useState(post.is_liked);
     const [likesCount, setLikesCount] = useState(post.likes_count);
 
+    const [isFavorited, setIsFavorited] = useState(post.is_favorited);
+    const [favoritesCount, setFavoritesCount] = useState(post.favorites_count);
+
     const handleLike = async () => {
         setIsLiked(!isLiked);
         setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
@@ -43,6 +46,23 @@ export default function Show() {
                 onError: () => {
                     setIsLiked(post.is_liked);
                     setLikesCount(post.likes_count);
+                },
+            }
+        );
+    };
+
+    const handleFavorite = async () => {
+        setIsFavorited(!isFavorited);
+        setFavoritesCount(isFavorited ? favoritesCount - 1 : favoritesCount + 1);
+
+        await router.post(
+            isFavorited ? `/post/${post.id}/remove-favorite` : `/post/${post.id}/add-favorite`,
+            {},
+            {
+                preserveScroll: true,
+                onError: () => {
+                    setIsFavorited(post.is_favorited);
+                    setFavoritesCount(post.favorites_count);
                 },
             }
         );
@@ -111,10 +131,19 @@ export default function Show() {
                             <strong>{likesCount}</strong>
                         </p>
                     </div>
-                    <div className="flex items-center space-x-0.5">
+                    <div className="flex items-center space-x-1">
                         <MessageCircle className="h-6 w-6 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-500" />
                         <p>
                             <strong>{post.comments_count}</strong>
+                        </p>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                        <Bookmark
+                            className={`h-6 w-6 cursor-pointer ${isFavorited ? 'text-yellow-500' : 'text-gray-500 hover:yellow-red-500'}`}
+                            onClick={handleFavorite}
+                        />
+                        <p>
+                            <strong>{favoritesCount}</strong>
                         </p>
                     </div>
                     {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
@@ -162,7 +191,7 @@ export default function Show() {
                     {post.comments.length > 0 ? (
                         post.comments.map((comment) => (
                             <div key={comment.id} className="py-4 flex items-center space-x-3">
-                                <Avatar className="h-10 w-10 border border-gray-300 dark:border-gray-700">
+                                <Avatar className="h-12 w-12 border border-gray-300 dark:border-gray-700">
                                     <AvatarImage src={comment.user.profile_image_url} alt={comment.user.name} />
                                     <AvatarFallback className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white">
                                         {getInitials(comment.user.name)}
