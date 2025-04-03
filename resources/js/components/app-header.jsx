@@ -52,7 +52,7 @@ export function AppHeader({ breadcrumbs = [] }) {
         },
         {
             title: 'Favourites',
-            url: '#',
+            url: '/user/favorites',
             icon: Bookmark,
         },
         {
@@ -113,14 +113,10 @@ export function AppHeader({ breadcrumbs = [] }) {
                                                 <Folder className="h-5 w-5"/>
                                                 <span>Repository</span>
                                             </a>
-                                            {/*<Link className="flex items-center space-x-2 font-medium cursor-pointer" method="post" href={route('logout')} as="button">*/}
-                                            {/*    <LogOut className="h-5 w-5"/>*/}
-                                            {/*    <span>Log out</span>*/}
-                                            {/*</Link>*/}
                                             <Button
                                                 onClick={handleLogout}
                                                 size="lg"
-                                                className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group cursor-pointer">
+                                                className="data-[state=open]:bg-sidebar-accent group cursor-pointer mr-auto mt-3">
                                                 <LogOut/>
                                                 Log out
                                             </Button>
