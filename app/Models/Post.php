@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Post extends Model
 {
@@ -14,15 +16,12 @@ class Post extends Model
         'user_id',
         'content',
         'parent_post_id',
-        'media_url',
         'is_deleted',
         'is_private',
         'likes_count',
         'is_liked',
         'comments_count',
     ];
-
-    //public $timestamps = false;
 
     public function user()
     {
@@ -34,18 +33,36 @@ class Post extends Model
         return $this->belongsTo(Post::class, 'parent_post_id');
     }
 
-    public function replies() : HasMany
+    public function replies(): HasMany
     {
         return $this->hasMany(Post::class, 'parent_post_id');
     }
 
-    public function likes() : HasMany
+    public function likes(): HasMany
     {
         return $this->hasMany(Like::class);
     }
 
-    public function comments() : HasMany
+    public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    // Polymorphic Relationship to Media
+    public function media(): MorphMany
+    {
+        return $this->morphMany(Media::class, 'mediable');
+    }
+
+//    public function profileImage(): HasOne
+//    {
+//        return $this->hasOne(Media::class, 'mediable_id')
+//            ->where('mediable_type', User::class)
+//            ->where('file_type', 'profile');
+//    }
 }

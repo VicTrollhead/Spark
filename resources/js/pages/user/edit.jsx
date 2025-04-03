@@ -20,8 +20,8 @@ export default function Edit() {
         date_of_birth: user.date_of_birth || '',
         is_private: user.is_private || false,
         status: user.status || 'active',
-        profile_image: null,
-        cover_image: null,
+        profile_image: user.profile_image_url || null,
+        cover_image: user.cover_image_url || null,
         _method: 'PATCH',
     });
 
@@ -52,9 +52,13 @@ export default function Edit() {
                         <div>
                             <label className="mb-2 block text-gray-700 dark:text-gray-200">
                                 Profile Image
-                                <span className="text-gray-500 break-all"> ({user.profile_image_url || 'Not Set'})</span>
+                                <span className="text-gray-500 break-all"> ({user.profile_image_url  || 'Not Set'})</span>
                             </label>
-                            <input type="file" onChange={(e) => setData('profile_image', e.target.files[0])} className="text-sm text-gray-500" />
+                            <input
+                                type="file"
+                                onChange={(e) => setData('profile_image', e.target.files[0])}
+                                className="text-sm text-gray-500"
+                            />
                         </div>
                     </div>
 
@@ -63,7 +67,11 @@ export default function Edit() {
                             Cover Image
                             <span className="text-gray-500"> ({user.cover_image_url || 'Not Set'})</span>
                         </label>
-                        <input type="file" onChange={(e) => setData('cover_image', e.target.files[0])} className="text-sm text-gray-500" />
+                        <input
+                            type="file"
+                            onChange={(e) => setData('cover_image', e.target.files[0])}
+                            className="text-sm text-gray-500"
+                        />
                     </div>
 
                     <div>

@@ -1,17 +1,10 @@
 import { NavMain } from './nav-main';
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarSeparator
-} from './ui/sidebar';
-import { Link, router, usePage } from '@inertiajs/react';
-import { Bookmark, Home, LogOut, Mail, Settings, User, Users, Folder } from 'lucide-react';
-import { Avatar, AvatarImage } from '@/components/ui/avatar.jsx';
-import { useMobileNavigation } from '@/hooks/use-mobile-navigation.js';
+import { NavUser } from './nav-user';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton } from './ui/sidebar';
+import { Link, usePage } from '@inertiajs/react';
+import { Bookmark, BookOpen, Folder, Home, LogOut, Mail, Settings, User, Users } from 'lucide-react';
+import AppLogo from './app-logo';
+import { useMobileNavigation } from '../hooks/use-mobile-navigation';
 
 export function AppSidebar() {
     const { auth } = usePage().props;
@@ -37,8 +30,8 @@ export function AppSidebar() {
             icon: Mail,
         },
         {
-            title: 'Favourites',
-            url: '#',
+            title: 'Favorites',
+            url: '/user/favorites',
             icon: Bookmark,
         },
         {
@@ -50,6 +43,14 @@ export function AppSidebar() {
             title: 'Settings',
             url: '/settings/profile',
             icon: Settings,
+        },
+    ];
+
+    const footerNavItems = [
+        {
+            title: 'Repository',
+            url: 'https://github.com/VicTrollhead/Spark',
+            icon: Folder,
         },
     ];
 
@@ -65,6 +66,9 @@ export function AppSidebar() {
                  className="bg-transparent fixed top-16 left-0 w-64 h-[calc(100vh-4rem)] shadow-md hidden lg:flex">
             <SidebarHeader>
                 <SidebarMenu>
+                    <SidebarMenuButton size="lg" asChild >
+                        <Link href="/dashboard" prefetch>
+                            <AppLogo />
                     <div className="flex items-center gap-1">
                         <Link href={user.username ? `/user/${user.username}` : '/user'} prefetch>
                             <Avatar className="ml-2 my-3 size-12">
