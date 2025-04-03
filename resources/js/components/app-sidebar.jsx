@@ -1,15 +1,25 @@
 import { NavMain } from './nav-main';
 import { NavUser } from './nav-user';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton } from './ui/sidebar';
-import { Link, usePage } from '@inertiajs/react';
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarSeparator
+} from './ui/sidebar';
+import { Link, router, usePage } from '@inertiajs/react';
 import { Bookmark, BookOpen, Folder, Home, LogOut, Mail, Settings, User, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useMobileNavigation } from '../hooks/use-mobile-navigation';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx';
+import { useInitials } from '@/hooks/use-initials.jsx';
 
 export function AppSidebar() {
     const { auth } = usePage().props;
     const user = auth?.user;
-    const cleanup = useMobileNavigation();
+    const getInitials = useInitials();
 
     if (!user) return null;
 
@@ -55,7 +65,7 @@ export function AppSidebar() {
     ];
 
     const handleLogout = () => {
-        router.post(`logout`);
+        router.post(`/logout`);
         window.location.href = "/login";
     };
 
@@ -66,13 +76,13 @@ export function AppSidebar() {
                  className="bg-transparent fixed top-16 left-0 w-64 h-[calc(100vh-4rem)] shadow-md hidden lg:flex">
             <SidebarHeader>
                 <SidebarMenu>
-                    <SidebarMenuButton size="lg" asChild >
-                        <Link href="/dashboard" prefetch>
-                            <AppLogo />
                     <div className="flex items-center gap-1">
                         <Link href={user.username ? `/user/${user.username}` : '/user'} prefetch>
                             <Avatar className="ml-2 my-3 size-12">
-                                <AvatarImage src={user.profile_image_url} alt={user.username[0]}/>
+                                <AvatarImage src={user.profile_image_url} alt={user.name}/>
+                                <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                    {getInitials(user.name)}
+                                </AvatarFallback>
                             </Avatar>
                         </Link>
                         <div className="ml-2">

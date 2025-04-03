@@ -36,8 +36,6 @@ export default function Dashboard() {
             <Head title="Users Dashboard" />
 
             <div className="px-6">
-                <h1 className="text-2xl font-bold mb-4">All Users</h1>
-            <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
                     <h1 className="text-2xl font-bold">All Users</h1>
                     <div className="flex items-center gap-2">
