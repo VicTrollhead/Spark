@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Head, usePage, useForm, router } from '@inertiajs/react';
 import AppLayout from '../layouts/app-layout';
 import PostComponent from './post/post-component';
@@ -8,6 +8,12 @@ export default function Dashboard() {
     const { users, posts, sort } = usePage().props;
     const [sortOption, setSortOption] = useState(sort || 'latest');
     const [isLoading, setIsLoading] = useState(false);
+
+   useEffect(() => {
+       setInterval(() => {
+           router.reload({ only: ['posts'] });
+       }, 20000)
+   });
 
     const { data, setData, post, errors } = useForm({
         content: '',
@@ -28,7 +34,7 @@ export default function Dashboard() {
             content: data.content,
             parent_post_id: data.parent_post_id,
             post_type: data.post_type,
-            is_private: data.is_private,
+            is_private: data.is_private
         });
         setData({ content: '', parent_post_id: null, media_url: null, is_private: false });
     };
@@ -118,5 +124,5 @@ export default function Dashboard() {
                 )}
             </div>
         </AppLayout>
-);
+    );
 }
