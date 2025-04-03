@@ -26,7 +26,7 @@ export function AppExtraSidebar() {
             side="right"
             variant="inset"
             collapsible="none"
-            className="bg-transparent hidden xl:flex">
+            className="bg-transparent fixed top-16 right-0 w-64 h-[calc(100vh-4rem)] shadow-md hidden xl:flex">
             <SidebarContent>
                 <NavMain items={mainNavItems} />
             </SidebarContent>

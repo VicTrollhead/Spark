@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { Bookmark, Folder, Home, LogOut, Mail, Menu, Search, Settings, User, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
@@ -66,6 +66,10 @@ export function AppHeader({ breadcrumbs = [] }) {
             icon: Settings,
         },
     ];
+    const handleLogout = () => {
+        router.post(`logout`);
+        window.location.href = "/login";
+    };
 
     // const rightNavItems = [
     //     {
@@ -81,7 +85,7 @@ export function AppHeader({ breadcrumbs = [] }) {
     // ];
 
     return (<>
-            <div className="border-sidebar-border/80 border-b">
+            <div className="border-sidebar-border/80 border-b fixed top-0 left-0 w-full z-50 bg-white dark:bg-neutral-950">
                 <div className="mx-4 flex h-16 ">
                     {/* Mobile Menu */}
                     <div className="lg:hidden">
@@ -109,10 +113,17 @@ export function AppHeader({ breadcrumbs = [] }) {
                                                 <Folder className="h-5 w-5"/>
                                                 <span>Repository</span>
                                             </a>
-                                            <Link className="flex items-center space-x-2 font-medium cursor-pointer" method="post" href={route('logout')} as="button">
-                                                <LogOut className="h-5 w-5"/>
-                                                <span>Log out</span>
-                                            </Link>
+                                            {/*<Link className="flex items-center space-x-2 font-medium cursor-pointer" method="post" href={route('logout')} as="button">*/}
+                                            {/*    <LogOut className="h-5 w-5"/>*/}
+                                            {/*    <span>Log out</span>*/}
+                                            {/*</Link>*/}
+                                            <Button
+                                                onClick={handleLogout}
+                                                size="lg"
+                                                className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group cursor-pointer">
+                                                <LogOut/>
+                                                Log out
+                                            </Button>
                                         </div>
                                     </div>
                                 </div>

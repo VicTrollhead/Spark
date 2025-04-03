@@ -8,7 +8,7 @@ import {
     SidebarMenuButton,
     SidebarSeparator
 } from './ui/sidebar';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { Bookmark, Home, LogOut, Mail, Settings, User, Users, Folder } from 'lucide-react';
 import { Avatar, AvatarImage } from '@/components/ui/avatar.jsx';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation.js';
@@ -53,11 +53,16 @@ export function AppSidebar() {
         },
     ];
 
+    const handleLogout = () => {
+        router.post(`logout`);
+        window.location.href = "/login";
+    };
+
     return (
         <Sidebar
                  variant="inset"
                  collapsible="none"
-                 className="bg-transparent hidden lg:flex">
+                 className="bg-transparent fixed top-16 left-0 w-64 h-[calc(100vh-4rem)] shadow-md hidden lg:flex">
             <SidebarHeader>
                 <SidebarMenu>
                     <div className="flex items-center gap-1">
@@ -74,7 +79,7 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent className="mt-5">
+            <SidebarContent className="mt-4">
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 
@@ -86,12 +91,13 @@ export function AppSidebar() {
                         Repository
                     </SidebarMenuButton>
                 </a>
-                <Link className="flex cursor-pointer" method="post" href={route('logout')} as="button" onClick={cleanup}>
-                    <SidebarMenuButton size="lg" className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group cursor-pointer">
-                        <LogOut/>
-                        Log out
-                    </SidebarMenuButton>
-                </Link>
+                <SidebarMenuButton
+                    onClick={handleLogout}
+                    size="lg"
+                    className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group cursor-pointer">
+                    <LogOut/>
+                    Log out
+                </SidebarMenuButton>
             </SidebarFooter>
         </Sidebar>
     );

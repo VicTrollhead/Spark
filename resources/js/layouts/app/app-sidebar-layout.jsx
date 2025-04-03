@@ -7,10 +7,10 @@ import { AppHeader } from '@/components/app-header.jsx';
 export default function AppSidebarLayout({ children, breadcrumbs = [] }) {
     return (<>
         <div className="flex flex-col">
-            <AppHeader/>
+            <AppHeader breadcrumbs={breadcrumbs}/>
             <AppShell variant="sidebar">
                 <AppSidebar />
-                <AppContent variant="sidebar" breadcrumbs={breadcrumbs}>
+                <AppContent variant="sidebar" breadcrumbs={breadcrumbs} class="container mx-auto px-20 pt-16">
                     {/*<AppSidebarHeader breadcrumbs={breadcrumbs}/>*/}
                     {children}
 

@@ -1,4 +1,4 @@
-import { usePage, Link, Head } from '@inertiajs/react';
+import { usePage, Link, Head, router } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
@@ -11,10 +11,19 @@ export default function Following() {
         { title: isOwnProfile ? 'My Profile' : "@" + user.username + "'s Profile", href: `/user/${user.username}` },
         { title:  'Following', href: `/user/${user.username}` },
     ];
+
+    const handleFollow = (user) => {
+        router.post(`/user/${user.username}/unfollow`, {}, {
+            onSuccess: () => {
+                router.reload({ only: ['posts'] });
+            }
+        });
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isOwnProfile ? 'Following' : user.name + "'s Following"} />
-            <div className="max-w-lg p-6">
+            <div className="max-w-lg px-6">
                 <h1 className="mb-4 text-2xl font-bold">{title}</h1>
                 {users.length === 0 ? (
                     <p className="text-gray-500">Not following anyone yet.</p>
@@ -28,11 +37,18 @@ export default function Following() {
                                         {getInitials(user.name)}
                                     </AvatarFallback>
                                 </Avatar>
-                                <div>
-                                    <Link href={`/user/${user.username}`} className="font-medium text-blue-500 hover:underline">
-                                        {user.name}
-                                    </Link>
-                                    <p className="text-gray-500 dark:text-gray-400">@{user.username}</p>
+                                <div className="flex flex-row w-full">
+                                    <div>
+                                        <Link href={`/user/${user.username}`} className="font-medium text-blue-500 hover:underline">
+                                            {user.name}
+                                        </Link>
+                                        <p className="text-gray-500 dark:text-gray-400">@{user.username}</p>
+                                    </div>
+                                    <button
+                                        onClick={() => handleFollow(user)}
+                                        className={`ml-auto px-4 py-2 rounded-md bg-gray-600 hover:bg-gray-500 text-white dark:bg-gray-800 dark:hover:bg-gray-700`}>
+                                        Unfollow
+                                    </button>
                                 </div>
                             </li>
                         ))}
