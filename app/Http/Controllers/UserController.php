@@ -225,6 +225,7 @@ class UserController extends Controller
             })
             ->latest()
             ->get()
+            ->filter(fn ($post) => $post->is_private == 0 || $post->user_id == $currentUser->id || $post->user->followers->contains('id', $currentUser->id)) // Double-check filtering
             ->map(function ($post) use ($currentUser) {
                 return [
                     'id' => $post->id,
@@ -246,12 +247,12 @@ class UserController extends Controller
                 ];
             });
 
-
         return Inertia::render('user/favorites', [
             'user' => $currentUser,
             'posts' => $favoritedPosts,
         ]);
     }
+
 
 
 

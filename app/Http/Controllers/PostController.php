@@ -120,8 +120,16 @@ class PostController extends Controller
             'user.profileImage',
             'comments.user.profileImage',
             'likes',
-            'media'
+            'media',
+            'hashtags'
         ]);
+
+        $hashtags = $post->hashtags->map(function ($hashtag) {
+            return [
+                'id' => $hashtag->id,
+                'hashtag' => $hashtag->hashtag,
+            ];
+        });
 
         $commentsQuery = $post->comments()->with('user.profileImage');
 
@@ -170,6 +178,7 @@ class PostController extends Controller
                 'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
                 'comments_count' => $comments->count(),
                 'comments' => $comments,
+                'hashtags' => $hashtags,
             ],
             'sort' => $sort
         ]);
