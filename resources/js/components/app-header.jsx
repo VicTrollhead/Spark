@@ -11,7 +11,7 @@ import {
     LogOut,
     Mail,
     Menu, Search,
-    Settings,
+    Settings, Text,
     User,
     Users
 } from 'lucide-react';
@@ -19,6 +19,8 @@ import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 import { Input } from '@/components/ui/input.jsx';
 import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu.jsx';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx';
+import { useInitials } from '@/hooks/use-initials.jsx';
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
@@ -26,6 +28,7 @@ export function AppHeader({ breadcrumbs = [] }) {
     const page = usePage();
     const { auth } = page.props;
     const user = auth?.user;
+    const getInitials = useInitials();
     if (!user) return null;
 
     const mainNavItems = [
@@ -45,7 +48,7 @@ export function AppHeader({ breadcrumbs = [] }) {
 
     const sideBarNavItems = [
         {
-            title: 'News',
+            title: 'Dashboard',
             url: '/dashboard',
             icon: Home,
         },
@@ -106,31 +109,42 @@ export function AppHeader({ breadcrumbs = [] }) {
                                     <Menu className="h-6 w-6"/>
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between pl-5">
+                            <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between pl-5 gap-0">
                                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                                <SheetHeader className="flex justify-start text-left">
-                                    <AppLogoIcon className="h-6 w-6 fill-current text-black dark:text-white"/>
+                                <SheetHeader className="flex justify-start text-left p-0 pt-3">
+                                    <div className="flex items-center gap-1">
+                                        <Link href={user.username ? `/user/${user.username}` : '/user'} prefetch>
+                                            <Avatar className="my-3 size-10">
+                                                <AvatarImage src={user.profile_image_url} alt={user.name}/>
+                                                <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                                    {getInitials(user.name)}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                        </Link>
+                                        <div className="ml-2">
+                                            <h1 className="text-1l ml-1 font-bold text-gray-900 dark:text-white">{user.name}</h1>
+                                            <p className="text-gray-500 dark:text-gray-400">@{user.username}</p>
+                                        </div>
+                                    </div>
                                 </SheetHeader>
-                                <div className="mt-6 flex h-full flex-1 flex-col space-y-4">
+                                <div className="mt-4 flex h-full flex-1 flex-col ">
                                     <div className="flex h-full flex-col justify-between text-sm">
                                         <div className="flex flex-col space-y-4">
                                             {sideBarNavItems.map((item) => (
-                                                <Link key={item.title} href={item.url} className="flex items-center space-x-2 font-medium">
+                                                <Link key={item.title} href={item.url} className="flex items-center space-x-2 ">
                                                     {item.icon && <Icon iconNode={item.icon} className="h-5 w-5"/>}
                                                     <span>{item.title}</span>
                                                 </Link>))}
                                            <DropdownMenuSeparator className="mb-5"/>
-                                            <a className="flex items-center space-x-2 font-medium" href="https://github.com/VicTrollhead/Spark">
+                                            <a className="flex items-center space-x-2 " href="https://github.com/VicTrollhead/Spark">
                                                 <Folder className="h-5 w-5"/>
                                                 <span>Repository</span>
                                             </a>
-                                            <Button
-                                                onClick={handleLogout}
-                                                size="lg"
-                                                className="data-[state=open]:bg-sidebar-accent group cursor-pointer mr-auto mt-3">
-                                                <LogOut/>
+                                            <p onClick={handleLogout}
+                                                className="flex items-center space-x-2 cursor-pointer">
+                                                <LogOut className="h-5 w-5 mr-2"/>
                                                 Log out
-                                            </Button>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
