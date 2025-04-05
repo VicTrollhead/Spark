@@ -132,6 +132,9 @@ class FollowController extends Controller
         ]);
     }
 
-
-
+    public function friends(User $user)
+    {
+        $friends = $user->friends()->select('id', 'name', 'username', 'profile_image_url as avatar')->get();
+        return inertia('user/friends', ['title' => 'Friends', 'users' => $friends, 'user' => $user]);
+    }
 }
