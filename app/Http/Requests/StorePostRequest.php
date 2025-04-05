@@ -26,6 +26,8 @@ class StorePostRequest extends FormRequest
             'parent_post_id' => ['nullable', 'exists:posts,id'],
             'media_url' => ['nullable', 'string', 'max:255'],
             'is_private' => ['required', 'boolean'],
+            'hashtags' => ['nullable','array'],
+            'hashtags.*' => ['string','max:255'],
         ];
     }
 }

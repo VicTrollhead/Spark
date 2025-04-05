@@ -9,6 +9,7 @@ export default function Dashboard() {
     const [sortOption, setSortOption] = useState(sort || 'latest');
     const [isLoading, setIsLoading] = useState(false);
 
+
     const { data, setData, post, errors } = useForm({
         content: '',
         parent_post_id: null,
@@ -24,6 +25,8 @@ export default function Dashboard() {
 
     const handlePostSubmit = (e) => {
         e.preventDefault();
+
+        const extractedTags = data.content.match(/#(\w+)/g)?.map(tag => tag.slice(1)) || [];
         post('/dashboard', {
             content: data.content,
             parent_post_id: data.parent_post_id,
