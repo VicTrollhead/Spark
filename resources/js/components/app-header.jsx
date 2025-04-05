@@ -30,7 +30,7 @@ export function AppHeader({ breadcrumbs = [] }) {
         },
         {
             title: 'Liked posts',
-            url: '#',
+            url: '/user/liked',
         },
     ];
 
