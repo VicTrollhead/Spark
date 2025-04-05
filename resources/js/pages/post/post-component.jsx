@@ -1,5 +1,5 @@
 import { Link, useForm, router } from '@inertiajs/react';
-import { Heart, MessageCircle, EyeOff } from 'lucide-react';
+import { Heart, MessageCircle, EyeOff, Bookmark } from 'lucide-react';
 import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
@@ -11,18 +11,42 @@ export default function PostComponent({ post }) {
     const [isLiked, setIsLiked] = useState(post.is_liked);
     const [likesCount, setLikesCount] = useState(post.likes_count);
 
+    const [isFavorited, setIsFavorited] = useState(post.is_favorited);
+    const [favoritesCount, setFavoritesCount] = useState(post.favorites_count);
+
 
     const handleLike = async () => {
         setIsLiked(!isLiked);
         setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
 
-        await router.post(isLiked ? `/post/${post.id}/unlike` : `/post/${post.id}/like`, {
-            preserveScroll: true,
-            onError: () => {
-                setIsLiked(post.is_liked);
-                setLikesCount(post.likes_count);
-            },
-        });
+        await router.post(
+            isLiked ? `/post/${post.id}/unlike` : `/post/${post.id}/like`,
+            {},
+            {
+                preserveScroll: true,
+                onError: () => {
+                    setIsLiked(post.is_liked);
+                    setLikesCount(post.likes_count);
+                },
+            }
+        );
+    };
+
+    const handleFavorite = async () => {
+        setIsFavorited(!isFavorited);
+        setFavoritesCount(isFavorited ? favoritesCount - 1 : favoritesCount + 1);
+
+        await router.post(
+            isFavorited ? `/post/${post.id}/remove-favorite` : `/post/${post.id}/add-favorite`,
+            {},
+            {
+                preserveScroll: true,
+                onError: () => {
+                    setIsFavorited(post.is_favorited);
+                    setFavoritesCount(post.favorites_count);
+                },
+            }
+        );
     };
 
     return (
@@ -60,6 +84,15 @@ export default function PostComponent({ post }) {
                             <MessageCircle className="h-5 w-5" />
                             <span>{post.comments_count}</span>
                         </Link>
+
+                        <button
+                            onClick={handleFavorite}
+                            disabled={processing}
+                            className={`flex items-center gap-1 ${post.is_favorited ? 'text-yellow-500' : 'hover:text-yellow-500'}`}
+                        >
+                            <Bookmark className="h-5 w-5" />
+                            <span>{post.favorites_count}</span>
+                        </button>
 
                         {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
 

@@ -2,14 +2,14 @@ import { usePage, Link, Head, router } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
-export default function Following() {
+export default function Friends() {
     const { title, users, user, auth } = usePage().props;
     const getInitials = useInitials();
     const isOwnProfile = auth.user && auth.user.id === user.id;
 
     const breadcrumbs = [
         { title: isOwnProfile ? 'My Profile' : "@" + user.username + "'s Profile", href: `/user/${user.username}` },
-        { title:  'Following', href: `/user/${user.username}` },
+        { title:  'Friends', href: `/user/${user.username}` },
     ];
 
     const handleFollow = (user) => {
@@ -22,11 +22,11 @@ export default function Following() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={isOwnProfile ? 'Following' : user.name + "'s Following"} />
-            <div className="max-w-lg px-6">
+            <Head title={isOwnProfile ? 'Friends' : user.name + "'s Friends"} />
+            <div className="max-w-lg p-6">
                 <h1 className="mb-4 text-2xl font-bold">{title}</h1>
                 {users.length === 0 ? (
-                    <p className="text-gray-500">Not following anyone yet.</p>
+                    <p className="text-gray-500">Not friends anyone yet.</p>
                 ) : (
                     <ul>
                         {users.map((user) => (

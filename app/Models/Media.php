@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Media extends Model
 {
@@ -16,11 +17,14 @@ class Media extends Model
         'mediable_type',
     ];
 
-    /**
-     * Get the parent mediable model (Post or User).
-     */
-    public function mediable()
+    public function mediable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function getUrlAttribute()
+    {
+
+        return asset('storage/' . $this->file_path);
     }
 }

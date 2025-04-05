@@ -15,26 +15,26 @@ use Illuminate\Validation\Rule;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request): Response
     {
         $currentUser = Auth::user();
         $sort = $request->query('sort', 'latest');
 
-        $postsQuery = Post::with(['user', 'comments', 'likes'])
+        $postsQuery = Post::with(['user.profileImage', 'comments', 'likes', 'media'])
             ->where(function ($query) use ($currentUser) {
-                $query->where('is_private', false);
+                $query->where('is_private', 0);
 
                 if ($currentUser) {
-                    $query->orWhereHas('user.followers', function ($subQuery) use ($currentUser) {
-                        $subQuery->where('follower_id', $currentUser->id);
+                    $query->orWhere(function ($subQuery) use ($currentUser) {
+                        $subQuery->where('user_id', $currentUser->id)
+                        ->orWhereHas('user.followers', function ($followersQuery) use ($currentUser) {
+                            $followersQuery->where('follower_id', $currentUser->id);
+                        });
                     });
-
-                    $query->orWhere('user_id', $currentUser->id);
                 }
             });
+
+
 
         switch ($sort) {
             case 'likes':
@@ -64,12 +64,14 @@ class PostController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profile_image_url,
+                    'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
                 ],
-                'media_url' => $post->media_url,
+                'media' => $post->media->map(fn ($media) => $media->file_path),
                 'is_private' => $post->is_private,
                 'likes_count' => $post->likes->count(),
                 'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                'favorites_count' => $post->favorites->count(),
+                'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
                 'comments_count' => $post->comments->count(),
             ];
         });
@@ -80,48 +82,56 @@ class PostController extends Controller
         ]);
     }
 
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
-//    public function create(): Response
-//    {
-//        return Inertia::render('Posts/Create');
-//    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StorePostRequest $request)
     {
         $request->validated();
 
-        Post::create([
+        $post = Post::create([
             'user_id' => Auth::id(),
             'content' => $request['content'],
             'parent_post_id' => $request['parent_post_id'],
-            'media_url' => $request['media_url'],
             'is_private' => $request['is_private'],
         ]);
+
+        if ($request->hasFile('media')) {
+            foreach ($request->file('media') as $file) {
+                $path = $file->store('uploads/posts', 'public');
+                $post->media()->create([
+                    'file_path' => $path,
+                    'file_type' => $file->getMimeType(),
+                ]);
+            }
+        }
 
         return redirect()->route('dashboard')->with('success', 'Post created successfully!');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Post $post, Request $request)
     {
+        $currentUser = Auth::user();
+
         if (Gate::denies('view', $post)) {
             abort(403, 'Unauthorized to view this post.');
         }
 
         $sort = $request->query('sort', 'latest');
 
-        $post->load(['user', 'comments', 'likes']);
+        $post->load([
+            'user.profileImage',
+            'comments.user.profileImage',
+            'likes',
+            'media',
+            'hashtags'
+        ]);
 
-        $commentsQuery = $post->comments()->with('user');
+        $hashtags = $post->hashtags->map(function ($hashtag) {
+            return [
+                'id' => $hashtag->id,
+                'hashtag' => $hashtag->hashtag,
+            ];
+        });
+
+        $commentsQuery = $post->comments()->with('user.profileImage');
 
         switch ($sort) {
             case 'likes':
@@ -144,7 +154,7 @@ class PostController extends Controller
                     'id' => $comment->user->id,
                     'name' => $comment->user->name,
                     'username' => $comment->user->username,
-                    'profile_image_url' => $comment->user->profile_image_url,
+                    'profile_image_url' => $comment->user->profileImage ? asset('storage/' . $comment->user->profileImage->file_path) : null,
                 ],
             ];
         });
@@ -153,29 +163,27 @@ class PostController extends Controller
             'post' => [
                 'id' => $post->id,
                 'content' => $post->content,
-                'media_url' => $post->media_url,
+                'media' => $post->media->map(fn ($media) => asset('storage/' . $media->file_path)),
                 'created_at' => $post->created_at->format('n/j/Y'),
                 'user' => [
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profile_image_url,
+                    'profile_image_url' => $post->user->profileImage ? asset('storage/' . $post->user->profileImage->file_path) : null, // ✅ Fix profile image URL
                 ],
                 'is_private' => $post->is_private,
                 'likes_count' => $post->likes->count(),
-                'is_liked' => auth()->check() ? $post->likes->contains('user_id', auth()->id()) : false,
+                'is_liked' => $currentUser ? $post->likes->contains('user_id', auth()->id()) : false,
+                'favorites_count' => $post->favorites->count(),
+                'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
                 'comments_count' => $comments->count(),
                 'comments' => $comments,
+                'hashtags' => $hashtags,
             ],
             'sort' => $sort
         ]);
     }
 
-
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Post $post): Response
     {
         return Inertia::render('Posts/Edit', [
@@ -183,9 +191,6 @@ class PostController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Post $post): RedirectResponse
     {
         $validated = $request->validate([
@@ -198,9 +203,6 @@ class PostController extends Controller
         return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Post $post): RedirectResponse
     {
         if (Auth::id() !== $post->user_id) {

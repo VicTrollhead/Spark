@@ -6,6 +6,8 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -13,19 +15,12 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'username',
         'email',
         'password',
         'name',
         'bio',
-        'profile_image_url',
-        'cover_image_url',
         'location',
         'website',
         'date_of_birth',
@@ -35,21 +30,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'status',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -62,29 +47,41 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    /**
-     * Automatically hash password when setting it.
-     */
-//    protected function password(): Attribute
-//    {
-//        return Attribute::make(
-//            set: fn ($value) => bcrypt($value),
-//        );
-//    }
+    // Polymorphic Relationship to Media
+    public function profileImage(): HasOne
+    {
+        return $this->hasOne(Media::class, 'mediable_id')
+            ->where('mediable_type', User::class)
+            ->where('file_type', 'profile');
+    }
 
-    public function followers() : BelongsToMany
+    public function coverImage(): HasOne
+    {
+        return $this->hasOne(Media::class, 'mediable_id')
+            ->where('mediable_type', User::class)
+            ->where('file_type', 'cover');
+    }
+
+    public function followers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'follows', 'followee_id', 'follower_id');
     }
 
-    public function following() :BelongsToMany
+    public function following(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'follows', 'follower_id', 'followee_id');
     }
 
-    /**
-     * Check if a user is following another user.
-     */
+    public function friends(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'followee_id')
+            ->join('follows as f2', function ($join) {
+                $join->on('follows.followee_id', '=', 'f2.follower_id')
+                    ->where('f2.followee_id', '=', $this->id);
+            })
+            ->select('users.*');
+    }
+
     public function isFollowing(User $user): bool
     {
         return $this->following()->where('followee_id', $user->id)->exists();
@@ -95,5 +92,25 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Post::class, 'user_id');
     }
 
+    public function favorites(): BelongsToMany
+    {
+        return $this->belongsToMany(Post::class, 'favorites', 'user_id', 'post_id');
+    }
 
+    public function likes(): BelongsToMany
+    {
+        return $this->belongsToMany(Post::class, 'likes', 'user_id', 'post_id');
+    }
+
+    public function followingPosts(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Post::class,
+            Follow::class,
+            'follower_id',
+            'user_id',
+            'id',
+            'followee_id'
+        );
+    }
 }
