@@ -67,7 +67,7 @@ export function AppHeader({ breadcrumbs = [] }) {
         },
     ];
     const handleLogout = () => {
-        router.post(`logout`);
+        router.post(`/logout`);
         window.location.href = "/login";
     };
 
