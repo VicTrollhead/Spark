@@ -253,6 +253,83 @@ class UserController extends Controller
         ]);
     }
 
+    public function liked(): Response
+    {
+        $currentUser = Auth::user();
+
+        if (!$currentUser) {
+            abort(403, 'Unauthorized');
+        }
+
+        $likedPosts = $currentUser->likes()
+            ->with(['user.profileImage', 'comments', 'likes', 'media'])
+            ->latest()
+            ->get()
+            ->map(function ($post) use ($currentUser) {
+                return [
+                    'id' => $post->id,
+                    'content' => $post->content,
+                    'created_at' => $post->created_at->format('n/j/Y'),
+                    'user' => [
+                        'id' => $post->user->id,
+                        'name' => $post->user->name,
+                        'username' => $post->user->username,
+                        'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
+                    ],
+                    'media' => $post->media->map(fn($media) => $media->url),
+                    'is_private' => $post->is_private,
+                    'likes_count' => $post->likes->count(),
+                    'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                    'favorites_count' => $post->favorites->count(),
+                    'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
+                    'comments_count' => $post->comments->count(),
+                ];
+            });
+
+        return Inertia::render('user/liked', [
+            'user' => $currentUser,
+            'posts' => $likedPosts,
+        ]);
+    }
+
+    public function followingPosts(): Response
+    {
+        $currentUser = Auth::user();
+
+        if (!$currentUser) {
+            abort(403, 'Unauthorized');
+        }
+
+        $followingPosts = $currentUser->followingPosts()
+            ->with(['user.profileImage', 'comments', 'likes', 'media'])
+            ->latest()
+            ->get()
+            ->map(function ($post) use ($currentUser) {
+                return [
+                    'id' => $post->id,
+                    'content' => $post->content,
+                    'created_at' => $post->created_at->format('n/j/Y'),
+                    'user' => [
+                        'id' => $post->user->id,
+                        'name' => $post->user->name,
+                        'username' => $post->user->username,
+                        'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
+                    ],
+                    'media' => $post->media->map(fn($media) => $media->url),
+                    'is_private' => $post->is_private,
+                    'likes_count' => $post->likes->count(),
+                    'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                    'favorites_count' => $post->favorites->count(),
+                    'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
+                    'comments_count' => $post->comments->count(),
+                ];
+            });
+
+        return Inertia::render('user/following-posts', [
+            'user' => $currentUser,
+            'posts' => $followingPosts,
+        ]);
+    }
 
 
 
