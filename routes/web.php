@@ -23,6 +23,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/user/favorites', [UserController::class, 'favorites'])->name('user.favorites');
     Route::get('/user/liked', [UserController::class, 'liked'])->name('user.liked');
+    Route::get('/user/following-posts', [UserController::class, 'followingPosts'])->name('user.followingPosts');
     Route::get('/user', [UserController::class, 'show'])->name('user.show');
     Route::get('/user/{user}/edit', [UserController::class, 'edit'])->name('user.edit');
     Route::patch('/user/{user}/update', [UserController::class, 'update'])->name('user.update');

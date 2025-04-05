@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -99,5 +100,17 @@ class User extends Authenticatable implements MustVerifyEmail
     public function likes(): BelongsToMany
     {
         return $this->belongsToMany(Post::class, 'likes', 'user_id', 'post_id');
+    }
+
+    public function followingPosts(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Post::class,
+            Follow::class,
+            'follower_id',
+            'user_id',
+            'id',
+            'followee_id'
+        );
     }
 }

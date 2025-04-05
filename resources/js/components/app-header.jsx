@@ -35,10 +35,10 @@ export function AppHeader({ breadcrumbs = [] }) {
         },
         {
             title: 'Following',
-            url: `/user/${user.username}/following`,
+            url: `/user/following-posts`,
         },
         {
-            title: 'Liked posts',
+            title: 'Liked',
             url: '/user/liked',
         },
     ];
