@@ -13,6 +13,8 @@ export default function Show() {
         content: '', post_id: post.id, parent_comment_id: null
     });
 
+    console.log(post);
+
     const [sortOption, setSortOption] = useState(sort || "latest");
 
     const handleSortChange = (e) => {
@@ -117,9 +119,26 @@ export default function Show() {
                 </div>
 
                 <div className="mt-4">
-                    <p className="text-gray-800 dark:text-gray-200">{post.content}</p>
+                    <p className="text-gray-800 text-lg dark:text-gray-200">
+                        {post.content}
+                    </p>
+                    {post.hashtags?.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                            {post.hashtags.map((hashtag, index) => (
+                                <Link
+                                    key={hashtag.id}
+                                    href={`/hashtag/${hashtag.hashtag}`}
+                                    className="text-blue-500 hover:underline"
+                                >
+                                    #{hashtag.hashtag}
+                                </Link>
+                            ))}
+                        </div>
+                    )}
+
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{post.created_at}</p>
                 </div>
+
 
                 <div className="mt-3 flex items-center space-x-6 text-md text-gray-600 dark:text-gray-400">
                     <div className="flex items-center space-x-1">

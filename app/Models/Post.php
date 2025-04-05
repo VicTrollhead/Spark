@@ -53,7 +53,12 @@ class Post extends Model
         return $this->hasMany(Favorite::class);
     }
 
-    // Polymorphic Relationship to Media
+    public function hashtags()
+    {
+        return $this->belongsToMany(Hashtag::class, 'post_hashtags');
+    }
+
+
     public function media(): MorphMany
     {
         return $this->morphMany(Media::class, 'mediable');

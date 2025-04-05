@@ -22,16 +22,19 @@ class PostController extends Controller
 
         $postsQuery = Post::with(['user.profileImage', 'comments', 'likes', 'media'])
             ->where(function ($query) use ($currentUser) {
-                $query->where('is_private', false);
+                $query->where('is_private', 0);
 
                 if ($currentUser) {
-                    $query->orWhereHas('user.followers', function ($subQuery) use ($currentUser) {
-                        $subQuery->where('follower_id', $currentUser->id);
+                    $query->orWhere(function ($subQuery) use ($currentUser) {
+                        $subQuery->where('user_id', $currentUser->id)
+                        ->orWhereHas('user.followers', function ($followersQuery) use ($currentUser) {
+                            $followersQuery->where('follower_id', $currentUser->id);
+                        });
                     });
-
-                    $query->orWhere('user_id', $currentUser->id);
                 }
             });
+
+
 
         switch ($sort) {
             case 'likes':
@@ -117,8 +120,16 @@ class PostController extends Controller
             'user.profileImage',
             'comments.user.profileImage',
             'likes',
-            'media'
+            'media',
+            'hashtags'
         ]);
+
+        $hashtags = $post->hashtags->map(function ($hashtag) {
+            return [
+                'id' => $hashtag->id,
+                'hashtag' => $hashtag->hashtag,
+            ];
+        });
 
         $commentsQuery = $post->comments()->with('user.profileImage');
 
@@ -167,6 +178,7 @@ class PostController extends Controller
                 'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
                 'comments_count' => $comments->count(),
                 'comments' => $comments,
+                'hashtags' => $hashtags,
             ],
             'sort' => $sort
         ]);
