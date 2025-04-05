@@ -42,6 +42,11 @@ export function AppHeader({ breadcrumbs = [] }) {
         },
         {
             title: 'Friends',
+            url: `/user/${user.username}/friends`,
+            icon: Users,
+        },
+        {
+            title: 'All users',
             url: '/dashboard/users',
             icon: Users,
         },

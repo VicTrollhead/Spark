@@ -88,4 +88,9 @@ class FollowController extends Controller
         return inertia('user/following', ['title' => 'Following', 'users' => $following, 'user' => $user]);
     }
 
+    public function friends(User $user)
+    {
+        $friends = $user->friends()->select('id', 'name', 'username', 'profile_image_url as avatar')->get();
+        return inertia('user/friends', ['title' => 'Friends', 'users' => $friends, 'user' => $user]);
+    }
 }
