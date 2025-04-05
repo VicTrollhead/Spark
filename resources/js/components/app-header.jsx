@@ -1,4 +1,3 @@
-import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Icon } from '@/components/icon';
 import { Button } from '@/components/ui/button';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
@@ -11,12 +10,11 @@ import {
     LogOut,
     Mail,
     Menu, Search,
-    Settings, Text,
+    Settings,
     User,
     Users
 } from 'lucide-react';
 import AppLogo from './app-logo';
-import AppLogoIcon from './app-logo-icon';
 import { Input } from '@/components/ui/input.jsx';
 import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu.jsx';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx';
