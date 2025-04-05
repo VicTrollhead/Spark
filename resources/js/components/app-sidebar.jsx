@@ -75,25 +75,11 @@ export function AppSidebar() {
                  collapsible="none"
                  className="bg-transparent fixed top-16 left-0 w-64 h-[calc(100vh-4rem)] shadow-md hidden lg:flex">
             <SidebarHeader>
-                <SidebarMenu>
-                    <div className="flex items-center gap-1">
-                        <Link href={user.username ? `/user/${user.username}` : '/user'} prefetch>
-                            <Avatar className="ml-2 my-3 size-12">
-                                <AvatarImage src={user.profile_image_url} alt={user.name}/>
-                                <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                                    {getInitials(user.name)}
-                                </AvatarFallback>
-                            </Avatar>
-                        </Link>
-                        <div className="ml-2">
-                            <h1 className="text-2l ml-1 font-bold text-gray-900 dark:text-white">{user.name}</h1>
-                            <p className="text-gray-500 dark:text-gray-400">@{user.username}</p>
-                        </div>
-                    </div>
-                </SidebarMenu>
+                <NavUser />
             </SidebarHeader>
 
-            <SidebarContent className="mt-4">
+            <SidebarContent className="-mt-2">
+
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 
