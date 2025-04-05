@@ -10,11 +10,12 @@ export default function AppSidebarLayout({ children, breadcrumbs = [] }) {
             <AppHeader breadcrumbs={breadcrumbs}/>
             <AppShell variant="sidebar">
                 <AppSidebar />
-                <AppContent variant="sidebar" breadcrumbs={breadcrumbs} className="container lg:mx-70 md:mx-auto pt-17">
+                <AppContent variant="sidebar" breadcrumbs={breadcrumbs} className="container lg:mx-70 md:mx-auto sm:mx-auto pt-17">
                     {/*<AppSidebarHeader breadcrumbs={breadcrumbs}/>*/}
                     {children}
 
                 </AppContent>
+
                 <AppExtraSidebar />
             </AppShell>
         </div>

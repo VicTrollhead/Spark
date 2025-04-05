@@ -97,13 +97,13 @@ export function AppHeader({ breadcrumbs = [] }) {
 
     return (<>
             <div className="border-sidebar-border/80 border-b fixed top-0 left-0 w-full z-50 bg-white dark:bg-neutral-950">
-                <div className="mx-4 flex h-16 ">
+                <div className="mx-4 flex h-16">
                     {/* Mobile Menu */}
                     <div className="lg:hidden">
                         <Sheet>
                             <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" className="mr-2 my-4 h-[34px] w-[34px]">
-                                    <Menu className="h-5 w-5"/>
+                                <Button variant="ghost" size="icon" className="mr-2 my-4 h-9 w-9 hover:bg-gray-300 dark:hover:bg-gray-800">
+                                    <Menu className="h-6 w-6"/>
                                 </Button>
                             </SheetTrigger>
                             <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between pl-5">
