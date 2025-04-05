@@ -5,7 +5,16 @@ import { NavigationMenu, NavigationMenuItem, NavigationMenuList, navigationMenuT
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { Link, router, usePage } from '@inertiajs/react';
-import { Bookmark, Folder, Home, LogOut, Mail, Menu, Search, Settings, User, Users } from 'lucide-react';
+import {
+    Bookmark, Folder, FolderHeart,
+    Home, List,
+    LogOut,
+    Mail,
+    Menu, Search,
+    Settings,
+    User,
+    Users
+} from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 import { Input } from '@/components/ui/input.jsx';
@@ -26,22 +35,37 @@ export function AppHeader({ breadcrumbs = [] }) {
         },
         {
             title: 'Following',
-            url: `/user/${user.username}/following`,
+            url: `/user/following-posts`,
         },
         {
-            title: 'Liked posts',
-            url: '#',
+            title: 'Liked',
+            url: '/user/liked',
         },
     ];
 
     const sideBarNavItems = [
         {
-            title: 'Dashboard',
+            title: 'News',
             url: '/dashboard',
             icon: Home,
         },
         {
+            title: 'Following',
+            url: `/user/following-posts`,
+            icon: List,
+        },
+        {
+            title: 'Liked posts',
+            url: '/user/liked',
+            icon: FolderHeart,
+        },
+        {
             title: 'Friends',
+            url: `/user/${user.username}/friends`,
+            icon: Users,
+        },
+        {
+            title: 'All users',
             url: '/dashboard/users',
             icon: Users,
         },
@@ -70,19 +94,6 @@ export function AppHeader({ breadcrumbs = [] }) {
         router.post(`/logout`);
         window.location.href = "/login";
     };
-
-    // const rightNavItems = [
-    //     {
-    //         title: 'Repository',
-    //         url: 'https://github.com/laravel/react-starter-kit',
-    //         icon: Folder,
-    //     },
-    //     {
-    //         title: 'Documentation',
-    //         url: 'https://laravel.com/docs/starter-kits',
-    //         icon: BookOpen,
-    //     },
-    // ];
 
     return (<>
             <div className="border-sidebar-border/80 border-b fixed top-0 left-0 w-full z-50 bg-white dark:bg-neutral-950">
@@ -155,11 +166,11 @@ export function AppHeader({ breadcrumbs = [] }) {
                     </div>
                 </div>
             </div>
-            {breadcrumbs.length > 1 && (<div className="border-sidebar-border/70 flex w-full border-b">
-                    <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 md:max-w-7xl">
-                        <Breadcrumbs breadcrumbs={breadcrumbs}/>
-                    </div>
-                </div>)}
+            {/*{breadcrumbs.length > 1 && (<div className="border-sidebar-border/70 flex w-full border-b">*/}
+            {/*        <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 md:max-w-7xl">*/}
+            {/*            <Breadcrumbs breadcrumbs={breadcrumbs}/>*/}
+            {/*        </div>*/}
+            {/*    </div>)}*/}
         </>);
 }
 

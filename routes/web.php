@@ -22,6 +22,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard/users', [UserController::class, 'users'])->name('dashboard.users');
 
     Route::get('/user/favorites', [UserController::class, 'favorites'])->name('user.favorites');
+    Route::get('/user/liked', [UserController::class, 'liked'])->name('user.liked');
+    Route::get('/user/following-posts', [UserController::class, 'followingPosts'])->name('user.followingPosts');
     Route::get('/user', [UserController::class, 'show'])->name('user.show');
     Route::get('/user/{user}/edit', [UserController::class, 'edit'])->name('user.edit');
     Route::patch('/user/{user}/update', [UserController::class, 'update'])->name('user.update');
@@ -33,6 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/is-following/{user}', [FollowController::class, 'isFollowing'])->name('isFollowing');
     Route::get('/user/{user}/followers', [FollowController::class, 'followers'])->name('user.followers');
     Route::get('/user/{user}/following', [FollowController::class, 'following'])->name('user.following');
+    Route::get('/user/{user}/friends', [FollowController::class, 'friends'])->name('user.friends');
 
     Route::post('/dashboard', [PostController::class, 'store'])->name('posts.store');
     Route::get('/post/{post}', [PostController::class, 'show'])->name('post.show');

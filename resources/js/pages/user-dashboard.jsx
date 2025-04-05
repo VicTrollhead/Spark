@@ -35,7 +35,7 @@ export default function Dashboard() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users Dashboard" />
 
-            <div className="px-6">
+            <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
                     <h1 className="text-2xl font-bold mr-2">All Users</h1>
                     <div className="flex items-center gap-1.5">
