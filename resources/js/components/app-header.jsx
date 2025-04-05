@@ -91,7 +91,7 @@ export function AppHeader({ breadcrumbs = [] }) {
                     <div className="lg:hidden">
                         <Sheet>
                             <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" className="mr-2 my-4 h-9 w-9 hover:bg-gray-500">
+                                <Button variant="ghost" size="icon" className="mr-2 my-4 h-9 w-9 hover:bg-gray-300 dark:hover:bg-gray-800">
                                     <Menu className="h-6 w-6"/>
                                 </Button>
                             </SheetTrigger>

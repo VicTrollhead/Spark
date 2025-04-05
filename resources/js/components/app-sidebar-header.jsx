@@ -27,8 +27,6 @@ export function AppSidebarHeader({ breadcrumbs = [] }) {
                 <SidebarTrigger className="-ml-3 lg:hidden md:hidden"/>
                 <Breadcrumbs breadcrumbs={breadcrumbs}/>
             </div>
-
-
             <div>
                 <AppearanceToggle className="justify-center p-2.5"/>
             </div>
