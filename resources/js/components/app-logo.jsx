@@ -1,4 +1,5 @@
 import AppLogoIcon from './app-logo-icon';
+import AppearanceToggle from '@/components/appearance-toggle.jsx';
 
 export default function AppLogo() {
     return (<div className="flex items-center gap-x-2 justify-start py-2">
@@ -7,6 +8,9 @@ export default function AppLogo() {
             </div>
             <div className="grid flex-1 text-left text-xl font-extrabold">
                 <span className="leading-none ">Spark</span>
+            </div>
+            <div>
+                <AppearanceToggle className="justify-center p-2.5"/>
             </div>
         </div>);
 }

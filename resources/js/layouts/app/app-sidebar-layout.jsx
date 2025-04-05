@@ -2,17 +2,22 @@ import { AppContent } from '../../components/app-content';
 import { AppShell } from '../../components/app-shell';
 import { AppSidebar } from '../../components/app-sidebar';
 import { AppExtraSidebar} from '../../components/app-extra-sidebar';
-import { AppSidebarHeader } from '../../components/app-sidebar-header';
+import { AppHeader } from '@/components/app-header.jsx';
 
 export default function AppSidebarLayout({ children, breadcrumbs = [] }) {
-    return (<AppShell variant="sidebar">
-            <AppSidebar />
-            <AppContent variant="sidebar">
-                <AppSidebarHeader breadcrumbs={breadcrumbs}/>
-                {children}
+    return (<>
+        <div className="flex flex-col">
+            <AppHeader breadcrumbs={breadcrumbs}/>
+            <AppShell variant="sidebar">
+                <AppSidebar />
+                <AppContent variant="sidebar" breadcrumbs={breadcrumbs} className="container lg:mx-70 md:mx-auto pt-16">
+                    {/*<AppSidebarHeader breadcrumbs={breadcrumbs}/>*/}
+                    {children}
 
-            </AppContent>
-        <AppExtraSidebar />
-        </AppShell>);
+                </AppContent>
+                <AppExtraSidebar />
+            </AppShell>
+        </div>
+    </>);
 }
 

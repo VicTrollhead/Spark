@@ -1,4 +1,4 @@
-import { Icon } from '@/components/icon';
+import { Icon } from './icon';
 import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { useForm } from '@inertiajs/react';
 import { LogOut } from 'lucide-react';
