@@ -3,7 +3,7 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from './u
 import { UserInfo } from './user-info';
 import { UserMenuContent } from './user-menu-content';
 import { useIsMobile } from '../hooks/use-mobile';
-import { usePage } from '@inertiajs/react';
+import { usePage, Link } from '@inertiajs/react';
 import { ChevronsUpDown } from 'lucide-react';
 
 export function NavUser() {
@@ -14,9 +14,9 @@ export function NavUser() {
     return (<SidebarMenu>
         <SidebarMenuItem>
             <SidebarMenuButton asChild size="lg" className="text-sidebar-accent-foreground hover:bg-sidebar-accent py-9">
-                <a href="/user" className="w-full flex items-center">
+                <Link href="/user" className="w-full flex items-center">
                     <UserInfo user={auth.user} />
-                </a>
+                </Link>
             </SidebarMenuButton>
         </SidebarMenuItem>
             {/*<SidebarMenuItem>*/}

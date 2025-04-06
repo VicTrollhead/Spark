@@ -9,7 +9,7 @@ import {
     SidebarMenuButton,
     SidebarSeparator
 } from './ui/sidebar';
-import { Link, router, usePage } from '@inertiajs/react';
+import { Link, router, useForm, usePage } from '@inertiajs/react';
 import { Bookmark, BookOpen, Folder, Home, LogOut, Mail, Settings, User, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useMobileNavigation } from '../hooks/use-mobile-navigation';
@@ -19,6 +19,7 @@ import { useInitials } from '@/hooks/use-initials.jsx';
 export function AppSidebar() {
     const { auth } = usePage().props;
     const user = auth?.user;
+    const { post } = useForm();
     const getInitials = useInitials();
 
     if (!user) return null;
@@ -97,7 +98,7 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                 </a>
                 <SidebarMenuButton
-                    onClick={handleLogout}
+                    onClick={() => post(route('logout'))}
                     size="lg"
                     className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group cursor-pointer">
                     <LogOut/>
