@@ -24,7 +24,7 @@ export default function Following() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isOwnProfile ? 'Following' : user.name + "'s Following"} />
             <div className="max-w-lg px-6">
-                <h1 className="mb-4 text-2xl font-bold">{title}</h1>
+                <h1 className="my-6 text-2xl font-bold">{title}</h1>
                 {users.length === 0 ? (
                     <p className="text-gray-500">Not following anyone yet.</p>
                 ) : (

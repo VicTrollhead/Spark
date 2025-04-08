@@ -119,11 +119,11 @@ export default function Show() {
                 </div>
 
                 <div className="mt-4">
-                    <p className="text-gray-800 text-lg dark:text-gray-200">
+                    <p className="text-gray-800 text-xl dark:text-gray-200">
                         {post.content}
                     </p>
                     {post.hashtags?.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-2">
+                        <div className="mt-2 lg:text-[16px] text-sm flex flex-wrap gap-x-1 break-all">
                             {post.hashtags.map((hashtag, index) => (
                                 <Link
                                     key={hashtag.id}

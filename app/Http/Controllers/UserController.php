@@ -30,11 +30,10 @@ class UserController extends Controller
         $canViewFullProfile = Gate::allows('view', $user);
         $user->loadCount(['followers', 'following']);
 
-        // Apply privacy filtering for posts
         $postsQuery = $user->posts()
             ->with(['user.profileImage', 'comments', 'likes', 'media'])
             ->where(function ($query) use ($currentUser) {
-                $query->where('is_private', 0); // Public posts
+                $query->where('is_private', 0);
 
                 if ($currentUser) {
                     $query->orWhere(function ($subQuery) use ($currentUser) {
@@ -89,60 +88,6 @@ class UserController extends Controller
                 'canViewFullProfile' => $canViewFullProfile,
             ],
             'posts' => $posts
-        ]);
-    }
-
-
-
-
-    public function index(): Response
-    {
-        $currentUser = Auth::user();
-
-        $users = User::with(['profileImage'])->get();
-
-        $posts = $user->posts()
-            ->with(['user', 'comments', 'likes', 'media'])
-            ->where(function ($query) use ($currentUser, $user) {
-                $query->where('is_private', false);
-
-                if ($currentUser) {
-                    $query->orWhere(function ($q) use ($currentUser, $user) {
-                        $q->where('is_private', true)
-                            ->where(function ($innerQuery) use ($currentUser, $user) {
-                                $innerQuery->where('user_id', $currentUser->id)
-                                    ->orWhereIn('user_id', $user->followers()->pluck('follower_id'));
-                            });
-                    });
-                }
-            })
-            ->latest()
-            ->get()
-            ->filter(fn($post) => Gate::allows('view', $post))
-            ->map(function ($post) use ($currentUser) {
-                return [
-                    'id' => $post->id,
-                    'content' => $post->content,
-                    'created_at' => $post->created_at->format('n/j/Y'),
-                    'user' => [
-                        'id' => $post->user->id,
-                        'name' => $post->user->name,
-                        'username' => $post->user->username,
-                        'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
-                    ],
-                    'media' => $post->media->map(fn($media) => $media->url),
-                    'is_private' => $post->is_private,
-                    'likes_count' => $post->likes->count(),
-                    'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
-                    'favorites_count' => $post->favorites->count(),
-                    'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
-                    'comments_count' => $post->comments->count(),
-                ];
-            });
-
-        return Inertia::render('dashboard', [
-            'users' => $users,
-            'posts' => $posts,
         ]);
     }
 
@@ -225,7 +170,7 @@ class UserController extends Controller
             })
             ->latest()
             ->get()
-            ->filter(fn ($post) => $post->is_private == 0 || $post->user_id == $currentUser->id || $post->user->followers->contains('id', $currentUser->id)) // Double-check filtering
+            ->filter(fn ($post) => $post->is_private == 0 || $post->user_id == $currentUser->id || $post->user->followers->contains('id', $currentUser->id))
             ->map(function ($post) use ($currentUser) {
                 return [
                     'id' => $post->id,
@@ -262,9 +207,19 @@ class UserController extends Controller
         }
 
         $likedPosts = $currentUser->likes()
-            ->with(['user.profileImage', 'comments', 'likes', 'media'])
+            ->with(['user.profileImage', 'comments', 'likes', 'media', 'user.followers']) // make sure followers is eager loaded
+            ->where(function ($query) use ($currentUser) {
+                $query->where('posts.is_private', 0) // public posts
+                ->orWhere(function ($subQuery) use ($currentUser) {
+                    $subQuery->where('posts.user_id', $currentUser->id) // own posts
+                    ->orWhereHas('user.followers', function ($followersQuery) use ($currentUser) {
+                        $followersQuery->where('follower_id', $currentUser->id); // followed by current user
+                    });
+                });
+            })
             ->latest()
             ->get()
+            ->filter(fn ($post) => $post->is_private == 0 || $post->user_id == $currentUser->id || $post->user->followers->contains('id', $currentUser->id))
             ->map(function ($post) use ($currentUser) {
                 return [
                     'id' => $post->id,
@@ -291,6 +246,7 @@ class UserController extends Controller
             'posts' => $likedPosts,
         ]);
     }
+
 
     public function followingPosts(): Response
     {

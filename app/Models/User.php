@@ -47,7 +47,6 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    // Polymorphic Relationship to Media
     public function profileImage(): HasOne
     {
         return $this->hasOne(Media::class, 'mediable_id')

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePostRequest;
+use App\Models\Media;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -20,7 +21,7 @@ class PostController extends Controller
         $currentUser = Auth::user();
         $sort = $request->query('sort', 'latest');
 
-        $postsQuery = Post::with(['user.profileImage', 'comments', 'likes', 'media'])
+        $postsQuery = Post::with(['user.profileImage', 'comments', 'likes', 'media', 'hashtags'])
             ->where(function ($query) use ($currentUser) {
                 $query->where('is_private', 0);
 
@@ -55,6 +56,7 @@ class PostController extends Controller
                 break;
         }
 
+
         $posts = $postsQuery->get()->map(function ($post) use ($currentUser) {
             return [
                 'id' => $post->id,
@@ -66,7 +68,14 @@ class PostController extends Controller
                     'username' => $post->user->username,
                     'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
                 ],
-                'media' => $post->media->map(fn ($media) => $media->file_path),
+                'hashtags' => $post->hashtags->map(fn ($tag) => [
+                    'id' => $tag->id,
+                    'hashtag' => $tag->hashtag,
+                ]),
+                'media' => $post->media->map(fn ($media) => [
+                    'file_path' => $media->file_path,
+                    'file_type' => $media->file_type,
+                ]),
                 'is_private' => $post->is_private,
                 'likes_count' => $post->likes->count(),
                 'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
@@ -84,27 +93,48 @@ class PostController extends Controller
 
     public function store(StorePostRequest $request)
     {
-        $request->validated();
+        $validated = $request->validated();
 
         $post = Post::create([
             'user_id' => Auth::id(),
-            'content' => $request['content'],
-            'parent_post_id' => $request['parent_post_id'],
-            'is_private' => $request['is_private'],
+            'content' => $validated['content'],
+            'parent_post_id' => $validated['parent_post_id'] ?? null,
+            'is_private' => $validated['is_private'] ?? false,
         ]);
 
         if ($request->hasFile('media')) {
             foreach ($request->file('media') as $file) {
                 $path = $file->store('uploads/posts', 'public');
-                $post->media()->create([
+
+                $media = new Media([
                     'file_path' => $path,
-                    'file_type' => $file->getMimeType(),
+                    'file_type' => str_starts_with($file->getMimeType(), 'video') ? 'video' : 'image',
+                    'mediable_id' => $post->id,
+                    'mediable_type' => Post::class,
                 ]);
+
+                $media->save();
             }
         }
 
+        // Handle hashtags
+        $hashtags = $validated['hashtags'] ?? [];
+        $hashtagIds = [];
+
+        foreach ($hashtags as $tag) {
+            $cleanTag = ltrim($tag, '#');
+            $hashtag = \App\Models\Hashtag::firstOrCreate([
+                'hashtag' => strtolower($cleanTag)
+            ]);
+
+            $hashtagIds[] = $hashtag->id;
+        }
+
+        $post->hashtags()->sync($hashtagIds);
+
         return redirect()->route('dashboard')->with('success', 'Post created successfully!');
     }
+
 
     public function show(Post $post, Request $request)
     {

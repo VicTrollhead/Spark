@@ -1,20 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Head, usePage, useForm, router } from '@inertiajs/react';
 import AppLayout from '../layouts/app-layout';
 import PostComponent from './post/post-component';
-import {RefreshCw} from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
+import { HashtagInput } from '../components/hashtag-input';
 
 export default function Dashboard() {
     const { users, posts, sort } = usePage().props;
     const [sortOption, setSortOption] = useState(sort || 'latest');
     const [isLoading, setIsLoading] = useState(false);
-
+    const [media, setMedia] = useState(null);
+    const hashtagRef = useRef();
 
     const { data, setData, post, errors } = useForm({
         content: '',
         parent_post_id: null,
-        media_url: null,
         is_private: false,
+        hashtags: [],
+        media: null, // Track media file
     });
 
     const handleSortChange = (e) => {
@@ -27,13 +30,20 @@ export default function Dashboard() {
         e.preventDefault();
 
         const extractedTags = data.content.match(/#(\w+)/g)?.map(tag => tag.slice(1)) || [];
+
+        // Include hashtags and media in the post submission
         post('/dashboard', {
             content: data.content,
             parent_post_id: data.parent_post_id,
             post_type: data.post_type,
-            is_private: data.is_private
+            is_private: data.is_private,
+            hashtags: extractedTags, // Added extracted hashtags
+            media: data.media, // Added media file
         });
-        setData({ content: '', parent_post_id: null, media_url: null, is_private: false });
+
+        // Reset form fields
+        setData({ content: '', parent_post_id: null, media: null, is_private: false, hashtags: [] });
+        hashtagRef.current?.reset();
     };
 
     const handleReload = () => {
@@ -43,13 +53,15 @@ export default function Dashboard() {
             setIsLoading(false);
         }, 1000);
     };
-    //
-    // useEffect(() => {
-    //     setInterval(() => {
-    //         router.reload({ only: ['posts'] });
-    //     }, 120000)
-    // });
 
+    const handleMediaChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData('media', file); // Set the media file to the form data
+        }
+    };
+
+    console.log(posts);
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Dashboard', href: '/dashboard' }]}>
@@ -68,6 +80,21 @@ export default function Dashboard() {
                     />
                     {errors.content && <p className="text-red-500 text-sm">{errors.content}</p>}
 
+                    <HashtagInput ref={hashtagRef} onChange={(hashtags) => setData('hashtags', hashtags)} />
+
+                    {/* Media Upload */}
+                    <div>
+                        <label className="block text-sm text-gray-700 dark:text-gray-200">
+                            Upload Media
+                        </label>
+                        <input
+                            type="file"
+                            onChange={handleMediaChange}
+                            className="mt-2 p-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
+                        />
+                        {data.media && <p className="mt-2 text-sm text-gray-500">Media Selected: {data.media.name}</p>}
+                    </div>
+
                     <label>
                         <input
                             type="checkbox"
@@ -77,6 +104,7 @@ export default function Dashboard() {
                         />
                         Private (Only for subscribers)
                     </label>
+
                     <button
                         type="submit"
                         disabled={!data.content}

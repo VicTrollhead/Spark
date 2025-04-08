@@ -68,7 +68,20 @@ export default function PostComponent({ post }) {
 
                     </div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username}</p>
-                    <p className="mt-1 text-gray-700 dark:text-gray-300">{post.content}</p>
+                    <p className="mt-1 text-gray-700 dark:text-gray-300 text-lg">{post.content}</p>
+                    {post.hashtags?.length > 0 && (
+                        <div className="mt-0.5 text-sm flex flex-wrap gap-x-1 break-all">
+                            {post.hashtags.map((hashtag, index) => (
+                                <Link
+                                    key={hashtag.id}
+                                    href={`/hashtag/${hashtag.hashtag}`}
+                                    className="text-blue-500 hover:underline"
+                                >
+                                    #{hashtag.hashtag}
+                                </Link>
+                            ))}
+                        </div>
+                    )}
 
                     <div className="mt-3 flex items-center gap-3 text-gray-500 dark:text-gray-400">
                         <button
