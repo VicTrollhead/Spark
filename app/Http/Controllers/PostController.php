@@ -116,8 +116,6 @@ class PostController extends Controller
                 $media->save();
             }
         }
-
-        // Handle hashtags
         $hashtags = $validated['hashtags'] ?? [];
         $hashtagIds = [];
 
@@ -193,7 +191,10 @@ class PostController extends Controller
             'post' => [
                 'id' => $post->id,
                 'content' => $post->content,
-                'media' => $post->media->map(fn ($media) => asset('storage/' . $media->file_path)),
+                'media' => $post->media->map(fn ($media) => [
+                    'file_path' => $media->file_path,
+                    'file_type' => $media->file_type,
+                ]),
                 'created_at' => $post->created_at->format('n/j/Y'),
                 'user' => [
                     'id' => $post->user->id,

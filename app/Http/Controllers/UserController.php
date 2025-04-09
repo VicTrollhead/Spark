@@ -57,7 +57,14 @@ class UserController extends Controller
                     'username' => $post->user->username,
                     'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
                 ],
-                'media' => $post->media->map(fn ($media) => $media->file_path),
+                'media' => $post->media->map(fn ($media) => [
+                    'file_path' => $media->file_path,
+                    'file_type' => $media->file_type,
+                ]),
+                'hashtags' => $post->hashtags->map(fn ($tag) => [
+                    'id' => $tag->id,
+                    'hashtag' => $tag->hashtag,
+                ]),
                 'is_private' => $post->is_private,
                 'likes_count' => $post->likes->count(),
                 'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
@@ -182,7 +189,14 @@ class UserController extends Controller
                         'username' => $post->user->username,
                         'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
                     ],
-                    'media' => $post->media->map(fn ($media) => $media->url),
+                    'media' => $post->media->map(fn ($media) => [
+                        'file_path' => $media->file_path,
+                        'file_type' => $media->file_type,
+                    ]),
+                    'hashtags' => $post->hashtags->map(fn ($tag) => [
+                        'id' => $tag->id,
+                        'hashtag' => $tag->hashtag,
+                    ]),
                     'is_private' => $post->is_private,
                     'likes_count' => $post->likes->count(),
                     'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
@@ -231,7 +245,14 @@ class UserController extends Controller
                         'username' => $post->user->username,
                         'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
                     ],
-                    'media' => $post->media->map(fn($media) => $media->url),
+                    'media' => $post->media->map(fn ($media) => [
+                        'file_path' => $media->file_path,
+                        'file_type' => $media->file_type,
+                    ]),
+                    'hashtags' => $post->hashtags->map(fn ($tag) => [
+                        'id' => $tag->id,
+                        'hashtag' => $tag->hashtag,
+                    ]),
                     'is_private' => $post->is_private,
                     'likes_count' => $post->likes->count(),
                     'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
@@ -271,7 +292,14 @@ class UserController extends Controller
                         'username' => $post->user->username,
                         'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
                     ],
-                    'media' => $post->media->map(fn($media) => $media->url),
+                    'media' => $post->media->map(fn ($media) => [
+                        'file_path' => $media->file_path,
+                        'file_type' => $media->file_type,
+                    ]),
+                    'hashtags' => $post->hashtags->map(fn ($tag) => [
+                        'id' => $tag->id,
+                        'hashtag' => $tag->hashtag,
+                    ]),
                     'is_private' => $post->is_private,
                     'likes_count' => $post->likes->count(),
                     'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
@@ -350,4 +378,31 @@ class UserController extends Controller
         return redirect()->route('user.show', $user->username)
             ->with('success', 'Profile updated successfully.');
     }
+
+    public function friends(User $user): Response
+    {
+        $friends = $user->friends()
+            ->with('profileImage')
+            ->select('id', 'name', 'username')
+            ->get()
+            ->map(function ($friend) {
+                return [
+                    'id' => $friend->id,
+                    'name' => $friend->name,
+                    'username' => $friend->username,
+                    'profile_image_url' => $friend->profileImage ? $friend->profileImage->url : null,
+                ];
+            });
+
+        return Inertia::render('user/friends', [
+            'title' => 'Friends',
+            'users' => $friends,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+            ],
+        ]);
+    }
+
 }

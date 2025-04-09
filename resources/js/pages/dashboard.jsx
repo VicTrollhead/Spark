@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Head, usePage, useForm, router } from '@inertiajs/react';
+import { Head, usePage, router } from '@inertiajs/react';
 import AppLayout from '../layouts/app-layout';
 import PostComponent from './post/post-component';
 import { RefreshCw } from 'lucide-react';
@@ -9,16 +9,18 @@ export default function Dashboard() {
     const { users, posts, sort } = usePage().props;
     const [sortOption, setSortOption] = useState(sort || 'latest');
     const [isLoading, setIsLoading] = useState(false);
-    const [media, setMedia] = useState(null);
+    const [selectedFiles, setSelectedFiles] = useState([]);
     const hashtagRef = useRef();
 
-    const { data, setData, post, errors } = useForm({
+    const [data, setData] = useState({
         content: '',
         parent_post_id: null,
         is_private: false,
+        media: [],
         hashtags: [],
-        media: null, // Track media file
     });
+
+    const [errors, setErrors] = useState({});
 
     const handleSortChange = (e) => {
         const selectedSort = e.target.value;
@@ -26,24 +28,53 @@ export default function Dashboard() {
         router.get('/dashboard', { sort: selectedSort }, { preserveScroll: true });
     };
 
+    const handleMediaChange = (e) => {
+        const files = Array.from(e.target.files);
+        setData((prev) => ({ ...prev, media: files }));
+        setSelectedFiles(files.map((file) => file.name));
+    };
+
     const handlePostSubmit = (e) => {
         e.preventDefault();
 
-        const extractedTags = data.content.match(/#(\w+)/g)?.map(tag => tag.slice(1)) || [];
+        const formData = new FormData();
+        formData.append('content', data.content);
+        formData.append('parent_post_id', data.parent_post_id || '');
+        formData.append('is_private', data.is_private ? 1 : 0);
 
-        // Include hashtags and media in the post submission
-        post('/dashboard', {
-            content: data.content,
-            parent_post_id: data.parent_post_id,
-            post_type: data.post_type,
-            is_private: data.is_private,
-            hashtags: extractedTags, // Added extracted hashtags
-            media: data.media, // Added media file
+        const contentTags = data.content.match(/#(\w+)/g)?.map(tag => tag.slice(1)) || [];
+        const manualTags = data.hashtags || [];
+
+        const combinedTags = Array.from(new Set([...contentTags, ...manualTags]));
+
+        combinedTags.forEach((tag, index) => {
+            formData.append(`hashtags[${index}]`, tag);
         });
 
-        // Reset form fields
-        setData({ content: '', parent_post_id: null, media: null, is_private: false, hashtags: [] });
-        hashtagRef.current?.reset();
+        if (data.media.length > 0) {
+            data.media.forEach((file, index) => {
+                formData.append(`media[${index}]`, file);
+            });
+        }
+
+        router.post('/dashboard', formData, {
+            forceFormData: true,
+            onSuccess: () => {
+                setData({
+                    content: '',
+                    parent_post_id: null,
+                    is_private: false,
+                    media: [],
+                    hashtags: [],
+                });
+                setSelectedFiles([]);
+                setErrors({});
+                hashtagRef.current?.reset();
+            },
+            onError: (errorBag) => {
+                setErrors(errorBag);
+            },
+        });
     };
 
     const handleReload = () => {
@@ -53,15 +84,6 @@ export default function Dashboard() {
             setIsLoading(false);
         }, 1000);
     };
-
-    const handleMediaChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setData('media', file); // Set the media file to the form data
-        }
-    };
-
-    console.log(posts);
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Dashboard', href: '/dashboard' }]}>
@@ -73,33 +95,40 @@ export default function Dashboard() {
                 <form onSubmit={handlePostSubmit} className="flex flex-col space-y-4">
                     <textarea
                         value={data.content}
-                        onChange={(e) => setData('content', e.target.value)}
+                        onChange={(e) => setData((prev) => ({ ...prev, content: e.target.value }))}
                         rows={3}
                         placeholder="What's on your mind?"
                         className="resize-none p-3 bg-gray-100 dark:bg-neutral-900 rounded-md text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600"
                     />
                     {errors.content && <p className="text-red-500 text-sm">{errors.content}</p>}
 
-                    <HashtagInput ref={hashtagRef} onChange={(hashtags) => setData('hashtags', hashtags)} />
+                    <HashtagInput ref={hashtagRef} onChange={(hashtags) => setData((prev) => ({ ...prev, hashtags }))} />
 
-                    {/* Media Upload */}
                     <div>
                         <label className="block text-sm text-gray-700 dark:text-gray-200">
-                            Upload Media
+                            Upload Media (Images or Videos)
                         </label>
                         <input
                             type="file"
+                            multiple
                             onChange={handleMediaChange}
                             className="mt-2 p-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
                         />
-                        {data.media && <p className="mt-2 text-sm text-gray-500">Media Selected: {data.media.name}</p>}
+                        {selectedFiles.length > 0 && (
+                            <ul className="mt-2 text-sm text-gray-500 list-disc pl-4">
+                                {selectedFiles.map((name, index) => (
+                                    <li key={index}>{name}</li>
+                                ))}
+                            </ul>
+                        )}
+                        {errors['media.0'] && <p className="text-red-500 text-sm">{errors['media.0']}</p>}
                     </div>
 
-                    <label>
+                    <label className="text-sm text-gray-700 dark:text-gray-300">
                         <input
                             type="checkbox"
                             checked={data.is_private}
-                            onChange={(e) => setData('is_private', e.target.checked)}
+                            onChange={(e) => setData((prev) => ({ ...prev, is_private: e.target.checked }))}
                             className="mx-2"
                         />
                         Private (Only for subscribers)
@@ -108,8 +137,10 @@ export default function Dashboard() {
                     <button
                         type="submit"
                         disabled={!data.content}
-                        className={`self-end py-2 px-4 mr-0.5 rounded-lg text-white ${
-                            data.content ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 cursor-not-allowed'
+                        className={`self-end py-2 px-4 rounded-lg text-white transition ${
+                            data.content
+                                ? 'bg-blue-600 hover:bg-blue-700'
+                                : 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
                         }`}
                     >
                         Post
@@ -134,9 +165,7 @@ export default function Dashboard() {
                         onClick={handleReload}
                         className="p-2 text-sm font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition flex items-center"
                     >
-                        <RefreshCw
-                            className={`w-6 h-6 ${isLoading ? 'animate-spin' : ''}`}
-                        />
+                        <RefreshCw className={`w-6 h-6 ${isLoading ? 'animate-spin' : ''}`} />
                     </button>
                 </div>
             </div>

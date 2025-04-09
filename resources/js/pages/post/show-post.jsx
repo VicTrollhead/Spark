@@ -13,8 +13,6 @@ export default function Show() {
         content: '', post_id: post.id, parent_comment_id: null
     });
 
-    console.log(post);
-
     const [sortOption, setSortOption] = useState(sort || "latest");
 
     const handleSortChange = (e) => {
@@ -122,6 +120,32 @@ export default function Show() {
                     <p className="text-gray-800 text-xl dark:text-gray-200">
                         {post.content}
                     </p>
+                    {post.media.length > 0 && (
+                        <div className="mt-2 py-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {post.media.map((file, index) => {
+                                const uniqueKey = `${post.id}-${file.id ?? file.file_path ?? index}`;
+                                return file.file_type === 'image' ? (
+                                    <div key={uniqueKey} className="relative w-full rounded-lg overflow-hidden border dark:border-gray-700">
+                                        <img
+                                            src={`/storage/${file.file_path}`}
+                                            alt="Post Media"
+                                            className="w-full h-auto rounded-lg object-contain"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div key={uniqueKey} className="relative w-full rounded-lg overflow-hidden border dark:border-gray-700">
+                                        <video
+                                            controls
+                                            className="w-full h-auto rounded-lg object-contain"
+                                        >
+                                            <source src={`/storage/${file.file_path}`} type="video/mp4" />
+                                        </video>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+
                     {post.hashtags?.length > 0 && (
                         <div className="mt-2 lg:text-[16px] text-sm flex flex-wrap gap-x-1 break-all">
                             {post.hashtags.map((hashtag, index) => (

@@ -24,7 +24,7 @@ class StorePostRequest extends FormRequest
         return [
             'content' => ['required', 'string', 'max:5000'],
             'parent_post_id' => ['nullable', 'exists:posts,id'],
-            'media_url' => ['nullable', 'string', 'max:255'],
+//            'media.*' => 'file|mimes:jpeg,png,jpg,mp4,mov,webm|max:20480',
             'is_private' => ['required', 'boolean'],
             'hashtags' => ['nullable','array'],
             'hashtags.*' => ['string','max:255'],

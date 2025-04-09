@@ -103,7 +103,7 @@ export function AppHeader({ breadcrumbs = [] }) {
                     <div className="lg:hidden">
                         <Sheet>
                             <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" className="mr-2 my-4 h-9 w-9 hover:bg-gray-300 dark:hover:bg-gray-800">
+                                <Button variant="ghost" size="icon" className="mr-2 my-4 h-9 w-9 hover:bg-neutral-300 dark:hover:bg-neutral-800">
                                     <Menu className="h-6 w-6"/>
                                 </Button>
                             </SheetTrigger>
@@ -119,10 +119,10 @@ export function AppHeader({ breadcrumbs = [] }) {
                                                 </AvatarFallback>
                                             </Avatar>
                                         </Link>
-                                        <div className="ml-2">
+                                        <Link href={user.username ? `/user/${user.username}` : '/user'} prefetch className="ml-2">
                                             <h1 className="text-1l ml-1 font-bold text-gray-900 dark:text-white">{user.name}</h1>
                                             <p className="text-gray-500 dark:text-gray-400">@{user.username}</p>
-                                        </div>
+                                        </Link>
                                     </div>
                                 </SheetHeader>
                                 <div className="mt-4 flex h-full flex-1 flex-col ">
