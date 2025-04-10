@@ -82,7 +82,7 @@ export function AppExtraSidebar() {
                     ) : (
                         <div className="flex flex-col gap-1">
                             {hashtags.map((hashtag) => (
-                                <TextLink href={`/posts-by-hashtag/${hashtag.id}`} className='mx-5 no-underline hover:text-neutral-700 font-serif'>#{hashtag.name}</TextLink>
+                                <TextLink key={hashtag.id} href={`/posts-by-hashtag/${hashtag.id}`} className='mx-5 no-underline hover:text-neutral-700 font-serif'>#{hashtag.name}</TextLink>
                             ))}
                         </div>
                     )}

@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input.jsx';
 import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu.jsx';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx';
 import { useInitials } from '@/hooks/use-initials.jsx';
+import AppearanceToggle from '@/components/appearance-toggle.jsx';
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
@@ -150,9 +151,12 @@ export function AppHeader({ breadcrumbs = [] }) {
                         </Sheet>
                     </div>
 
-                    <Link href="/dashboard" prefetch className="flex items-center space-x-2 w-1/6">
-                        <AppLogo />
-                    </Link>
+                    <div className="flex items-center space-x-2 w-1/6">
+                        <Link href="/dashboard" prefetch>
+                            <AppLogo />
+                        </Link>
+                        <AppearanceToggle className="justify-center ml-4 p-2.5"/>
+                    </div>
 
                     {/* Desktop Navigation */}
                     <div className="hidden w-full h-full items-center justify-around lg:flex">
