@@ -155,6 +155,23 @@ class UserController extends Controller
         ]);
     }
 
+    public function usersList(Request $request)
+    {
+        $usersQuery = User::with('profileImage')->withCount('followers');
+
+        $users = $usersQuery->oldest()->take(3)->get();
+
+        return $users->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'followers_count' => $user->followers_count,
+            ];
+        });
+    }
+
 
     public function favorites(): Response
     {
@@ -268,7 +285,6 @@ class UserController extends Controller
         ]);
     }
 
-
     public function followingPosts(): Response
     {
         $currentUser = Auth::user();
@@ -314,8 +330,6 @@ class UserController extends Controller
             'posts' => $followingPosts,
         ]);
     }
-
-
 
     public function edit(User $user): Response
     {

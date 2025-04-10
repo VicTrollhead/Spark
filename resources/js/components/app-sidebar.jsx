@@ -20,7 +20,6 @@ export function AppSidebar() {
     const { auth } = usePage().props;
     const user = auth?.user;
     const { post } = useForm();
-    const getInitials = useInitials();
 
     if (!user) return null;
 
@@ -33,11 +32,6 @@ export function AppSidebar() {
         {
             title: 'Friends',
             url: `/user/${user.username}/friends`,
-            icon: Users,
-        },
-        {
-            title: 'All users',
-            url: '/dashboard/users',
             icon: Users,
         },
         {
@@ -62,19 +56,6 @@ export function AppSidebar() {
         },
     ];
 
-    const footerNavItems = [
-        {
-            title: 'Repository',
-            url: 'https://github.com/VicTrollhead/Spark',
-            icon: Folder,
-        },
-    ];
-
-    const handleLogout = () => {
-        router.post(`/logout`);
-        window.location.href = "/login";
-    };
-
     return (
         <Sidebar
                  variant="inset"
@@ -85,7 +66,6 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent className="-mt-2">
-
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 

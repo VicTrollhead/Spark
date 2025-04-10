@@ -9,9 +9,6 @@ export default function AppLogo() {
             <div className="grid flex-1 text-left text-xl font-extrabold">
                 <span className="leading-none ">Spark</span>
             </div>
-            <div>
-                <AppearanceToggle className="justify-center p-2.5"/>
-            </div>
         </div>);
 }
 
