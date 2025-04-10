@@ -36,11 +36,6 @@ export function AppSidebar() {
             icon: Users,
         },
         {
-            title: 'All users',
-            url: '/dashboard/users',
-            icon: Users,
-        },
-        {
             title: 'Notifications',
             url: '#',
             icon: Mail,

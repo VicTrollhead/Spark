@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePostRequest;
+use App\Models\Hashtag;
 use App\Models\Media;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -244,4 +245,71 @@ class PostController extends Controller
 
         return redirect()->back()->with(['message' => 'Post deleted successfully']);
     }
+
+    public function popularHashtags(Request $request)
+    {
+        $hashtags = Hashtag::withCount('posts')
+            ->orderByDesc('posts_count')
+            ->take(3)
+            ->get();
+
+        return $hashtags->map(function ($hashtag) {
+            return [
+                'id' => $hashtag->id,
+                'name' => $hashtag->hashtag,
+            ];
+        });
+    }
+
+    public function postsByHashtag($hashtag_id): Response
+    {
+        $currentUser = Auth::user();
+
+        if (!$currentUser) {
+            abort(403, 'Unauthorized');
+        }
+
+        $hashtag = Hashtag::findOrFail($hashtag_id);
+
+        $posts = Post::whereHas('hashtags', function ($query) use ($hashtag_id) {
+            $query->where('hashtags.id', $hashtag_id);
+        })
+            ->with(['user.profileImage', 'comments', 'likes', 'media', 'hashtags', 'favorites'])
+            ->latest()
+            ->get()
+            ->map(function ($post) use ($currentUser) {
+                return [
+                    'id' => $post->id,
+                    'content' => $post->content,
+                    'created_at' => $post->created_at->format('n/j/Y'),
+                    'user' => [
+                        'id' => $post->user->id,
+                        'name' => $post->user->name,
+                        'username' => $post->user->username,
+                        'profile_image_url' => $post->user->profileImage?->url,
+                    ],
+                    'media' => $post->media->map(fn ($media) => [
+                        'file_path' => $media->file_path,
+                        'file_type' => $media->file_type,
+                    ]),
+                    'hashtags' => $post->hashtags->map(fn ($tag) => [
+                        'id' => $tag->id,
+                        'hashtag' => $tag->hashtag,
+                    ]),
+                    'is_private' => $post->is_private,
+                    'likes_count' => $post->likes->count(),
+                    'is_liked' => $post->likes->contains('user_id', $currentUser->id),
+                    'favorites_count' => $post->favorites->count(),
+                    'is_favorited' => $post->favorites->contains('user_id', $currentUser->id),
+                    'comments_count' => $post->comments->count(),
+                ];
+            });
+
+        return Inertia::render('post/posts-by-hashtag', [
+            'user' => $currentUser,
+            'posts' => $posts,
+            'hashtag' => $hashtag->hashtag,
+        ]);
+    }
+
 }

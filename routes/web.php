@@ -20,6 +20,7 @@ Route::post('/api/auth/google/callback', [GoogleAuthController::class, 'callback
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [PostController::class, 'index'])->name('dashboard');
     Route::get('dashboard/users', [UserController::class, 'users'])->name('dashboard.users');
+    Route::get('/users-list', [UserController::class, 'usersList'])->name('users.list');
 
     Route::get('/user/favorites', [UserController::class, 'favorites'])->name('user.favorites');
     Route::get('/user/liked', [UserController::class, 'liked'])->name('user.liked');
@@ -40,6 +41,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/dashboard', [PostController::class, 'store'])->name('posts.store');
     Route::get('/post/{post}', [PostController::class, 'show'])->name('post.show');
     Route::delete('/posts/{post}', [PostController::class, 'destroy']);
+    Route::get('/popular-hashtags', [PostController::class, 'popularHashtags'])->name('popularHashtags');
+    Route::get('/posts-by-hashtag/{hashtag_id}', [PostController::class, 'postsByHashtag'])->name('postsByHashtag');
 
     Route::post('/post/{post}/like', [LikeController::class, 'like'])->name('post.like');
     Route::post('/post/{post}/unlike', [LikeController::class, 'unlike'])->name('post.unlike');
@@ -51,11 +54,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/post/{post}/comment', [CommentController::class, 'store'])->name('post.comment');
     Route::post('/comment/{comment}/delete', [CommentController::class, 'destroy'])->name('comment.delete');
-
-
-
-
-
 
 });
 
