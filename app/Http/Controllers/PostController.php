@@ -250,7 +250,7 @@ class PostController extends Controller
     {
         $hashtags = Hashtag::withCount('posts')
             ->orderByDesc('posts_count')
-            ->take(3)
+            ->take(5)
             ->get();
 
         return $hashtags->map(function ($hashtag) {

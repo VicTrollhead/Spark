@@ -1,7 +1,7 @@
 import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarSeparator } from './ui/sidebar';
 import { Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
-import { UserInfo } from '@/components/user-info.jsx';
+import { UserInfo } from './user-info.jsx';
 import TextLink from '@/components/text-link.jsx';
 
 export function AppExtraSidebar() {
@@ -18,7 +18,7 @@ export function AppExtraSidebar() {
                 const users = await response.json();
                 setUsers(users);
             } catch (error) {
-                console.error('Ошибка при загрузке пользователей:', error);
+                console.error('Error fetching users:', error);
             }
 
             try {
@@ -26,7 +26,7 @@ export function AppExtraSidebar() {
                 const hashtags = await response.json();
                 setHashtags(hashtags);
             } catch (error) {
-                console.error('Ошибка при загрузке хэштегов:', error);
+                console.error('Error fetching hashtags:', error);
             }
         }
         fetchData();
@@ -59,14 +59,14 @@ export function AppExtraSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <SidebarMenu className="pt-1 px-2">
-                    <h2 className="my-1 font-bold">Let's get acquainted</h2>
+                <SidebarMenu className="py-1 px-2">
+                    <h2 className="my-2 font-bold">Let's get acquainted</h2>
                     {users.length === 0 ? (
                         <p className="text-gray-500">Not users anyone yet.</p>
                     ) : (
-                        <ul>
+                        <ul className="flex flex-col gap-2">
                             {users.map((user) => (
-                                <SidebarMenuButton asChild key={user.id} className="flex items-center gap-1 border-b py-9 dark:border-gray-700">
+                                <SidebarMenuButton asChild key={user.id} className="flex items-center gap-y-2 border py-10 dark:border-gray-700">
                                     <Link href={`/user/${user.username}`} className="w-full flex items-center">
                                         <UserInfo user={user} />
                                     </Link>
@@ -74,7 +74,7 @@ export function AppExtraSidebar() {
                             ))}
                         </ul>
                     )}
-                    <TextLink href={'/dashboard/users'} className='my-2 mx-5 hover:text-neutral-700 font-serif'>All users</TextLink>
+                    <TextLink href={'/dashboard/users'} className='my-1 mx-4 text-blue-500 hover:underline no-underline hover:text-blue-600 dark:hover:text-blue-400 '>All users</TextLink>
                     <SidebarSeparator/>
                     <h2 className="my-1 font-bold">Popular hashtags</h2>
                     {hashtags.length === 0 ? (
@@ -82,7 +82,7 @@ export function AppExtraSidebar() {
                     ) : (
                         <div className="flex flex-col gap-1">
                             {hashtags.map((hashtag) => (
-                                <TextLink key={hashtag.id} href={`/posts-by-hashtag/${hashtag.id}`} className='mx-5 no-underline hover:text-neutral-700 font-serif'>#{hashtag.name}</TextLink>
+                                <TextLink key={hashtag.id} href={`/posts-by-hashtag/${hashtag.id}`} className='mx-5 text-blue-500 hover:underline no-underline hover:text-blue-600 dark:hover:text-blue-400'>#{hashtag.name}</TextLink>
                             ))}
                         </div>
                     )}
