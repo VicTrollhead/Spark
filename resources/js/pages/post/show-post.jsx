@@ -2,7 +2,7 @@ import { Head, usePage, Link, useForm, router } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
-import { Bookmark, EyeOff, Heart, MessageCircle, Trash2 } from 'lucide-react';
+import { Bookmark, EllipsisVertical, EyeOff, Heart, MessageCircle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 
@@ -33,6 +33,8 @@ export default function Show() {
 
     const [isFavorited, setIsFavorited] = useState(post.is_favorited);
     const [favoritesCount, setFavoritesCount] = useState(post.favorites_count);
+
+    const [showOptions, setShowOptions] = useState(false);
 
     const handleLike = async () => {
         setIsLiked(!isLiked);
@@ -96,25 +98,48 @@ export default function Show() {
         });
     };
 
+    const toggleOptions = () => setShowOptions(!showOptions);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Post by @${post.user.username}`} />
 
             <div className="p-6">
-                <div className="flex items-center space-x-3">
-                    <Avatar className="h-20 w-20 border border-gray-300 dark:border-gray-700">
-                        <AvatarImage src={post.user.profile_image_url} alt={post.user.name} />
-                        <AvatarFallback className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white">
-                            {getInitials(post.user.name)}
-                        </AvatarFallback>
-                    </Avatar>
-                    <div>
-                        <Link href={`/user/${post.user.username}`} className="text-lg font-semibold text-gray-900 dark:text-white hover:underline">
-                            {post.user.name}
-                        </Link>
-                        <p className="text-md text-gray-500 dark:text-gray-400">@{post.user.username}</p>
-                    </div>
-                </div>
+               <div className="flex justify-between">
+                   <div className="flex items-center space-x-3">
+                       <Avatar className="h-20 w-20 border border-gray-300 dark:border-gray-700">
+                           <AvatarImage src={post.user.profile_image_url} alt={post.user.name} />
+                           <AvatarFallback className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white">
+                               {getInitials(post.user.name)}
+                           </AvatarFallback>
+                       </Avatar>
+                       <div>
+                           <Link href={`/user/${post.user.username}`} className="text-lg font-semibold text-gray-900 dark:text-white hover:underline">
+                               {post.user.name}
+                           </Link>
+                           <p className="text-md text-gray-500 dark:text-gray-400">@{post.user.username}</p>
+                       </div>
+                   </div>
+                   {post.user.id === auth.user.id && (
+                       <div className="relative cursor-pointer" onClick={toggleOptions}>
+                           <EllipsisVertical className="h-6 w-6 text-gray-500 hover:text-gray-700 dark:text-white dark:hover:text-gray-300" />
+
+                           {showOptions && post.user.id === auth.user.id && (
+                               <div className="absolute right-0 mt-2 min-w-[160px] rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-neutral-800">
+                                   <button className="block w-full rounded-t-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600">
+                                       Edit
+                                   </button>
+                                   <button
+                                       onClick={() => router.delete(`/posts/${post.id}`)}
+                                       className="block w-full rounded-b-lg px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-neutral-600"
+                                   >
+                                       Delete
+                                   </button>
+                               </div>
+                           )}
+                       </div>
+                   )}
+               </div>
 
                 <div className="mt-4">
                     <p className="text-gray-800 text-xl dark:text-gray-200">
@@ -151,7 +176,7 @@ export default function Show() {
                             {post.hashtags.map((hashtag, index) => (
                                 <Link
                                     key={hashtag.id}
-                                    href={`/hashtag/${hashtag.hashtag}`}
+                                    href={`/posts-by-hashtag/${hashtag.hashtag}`}
                                     className="text-blue-500 hover:underline"
                                 >
                                     #{hashtag.hashtag}
@@ -225,8 +250,6 @@ export default function Show() {
                 >
                     <option value="latest">Latest</option>
                     <option value="oldest">Oldest</option>
-                    {/*<option value="likes">Most Liked</option>*/}
-                    {/*<option value="friends">Friends' Posts</option>*/}
                 </select>
             </div>
             <div className="mt-2 px-6">

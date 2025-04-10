@@ -8,6 +8,7 @@ use App\Models\Media;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 use App\Models\Post;
@@ -29,34 +30,52 @@ class PostController extends Controller
                 if ($currentUser) {
                     $query->orWhere(function ($subQuery) use ($currentUser) {
                         $subQuery->where('user_id', $currentUser->id)
-                        ->orWhereHas('user.followers', function ($followersQuery) use ($currentUser) {
-                            $followersQuery->where('follower_id', $currentUser->id);
-                        });
+                            ->orWhereHas('user.followers', function ($followersQuery) use ($currentUser) {
+                                $followersQuery->where('follower_id', $currentUser->id);
+                            });
                     });
                 }
             });
-
-
 
         switch ($sort) {
             case 'likes':
                 $postsQuery->withCount('likes')->orderByDesc('likes_count');
                 break;
+
             case 'oldest':
                 $postsQuery->oldest();
                 break;
-            case 'friends':
+
+            case 'followees':
                 if ($currentUser) {
                     $postsQuery->whereHas('user.followers', function ($query) use ($currentUser) {
                         $query->where('follower_id', $currentUser->id);
                     });
                 }
                 break;
+
+            case 'followers':
+                if ($currentUser) {
+                    $postsQuery->whereHas('user.following', function ($query) use ($currentUser) {
+                        $query->where('followee_id', $currentUser->id);
+                    });
+                }
+                break;
+
+            case 'mutuals':
+                if ($currentUser) {
+                    $postsQuery->whereHas('user.followers', function ($query) use ($currentUser) {
+                        $query->where('follower_id', $currentUser->id);
+                    })->whereHas('user.following', function ($query) use ($currentUser) {
+                        $query->where('followee_id', $currentUser->id);
+                    });
+                }
+                break;
+
             default:
                 $postsQuery->latest();
                 break;
         }
-
 
         $posts = $postsQuery->get()->map(function ($post) use ($currentUser) {
             return [
@@ -67,7 +86,7 @@ class PostController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
+                    'profile_image_url' => $post->user->profileImage?->url,
                 ],
                 'hashtags' => $post->hashtags->map(fn ($tag) => [
                     'id' => $tag->id,
@@ -91,6 +110,7 @@ class PostController extends Controller
             'sort' => $sort,
         ]);
     }
+
 
     public function store(StorePostRequest $request)
     {
@@ -235,16 +255,29 @@ class PostController extends Controller
         return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
     }
 
-    public function destroy(Post $post): RedirectResponse
+    public function destroy($postId)
     {
-        if (Auth::id() !== $post->user_id) {
-            return Redirect::back()->with(['error' => 'Unauthorized'], 403);
+        $currentUser = Auth::user();
+        $post = Post::with(['media', 'likes', 'comments'])->findOrFail($postId);
+        if ($currentUser->id !== $post->user_id) {
+            abort(403, 'Unauthorized');
         }
 
-        $post->update(['is_deleted' => true]);
+        foreach ($post->media as $media) {
+            if (Storage::exists($media->file_path)) {
+                Storage::delete($media->file_path);
+            }
+            $media->delete();
+        }
 
-        return redirect()->back()->with(['message' => 'Post deleted successfully']);
+        $post->likes()->delete();
+        $post->comments()->delete();
+        $post->hashtags()->detach();
+        $post->delete();
+
+        return redirect()->route('dashboard')->with('success', 'Post updated successfully.');
     }
+
 
     public function popularHashtags(Request $request)
     {
@@ -256,12 +289,13 @@ class PostController extends Controller
         return $hashtags->map(function ($hashtag) {
             return [
                 'id' => $hashtag->id,
-                'name' => $hashtag->hashtag,
+                'hashtag' => $hashtag->hashtag,
+                'uses_count' => $hashtag->posts_count,
             ];
         });
     }
 
-    public function postsByHashtag($hashtag_id): Response
+    public function postsByHashtag(string $hashtag): Response
     {
         $currentUser = Auth::user();
 
@@ -269,10 +303,12 @@ class PostController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $hashtag = Hashtag::findOrFail($hashtag_id);
+        $hashtagModel = Hashtag::where('hashtag', $hashtag)
+            ->withCount('posts')
+            ->firstOrFail();
 
-        $posts = Post::whereHas('hashtags', function ($query) use ($hashtag_id) {
-            $query->where('hashtags.id', $hashtag_id);
+        $posts = Post::whereHas('hashtags', function ($query) use ($hashtag) {
+            $query->where('hashtag', $hashtag);
         })
             ->with(['user.profileImage', 'comments', 'likes', 'media', 'hashtags', 'favorites'])
             ->latest()
@@ -295,6 +331,7 @@ class PostController extends Controller
                     'hashtags' => $post->hashtags->map(fn ($tag) => [
                         'id' => $tag->id,
                         'hashtag' => $tag->hashtag,
+                        'uses_count' => $tag->posts()->count(),
                     ]),
                     'is_private' => $post->is_private,
                     'likes_count' => $post->likes->count(),
@@ -308,8 +345,14 @@ class PostController extends Controller
         return Inertia::render('post/posts-by-hashtag', [
             'user' => $currentUser,
             'posts' => $posts,
-            'hashtag' => $hashtag->hashtag,
+            'hashtag' => [
+                'id' => $hashtagModel->id,
+                'hashtag' => $hashtagModel->hashtag,
+                'uses_count' => $hashtagModel->posts_count,
+            ],
         ]);
     }
+
+
 
 }

@@ -6,10 +6,10 @@ export default function PostsByHashtag() {
     const { user, posts, hashtag } = usePage().props;
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'My Profile', href: '/user' },{ title: `Posts by hashtag #${hashtag}`, href: '/posts-by-hashtag'}]}>
-            <Head title={`Posts by hashtag #${hashtag}`} />
+        <AppLayout breadcrumbs={[{ title: 'My Profile', href: '/user' },{ title: `Posts by hashtag #${hashtag.hashtag}`, href: '/posts-by-hashtag'}]}>
+            <Head title={`Posts by hashtag #${hashtag.hashtag}`} />
 
-            <div className="p-6 text-2xl font-extrabold">{`Posts by hashtag #${hashtag}`}</div>
+            <div className="p-6 text-2xl font-extrabold">{`Posts by hashtag `}<span className="text-blue-500">{`#${hashtag.hashtag}`}</span></div>
 
             <div className="divide-y divide-gray-200 dark:divide-gray-800">
                 {posts.length > 0 ? (

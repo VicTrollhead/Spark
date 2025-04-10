@@ -42,7 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/post/{post}', [PostController::class, 'show'])->name('post.show');
     Route::delete('/posts/{post}', [PostController::class, 'destroy']);
     Route::get('/popular-hashtags', [PostController::class, 'popularHashtags'])->name('popularHashtags');
-    Route::get('/posts-by-hashtag/{hashtag_id}', [PostController::class, 'postsByHashtag'])->name('postsByHashtag');
+    Route::get('/posts-by-hashtag/{hashtag}', [PostController::class, 'postsByHashtag'])->name('postsByHashtag');
 
     Route::post('/post/{post}/like', [LikeController::class, 'like'])->name('post.like');
     Route::post('/post/{post}/unlike', [LikeController::class, 'unlike'])->name('post.unlike');

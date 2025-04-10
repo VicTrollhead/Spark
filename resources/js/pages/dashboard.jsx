@@ -11,6 +11,7 @@ export default function Dashboard() {
     const [isLoading, setIsLoading] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const hashtagRef = useRef();
+    const fileInputRef = useRef();
 
     const [data, setData] = useState({
         content: '',
@@ -70,6 +71,7 @@ export default function Dashboard() {
                 setSelectedFiles([]);
                 setErrors({});
                 hashtagRef.current?.reset();
+                fileInputRef.current.value = null;
             },
             onError: (errorBag) => {
                 setErrors(errorBag);
@@ -109,6 +111,7 @@ export default function Dashboard() {
                             Upload Media (Images or Videos)
                         </label>
                         <input
+                            ref={fileInputRef}
                             type="file"
                             multiple
                             onChange={handleMediaChange}
@@ -159,8 +162,11 @@ export default function Dashboard() {
                         <option value="latest">Latest</option>
                         <option value="oldest">Oldest</option>
                         <option value="likes">Most Liked</option>
-                        <option value="friends">Friends' Posts</option>
+                        <option value="followees">People I Follow</option>
+                        <option value="followers">People Who Follow Me</option>
+                        <option value="mutuals">Mutual Friends</option>
                     </select>
+
                     <button
                         onClick={handleReload}
                         className="p-2 text-sm font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition flex items-center"
