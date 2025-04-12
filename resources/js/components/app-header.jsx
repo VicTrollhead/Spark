@@ -92,6 +92,14 @@ export function AppHeader({ breadcrumbs = [] }) {
             icon: Settings,
         },
     ];
+
+    const onKeyDownSearch = async (e) => {
+        if (e.code === 'Enter') {
+            const searchText = e.currentTarget.value;
+            router.get(`/user/search/${searchText}`, { sort: 'newest' }, { preserveScroll: true });
+        }
+    };
+
     const handleLogout = () => {
         router.post(`/logout`);
         window.location.href = "/login";
@@ -176,7 +184,7 @@ export function AppHeader({ breadcrumbs = [] }) {
                         <div className="relative flex items-center space-x-1">
                             <div className="flex items-center space-x-3">
                                 <Search className="size-1/8 opacity-80 group-hover:opacity-100"/>
-                                <Input placeholder="Search" className="w-full" />
+                                <Input placeholder="Search users" className="w-full" onKeyDown={onKeyDownSearch}  />
                             </div>
                         </div>
                     </div>
