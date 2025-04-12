@@ -280,7 +280,7 @@ export default function Show() {
 
                                 {auth.user?.id === comment.user.id && (
                                     <Trash2
-                                        className="h-5 w-5 text-gray-500 dark:text-gray-400 hover:text-red-600 cursor-pointer"
+                                        className="h-5 w-5 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500 cursor-pointer"
                                         onClick={() => handleDeleteComment(comment.id)}
                                     />
                                 )}

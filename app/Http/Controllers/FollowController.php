@@ -78,17 +78,20 @@ class FollowController extends Controller
 
     public function followers(User $user)
     {
+        $authUser = Auth::user();
+
         $followers = $user->followers()
             ->with('profileImage')
             ->withCount('followers')
             ->get()
-            ->map(function ($follower) {
+            ->map(function ($follower) use ($authUser) {
                 return [
                     'id' => $follower->id,
                     'name' => $follower->name,
                     'username' => $follower->username,
                     'profile_image_url' => $follower->profileImage ? $follower->profileImage->url : null,
                     'followers_count' => $follower->followers_count,
+                    'is_followed' => $authUser->following->contains($follower->id),
                 ];
             });
 
@@ -106,17 +109,20 @@ class FollowController extends Controller
 
     public function following(User $user)
     {
+        $authUser = Auth::user();
+
         $following = $user->following()
             ->with('profileImage')
             ->withCount('followers')
             ->get()
-            ->map(function ($followingUser) {
+            ->map(function ($followingUser) use ($authUser) {
                 return [
                     'id' => $followingUser->id,
                     'name' => $followingUser->name,
                     'username' => $followingUser->username,
                     'profile_image_url' => $followingUser->profileImage ? $followingUser->profileImage->url : null,
                     'followers_count' => $followingUser->followers_count,
+                    'is_followed' => $authUser->following->contains($followingUser->id),
                 ];
             });
 
@@ -131,6 +137,7 @@ class FollowController extends Controller
             ],
         ]);
     }
+
 
 
 }

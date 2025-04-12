@@ -59,8 +59,8 @@ export function AppExtraSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <SidebarMenu className="py-1 px-2">
-                    <h2 className="my-2 font-bold">Let's get acquainted</h2>
+                <SidebarMenu className="py-1 px-2.5">
+                    <h2 className="m-2 font-bold">Let's get acquainted</h2>
                     {users.length === 0 ? (
                         <p className="text-gray-500">Not users anyone yet.</p>
                     ) : (
@@ -76,7 +76,7 @@ export function AppExtraSidebar() {
                     )}
                     <TextLink href={'/dashboard/users'} className='my-1 mx-4 text-blue-500 hover:underline no-underline hover:text-blue-600 dark:hover:text-blue-400 '>All users</TextLink>
                     <SidebarSeparator/>
-                    <h2 className="my-1 font-bold">Popular hashtags</h2>
+                    <h2 className="m-2 font-bold">Popular hashtags</h2>
                     {hashtags.length === 0 ? (
                         <p className="text-gray-500">Not hashtags anyone yet.</p>
                     ) : (
