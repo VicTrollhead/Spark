@@ -155,6 +155,71 @@ class UserController extends Controller
         ]);
     }
 
+    public function search(Request $request, string $searchText = ''): Response
+    {
+        $currentUser = Auth::user();
+        $sort = $request->query('sort', 'newest');
+
+        $usersQuery = User::with('profileImage')->withCount('followers');
+
+        if (trim($searchText) !== '') {
+            $usersQuery->where(function ($query) use ($searchText) {
+                $query->where('name', 'like', "%{$searchText}%")
+                    ->orWhere('username', 'like', "%{$searchText}%");
+            });
+        }
+
+        switch ($sort) {
+            case 'oldest':
+                $usersQuery->oldest();
+                break;
+            case 'popular':
+                $usersQuery->orderByDesc('followers_count');
+                break;
+            case 'least_followed':
+                $usersQuery->orderBy('followers_count');
+                break;
+            case 'following':
+                if ($currentUser) {
+                    $usersQuery->whereHas('followers', fn($query) => $query->where('follower_id', $currentUser->id));
+                }
+                break;
+            case 'followers':
+                if ($currentUser) {
+                    $usersQuery->whereHas('following', fn($query) => $query->where('followee_id', $currentUser->id));
+                }
+                break;
+            case 'mutual_subscribers':
+                if ($currentUser) {
+                    $usersQuery->whereHas('followers', function ($query) use ($currentUser) {
+                        $query->where('follower_id', $currentUser->id);
+                    })->whereHas('following', function ($query) use ($currentUser) {
+                        $query->where('followee_id', $currentUser->id);
+                    });
+                }
+                break;
+            default:
+                $usersQuery->latest();
+                break;
+        }
+
+        $users = $usersQuery->get()->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'followers_count' => $user->followers_count,
+            ];
+        });
+
+        return Inertia::render('user/search-users', [
+            'users' => $users,
+            'sort' => $sort,
+            'searchText' => $searchText,
+        ]);
+    }
+
     public function usersList(Request $request)
     {
         $usersQuery = User::with('profileImage')->withCount('followers');

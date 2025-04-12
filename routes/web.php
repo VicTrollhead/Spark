@@ -29,6 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/user/{user}/edit', [UserController::class, 'edit'])->name('user.edit');
     Route::patch('/user/{user}/update', [UserController::class, 'update'])->name('user.update');
     Route::get('/user/{user}', [UserController::class, 'show'])->name('user.show');
+    Route::get('/user/search/{searchText}', [UserController::class, 'search'])->name('user.search');
 
 
     Route::post('/user/{user}/follow', [FollowController::class, 'follow'])->name('user.follow');

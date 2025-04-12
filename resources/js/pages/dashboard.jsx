@@ -95,38 +95,6 @@ export default function Dashboard() {
 
             <div className="p-4 bg-white dark:bg-neutral-950 border-y dark:border-gray-800">
                 <form onSubmit={handlePostSubmit} className="flex flex-col space-y-4">
-                    <textarea
-                        value={data.content}
-                        onChange={(e) => setData((prev) => ({ ...prev, content: e.target.value }))}
-                        rows={3}
-                        placeholder="What's on your mind?"
-                        className="resize-none p-3 bg-gray-100 dark:bg-neutral-900 rounded-md text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600"
-                    />
-                    {errors.content && <p className="text-red-500 text-sm">{errors.content}</p>}
-
-                    <HashtagInput ref={hashtagRef} onChange={(hashtags) => setData((prev) => ({ ...prev, hashtags }))} />
-
-                    <div>
-                        <label className="block text-sm text-gray-700 dark:text-gray-200">
-                            Upload Media (Images or Videos)
-                        </label>
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            multiple
-                            onChange={handleMediaChange}
-                            className="mt-2 p-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
-                        />
-                        {selectedFiles.length > 0 && (
-                            <ul className="mt-2 text-sm text-gray-500 list-disc pl-4">
-                                {selectedFiles.map((name, index) => (
-                                    <li key={index}>{name}</li>
-                                ))}
-                            </ul>
-                        )}
-                        {errors['media.0'] && <p className="text-red-500 text-sm">{errors['media.0']}</p>}
-                    </div>
-
                     <label className="text-sm text-gray-700 dark:text-gray-300">
                         <input
                             type="checkbox"
@@ -136,6 +104,44 @@ export default function Dashboard() {
                         />
                         Private (Only for subscribers)
                     </label>
+                    <textarea
+                        value={data.content}
+                        onChange={(e) => setData((prev) => ({ ...prev, content: e.target.value }))}
+                        rows={3}
+                        placeholder="What's on your mind?"
+                        className="resize-none p-3 bg-gray-100 dark:bg-neutral-900 rounded-md text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600"
+                    />
+                    {errors.content && <p className="text-red-500 text-sm">{errors.content}</p>}
+                    <hr/>
+
+                    <div className="flex flex-row gap-4 flex-wrap xl:flex-nowrap">
+                        <div>
+                            <label className="block text-sm text-gray-700 dark:text-gray-200">
+                                Upload Media (Images or Videos)
+                            </label>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                multiple
+                                onChange={handleMediaChange}
+                                className="mt-2 p-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
+                            />
+                            {selectedFiles.length > 0 && (
+                                <ul className="mt-2 text-sm text-gray-500 list-disc pl-4">
+                                    {selectedFiles.map((name, index) => (
+                                        <li key={index}>{name}</li>
+                                    ))}
+                                </ul>
+                            )}
+                            {errors['media.0'] && <p className="text-red-500 text-sm">{errors['media.0']}</p>}
+                        </div>
+                        <div className=" w-full items-center">
+                            <label className="block text-sm text-gray-700 dark:text-gray-200">
+                                Hashtags
+                            </label>
+                            <HashtagInput ref={hashtagRef} onChange={(hashtags) => setData((prev) => ({ ...prev, hashtags }))} />
+                        </div>
+                    </div>
 
                     <button
                         type="submit"
@@ -146,7 +152,7 @@ export default function Dashboard() {
                                 : 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
                         }`}
                     >
-                        Post
+                        Publish
                     </button>
                 </form>
             </div>
