@@ -80,7 +80,7 @@ export function AppExtraSidebar() {
                     {hashtags.length === 0 ? (
                         <p className="text-gray-500">{translations['Not hashtags anyone yet.']}</p>
                     ) : (
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1 mb-1">
                             {hashtags.map((hashtag) => (
                                 <TextLink
                                     key={hashtag.id}
