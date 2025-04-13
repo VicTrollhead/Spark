@@ -9,7 +9,7 @@ return [
     "Friends" => "Друзі",
     "All users" => "Усі користувачі",
     "Notifications" => "Повідомлення",
-    "Favourites" => "Обрані",
+    "Favorites" => "Обрані",
     "Profile" => "Профіль",
     "Settings" => "Налаштування",
     "Repository" => "Репозиторій",

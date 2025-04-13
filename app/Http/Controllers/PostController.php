@@ -23,7 +23,16 @@ class PostController extends Controller
         $currentUser = Auth::user();
         $sort = $request->query('sort', 'latest');
 
-        $postsQuery = Post::with(['user.profileImage', 'comments', 'likes', 'media', 'hashtags'])
+        $postsQuery = Post::with([
+            'user.profileImage',
+            'comments',
+            'likes',
+            'media',
+            'hashtags',
+            'favorites',
+            'repostedByUsers',
+
+        ])
             ->where(function ($query) use ($currentUser) {
                 $query->where('is_private', 0);
 
@@ -102,6 +111,8 @@ class PostController extends Controller
                 'favorites_count' => $post->favorites->count(),
                 'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
                 'comments_count' => $post->comments->count(),
+                'reposts_count' => $post->repostedByUsers->count(),
+                'is_reposted' => $currentUser ? $post->repostedByUsers->contains('id', $currentUser->id) : false,
             ];
         });
 
@@ -231,6 +242,8 @@ class PostController extends Controller
                 'comments_count' => $comments->count(),
                 'comments' => $comments,
                 'hashtags' => $hashtags,
+                'is_reposted' => $currentUser ? $post->repostedByUsers->contains('id', $currentUser->id) : false,
+                'reposts_count' => $post->repostedByUsers->count(),
             ],
             'sort' => $sort
         ]);
@@ -339,6 +352,8 @@ class PostController extends Controller
                     'favorites_count' => $post->favorites->count(),
                     'is_favorited' => $post->favorites->contains('user_id', $currentUser->id),
                     'comments_count' => $post->comments->count(),
+                    'is_reposted' => $currentUser ? $post->repostedByUsers->contains('id', $currentUser->id) : false,
+                    'reposts_count' => $post->repostedByUsers->count(),
                 ];
             });
 

@@ -58,16 +58,19 @@ class Post extends Model
         return $this->belongsToMany(Hashtag::class, 'post_hashtags');
     }
 
-
     public function media(): MorphMany
     {
         return $this->morphMany(Media::class, 'mediable');
     }
 
-//    public function profileImage(): HasOne
-//    {
-//        return $this->hasOne(Media::class, 'mediable_id')
-//            ->where('mediable_type', User::class)
-//            ->where('file_type', 'profile');
-//    }
+    public function reposts()
+    {
+        return $this->hasMany(Repost::class);
+    }
+
+    public function repostedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'reposts');
+    }
+
 }

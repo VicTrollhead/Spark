@@ -1,29 +1,24 @@
-import { Head, usePage, Link, useForm, router } from '@inertiajs/react';
+import { Head, usePage, Link, router } from '@inertiajs/react';
 import { Check, MapPin, Globe, Calendar, UserCheck, AlertCircle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
 import PostComponent from '../post/post-component';
+import { useState } from 'react';
 
 export default function Show() {
-    const { user, auth, posts } = usePage().props;
+    const { user, auth, posts, filters } = usePage().props;
     const getInitials = useInitials();
-    const { get, post, processing } = useForm();
+
+    const [sort, setSort] = useState(filters?.sort || 'latest');
 
     const handleFollow = () => {
-        if (user.is_following) {
-            router.post(`/user/${user.username}/unfollow`, {}, {
-                onSuccess: () => {
-                    router.reload({ only: ['posts'] });
-                }
-            });
-        } else {
-            router.post(`/user/${user.username}/follow`, {}, {
-                onSuccess: () => {
-                    router.reload({ only: ['posts'] });
-                }
-            });
-        }
+        const route = user.is_following ? 'unfollow' : 'follow';
+        router.post(`/user/${user.username}/${route}`, {}, {
+            onSuccess: () => {
+                router.reload({ only: ['posts'] });
+            }
+        });
     };
 
     const handleEditProfile = () => {
@@ -40,7 +35,6 @@ export default function Show() {
         return (
             <AppLayout breadcrumbs={[{ title: `@${user.username} (Private Account)`, href: `/user/${user.username}` }]}>
                 <Head title={`@${user.username} (Private Account)`} />
-
                 <div className="p-6 text-center">
                     <Avatar className="h-24 w-24 mx-auto border-4 border-white dark:border-gray-900">
                         <AvatarImage src={user.profile_image_url || ''} alt={user.username} />
@@ -48,14 +42,11 @@ export default function Show() {
                             {getInitials(user.username)}
                         </AvatarFallback>
                     </Avatar>
-
                     <h2 className="text-lg font-semibold mt-2">@{user.username}</h2>
                     <p className="text-gray-500 dark:text-gray-400">This account is private.</p>
-
                     {auth.user && !user.is_following && (
                         <button
                             onClick={handleFollow}
-                            disabled={processing}
                             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
                         >
                             Follow to See More
@@ -70,6 +61,7 @@ export default function Show() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${user.name} (@${user.username})`} />
 
+            {/* Cover Image */}
             <div className="relative w-full bg-gray-200 h-72 dark:bg-gray-800">
                 {user.cover_image_url && (
                     <img src={user.cover_image_url} alt="Cover Image" className="h-full w-full object-fill object-center" />
@@ -82,9 +74,9 @@ export default function Show() {
                         </AvatarFallback>
                     </Avatar>
                 </div>
-
             </div>
 
+            {/* Profile Info */}
             <div className="space-y-2 p-6 pt-12 sm:pt-16">
                 <div className="flex items-center justify-between gap-x-5">
                     <div>
@@ -103,10 +95,10 @@ export default function Show() {
                         </div>
                         <p className="text-gray-500 dark:text-gray-400 mt-1">@{user.username}</p>
                     </div>
+
                     {!isOwnProfile && (
                         <button
                             onClick={handleFollow}
-                            disabled={processing}
                             className={`px-4 py-2 rounded-md ${
                                 user.is_following
                                     ? 'bg-gray-600 hover:bg-gray-500 text-white dark:bg-gray-800 dark:hover:bg-gray-700'
@@ -116,6 +108,7 @@ export default function Show() {
                             {user.is_following ? 'Unfollow' : 'Follow'}
                         </button>
                     )}
+
                     {isOwnProfile && (
                         <div className="flex flex-col lg:items-end sm:items-center pl-1 sm:ml-10 space-y-2">
                             <button
@@ -124,7 +117,6 @@ export default function Show() {
                             >
                                 Edit Profile
                             </button>
-
                             {(!user.bio || !user.location || !user.website || !user.date_of_birth) && (
                                 <div className="flex items-center gap-2 bg-blue-100 text-blue-600 px-2 py-2 rounded-lg text-sm dark:bg-gray-800 dark:text-blue-400 sm:w-auto w-full">
                                     <AlertCircle className="h-4 w-4" />
@@ -139,7 +131,6 @@ export default function Show() {
 
                 {user.bio && <p className="text-gray-700 dark:text-gray-300">{user.bio}</p>}
 
-                {/* Additional User Info */}
                 <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                     {user.location && (
                         <div className="flex items-center gap-1">
@@ -147,7 +138,6 @@ export default function Show() {
                             {user.location}
                         </div>
                     )}
-
                     {user.website && (
                         <div className="flex items-center gap-1">
                             <Globe className="h-4 w-4" />
@@ -156,7 +146,6 @@ export default function Show() {
                             </a>
                         </div>
                     )}
-
                     {user.date_of_birth && (
                         <div className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
@@ -167,12 +156,10 @@ export default function Show() {
                             })}
                         </div>
                     )}
-
                     <div className="flex items-center gap-1">
                         <UserCheck className="h-4 w-4" />
-                        Joined{' '}{user.created_at}
+                        Joined {user.created_at}
                     </div>
-
                     {user.status && (
                         <div className="flex items-center gap-1">
                             <AlertCircle className="h-4 w-4" />
@@ -181,7 +168,7 @@ export default function Show() {
                     )}
                 </div>
 
-                {/* Followers & Following */}
+                {/* Followers */}
                 <div className="flex gap-4 text-gray-700 dark:text-gray-300 mt-4">
                     <Link href={`/user/${user.username}/followers`} className="hover:underline">
                         <strong>{user.followers_count}</strong> Followers
@@ -192,12 +179,33 @@ export default function Show() {
                 </div>
             </div>
 
-            {/* Posts */}
+            {/* Sorting and Posts */}
             <div className="divide-y">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white px-6 py-3">Posts</h2>
+                <div className="flex items-center justify-between px-6 py-3">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Posts</h2>
+                    <select
+                        className="ml-4 px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
+                        value={sort}
+                        onChange={(e) => {
+                            setSort(e.target.value);
+                            router.get(window.location.pathname, { sort: e.target.value }, {
+                                preserveScroll: true,
+                                preserveState: true,
+                            });
+                        }}
+                    >
+                        <option value="latest">Latest</option>
+                        <option value="oldest">Oldest</option>
+                        <option value="most_liked">Most Liked</option>
+                        <option value="reposts">Reposts</option>
+                    </select>
+                </div>
+
                 <div className="divide-y divide-gray-200 dark:divide-gray-800">
                     {posts.length > 0 ? (
-                        posts.map((post) => <PostComponent key={post.id} post={post} user={user} auth={auth} />)
+                        posts.map((post) => (
+                            <PostComponent key={post.id} post={post} user={user} auth={auth} />
+                        ))
                     ) : (
                         <p className="text-gray-500 dark:text-gray-400 px-6 py-4">No posts yet.</p>
                     )}

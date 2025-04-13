@@ -41,7 +41,7 @@ export const HashtagInput = forwardRef(function HashtagInput({ onChange, placeho
     };
 
     return (
-        <div className="flex w-full flex-wrap items-center gap-2 rounded-md  bg-gray-100 p-2 text-neutral-900 transition-colors focus-within:ring-2 focus-within:ring-blue-500 dark:bg-neutral-900 dark:text-white dark:focus-within:ring-blue-600">
+        <div className="flex w-full flex-wrap items-center gap-2 rounded-md  bg-gray-100 p-1.5 text-neutral-900 transition-colors focus-within:ring-2 focus-within:ring-blue-500 dark:bg-neutral-900 dark:text-white dark:focus-within:ring-blue-600">
             {tags.map((tag, index) => (
                 <Badge
                     key={index}
