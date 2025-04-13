@@ -5,7 +5,7 @@ import { UserInfo } from './user-info.jsx';
 import TextLink from '@/components/text-link.jsx';
 
 export function AppExtraSidebar() {
-    const { auth } = usePage().props;
+    const { auth, translations } = usePage().props;
     const user = auth?.user;
     const [users, setUsers] = useState([]);
     const [hashtags, setHashtags] = useState([]);
@@ -60,9 +60,9 @@ export function AppExtraSidebar() {
 
             <SidebarContent>
                 <SidebarMenu className="py-1 px-2.5">
-                    <h2 className="m-2 font-bold">Let's get acquainted</h2>
+                    <h2 className="m-2 font-bold">{translations['Let\'s get acquainted']}</h2>
                     {users.length === 0 ? (
-                        <p className="text-gray-500">Not users anyone yet.</p>
+                        <p className="text-gray-500">{translations['Not users anyone yet.']}</p>
                     ) : (
                         <ul className="flex flex-col gap-2">
                             {users.map((user) => (
@@ -74,11 +74,11 @@ export function AppExtraSidebar() {
                             ))}
                         </ul>
                     )}
-                    <TextLink href={'/dashboard/users'} className='my-1 mx-4 text-blue-500 hover:underline no-underline hover:text-blue-600 dark:hover:text-blue-400 '>All users</TextLink>
+                    <TextLink href={'/dashboard/users'} className='my-1 mx-4 text-blue-500 hover:underline no-underline hover:text-blue-600 dark:hover:text-blue-400 '>{translations['All users']}</TextLink>
                     <SidebarSeparator/>
-                    <h2 className="m-2 font-bold">Popular hashtags</h2>
+                    <h2 className="m-2 font-bold">{translations['Popular hashtags']}</h2>
                     {hashtags.length === 0 ? (
-                        <p className="text-gray-500">Not hashtags anyone yet.</p>
+                        <p className="text-gray-500">{translations['Not hashtags anyone yet.']}</p>
                     ) : (
                         <div className="flex flex-col gap-1">
                             {hashtags.map((hashtag) => (
@@ -92,7 +92,6 @@ export function AppExtraSidebar() {
                             ))}
                         </div>
                     )}
-
                     <SidebarSeparator/>
                 </SidebarMenu>
             </SidebarContent>

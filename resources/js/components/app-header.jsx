@@ -25,6 +25,7 @@ const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral
 
 export function AppHeader({ breadcrumbs = [] }) {
     const page = usePage();
+    const { translations } = usePage().props;
     const { auth } = page.props;
     const user = auth?.user;
     const getInitials = useInitials();
@@ -32,62 +33,62 @@ export function AppHeader({ breadcrumbs = [] }) {
 
     const mainNavItems = [
         {
-            title: 'News',
+            title: translations['News'],
             url: '/dashboard',
         },
         {
-            title: 'Following',
+            title: translations['Following'],
             url: `/user/following-posts`,
         },
         {
-            title: 'Liked',
+            title: translations['Liked'],
             url: '/user/liked',
         },
     ];
 
     const sideBarNavItems = [
         {
-            title: 'Dashboard',
+            title: translations['Dashboard'],
             url: '/dashboard',
             icon: Home,
         },
         {
-            title: 'Following',
+            title: translations['Following'],
             url: `/user/following-posts`,
             icon: List,
         },
         {
-            title: 'Liked posts',
+            title: translations['Liked'],
             url: '/user/liked',
             icon: FolderHeart,
         },
         {
-            title: 'Friends',
+            title: translations['Friends'],
             url: `/user/${user.username}/friends`,
             icon: Users,
         },
         {
-            title: 'All users',
+            title: translations['All users'],
             url: '/dashboard/users',
             icon: Users,
         },
         {
-            title: 'Notifications',
+            title: translations['Notifications'],
             url: '#',
             icon: Mail,
         },
         {
-            title: 'Favourites',
+            title: translations['Favourites'],
             url: '/user/favorites',
             icon: Bookmark,
         },
         {
-            title: 'Profile',
+            title: translations['Profile'],
             url: user.username ? `/user/${user.username}` : '/user',
             icon: User,
         },
         {
-            title: 'Settings',
+            title: translations['Settings'],
             url: '/settings/profile',
             icon: Settings,
         },
@@ -145,12 +146,12 @@ export function AppHeader({ breadcrumbs = [] }) {
                                            <DropdownMenuSeparator className="mb-5"/>
                                             <a className="flex items-center space-x-2 " href="https://github.com/VicTrollhead/Spark">
                                                 <Folder className="h-5 w-5"/>
-                                                <span>Repository</span>
+                                                <span>{translations['Repository']}</span>
                                             </a>
                                             <p onClick={handleLogout}
                                                 className="flex items-center space-x-2 cursor-pointer">
                                                 <LogOut className="h-5 w-5 mr-2"/>
-                                                Log out
+                                                {translations['Log out']}
                                             </p>
                                         </div>
                                     </div>
@@ -184,7 +185,7 @@ export function AppHeader({ breadcrumbs = [] }) {
                         <div className="relative flex items-center space-x-1">
                             <div className="flex items-center space-x-3">
                                 <Search className="size-1/8 opacity-80 group-hover:opacity-100"/>
-                                <Input placeholder="Search users" className="w-full" onKeyDown={onKeyDownSearch}  />
+                                <Input placeholder={translations['Search users']} className="w-full" onKeyDown={onKeyDownSearch}  />
                             </div>
                         </div>
                     </div>

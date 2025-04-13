@@ -4,6 +4,8 @@ namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Str;
 use Inertia\Middleware;
 
@@ -37,6 +39,8 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        App::setLocale(Cookie::get('locale', config('app.locale')));
+
         [$message, $author] = Str::of(Inspiring::quotes()->random())->explode('-');
 
         $user = $request->user();
@@ -44,6 +48,8 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            'locale' => app()->getLocale(),
+            'translations' => trans('common'),
             'quote' => [
                 'message' => trim($message),
                 'author' => trim($author),

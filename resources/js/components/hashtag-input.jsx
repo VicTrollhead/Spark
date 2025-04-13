@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { X } from 'lucide-react';
 
-export const HashtagInput = forwardRef(function HashtagInput({ onChange }, ref) {
+export const HashtagInput = forwardRef(function HashtagInput({ onChange, placeholder }, ref) {
     const [tags, setTags] = useState([]);
     const [input, setInput] = useState('');
 
@@ -59,7 +59,7 @@ export const HashtagInput = forwardRef(function HashtagInput({ onChange }, ref) 
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Add hashtag..."
+                placeholder={placeholder}
                 className="placeholder:text-muted-foreground flex-1 border-none bg-transparent text-sm text-black shadow-none outline-none dark:text-white"
             />
         </div>
