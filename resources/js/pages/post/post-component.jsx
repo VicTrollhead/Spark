@@ -1,6 +1,6 @@
 import { Link, router, useForm, usePage } from '@inertiajs/react';
 import { Bookmark, EllipsisVertical, EyeOff, Heart, MessageCircle } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 
@@ -16,6 +16,26 @@ export default function PostComponent({ post }) {
     const [favoritesCount, setFavoritesCount] = useState(post.favorites_count);
 
     const [showOptions, setShowOptions] = useState(false);
+    const optionsRef = useRef(null);
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (optionsRef.current && !optionsRef.current.contains(event.target)) {
+                setShowOptions(false);
+            }
+        }
+
+        if (showOptions) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showOptions]);
+
+    const toggleOptions = () => setShowOptions(prev => !prev);
+
     const handleLike = async () => {
         setIsLiked(!isLiked);
         setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
@@ -50,10 +70,8 @@ export default function PostComponent({ post }) {
         );
     };
 
-    const toggleOptions = () => setShowOptions(!showOptions);
-
     return (
-        <div className="border-b border-gray-200 p-4 dark:border-gray-800">
+        <div className="relative border-b border-gray-200 p-4 dark:border-gray-800">
             <div className="flex items-start space-x-3">
                 <Avatar className="h-16 w-16">
                     <AvatarImage src={post.user.profile_image_url} alt={post.user.name} />
@@ -72,11 +90,14 @@ export default function PostComponent({ post }) {
                         </div>
 
                         {post.user.id === auth.user.id && (
-                            <div className="relative cursor-pointer" onClick={toggleOptions}>
-                                <EllipsisVertical className="h-6 w-6 text-gray-500 hover:text-gray-700 dark:text-white dark:hover:text-gray-300" />
+                            <div className="relative" ref={optionsRef}>
+                                <EllipsisVertical
+                                    className="h-6 w-6 cursor-pointer text-gray-500 hover:text-gray-700 dark:text-white dark:hover:text-gray-300"
+                                    onClick={toggleOptions}
+                                />
 
-                                {showOptions && post.user.id === auth.user.id && (
-                                    <div className="absolute right-0 mt-2 min-w-[160px] rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-neutral-800">
+                                {showOptions && (
+                                    <div className="absolute right-0 z-50 mt-1 min-w-[160px] rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-neutral-800">
                                         <button className="block w-full rounded-t-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600">
                                             Edit
                                         </button>
@@ -91,7 +112,6 @@ export default function PostComponent({ post }) {
                             </div>
                         )}
                     </div>
-
 
                     <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username}</p>
                     <p className="mt-1 text-lg text-gray-700 dark:text-gray-300">{post.content}</p>
@@ -120,7 +140,7 @@ export default function PostComponent({ post }) {
 
                     {post.hashtags?.length > 0 && (
                         <div className="mt-0.5 flex flex-wrap gap-x-1 text-[16px] break-all">
-                            {post.hashtags.map((hashtag, index) => (
+                            {post.hashtags.map((hashtag) => (
                                 <Link key={hashtag.id} href={`/posts-by-hashtag/${hashtag.hashtag}`} className="text-blue-500 hover:underline">
                                     #{hashtag.hashtag}
                                 </Link>

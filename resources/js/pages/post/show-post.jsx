@@ -3,8 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar'
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
 import { Bookmark, EllipsisVertical, EyeOff, Heart, MessageCircle, Trash2 } from 'lucide-react';
-import { useState } from 'react';
-
+import { useEffect, useRef, useState } from 'react';
 
 export default function Show() {
     const { post, auth, sort } = usePage().props;
@@ -14,13 +13,6 @@ export default function Show() {
     });
 
     const [sortOption, setSortOption] = useState(sort || "latest");
-
-    const handleSortChange = (e) => {
-        const selectedSort = e.target.value;
-        setSortOption(selectedSort);
-        router.get(`/post/${post.id}`, { sort: selectedSort }, { preserveScroll: true });
-    };
-
     const isOwnPost = auth.user && auth.user.id === post.user.id;
 
     const breadcrumbs = [
@@ -30,44 +22,54 @@ export default function Show() {
 
     const [isLiked, setIsLiked] = useState(post.is_liked);
     const [likesCount, setLikesCount] = useState(post.likes_count);
-
     const [isFavorited, setIsFavorited] = useState(post.is_favorited);
     const [favoritesCount, setFavoritesCount] = useState(post.favorites_count);
-
     const [showOptions, setShowOptions] = useState(false);
+
+    const optionsRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (optionsRef.current && !optionsRef.current.contains(event.target)) {
+                setShowOptions(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    const toggleOptions = () => setShowOptions(!showOptions);
+
+    const handleSortChange = (e) => {
+        const selectedSort = e.target.value;
+        setSortOption(selectedSort);
+        router.get(`/post/${post.id}`, { sort: selectedSort }, { preserveScroll: true });
+    };
 
     const handleLike = async () => {
         setIsLiked(!isLiked);
         setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
-
-        await router.post(
-            isLiked ? `/post/${post.id}/unlike` : `/post/${post.id}/like`,
-            {},
-            {
-                preserveScroll: true,
-                onError: () => {
-                    setIsLiked(post.is_liked);
-                    setLikesCount(post.likes_count);
-                },
-            }
-        );
+        await router.post(isLiked ? `/post/${post.id}/unlike` : `/post/${post.id}/like`, {}, {
+            preserveScroll: true,
+            onError: () => {
+                setIsLiked(post.is_liked);
+                setLikesCount(post.likes_count);
+            },
+        });
     };
 
     const handleFavorite = async () => {
         setIsFavorited(!isFavorited);
         setFavoritesCount(isFavorited ? favoritesCount - 1 : favoritesCount + 1);
-
-        await router.post(
-            isFavorited ? `/post/${post.id}/remove-favorite` : `/post/${post.id}/add-favorite`,
-            {},
-            {
-                preserveScroll: true,
-                onError: () => {
-                    setIsFavorited(post.is_favorited);
-                    setFavoritesCount(post.favorites_count);
-                },
-            }
-        );
+        await router.post(isFavorited ? `/post/${post.id}/remove-favorite` : `/post/${post.id}/add-favorite`, {}, {
+            preserveScroll: true,
+            onError: () => {
+                setIsFavorited(post.is_favorited);
+                setFavoritesCount(post.favorites_count);
+            },
+        });
     };
 
     const handleCommentSubmit = (e) => {
@@ -83,13 +85,11 @@ export default function Show() {
                 router.reload({ only: ['post'] });
             }
         });
-
         setData({ content: '', post_id: post.id, parent_comment_id: null });
     };
 
     const handleDeleteComment = async (commentId) => {
         if (!window.confirm("Are you sure you want to delete this comment?")) return;
-
         await router.post(`/comment/${commentId}/delete`, {}, {
             preserveScroll: true,
             onSuccess: () => {
@@ -98,48 +98,48 @@ export default function Show() {
         });
     };
 
-    const toggleOptions = () => setShowOptions(!showOptions);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Post by @${post.user.username}`} />
 
             <div className="p-6">
-               <div className="flex justify-between">
-                   <div className="flex items-center space-x-3">
-                       <Avatar className="h-20 w-20 border border-gray-300 dark:border-gray-700">
-                           <AvatarImage src={post.user.profile_image_url} alt={post.user.name} />
-                           <AvatarFallback className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white">
-                               {getInitials(post.user.name)}
-                           </AvatarFallback>
-                       </Avatar>
-                       <div>
-                           <Link href={`/user/${post.user.username}`} className="text-lg font-semibold text-gray-900 dark:text-white hover:underline">
-                               {post.user.name}
-                           </Link>
-                           <p className="text-md text-gray-500 dark:text-gray-400">@{post.user.username}</p>
-                       </div>
-                   </div>
-                   {post.user.id === auth.user.id && (
-                       <div className="relative cursor-pointer" onClick={toggleOptions}>
-                           <EllipsisVertical className="h-6 w-6 text-gray-500 hover:text-gray-700 dark:text-white dark:hover:text-gray-300" />
-
-                           {showOptions && post.user.id === auth.user.id && (
-                               <div className="absolute right-0 mt-2 min-w-[160px] rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-neutral-800">
-                                   <button className="block w-full rounded-t-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600">
-                                       Edit
-                                   </button>
-                                   <button
-                                       onClick={() => router.delete(`/posts/${post.id}`)}
-                                       className="block w-full rounded-b-lg px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-neutral-600"
-                                   >
-                                       Delete
-                                   </button>
-                               </div>
-                           )}
-                       </div>
-                   )}
-               </div>
+                <div className="flex justify-between">
+                    <div className="flex items-center space-x-3">
+                        <Avatar className="h-20 w-20 border border-gray-300 dark:border-gray-700">
+                            <AvatarImage src={post.user.profile_image_url} alt={post.user.name} />
+                            <AvatarFallback className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white">
+                                {getInitials(post.user.name)}
+                            </AvatarFallback>
+                        </Avatar>
+                        <div>
+                            <Link href={`/user/${post.user.username}`} className="text-lg font-semibold text-gray-900 dark:text-white hover:underline">
+                                {post.user.name}
+                            </Link>
+                            <p className="text-md text-gray-500 dark:text-gray-400">@{post.user.username}</p>
+                        </div>
+                    </div>
+                    {isOwnPost && (
+                        <div className="relative" ref={optionsRef}>
+                            <EllipsisVertical
+                                className="h-6 w-6 text-gray-500 hover:text-gray-700 dark:text-white dark:hover:text-gray-300 cursor-pointer"
+                                onClick={toggleOptions}
+                            />
+                            {showOptions && (
+                                <div className="absolute right-0 mt-2 min-w-[160px] rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-neutral-800 z-50">
+                                    <button className="block w-full rounded-t-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600">
+                                        Edit
+                                    </button>
+                                    <button
+                                        onClick={() => router.delete(`/posts/${post.id}`)}
+                                        className="block w-full rounded-b-lg px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-neutral-600"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
 
                 <div className="mt-4">
                     <p className="text-gray-800 text-xl dark:text-gray-200">
@@ -159,10 +159,7 @@ export default function Show() {
                                     </div>
                                 ) : (
                                     <div key={uniqueKey} className="relative w-full rounded-lg overflow-hidden border dark:border-gray-700">
-                                        <video
-                                            controls
-                                            className="w-full h-auto rounded-lg object-contain"
-                                        >
+                                        <video controls className="w-full h-auto rounded-lg object-contain">
                                             <source src={`/storage/${file.file_path}`} type="video/mp4" />
                                         </video>
                                     </div>
@@ -173,7 +170,7 @@ export default function Show() {
 
                     {post.hashtags?.length > 0 && (
                         <div className="mt-2 lg:text-[16px] text-sm flex flex-wrap gap-x-1 break-all">
-                            {post.hashtags.map((hashtag, index) => (
+                            {post.hashtags.map((hashtag) => (
                                 <Link
                                     key={hashtag.id}
                                     href={`/posts-by-hashtag/${hashtag.hashtag}`}
@@ -188,31 +185,24 @@ export default function Show() {
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{post.created_at}</p>
                 </div>
 
-
                 <div className="mt-3 flex items-center space-x-6 text-md text-gray-600 dark:text-gray-400">
                     <div className="flex items-center space-x-1">
                         <Heart
                             className={`h-6 w-6 cursor-pointer ${isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}`}
                             onClick={handleLike}
                         />
-                        <p>
-                            <strong>{likesCount}</strong>
-                        </p>
+                        <p><strong>{likesCount}</strong></p>
                     </div>
                     <div className="flex items-center space-x-1">
                         <MessageCircle className="h-6 w-6 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-500" />
-                        <p>
-                            <strong>{post.comments_count}</strong>
-                        </p>
+                        <p><strong>{post.comments_count}</strong></p>
                     </div>
                     <div className="flex items-center space-x-1">
                         <Bookmark
                             className={`h-6 w-6 cursor-pointer ${isFavorited ? 'text-yellow-500' : 'text-gray-500 hover:yellow-red-500'}`}
                             onClick={handleFavorite}
                         />
-                        <p>
-                            <strong>{favoritesCount}</strong>
-                        </p>
+                        <p><strong>{favoritesCount}</strong></p>
                     </div>
                     {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
                 </div>
@@ -228,7 +218,6 @@ export default function Show() {
                         className="resize-none p-3 bg-gray-100 dark:bg-neutral-900 rounded-md text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600"
                     />
                     {errors.content && <p className="text-red-500 text-sm">{errors.content}</p>}
-
                     <button
                         type="submit"
                         disabled={!data.content || processing}
@@ -272,12 +261,10 @@ export default function Show() {
                                             <p className="text-sm text-gray-500 dark:text-gray-400">{comment.created_at}</p>
                                         </div>
                                     </div>
-
-                                    <p className={`text-gray-800 dark:text-gray-200 mt-1 `}>
+                                    <p className={`text-gray-800 dark:text-gray-200 mt-1`}>
                                         {comment.content}
                                     </p>
                                 </div>
-
                                 {auth.user?.id === comment.user.id && (
                                     <Trash2
                                         className="h-5 w-5 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500 cursor-pointer"

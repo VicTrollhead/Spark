@@ -76,11 +76,11 @@ export function AppExtraSidebar() {
                     )}
                     <TextLink href={'/dashboard/users'} className='my-1 mx-4 text-blue-500 hover:underline no-underline hover:text-blue-600 dark:hover:text-blue-400 '>All users</TextLink>
                     <SidebarSeparator/>
-                    <h2 className="m-2 font-bold">Popular hashtags</h2>
+                    <h2 className="mx-2 font-bold">Popular hashtags</h2>
                     {hashtags.length === 0 ? (
                         <p className="text-gray-500">Not hashtags anyone yet.</p>
                     ) : (
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1 mb-1">
                             {hashtags.map((hashtag) => (
                                 <TextLink
                                     key={hashtag.id}
