@@ -1,0 +1,37 @@
+<?php
+
+// resources/lang/en/common.php
+return [
+    "News" => "News",
+    "Following" => "Following",
+    "Liked" => "Liked",
+    "Dashboard" => "Dashboard",
+    "Friends" => "Friends",
+    "All users" => "All users",
+    "Notifications" => "Notifications",
+    "Favourites" => "Favourites",
+    "Profile" => "Profile",
+    "Settings" => "Settings",
+    "Repository" => "Repository",
+    "Log out" => "Log out",
+    "Search users" => "Search users",
+    "Let's get acquainted" => "Let's get acquainted",
+    "Popular hashtags" => "Popular hashtags",
+    "Not users anyone yet." => "Not users anyone yet.",
+    "Not hashtags anyone yet." => "Not hashtags anyone yet.",
+    "What's new?" => "What's new?",
+    "Private (Only for subscribers)" => "Private (Only for subscribers)",
+    "What's on your mind?" => "What's on your mind?",
+    "Upload Media (Images or Videos)" => "Upload Media (Images or Videos)",
+    "Hashtags" => "Hashtags",
+    "Add hashtag..." => "Add hashtag...",
+    "Publish" => "Publish",
+    "Posts" => "Posts",
+    "Latest" => "Latest",
+    "Oldest" => "Oldest",
+    "Most Liked" => "Most Liked",
+    "People I Follow" => "People I Follow",
+    "People Who Follow Me" => "People Who Follow Me",
+    "Mutual Friends" => "Mutual Friends",
+];
+
