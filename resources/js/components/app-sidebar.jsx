@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx'
 import { useInitials } from '@/hooks/use-initials.jsx';
 
 export function AppSidebar() {
-    const { auth } = usePage().props;
+    const { auth, translations } = usePage().props;
     const user = auth?.user;
     const { post } = useForm();
 
@@ -25,37 +25,37 @@ export function AppSidebar() {
 
     const mainNavItems = [
         {
-            title: 'Dashboard',
+            title: translations['Dashboard'],
             url: '/dashboard',
             icon: Home,
         },
         {
-            title: 'Friends',
+            title: translations['Friends'],
             url: `/user/${user.username}/friends`,
             icon: Users,
         },
         {
-            title: 'All users',
+            title: translations['All users'],
             url: '/dashboard/users',
             icon: Users,
         },
         {
-            title: 'Notifications',
+            title: translations['Notifications'],
             url: '#',
             icon: Mail,
         },
         {
-            title: 'Favorites',
+            title: translations['Favourites'],
             url: '/user/favorites',
             icon: Bookmark,
         },
         {
-            title: 'Profile',
+            title: translations['Profile'],
             url: user.username ? `/user/${user.username}` : '/user',
             icon: User,
         },
         {
-            title: 'Settings',
+            title: translations['Settings'],
             url: '/settings/profile',
             icon: Settings,
         },
@@ -79,7 +79,7 @@ export function AppSidebar() {
                 <a className="flex cursor-pointer" href="https://github.com/VicTrollhead/Spark">
                     <SidebarMenuButton size="lg" className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group cursor-pointer">
                         <Folder/>
-                        Repository
+                        {translations['Repository']}
                     </SidebarMenuButton>
                 </a>
                 <SidebarMenuButton
@@ -87,7 +87,7 @@ export function AppSidebar() {
                     size="lg"
                     className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group cursor-pointer">
                     <LogOut/>
-                    Log out
+                    {translations['Log out']}
                 </SidebarMenuButton>
             </SidebarFooter>
         </Sidebar>
