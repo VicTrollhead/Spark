@@ -6,7 +6,7 @@ import { Bookmark, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat, Trash
 import { useEffect, useRef, useState } from 'react';
 
 export default function Show() {
-    const { post, auth, sort } = usePage().props;
+    const { post, auth, sort, translations } = usePage().props;
     const getInitials = useInitials();
     const { data, setData, post: sendPost, processing, reset, errors } = useForm({
         content: '', post_id: post.id, parent_comment_id: null
@@ -14,11 +14,6 @@ export default function Show() {
 
     const [sortOption, setSortOption] = useState(sort || "latest");
     const isOwnPost = auth.user && auth.user.id === post.user.id;
-
-    const breadcrumbs = [
-        { title: isOwnPost ? 'My Profile' : '@' + post.user.username + "'s Profile", href: `/user/${post.user.username}` },
-        { title: "Post by @" + post.user.username, href: `/post/${post.id}` },
-    ];
 
     const [isLiked, setIsLiked] = useState(post.is_liked);
     const [likesCount, setLikesCount] = useState(post.likes_count);
@@ -91,7 +86,7 @@ export default function Show() {
     };
 
     const handleDeleteComment = async (commentId) => {
-        if (!window.confirm("Are you sure you want to delete this comment?")) return;
+        if (!window.confirm(translations["Are you sure you want to delete this comment?"])) return;
         await router.post(`/comment/${commentId}/delete`, {}, {
             preserveScroll: true,
             onSuccess: () => {
@@ -102,7 +97,7 @@ export default function Show() {
 
     const handleRepost = async () => {
         if (post.is_private || post.user.is_private) {
-            alert("You cannot repost private posts.");
+            alert(translations["You cannot repost private posts."]);
             return;
         }
         setIsReposted(!isReposted);
@@ -127,8 +122,8 @@ export default function Show() {
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Post by @${post.user.username}`} />
+        <AppLayout>
+            <Head title={`${translations['Post by']} @${post.user.username}`} />
 
             <div className="p-6">
                 <div className="flex justify-between">
@@ -155,13 +150,13 @@ export default function Show() {
                             {showOptions && (
                                 <div className="absolute right-0 mt-2 min-w-[160px] rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-neutral-800 z-50">
                                     <button className="block w-full rounded-t-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600">
-                                        Edit
+                                        {translations['Edit']}
                                     </button>
                                     <button
                                         onClick={() => router.delete(`/posts/${post.id}`)}
                                         className="block w-full rounded-b-lg px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-neutral-600"
                                     >
-                                        Delete
+                                        {translations['Delete']}
                                     </button>
                                 </div>
                             )}
@@ -254,7 +249,7 @@ export default function Show() {
                         value={data.content}
                         onChange={(e) => setData('content', e.target.value)}
                         rows={3}
-                        placeholder="What's on your mind?"
+                        placeholder={translations["What's on your mind?"]}
                         className="resize-none p-3 bg-gray-100 dark:bg-neutral-900 rounded-md text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600"
                     />
                     {errors.content && <p className="text-red-500 text-sm">{errors.content}</p>}
@@ -265,20 +260,20 @@ export default function Show() {
                             data.content ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 cursor-not-allowed'
                         }`}
                     >
-                        Post
+                        {translations['Publish']}
                     </button>
                 </form>
             </div>
 
             <div className="flex items-center justify-between p-4 bg-white dark:bg-neutral-950 border-b dark:border-gray-800">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Comments</h2>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{translations['Comments']}</h2>
                 <select
                     value={sortOption}
                     onChange={handleSortChange}
                     className="p-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
                 >
-                    <option value="latest">Latest</option>
-                    <option value="oldest">Oldest</option>
+                    <option value="latest">{translations['Latest']}</option>
+                    <option value="oldest">{translations['Oldest']}</option>
                 </select>
             </div>
             <div className="mt-2 px-6">
@@ -314,7 +309,7 @@ export default function Show() {
                             </div>
                         ))
                     ) : (
-                        <p className="text-gray-500 dark:text-gray-400 py-4">No comments yet.</p>
+                        <p className="text-gray-500 dark:text-gray-400 py-4">{translations['No comments yet.']}</p>
                     )}
                 </div>
             </div>

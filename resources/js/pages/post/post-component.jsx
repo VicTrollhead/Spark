@@ -6,7 +6,7 @@ import { useInitials } from '../../hooks/use-initials';
 
 export default function PostComponent({ post }) {
     const { post: sendPost, processing } = useForm();
-    const { auth } = usePage().props;
+    const { auth, translations } = usePage().props;
     const getInitials = useInitials();
 
     const [isLiked, setIsLiked] = useState(post.is_liked);
@@ -75,7 +75,7 @@ export default function PostComponent({ post }) {
 
     const handleRepost = async () => {
         if (post.is_private || post.user.is_private) {
-            alert("You cannot repost private posts.");
+            alert(translations['You cannot repost private posts.']);
             return;
         }
         setIsReposted(!isReposted);
@@ -129,13 +129,13 @@ export default function PostComponent({ post }) {
                                 {showOptions && (
                                     <div className="absolute right-0 z-50 mt-1 min-w-[160px] rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-neutral-800">
                                         <button className="block w-full rounded-t-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600">
-                                            Edit
+                                            {translations['Edit']}
                                         </button>
                                         <button
                                             onClick={() => router.delete(`/posts/${post.id}`)}
                                             className="block w-full rounded-b-lg px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-neutral-600"
                                         >
-                                            Delete
+                                            {translations['Delete']}
                                         </button>
                                     </div>
                                 )}
