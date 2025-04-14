@@ -4,14 +4,9 @@ import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
 
 export default function Following() {
-    const { title, users, user, auth } = usePage().props;
+    const { title, users, user, auth, translations } = usePage().props;
     const getInitials = useInitials();
     const isOwnProfile = auth.user && auth.user.id === user.id;
-
-    const breadcrumbs = [
-        { title: isOwnProfile ? 'My Profile' : "@" + user.username + "'s Profile", href: `/user/${user.username}` },
-        { title: 'Following', href: `/user/${user.username}` },
-    ];
 
     const handleFollowToggle = (targetUser, isFollowed) => {
         const action = isFollowed ? 'unfollow' : 'follow';
@@ -22,12 +17,12 @@ export default function Following() {
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={isOwnProfile ? 'Following' : user.name + "'s Following"} />
+        <AppLayout>
+            <Head title={translations['Following']} />
             <div className="max-w-lg px-6">
-                <h1 className="my-6 text-2xl font-bold">{title}</h1>
+                <h1 className="my-6 text-2xl font-bold">{translations['Following']}</h1>
                 {users.length === 0 ? (
-                    <p className="text-gray-500">Not following anyone yet.</p>
+                    <p className="text-gray-500">{translations['Not following anyone yet.']}</p>
                 ) : (
                     <ul>
                         {users.map((followee) => (
@@ -54,7 +49,7 @@ export default function Following() {
                                                     : 'bg-blue-600 hover:bg-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600'
                                             }`}
                                         >
-                                            {followee.is_followed ? 'Unfollow' : 'Follow'}
+                                            {followee.is_followed ? translations['Unfollow'] : translations['Follow']}
                                         </button>
                                     )}
                                 </div>

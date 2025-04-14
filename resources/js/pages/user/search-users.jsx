@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar.
 import { Input } from '../../components/ui/input.jsx';
 
 export default function SearchUsers() {
-    const { users, sort, searchText } = usePage().props;
+    const { users, sort, searchText, translations } = usePage().props;
     const [sortOption, setSortOption] = useState(sort || 'latest');
     const [searchTextOption, setSearchTextOption] = useState(searchText || '');
     const [usersList, setUsersList] = useState(users || []);
@@ -50,7 +50,7 @@ export default function SearchUsers() {
 
     return (
         <AppLayout>
-            <Head title="Search users" />
+            <Head title={translations['Search users']} />
 
             <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
@@ -58,7 +58,7 @@ export default function SearchUsers() {
                         <div className="flex items-center space-x-3 w-full">
                             <Search className="size-10 opacity-80 group-hover:opacity-100"/>
                             <Input
-                                placeholder="Search users by name or username"
+                                placeholder={translations['Search users by name or username']}
                                 className="w-full"
                                 value={searchTextOption}
                                 onChange={(e) => setSearchTextOption(e.target.value)}
@@ -71,13 +71,13 @@ export default function SearchUsers() {
                             onChange={handleSortChange}
                             className="px-1 py-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
                         >
-                            <option value="latest">Latest</option>
-                            <option value="oldest">Oldest</option>
-                            <option value="popular">Most Followed</option>
-                            <option value="least_followed">Least Followed</option>
-                            <option value="following">Following</option>
-                            <option value="followers">Followers</option>
-                            <option value="mutual_subscribers">Mutual Subscribers</option>
+                            <option value="latest">{translations['Latest']}</option>
+                            <option value="oldest">{translations['Oldest']}</option>
+                            <option value="popular">{translations['Most Followed']}</option>
+                            <option value="least_followed">{translations['Least Followed']}</option>
+                            <option value="following">{translations['Following']}</option>
+                            <option value="followers">{translations['Followers']}</option>
+                            <option value="mutual_subscribers">{translations['Friends']}</option>
                         </select>
                         <button
                             onClick={handleReload}
@@ -117,7 +117,7 @@ export default function SearchUsers() {
                     </div>
                 ) : (
                     <p className="text-gray-500 dark:text-gray-400 px-6 py-4 text-center">
-                        No users found.
+                        {translations['No users found.']}
                     </p>
                 )}
             </div>

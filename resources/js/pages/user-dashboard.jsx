@@ -6,7 +6,7 @@ import { useInitials } from '../hooks/use-initials';
 import { RefreshCw } from 'lucide-react';
 
 export default function Dashboard() {
-    const { users, sort } = usePage().props;
+    const { users, sort, translations } = usePage().props;
     const [sortOption, setSortOption] = useState(sort || 'latest');
     const getInitials = useInitials();
 
@@ -18,11 +18,6 @@ export default function Dashboard() {
         router.get('/dashboard/users', { sort: selectedSort }, { preserveScroll: true });
     };
 
-    const breadcrumbs = [
-        { title: 'Dashboard', href: '/dashboard' },
-        { title: 'Users', href: '/dashboard/users' },
-    ];
-
     const handleReload = () => {
         setIsLoading(true);
         router.reload({ only: ['posts'] });
@@ -32,25 +27,25 @@ export default function Dashboard() {
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="All users" />
+        <AppLayout>
+            <Head title={translations["All users"]} />
 
             <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-2xl font-bold mr-2">All Users</h1>
+                    <h1 className="text-2xl font-bold mr-2">{translations["All users"]}</h1>
                     <div className="flex items-center gap-1.5">
                         <select
                             value={sortOption}
                             onChange={handleSortChange}
                             className="px-1 py-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
                         >
-                            <option value="latest">Latest</option>
-                            <option value="oldest">Oldest</option>
-                            <option value="popular">Most Followed</option>
-                            <option value="least_followed">Least Followed</option>
-                            <option value="following">Following</option>
-                            <option value="followers">Followers</option>
-                            <option value="mutual_subscribers">Mutual Subscribers</option>
+                            <option value="latest">{translations['Latest']}</option>
+                            <option value="oldest">{translations['Oldest']}</option>
+                            <option value="popular">{translations['Most Followed']}</option>
+                            <option value="least_followed">{translations['Least Followed']}</option>
+                            <option value="following">{translations['Following']}</option>
+                            <option value="followers">{translations['Followers']}</option>
+                            <option value="mutual_subscribers">{translations['Friends']}</option>
                         </select>
                         <button
                             onClick={handleReload}
@@ -89,7 +84,7 @@ export default function Dashboard() {
                     </div>
                 ) : (
                     <p className="text-gray-500 dark:text-gray-400 px-6 py-4 text-center">
-                        No users found for this sorting option.
+                        {translations['No users found for this sorting option.']}
                     </p>
                 )}
             </div>
