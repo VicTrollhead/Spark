@@ -1,5 +1,5 @@
 import { Link, router, useForm, usePage } from '@inertiajs/react';
-import { Bookmark, EllipsisVertical, EyeOff, Heart, MessageCircle } from 'lucide-react';
+import { Bookmark, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
@@ -14,6 +14,9 @@ export default function PostComponent({ post }) {
 
     const [isFavorited, setIsFavorited] = useState(post.is_favorited);
     const [favoritesCount, setFavoritesCount] = useState(post.favorites_count);
+
+    const [isReposted, setIsReposted] = useState(post.is_reposted);
+    const [repostsCount, setRepostsCount] = useState(post.reposts_count);
 
     const [showOptions, setShowOptions] = useState(false);
     const optionsRef = useRef(null);
@@ -70,6 +73,33 @@ export default function PostComponent({ post }) {
         );
     };
 
+    const handleRepost = async () => {
+        if (post.is_private || post.user.is_private) {
+            alert("You cannot repost private posts.");
+            return;
+        }
+        setIsReposted(!isReposted);
+        setRepostsCount(isReposted ? repostsCount - 1 : repostsCount + 1);
+
+        await router.post(
+            isReposted ? `/post/${post.id}/undo` : `/post/${post.id}/repost`,
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setRepostsCount(isReposted ? repostsCount - 1 : repostsCount + 1);
+                    setIsReposted(!isReposted);
+                },
+                onError: (error) => {
+                    console.error("Repost error:", error);
+                    setIsReposted(post.is_reposted);
+                    setRepostsCount(post.reposts_count);
+                },
+            }
+        );
+    };
+
+
     return (
         <div className="relative border-b border-gray-200 p-4 dark:border-gray-800">
             <div className="flex items-start space-x-3">
@@ -115,6 +145,7 @@ export default function PostComponent({ post }) {
 
                     <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username}</p>
                     <p className="mt-1 text-lg text-gray-700 dark:text-gray-300">{post.content}</p>
+
                     {post.media.length > 0 && (
                         <div className="mt-2 grid grid-cols-1 gap-3 py-1 sm:grid-cols-2">
                             {post.media.map((file, index) => {
@@ -152,10 +183,10 @@ export default function PostComponent({ post }) {
                         <button
                             onClick={handleLike}
                             disabled={processing}
-                            className={`flex items-center gap-1 ${post.is_liked ? 'text-red-500' : 'hover:text-red-500'}`}
+                            className={`flex items-center gap-1 ${isLiked ? 'text-red-500' : 'hover:text-red-500'}`}
                         >
                             <Heart className="h-5 w-5" />
-                            <span>{post.likes_count}</span>
+                            <span>{likesCount}</span>
                         </button>
 
                         <Link href={`/post/${post.id}`} className="flex items-center gap-1 hover:text-blue-500">
@@ -166,11 +197,22 @@ export default function PostComponent({ post }) {
                         <button
                             onClick={handleFavorite}
                             disabled={processing}
-                            className={`flex items-center gap-1 ${post.is_favorited ? 'text-yellow-500' : 'hover:text-yellow-500'}`}
+                            className={`flex items-center gap-1 ${isFavorited ? 'text-yellow-500' : 'hover:text-yellow-500'}`}
                         >
                             <Bookmark className="h-5 w-5" />
-                            <span>{post.favorites_count}</span>
+                            <span>{favoritesCount}</span>
                         </button>
+
+                        {post.user.id !== auth.user.id && !post.is_private && !post.user.is_private && (
+                            <button
+                                onClick={handleRepost}
+                                disabled={processing}
+                                className={`flex items-center gap-1 ${isReposted ? 'text-green-500' : 'hover:text-green-500'}`}
+                            >
+                                <Repeat className="h-5 w-5" />
+                                <span>{repostsCount}</span>
+                            </button>
+                        )}
 
                         {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
                     </div>

@@ -18,7 +18,8 @@ class UserController extends Controller
 {
     use AuthorizesRequests;
 
-    public function show(User $user = null): Response
+
+    public function show(Request $request, User $user = null): Response
     {
         $currentUser = Auth::user();
         $user = $user ?? $currentUser;
@@ -27,11 +28,12 @@ class UserController extends Controller
             abort(404, 'User not found');
         }
 
+        $sort = $request->input('sort', 'latest');
         $canViewFullProfile = Gate::allows('view', $user);
-        $user->loadCount(['followers', 'following']);
+        $user->loadCount(['followers', 'following', 'repostedPosts']);
 
-        $postsQuery = $user->posts()
-            ->with(['user.profileImage', 'comments', 'likes', 'media'])
+        $originalPostsQuery = $user->posts()
+            ->with(['user.profileImage', 'comments', 'likes', 'media', 'hashtags', 'favorites', 'repostedByUsers'])
             ->where(function ($query) use ($currentUser) {
                 $query->where('is_private', 0);
 
@@ -43,10 +45,34 @@ class UserController extends Controller
                             });
                     });
                 }
-            })
-            ->latest();
+            });
 
-        $posts = $postsQuery->get()->map(function ($post) use ($currentUser) {
+        $repostedPostsQuery = Post::whereHas('repostedByUsers', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })->with(['user.profileImage', 'comments', 'likes', 'media', 'hashtags', 'favorites', 'repostedByUsers']);
+
+        if ($sort === 'reposts') {
+            $originalPosts = collect();
+            $repostedPosts = $repostedPostsQuery->latest()->get();
+        } elseif ($sort === 'originals') {
+            $originalPosts = $originalPostsQuery->latest()->get();
+            $repostedPosts = collect();
+        } else {
+            $originalPosts = $originalPostsQuery->get();
+            $repostedPosts = $repostedPostsQuery->get();
+        }
+
+        $combinedPosts = $originalPosts->merge($repostedPosts);
+
+        if ($sort === 'most_liked') {
+            $combinedPosts = $combinedPosts->sortByDesc(fn($post) => $post->likes->count())->values();
+        } elseif ($sort === 'oldest') {
+            $combinedPosts = $combinedPosts->sortBy('created_at')->values();
+        } else {
+            $combinedPosts = $combinedPosts->sortByDesc('created_at')->values();
+        }
+
+        $posts = $combinedPosts->map(function ($post) use ($user, $currentUser) {
             return [
                 'id' => $post->id,
                 'content' => $post->content,
@@ -55,7 +81,7 @@ class UserController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
+                    'profile_image_url' => $post->user->profileImage?->url,
                 ],
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
@@ -71,6 +97,8 @@ class UserController extends Controller
                 'favorites_count' => $post->favorites->count(),
                 'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
                 'comments_count' => $post->comments->count(),
+                'is_reposted' => $user->repostedPosts->contains($post->id),
+                'reposts_count' => $post->repostedByUsers->count(),
             ];
         });
 
@@ -80,7 +108,7 @@ class UserController extends Controller
                 'username' => $user->username,
                 'name' => $canViewFullProfile ? $user->name : null,
                 'bio' => $canViewFullProfile ? $user->bio : null,
-                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'profile_image_url' => $user->profileImage?->url,
                 'cover_image_url' => $canViewFullProfile && $user->coverImage ? $user->coverImage->url : null,
                 'location' => $canViewFullProfile ? $user->location : null,
                 'website' => $canViewFullProfile ? $user->website : null,
@@ -94,9 +122,16 @@ class UserController extends Controller
                 'is_following' => Auth::check() && $user->followers()->where('follower_id', Auth::id())->exists(),
                 'canViewFullProfile' => $canViewFullProfile,
             ],
-            'posts' => $posts
+            'posts' => $posts,
+            'filters' => [
+                'sort' => $sort,
+            ],
         ]);
     }
+
+
+
+
 
     public function users(Request $request): Response
     {
@@ -285,6 +320,8 @@ class UserController extends Controller
                     'favorites_count' => $post->favorites->count(),
                     'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
                     'comments_count' => $post->comments->count(),
+                    'is_reposted' => $currentUser ? $post->repostedByUsers->contains('id', $currentUser->id) : false,
+                    'reposts_count' => $post->repostedByUsers->count(),
                 ];
             });
 
@@ -303,13 +340,13 @@ class UserController extends Controller
         }
 
         $likedPosts = $currentUser->likes()
-            ->with(['user.profileImage', 'comments', 'likes', 'media', 'user.followers']) // make sure followers is eager loaded
+            ->with(['user.profileImage', 'comments', 'likes', 'media', 'user.followers'])
             ->where(function ($query) use ($currentUser) {
-                $query->where('posts.is_private', 0) // public posts
+                $query->where('posts.is_private', 0)
                 ->orWhere(function ($subQuery) use ($currentUser) {
-                    $subQuery->where('posts.user_id', $currentUser->id) // own posts
+                    $subQuery->where('posts.user_id', $currentUser->id)
                     ->orWhereHas('user.followers', function ($followersQuery) use ($currentUser) {
-                        $followersQuery->where('follower_id', $currentUser->id); // followed by current user
+                        $followersQuery->where('follower_id', $currentUser->id);
                     });
                 });
             })
@@ -341,6 +378,8 @@ class UserController extends Controller
                     'favorites_count' => $post->favorites->count(),
                     'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
                     'comments_count' => $post->comments->count(),
+                    'is_reposted' => $currentUser ? $post->repostedByUsers->contains('id', $currentUser->id) : false,
+                    'reposts_count' => $post->repostedByUsers->count(),
                 ];
             });
 
@@ -387,6 +426,8 @@ class UserController extends Controller
                     'favorites_count' => $post->favorites->count(),
                     'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
                     'comments_count' => $post->comments->count(),
+                    'is_reposted' => $currentUser ? $post->repostedByUsers->contains('id', $currentUser->id) : false,
+                    'reposts_count' => $post->repostedByUsers->count(),
                 ];
             });
 

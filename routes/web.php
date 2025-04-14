@@ -7,6 +7,7 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\RepostController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -55,6 +56,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/post/{post}/comment', [CommentController::class, 'store'])->name('post.comment');
     Route::post('/comment/{comment}/delete', [CommentController::class, 'destroy'])->name('comment.delete');
+
+    Route::post('/post/{post}/repost', [RepostController::class, 'repost']);
+    Route::post('/post/{post}/undo', [RepostController::class, 'undo']);
 
 });
 

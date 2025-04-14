@@ -2,7 +2,7 @@ import { Head, usePage, Link, useForm, router } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
-import { Bookmark, EllipsisVertical, EyeOff, Heart, MessageCircle, Trash2 } from 'lucide-react';
+import { Bookmark, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 export default function Show() {
@@ -25,6 +25,8 @@ export default function Show() {
     const [isFavorited, setIsFavorited] = useState(post.is_favorited);
     const [favoritesCount, setFavoritesCount] = useState(post.favorites_count);
     const [showOptions, setShowOptions] = useState(false);
+    const [isReposted, setIsReposted] = useState(post.is_reposted);
+    const [repostsCount, setRepostsCount] = useState(post.reposts_count);
 
     const optionsRef = useRef(null);
 
@@ -98,6 +100,32 @@ export default function Show() {
         });
     };
 
+    const handleRepost = async () => {
+        if (post.is_private || post.user.is_private) {
+            alert("You cannot repost private posts.");
+            return;
+        }
+        setIsReposted(!isReposted);
+        setRepostsCount(isReposted ? repostsCount - 1 : repostsCount + 1);
+
+        await router.post(
+            isReposted ? `/post/${post.id}/undo` : `/post/${post.id}/repost`,
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setRepostsCount(isReposted ? repostsCount - 1 : repostsCount + 1);
+                    setIsReposted(!isReposted);
+                },
+                onError: (error) => {
+                    console.error("Repost error:", error);
+                    setIsReposted(post.is_reposted);
+                    setRepostsCount(post.reposts_count);
+                },
+            }
+        );
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Post by @${post.user.username}`} />
@@ -148,7 +176,7 @@ export default function Show() {
                     {post.media.length > 0 && (
                         <div className="mt-2 py-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {post.media.map((file, index) => {
-                                const uniqueKey = `${post.id}-${file.id ?? file.file_path ?? index}`;
+                                const uniqueKey = file.id ? `${post.id}-${file.id}` : `${post.id}-${file.file_path}-${index}`;
                                 return file.file_type === 'image' ? (
                                     <div key={uniqueKey} className="relative w-full rounded-lg overflow-hidden border dark:border-gray-700">
                                         <img
@@ -165,6 +193,7 @@ export default function Show() {
                                     </div>
                                 );
                             })}
+
                         </div>
                     )}
 
@@ -204,6 +233,17 @@ export default function Show() {
                         />
                         <p><strong>{favoritesCount}</strong></p>
                     </div>
+                    {post.user.id !== auth.user.id && !post.is_private && !post.user.is_private && (
+                        <button
+                            onClick={handleRepost}
+                            disabled={processing}
+                            className={`flex items-center gap-1 ${isReposted ? 'text-green-500' : 'hover:text-green-500'}`}
+                        >
+                            <Repeat className="h-5 w-5" />
+                            <span>{repostsCount}</span>
+                        </button>
+                    )}
+
                     {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
                 </div>
             </div>
@@ -245,7 +285,7 @@ export default function Show() {
                 <div className="divide-y divide-gray-200 dark:divide-gray-800">
                     {post.comments.length > 0 ? (
                         post.comments.map((comment) => (
-                            <div key={comment.id} className="py-4 flex items-center space-x-3">
+                            <div key={comment.id } className="py-4 flex items-center space-x-3">
                                 <Avatar className="h-12 w-12 border border-gray-300 dark:border-gray-700">
                                     <AvatarImage src={comment.user.profile_image_url} alt={comment.user.name} />
                                     <AvatarFallback className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white">

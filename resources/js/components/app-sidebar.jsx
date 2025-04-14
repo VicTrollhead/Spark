@@ -45,7 +45,7 @@ export function AppSidebar() {
             icon: Mail,
         },
         {
-            title: translations['Favourites'],
+            title: translations['Favorites'],
             url: '/user/favorites',
             icon: Bookmark,
         },

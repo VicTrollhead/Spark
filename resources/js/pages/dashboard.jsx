@@ -135,7 +135,7 @@ export default function Dashboard() {
                             )}
                             {errors['media.0'] && <p className="text-sm text-red-500">{errors['media.0']}</p>}
                         </div>
-                        <div className="w-full items-center">
+                        <div className="w-full flex flex-col items-start gap-y-1">
                             <label className="block text-sm text-gray-700 dark:text-gray-200">{translations['Hashtags']}</label>
                             <HashtagInput
                                 placeholder={translations['Add hashtag...']}

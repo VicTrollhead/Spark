@@ -9,7 +9,7 @@ return [
     "Friends" => "Friends",
     "All users" => "All users",
     "Notifications" => "Notifications",
-    "Favourites" => "Favourites",
+    "Favorites" => "Favorites",
     "Profile" => "Profile",
     "Settings" => "Settings",
     "Repository" => "Repository",
