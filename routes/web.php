@@ -42,7 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/dashboard', [PostController::class, 'store'])->name('posts.store');
     Route::get('/post/{post}', [PostController::class, 'show'])->name('post.show');
-    Route::delete('/posts/{post}', [PostController::class, 'destroy']);
+    Route::delete('/post/{post}', [PostController::class, 'destroy']);
     Route::get('/popular-hashtags', [PostController::class, 'popularHashtags'])->name('popularHashtags');
     Route::get('/posts-by-hashtag/{hashtag}', [PostController::class, 'postsByHashtag'])->name('postsByHashtag');
 
@@ -59,6 +59,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/post/{post}/repost', [RepostController::class, 'repost']);
     Route::post('/post/{post}/undo', [RepostController::class, 'undo']);
+
+    Route::get('/post/{post}/edit', [PostController::class, 'edit'])->name('post.edit');
+    Route::patch('/post/{post}/update', [PostController::class, 'update'])->name('post.update');
 
 });
 

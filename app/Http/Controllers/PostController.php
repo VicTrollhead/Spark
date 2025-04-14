@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePostRequest;
 use App\Models\Hashtag;
 use App\Models\Media;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -18,6 +19,7 @@ use Illuminate\Validation\Rule;
 
 class PostController extends Controller
 {
+    use AuthorizesRequests;
     public function index(Request $request): Response
     {
         $currentUser = Auth::user();
@@ -249,25 +251,6 @@ class PostController extends Controller
         ]);
     }
 
-    public function edit(Post $post): Response
-    {
-        return Inertia::render('Posts/Edit', [
-            'post' => $post,
-        ]);
-    }
-
-    public function update(Request $request, Post $post): RedirectResponse
-    {
-        $validated = $request->validate([
-            'content' => ['required', 'string', 'max:5000'],
-            'is_private' => ['required', 'boolean'],
-        ]);
-
-        $post->update($validated);
-
-        return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
-    }
-
     public function destroy($postId)
     {
         $currentUser = Auth::user();
@@ -367,6 +350,63 @@ class PostController extends Controller
             ],
         ]);
     }
+
+
+    public function edit(Post $post): Response
+    {
+        $this->authorize('update', $post);
+
+        return Inertia::render('post/edit-post', [
+            'post' => [
+                'id' => $post->id,
+                'content' => $post->content,
+                'is_private' => $post->is_private,
+                'media' => $post->media->map(fn ($media) => [
+                    'file_path' => $media->file_path,
+                    'file_type' => $media->file_type,
+                ]),
+                'parent_post_id' => $post->parent_post_id,
+            ],
+        ]);
+    }
+
+    public function update(StorePostRequest $request, Post $post)
+    {
+        $this->authorize('update', $post);
+
+        if ($request->boolean('remove_media')) {
+            foreach ($post->media as $media) {
+                if (Storage::exists($media->file_path)) {
+                    Storage::delete($media->file_path);
+                }
+                $media->delete();
+
+            }
+        }
+
+        if ($request->hasFile('media')) {
+            foreach ($post->media as $media) {
+                Storage::disk('public')->delete($media->file_path);
+                $media->delete();
+            }
+
+            $media = new Media([
+                'file_path' => $request->file('media')->store('post_media', 'public'),
+                'file_type' => str_starts_with($request->file('media')->getMimeType(), 'video') ? 'video' : 'image',
+                'mediable_id' => $post->id,
+                'mediable_type' => Post::class,
+            ]);
+
+            $media->save();
+        }
+
+        $post->update($request->validated());
+
+        return redirect()->route('post.show', $post->id)
+            ->with('success', 'Post updated successfully.');
+    }
+
+
 
 
 
