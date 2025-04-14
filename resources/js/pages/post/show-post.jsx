@@ -154,11 +154,13 @@ export default function Show() {
                             />
                             {showOptions && (
                                 <div className="absolute right-0 mt-2 min-w-[160px] rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-neutral-800 z-50">
-                                    <button className="block w-full rounded-t-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600">
+                                    <button
+                                        onClick={() => router.get(`/post/${post.id}/edit`)}
+                                        className="block w-full rounded-t-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600">
                                         Edit
                                     </button>
                                     <button
-                                        onClick={() => router.delete(`/posts/${post.id}`)}
+                                        onClick={() => router.delete(`/post/${post.id}`)}
                                         className="block w-full rounded-b-lg px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-neutral-600"
                                     >
                                         Delete
