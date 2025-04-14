@@ -1,32 +1,28 @@
-import React, { useState, useImperativeHandle, forwardRef } from 'react';
+import React, { useState, useImperativeHandle, forwardRef, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { X } from 'lucide-react';
 
-export const HashtagInput = forwardRef(function HashtagInput({ onChange, placeholder }, ref) {
-    const [tags, setTags] = useState([]);
+export const HashtagInput = forwardRef(function HashtagInput({ onChange, placeholder, value = [] }, ref) {
     const [input, setInput] = useState('');
 
     const addTag = (tag) => {
         const clean = tag.trim().replace(/^#/, '');
-        if (clean && !tags.includes(clean)) {
-            const newTags = [...tags, clean];
-            setTags(newTags);
+        if (clean && !value.includes(clean)) {
+            const newTags = [...value, clean];
             onChange?.(newTags);
         }
     };
 
     const removeTag = (index) => {
-        const newTags = tags.filter((_, i) => i !== index);
-        setTags(newTags);
+        const newTags = value.filter((_, i) => i !== index);
         onChange?.(newTags);
     };
 
     useImperativeHandle(ref, () => ({
         reset: () => {
-            setTags([]);
-            setInput('');
             onChange?.([]);
+            setInput('');
         },
     }));
 
@@ -42,7 +38,7 @@ export const HashtagInput = forwardRef(function HashtagInput({ onChange, placeho
 
     return (
         <div className="flex w-full flex-wrap items-center gap-2 rounded-md  bg-gray-100 p-1.5 text-neutral-900 transition-colors focus-within:ring-2 focus-within:ring-blue-500 dark:bg-neutral-900 dark:text-white dark:focus-within:ring-blue-600">
-            {tags.map((tag, index) => (
+            {value.map((tag, index) => (
                 <Badge
                     key={index}
                     variant="secondary"
@@ -65,3 +61,4 @@ export const HashtagInput = forwardRef(function HashtagInput({ onChange, placeho
         </div>
     );
 });
+

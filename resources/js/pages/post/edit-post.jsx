@@ -4,6 +4,7 @@ import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 import { Switch } from '../../components/ui/switch';
 import { useState } from 'react';
+import { HashtagInput } from '../../components/hashtag-input.jsx';
 
 export default function EditPost() {
     const { post, auth } = usePage().props;
@@ -15,6 +16,7 @@ export default function EditPost() {
         is_private: post.is_private || false,
         media: null,
         remove_media: false,
+        hashtags: (post.hashtags || []).map((h) => h.hashtag),
         _method: 'PATCH',
     });
 
@@ -86,6 +88,15 @@ export default function EditPost() {
                     <div>
                         <label className="mb-2 block text-gray-700 dark:text-gray-200">Upload New Media</label>
                         <Input type="file" onChange={(e) => setData('media', e.target.files[0])} />
+                    </div>
+
+                    <div>
+                        <label className="mb-2 block text-gray-700 dark:text-gray-200">Hashtags</label>
+                        <HashtagInput
+                            initialHashtags={(post.hashtags || []).map((h) => h.hashtag)}
+                            value={data.hashtags}
+                            onChange={(hashtags) => setData('hashtags', hashtags)}
+                        />
                     </div>
 
                     <div className="flex items-center justify-between">

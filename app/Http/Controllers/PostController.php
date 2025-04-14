@@ -365,6 +365,10 @@ class PostController extends Controller
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
                 ]),
+                'hashtags' => $post->hashtags->map(fn ($tag) => [
+                    'id' => $tag->id,
+                    'hashtag' => $tag->hashtag,
+                ]),
                 'parent_post_id' => $post->parent_post_id,
             ],
         ]);
@@ -374,37 +378,50 @@ class PostController extends Controller
     {
         $this->authorize('update', $post);
 
-        if ($request->boolean('remove_media')) {
-            foreach ($post->media as $media) {
-                if (Storage::exists($media->file_path)) {
-                    Storage::delete($media->file_path);
-                }
-                $media->delete();
+        $validated = $request->validated();
 
+        $post->update([
+            'content' => $validated['content'],
+            'is_private' => $validated['is_private'] ?? false,
+        ]);
+
+        if ($request->remove_media && $post->media) {
+            foreach ($post->media as $media) {
+                Storage::delete($media->file_path);
+                $media->delete();
             }
         }
 
         if ($request->hasFile('media')) {
-            foreach ($post->media as $media) {
-                Storage::disk('public')->delete($media->file_path);
-                $media->delete();
+            foreach ($request->file('media') as $file) {
+                $path = $file->store('uploads/posts', 'public');
+
+                $media = new Media([
+                    'file_path' => $path,
+                    'file_type' => str_starts_with($file->getMimeType(), 'video') ? 'video' : 'image',
+                ]);
+
+                $post->media()->save($media);
             }
-
-            $media = new Media([
-                'file_path' => $request->file('media')->store('post_media', 'public'),
-                'file_type' => str_starts_with($request->file('media')->getMimeType(), 'video') ? 'video' : 'image',
-                'mediable_id' => $post->id,
-                'mediable_type' => Post::class,
-            ]);
-
-            $media->save();
         }
 
-        $post->update($request->validated());
+        $hashtags = $validated['hashtags'] ?? [];
+        $hashtagIds = [];
 
-        return redirect()->route('post.show', $post->id)
-            ->with('success', 'Post updated successfully.');
+        foreach ($hashtags as $tag) {
+            $cleanTag = ltrim($tag, '#');
+            $hashtag = Hashtag::firstOrCreate([
+                'hashtag' => strtolower($cleanTag)
+            ]);
+
+            $hashtagIds[] = $hashtag->id;
+        }
+
+        $post->hashtags()->sync($hashtagIds);
+
+        return redirect()->route('dashboard')->with('success', 'Post updated successfully!');
     }
+
 
 
 

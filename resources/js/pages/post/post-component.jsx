@@ -131,7 +131,7 @@ export default function PostComponent({ post }) {
                                         <button
                                             onClick={() => router.get(`/post/${post.id}/edit`)}
                                             className="block w-full rounded-t-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600">
-                                           router.delete(`/posts/${post.id}`);
+                                            {translations['Edit']}
                                         </button>
                                         <button
                                             onClick={() => router.delete(`/post/${post.id}`)}
