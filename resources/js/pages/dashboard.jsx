@@ -163,7 +163,7 @@ export default function Dashboard() {
                     <select
                         value={sortOption}
                         onChange={handleSortChange}
-                        className="rounded-md border bg-gray-100 p-2 text-neutral-950 dark:bg-neutral-900 dark:text-white"
+                        className="rounded-md border ml-auto w-1/2 bg-gray-100 p-2 text-neutral-950 dark:bg-neutral-900 dark:text-white"
                     >
                         <option value="latest">{translations['Latest']}</option>
                         <option value="oldest">{translations['Oldest']}</option>

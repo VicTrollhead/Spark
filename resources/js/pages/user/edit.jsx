@@ -8,7 +8,7 @@ import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
 
 export default function Edit() {
-    const { user } = usePage().props;
+    const { user, translations } = usePage().props;
     const getInitials = useInitials();
 
     const { data, setData, post, processing, errors } = useForm({
@@ -31,18 +31,10 @@ export default function Edit() {
     };
 
     return (
-        <AppLayout
-            breadcrumbs={[
-                { title: 'My Profile', href: `/user/${user.username}` },
-                {
-                    title: 'Edit Profile',
-                    href: `/user/${user.username}`,
-                },
-            ]}
-        >
-            <Head title="Edit My Profile" />
+        <AppLayout>
+            <Head title={translations['Edit My Profile']} />
             <div className="mx-auto w-11/12 max-w-7xl py-2">
-                <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Edit Profile</h1>
+                <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">{translations['Edit Profile']}</h1>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="flex items-center gap-4">
                         <Avatar className="h-24 w-24 border-4 border-white dark:border-gray-900">
@@ -51,8 +43,8 @@ export default function Edit() {
                         </Avatar>
                         <div>
                             <label className="mb-2 block text-gray-700 dark:text-gray-200">
-                                Profile Image
-                                <span className="text-gray-500 break-all"> ({user.profile_image_url  || 'Not Set'})</span>
+                                {translations['Profile Image']}
+                                <span className="text-gray-500 break-all"> ({user.profile_image_url  || translations['Not Set']})</span>
                             </label>
                             <input
                                 type="file"
@@ -64,8 +56,8 @@ export default function Edit() {
 
                     <div>
                         <label className="mb-2 block text-gray-700 dark:text-gray-200">
-                            Cover Image
-                            <span className="text-gray-500"> ({user.cover_image_url || 'Not Set'})</span>
+                            {translations['Cover Image']}
+                            <span className="text-gray-500"> ({user.cover_image_url || translations['Not Set']})</span>
                         </label>
                         <input
                             type="file"
@@ -76,7 +68,7 @@ export default function Edit() {
 
                     <div>
                         <label className="mb-2 block text-gray-700 dark:text-gray-200">
-                            Name <span className="text-gray-500">({user.name})</span>
+                            {translations['Name']} <span className="text-gray-500">({user.name})</span>
                         </label>
                         <Input value={data.name} onChange={(e) => setData('name', e.target.value)} error={errors.name} />
                     </div>
@@ -84,7 +76,7 @@ export default function Edit() {
                     {/* Username */}
                     <div>
                         <label className="mb-2 block text-gray-700 dark:text-gray-200">
-                            Username <span className="text-gray-500">({user.username})</span>
+                            {translations['Username']} <span className="text-gray-500">({user.username})</span>
                         </label>
                         <Input value={data.username} onChange={(e) => setData('username', e.target.value)} error={errors.username} />
                     </div>
@@ -92,7 +84,7 @@ export default function Edit() {
                     {/* Bio */}
                     <div>
                         <label className="mb-2 block text-gray-700 dark:text-gray-200">
-                            Bio <span className="text-gray-500">({user.bio || 'Not Set'})</span>
+                            {translations['Bio']} <span className="text-gray-500">({user.bio || translations['Not Set']})</span>
                         </label>
                         <Input value={data.bio} onChange={(e) => setData('bio', e.target.value)} error={errors.bio} />
                     </div>
@@ -100,7 +92,7 @@ export default function Edit() {
                     {/* Location */}
                     <div>
                         <label className="mb-2 block text-gray-700 dark:text-gray-200">
-                            Location <span className="text-gray-500">({user.location || 'Not Set'})</span>
+                            {translations['Location']} <span className="text-gray-500">({user.location || translations['Not Set']})</span>
                         </label>
                         <Input value={data.location} onChange={(e) => setData('location', e.target.value)} error={errors.location} />
                     </div>
@@ -108,7 +100,7 @@ export default function Edit() {
                     {/* Website */}
                     <div>
                         <label className="mb-2 block text-gray-700 dark:text-gray-200">
-                            Website <span className="text-gray-500">({user.website || 'Not Set'})</span>
+                            {translations['Website']} <span className="text-gray-500">({user.website || translations['Not Set']})</span>
                         </label>
                         <Input value={data.website} onChange={(e) => setData('website', e.target.value)} error={errors.website} />
                     </div>
@@ -116,9 +108,9 @@ export default function Edit() {
                     {/* Date of Birth */}
                     <div>
                         <label className="mb-2 block text-gray-700 dark:text-gray-200">
-                            Date of Birth{' '}
+                            {translations['Date of Birth']}{' '}
                             <span className="text-gray-500">
-                                ({user.date_of_birth ? new Date(user.date_of_birth).toLocaleDateString() : 'Not Set'})
+                                ({user.date_of_birth ? new Date(user.date_of_birth).toLocaleDateString() : translations['Not Set']})
                             </span>
                         </label>
                         <Input
@@ -132,7 +124,7 @@ export default function Edit() {
                     {/* Private Account Toggle */}
                     <div className="flex items-center justify-between">
                         <label className="text-gray-700 dark:text-gray-200">
-                            Private Account <span className="text-gray-500">({user.is_private ? 'Yes' : 'No'})</span>
+                            {translations['Private Account']} <span className="text-gray-500">({user.is_private ? translations['Yes'] : translations['No']})</span>
                         </label>
                         <Switch checked={data.is_private} onChange={(value) => setData('is_private', value)} />
                     </div>
@@ -140,16 +132,16 @@ export default function Edit() {
 
                     <div>
                         <label className="mb-1 block text-gray-700 dark:text-gray-300">
-                            Status <span className="text-gray-500">({user.status})</span>
+                            {translations['Status']} <span className="text-gray-500">({user.status})</span>
                         </label>
                         <Select value={data.status} onValueChange={(value) => setData('status', value)}>
                             <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select Status" />
+                                <SelectValue placeholder={translations['Select Status']} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="active">Active</SelectItem>
-                                <SelectItem value="suspended">Suspended</SelectItem>
-                                <SelectItem value="deactivated">Deactivated</SelectItem>
+                                <SelectItem value="active">{translations['Active']}</SelectItem>
+                                <SelectItem value="suspended">{translations['Suspended']}</SelectItem>
+                                <SelectItem value="deactivated">{translations['Deactivated']}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -159,10 +151,10 @@ export default function Edit() {
                             href={`/user/${user.username}`}
                             className="rounded-md bg-gray-300 px-4 py-2 text-gray-900 hover:bg-gray-400 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
                         >
-                            Cancel
+                            {translations['Cancel']}
                         </Link>
                         <Button type="submit" disabled={processing} className="rounded-md bg-blue-600 px-4 py-5 text-white hover:bg-blue-700">
-                            Save Changes
+                            {translations['Save Changes']}
                         </Button>
                     </div>
                 </form>
