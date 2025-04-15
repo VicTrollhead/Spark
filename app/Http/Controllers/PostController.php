@@ -375,55 +375,56 @@ class PostController extends Controller
         ]);
     }
 
+
     public function update(UpdatePostRequest $request, Post $post)
     {
         $this->authorize('update', $post);
 
+
         $post->update([
-            'content' => $request->content,
+            'content' => $request->input('content', ''),
             'is_private' => $request->boolean('is_private'),
         ]);
 
-        if ($request->has('remove_media')) {
-            $removeMedia = $request->remove_media;
+        $removePaths = $request->input('remove_media', []);
+        if (!empty($removePaths)) {
+            $mediaToRemove = $post->media()->whereIn('file_path', (array) $removePaths)->get();
 
-            if (!is_array($removeMedia)) {
-                $removeMedia = [$removeMedia];
-            }
-
-            $mediaToDelete = $post->media()->whereIn('file_path', $removeMedia)->get();
-
-            foreach ($mediaToDelete as $media) {
+            foreach ($mediaToRemove as $media) {
                 if (Storage::disk('public')->exists($media->file_path)) {
                     Storage::disk('public')->delete($media->file_path);
                 }
-
                 $media->delete();
             }
         }
 
         if ($request->hasFile('media')) {
-            foreach ($request->file('media') as $file) {
+            $files = $request->file('media');
+            $files = is_array($files) ? $files : [$files];
+
+            foreach ($files as $file) {
                 $path = $file->store('uploads/posts', 'public');
 
                 $post->media()->create([
                     'file_path' => $path,
-                    'file_type' => $file->getMimeType() == 'video/mp4' ? 'video' : 'image',
+                    'file_type' => str_contains($file->getMimeType(), 'video') ? 'video' : 'image',
                 ]);
             }
         }
 
         if ($request->filled('hashtags')) {
-            $hashtags = collect($request->hashtags)->map(function ($tag) {
+            $hashtagIds = collect($request->hashtags)->map(function ($tag) {
                 return \App\Models\Hashtag::firstOrCreate(['hashtag' => $tag])->id;
             });
-            $post->hashtags()->sync($hashtags);
+            $post->hashtags()->sync($hashtagIds);
         } else {
             $post->hashtags()->sync([]);
         }
 
         return to_route('post.show', $post->id)->with('success', 'Post updated successfully.');
     }
+
+
 
 
 }

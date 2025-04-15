@@ -20,7 +20,6 @@ export default function EditPost() {
         hashtags: (post.hashtags || []).map((h) => h.hashtag),
         _method: 'PATCH',
     });
-
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -29,8 +28,11 @@ export default function EditPost() {
         formData.append('is_private', data.is_private ? '1' : '0');
         formData.append('_method', 'PATCH');
 
+        console.log("Removed media paths:", removedMediaPaths);
+
         removedMediaPaths.forEach(path => {
             formData.append('remove_media[]', path);
+            console.log("Adding to formData:", path);
         });
 
         data.hashtags.forEach(tag => {
@@ -106,7 +108,12 @@ export default function EditPost() {
 
                                             <button
                                                 type="button"
-                                                onClick={() => setRemovedMediaPaths([...removedMediaPaths, m.file_path])}
+                                                onClick={() => {
+                                                    const updated = [...removedMediaPaths, m.file_path];
+                                                    setRemovedMediaPaths(updated);
+                                                    setData('remove_media', updated);
+                                                }}
+
                                                 className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded-md text-xs hover:bg-red-700"
                                             >
                                                 Remove

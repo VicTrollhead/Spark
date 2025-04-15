@@ -175,11 +175,11 @@ export default function Show() {
                             {post.media.map((file, index) => {
                                 const uniqueKey = file.id ? `${post.id}-${file.id}` : `${post.id}-${file.file_path}-${index}`;
                                 return file.file_type === 'image' ? (
-                                    <div key={uniqueKey} className="relative w-full rounded-lg overflow-hidden border dark:border-gray-700">
+                                    <div key={uniqueKey} className="relative w-full overflow-hidden rounded-lg border dark:border-gray-700 flex items-center justify-center">
                                         <img
                                             src={`/storage/${file.file_path}`}
                                             alt="Post Media"
-                                            className="w-full h-auto rounded-lg object-contain"
+                                            className=" object-contain transition-transform duration-300 hover:scale-102"
                                         />
                                     </div>
                                 ) : (
