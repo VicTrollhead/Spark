@@ -45,7 +45,7 @@ export default function Language() {
                         className="p-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
                     >
                         <option value="en">English</option>
-                        <option value="ua">Ukraine</option>
+                        <option value="ua">Ukrainian</option>
                     </select>
                 </div>
             </SettingsLayout>

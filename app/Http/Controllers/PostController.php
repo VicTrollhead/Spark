@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostRequest;
 use App\Models\Hashtag;
 use App\Models\Media;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -374,20 +375,29 @@ class PostController extends Controller
         ]);
     }
 
-    public function update(StorePostRequest $request, Post $post)
+    public function update(UpdatePostRequest $request, Post $post)
     {
         $this->authorize('update', $post);
 
-        $validated = $request->validated();
-
         $post->update([
-            'content' => $validated['content'],
-            'is_private' => $validated['is_private'] ?? false,
+            'content' => $request->content,
+            'is_private' => $request->boolean('is_private'),
         ]);
 
-        if ($request->remove_media && $post->media) {
-            foreach ($post->media as $media) {
-                Storage::delete($media->file_path);
+        if ($request->has('remove_media')) {
+            $removeMedia = $request->remove_media;
+
+            if (!is_array($removeMedia)) {
+                $removeMedia = [$removeMedia];
+            }
+
+            $mediaToDelete = $post->media()->whereIn('file_path', $removeMedia)->get();
+
+            foreach ($mediaToDelete as $media) {
+                if (Storage::disk('public')->exists($media->file_path)) {
+                    Storage::disk('public')->delete($media->file_path);
+                }
+
                 $media->delete();
             }
         }
@@ -396,35 +406,24 @@ class PostController extends Controller
             foreach ($request->file('media') as $file) {
                 $path = $file->store('uploads/posts', 'public');
 
-                $media = new Media([
+                $post->media()->create([
                     'file_path' => $path,
-                    'file_type' => str_starts_with($file->getMimeType(), 'video') ? 'video' : 'image',
+                    'file_type' => $file->getMimeType() == 'video/mp4' ? 'video' : 'image',
                 ]);
-
-                $post->media()->save($media);
             }
         }
 
-        $hashtags = $validated['hashtags'] ?? [];
-        $hashtagIds = [];
-
-        foreach ($hashtags as $tag) {
-            $cleanTag = ltrim($tag, '#');
-            $hashtag = Hashtag::firstOrCreate([
-                'hashtag' => strtolower($cleanTag)
-            ]);
-
-            $hashtagIds[] = $hashtag->id;
+        if ($request->filled('hashtags')) {
+            $hashtags = collect($request->hashtags)->map(function ($tag) {
+                return \App\Models\Hashtag::firstOrCreate(['hashtag' => $tag])->id;
+            });
+            $post->hashtags()->sync($hashtags);
+        } else {
+            $post->hashtags()->sync([]);
         }
 
-        $post->hashtags()->sync($hashtagIds);
-
-        return redirect()->route('dashboard')->with('success', 'Post updated successfully!');
+        return to_route('post.show', $post->id)->with('success', 'Post updated successfully.');
     }
-
-
-
-
 
 
 }
