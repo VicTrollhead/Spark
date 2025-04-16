@@ -94,7 +94,7 @@ return [
     "Remove" => "Remove",
     "Upload New Media" => "Upload New Media",
     "Update" => "Update",
-    "followers_count" => "{1} follower|[2,*] followers",
-    "following_count" => "{1} following|[2,*] followings",
+    "followers_count" => "{1} Follower|[2,*] Followers",
+    "following_count" => "{1} Following|[2,*] Followings",
 ];
 
