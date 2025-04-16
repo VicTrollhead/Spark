@@ -53,6 +53,7 @@ return [
     "Least Followed" => "Least Followed",
     "Followers" => "Followers",
     "Private Account" => "Private Account",
+    "Private Post" => "Private Post",
     "This account is private." => "This account is private.",
     "Follow to See More" => "Follow to See More",
     "Edit Profile" => "Edit Profile",
@@ -87,5 +88,13 @@ return [
     "Post" => "Post",
     "Comments" => "Comments",
     "Are you sure you want to delete this comment?" => "Are you sure you want to delete this comment?",
+    "Edit Post" => "Edit Post",
+    "Content" => "Content",
+    "Current Media" => "Current Media",
+    "Remove" => "Remove",
+    "Upload New Media" => "Upload New Media",
+    "Update" => "Update",
+    "followers_count" => "{1} follower|[2,*] followers",
+    "following_count" => "{1} following|[2,*] followings",
 ];
 

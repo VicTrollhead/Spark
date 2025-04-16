@@ -8,6 +8,7 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -126,12 +127,10 @@ class UserController extends Controller
             'filters' => [
                 'sort' => $sort,
             ],
+            'followers_string' => trans_choice('common.followers_count', $user->followers_count),
+            'following_string' => trans_choice('common.following_count', $user->following_count),
         ]);
     }
-
-
-
-
 
     public function users(Request $request): Response
     {

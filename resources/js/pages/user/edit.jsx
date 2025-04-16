@@ -122,7 +122,7 @@ export default function Edit() {
                     </div>
 
                     {/* Private Account Toggle */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-start">
                         <label className="text-gray-700 dark:text-gray-200">
                             {translations['Private Account']} <span className="text-gray-500">({user.is_private ? translations['Yes'] : translations['No']})</span>
                         </label>
@@ -132,7 +132,7 @@ export default function Edit() {
 
                     <div>
                         <label className="mb-1 block text-gray-700 dark:text-gray-300">
-                            {translations['Status']} <span className="text-gray-500">({user.status})</span>
+                            {translations['Status']} <span className="text-gray-500">({translations[user.status]})</span>
                         </label>
                         <Select value={data.status} onValueChange={(value) => setData('status', value)}>
                             <SelectTrigger className="w-full">
