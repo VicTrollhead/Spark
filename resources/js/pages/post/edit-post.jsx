@@ -134,7 +134,7 @@ export default function EditPost() {
                     <div className="flex flex-row flex-wrap gap-4 xl:flex-nowrap">
                         <div>
                             <label className="mb-2 text-sm block text-gray-700 dark:text-gray-200">{translations['Upload Media (Images or Videos)']}</label>
-                            <div className="relative">
+                            <div className="relative mt-4">
                                 <Input
                                     type="file"
                                     multiple
@@ -153,7 +153,7 @@ export default function EditPost() {
                             </div>
                         </div>
 
-                        <div className="w-full flex flex-col items-start gap-y-3">
+                        <div className="w-full flex flex-col items-start gap-y-1">
                             <label className="block text-sm mb-2 text-gray-700 dark:text-gray-200">{translations['Hashtags']}</label>
                             <HashtagInput
                                 placeholder={translations['Add hashtag...']}
