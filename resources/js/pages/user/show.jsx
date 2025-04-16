@@ -7,7 +7,7 @@ import PostComponent from '../post/post-component';
 import { useState } from 'react';
 
 export default function Show() {
-    const { user, auth, posts, translations, filters } = usePage().props;
+    const { user, auth, posts, translations, filters, followers_string, following_string } = usePage().props;
     const getInitials = useInitials();
     const [sort, setSort] = useState(filters?.sort || 'latest');
 
@@ -150,23 +150,19 @@ export default function Show() {
                     {user.date_of_birth && (
                         <div className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
-                            {new Date(user.date_of_birth).toLocaleDateString('en-US', {
-                                month: 'long',
-                                day: 'numeric',
-                                year: 'numeric',
-                            })}
+                            {new Date(user.date_of_birth).toLocaleDateString()}
                         </div>
                     )}
 
                     <div className="flex items-center gap-1">
                         <UserCheck className="h-4 w-4" />
-                        {translations['Joined']}{' '}{user.created_at}
+                        {translations['Joined']}{' '}{new Date(user.created_at).toLocaleDateString()}
                     </div>
 
                     {user.status && (
                         <div className="flex items-center gap-1">
                             <AlertCircle className="h-4 w-4" />
-                            {user.status}
+                            {translations[user.status]}
                         </div>
                     )}
                 </div>
@@ -174,10 +170,10 @@ export default function Show() {
                 {/* Followers & Following */}
                 <div className="flex gap-4 text-gray-700 dark:text-gray-300 mt-4">
                     <Link href={`/user/${user.username}/followers`} className="hover:underline">
-                        <strong>{user.followers_count}</strong> {translations['Followers']}
+                        <strong>{user.followers_count}</strong> {followers_string}
                     </Link>
                     <Link href={`/user/${user.username}/following`} className="hover:underline">
-                        <strong>{user.following_count}</strong> {translations['Following']}
+                        <strong>{user.following_count}</strong> {following_string}
                     </Link>
                 </div>
             </div>

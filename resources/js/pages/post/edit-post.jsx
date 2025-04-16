@@ -8,7 +8,7 @@ import { HashtagInput } from '../../components/hashtag-input.jsx';
 import { X } from 'lucide-react';
 
 export default function EditPost() {
-    const { post, auth } = usePage().props;
+    const { post, auth, translations } = usePage().props;
 
     const [removedMediaPaths, setRemovedMediaPaths] = useState([]);
 
@@ -28,11 +28,11 @@ export default function EditPost() {
         formData.append('is_private', data.is_private ? '1' : '0');
         formData.append('_method', 'PATCH');
 
-        console.log("Removed media paths:", removedMediaPaths);
+        // console.log("Removed media paths:", removedMediaPaths);
 
         removedMediaPaths.forEach(path => {
             formData.append('remove_media[]', path);
-            console.log("Adding to formData:", path);
+            // console.log("Adding to formData:", path);
         });
 
         data.hashtags.forEach(tag => {
@@ -66,13 +66,20 @@ export default function EditPost() {
                 { title: 'Edit Post', href: `/posts/${post.id}` },
             ]}
         >
-            <Head title="Edit Post" />
-            <div className="mx-auto w-11/12 max-w-3xl py-4">
-                <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Edit Post</h1>
+            <Head title={translations['Edit Post']} />
+            <div className="p-6 py-4">
+                <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">{translations['Edit Post']}</h1>
+
+                <div className="flex items-center justify-start my-3">
+                    <label className="text-sm text-gray-700 dark:text-gray-200">
+                        {translations['Private (Only for subscribers)']} <span className="text-gray-500">({data.is_private ? translations['Yes'] : translations['No']})</span>
+                    </label>
+                    <Switch checked={data.is_private} onChange={(val) => setData('is_private', val)} />
+                </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5" encType="multipart/form-data">
                     <div>
-                        <label className="mb-2 block text-gray-700 dark:text-gray-200">Content</label>
+                        <label className="mb-2 block text-gray-700 dark:text-gray-200">{translations['Content']}</label>
                         <textarea
                             value={data.content}
                             onChange={(e) => setData('content', e.target.value)}
@@ -86,7 +93,7 @@ export default function EditPost() {
 
                     {post.media?.length > 0 && (
                         <div className="space-y-2">
-                            <label className="block text-gray-700 dark:text-gray-200">Current Media</label>
+                            <label className="block text-gray-700 dark:text-gray-200">{translations['Current Media']}</label>
                             <div className="grid grid-cols-2 gap-4">
                                 {post.media
                                     .filter((m) => !removedMediaPaths.includes(m.file_path))
@@ -116,7 +123,7 @@ export default function EditPost() {
 
                                                 className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded-md text-xs hover:bg-red-700"
                                             >
-                                                Remove
+                                                {translations['Remove']}
                                             </button>
                                         </div>
                                     ))}
@@ -124,41 +131,37 @@ export default function EditPost() {
                         </div>
                     )}
 
-                    <div>
-                        <label className="mb-2 block text-gray-700 dark:text-gray-200">Upload New Media</label>
-                        <div className="relative">
-                            <Input
-                                type="file"
-                                multiple
-                                onChange={(e) => setData('media', e.target.files)}
-                                className="pr-10"
-                            />
-                            {data.media && (
-                                <button
-                                    type="button"
-                                    onClick={clearMediaInput}
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-600 rounded-full p-1 bg-gray-200 dark:bg-gray-700"
-                                >
-                                    <X size={16} />
-                                </button>
-                            )}
+                    <div className="flex flex-row flex-wrap gap-4 xl:flex-nowrap">
+                        <div>
+                            <label className="mb-2 text-sm block text-gray-700 dark:text-gray-200">{translations['Upload Media (Images or Videos)']}</label>
+                            <div className="relative">
+                                <Input
+                                    type="file"
+                                    multiple
+                                    onChange={(e) => setData('media', e.target.files)}
+                                    className="pr-10"
+                                />
+                                {data.media && (
+                                    <button
+                                        type="button"
+                                        onClick={clearMediaInput}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-600 rounded-full p-1 bg-gray-200 dark:bg-gray-700"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                )}
+                            </div>
                         </div>
-                    </div>
 
-                    <div>
-                        <label className="mb-2 block text-gray-700 dark:text-gray-200">Hashtags</label>
-                        <HashtagInput
-                            initialHashtags={(post.hashtags || []).map((h) => h.hashtag)}
-                            value={data.hashtags}
-                            onChange={(hashtags) => setData('hashtags', hashtags)}
-                        />
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                        <label className="text-gray-700 dark:text-gray-200">
-                            Private Post <span className="text-gray-500">({data.is_private ? 'Yes' : 'No'})</span>
-                        </label>
-                        <Switch checked={data.is_private} onChange={(val) => setData('is_private', val)} />
+                        <div className="w-full flex flex-col items-start gap-y-3">
+                            <label className="block text-sm mb-2 text-gray-700 dark:text-gray-200">{translations['Hashtags']}</label>
+                            <HashtagInput
+                                placeholder={translations['Add hashtag...']}
+                                initialHashtags={(post.hashtags || []).map((h) => h.hashtag)}
+                                value={data.hashtags}
+                                onChange={(hashtags) => setData('hashtags', hashtags)}
+                            />
+                        </div>
                     </div>
 
                     <div className="flex justify-end gap-2">
@@ -166,10 +169,10 @@ export default function EditPost() {
                             href={`/post/${post.id}`}
                             className="rounded-md bg-gray-300 px-4 py-2 text-gray-900 hover:bg-gray-400 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
                         >
-                            Cancel
+                            {translations['Cancel']}
                         </Link>
                         <Button type="submit" disabled={processing} className="bg-blue-600 px-4 py-5 hover:bg-blue-700 text-white">
-                            Update Post
+                            {translations['Update']}
                         </Button>
                     </div>
                 </form>

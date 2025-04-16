@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Head, usePage, router } from '@inertiajs/react';
 import AppLayout from '../layouts/app-layout';
 import PostComponent from './post/post-component';
 import { RefreshCw } from 'lucide-react';
 import { HashtagInput } from '../components/hashtag-input';
+import {Input} from "../components/ui/input.jsx";
+import {Switch} from "../components/ui/switch.jsx";
 
 export default function Dashboard() {
     const { users, posts, sort, translations } = usePage().props;
@@ -89,25 +91,23 @@ export default function Dashboard() {
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Dashboard', href: '/dashboard' }]}>
-            <Head title="Dashboard" />
+            <Head title={translations['Dashboard']} />
 
             <div className="p-6 text-2xl font-extrabold">{translations["What's new?"]}</div>
 
             <div className="border-y bg-white p-4 dark:border-gray-800 dark:bg-neutral-950">
                 <form onSubmit={handlePostSubmit} className="flex flex-col space-y-4">
-                    <label className="text-sm text-gray-700 dark:text-gray-300">
-                        <input
-                            type="checkbox"
-                            checked={data.is_private}
-                            onChange={(e) => setData((prev) => ({ ...prev, is_private: e.target.checked }))}
-                            className="mx-2"
-                        />
-                        {translations['Private (Only for subscribers)']}
-                    </label>
+                    <div className="my-3 flex items-center justify-start">
+                        <label className="text-sm text-gray-700 dark:text-gray-200">
+                            {translations['Private (Only for subscribers)']}{' '}
+                            <span className="text-gray-500">({data.is_private ? translations['Yes'] : translations['No']})</span>
+                        </label>
+                        <Switch checked={data.is_private} onChange={(val) => setData((prev) => ({ ...prev, is_private: val }))} />
+                    </div>
                     <textarea
                         value={data.content}
                         onChange={(e) => setData((prev) => ({ ...prev, content: e.target.value }))}
-                        rows={3}
+                        rows={5}
                         placeholder={translations["What's on your mind?"]}
                         className="resize-none rounded-md bg-gray-100 p-3 text-neutral-950 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-neutral-900 dark:text-white dark:focus:ring-blue-600"
                     />
@@ -119,13 +119,7 @@ export default function Dashboard() {
                             <label className="block text-sm text-gray-700 dark:text-gray-200">
                                 {translations['Upload Media (Images or Videos)']}
                             </label>
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                multiple
-                                onChange={handleMediaChange}
-                                className="mt-2 rounded-md border bg-gray-100 p-2 text-neutral-950 dark:bg-neutral-900 dark:text-white"
-                            />
+                            <Input ref={fileInputRef} type="file" multiple onChange={handleMediaChange} className="pr-10" />
                             {selectedFiles.length > 0 && (
                                 <ul className="mt-2 list-disc pl-4 text-sm text-gray-500">
                                     {selectedFiles.map((name, index) => (
@@ -135,7 +129,7 @@ export default function Dashboard() {
                             )}
                             {errors['media.0'] && <p className="text-sm text-red-500">{errors['media.0']}</p>}
                         </div>
-                        <div className="w-full flex flex-col items-start gap-y-1">
+                        <div className="flex w-full flex-col items-start gap-y-3">
                             <label className="block text-sm text-gray-700 dark:text-gray-200">{translations['Hashtags']}</label>
                             <HashtagInput
                                 placeholder={translations['Add hashtag...']}
@@ -163,7 +157,7 @@ export default function Dashboard() {
                     <select
                         value={sortOption}
                         onChange={handleSortChange}
-                        className="rounded-md border ml-auto w-1/2 bg-gray-100 p-2 text-neutral-950 dark:bg-neutral-900 dark:text-white"
+                        className="ml-auto w-1/2 rounded-md border bg-gray-100 p-2 text-neutral-950 dark:bg-neutral-900 dark:text-white"
                     >
                         <option value="latest">{translations['Latest']}</option>
                         <option value="oldest">{translations['Oldest']}</option>
