@@ -12,6 +12,7 @@ return [
     "Favorites" => "Favorites",
     "Profile" => "Profile",
     "Settings" => "Settings",
+    "Reposts" => "Reposts",
     "Repository" => "Repository",
     "Log out" => "Log out",
     "Search users" => "Search users",

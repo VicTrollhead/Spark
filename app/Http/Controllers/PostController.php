@@ -116,6 +116,9 @@ class PostController extends Controller
                 'comments_count' => $post->comments->count(),
                 'reposts_count' => $post->repostedByUsers->count(),
                 'is_reposted' => $currentUser ? $post->repostedByUsers->contains('id', $currentUser->id) : false,
+                'reposted_by_you' => $currentUser && $post->repostedByUsers->contains('id', $currentUser->id),
+                'reposted_by_user' => $post->repostedByUsers
+                    ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
             ];
         });
 
@@ -247,6 +250,9 @@ class PostController extends Controller
                 'hashtags' => $hashtags,
                 'is_reposted' => $currentUser ? $post->repostedByUsers->contains('id', $currentUser->id) : false,
                 'reposts_count' => $post->repostedByUsers->count(),
+                'reposted_by_you' => $currentUser && $post->repostedByUsers->contains('id', $currentUser->id),
+                'reposted_by_user' => $post->repostedByUsers
+                    ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
             ],
             'sort' => $sort
         ]);
@@ -338,6 +344,9 @@ class PostController extends Controller
                     'comments_count' => $post->comments->count(),
                     'is_reposted' => $currentUser ? $post->repostedByUsers->contains('id', $currentUser->id) : false,
                     'reposts_count' => $post->repostedByUsers->count(),
+                    'reposted_by_you' => $currentUser && $post->repostedByUsers->contains('id', $currentUser->id),
+                    'reposted_by_user' => $post->repostedByUsers
+                        ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
                 ];
             });
 

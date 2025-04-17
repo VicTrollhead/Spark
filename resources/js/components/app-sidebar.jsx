@@ -10,7 +10,7 @@ import {
     SidebarSeparator
 } from './ui/sidebar';
 import { Link, router, useForm, usePage } from '@inertiajs/react';
-import { Bookmark, BookOpen, Folder, Home, LogOut, Mail, Settings, User, Users } from 'lucide-react';
+import { Bookmark, BookOpen, Folder, Home, LogOut, Mail, Repeat, Settings, User, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useMobileNavigation } from '../hooks/use-mobile-navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx';
@@ -48,6 +48,11 @@ export function AppSidebar() {
             title: translations['Favorites'],
             url: '/user/favorites',
             icon: Bookmark,
+        },
+        {
+            title: translations['Reposts'],
+            url: '/user/reposts',
+            icon: Repeat,
         },
         {
             title: translations['Profile'],

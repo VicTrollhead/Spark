@@ -67,6 +67,7 @@ export default function EditPost() {
             ]}
         >
             <Head title={translations['Edit Post']} />
+
             <div className="p-6 py-4">
                 <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">{translations['Edit Post']}</h1>
 

@@ -12,6 +12,7 @@ return [
     "Favorites" => "Обрані",
     "Profile" => "Профіль",
     "Settings" => "Налаштування",
+    "Reposts" => "Репости",
     "Repository" => "Репозиторій",
     "Log out" => "Вихід",
     "Search users" => "Пошук користувачів",

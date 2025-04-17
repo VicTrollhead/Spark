@@ -59,7 +59,6 @@ export default function Show() {
         <AppLayout>
             <Head title={`${user.name} (@${user.username})`} />
 
-            {/* Cover Image */}
             <div className="relative w-full bg-gray-200 h-72 dark:bg-gray-800">
                 {user.cover_image_url && (
                     <img src={user.cover_image_url} alt="Cover Image" className="h-full w-full object-fill object-center" />
@@ -75,7 +74,6 @@ export default function Show() {
 
             </div>
 
-            {/* Profile Info */}
             <div className="space-y-2 p-6 pt-12 sm:pt-16">
                 <div className="flex items-center justify-between gap-x-5">
                     <div>
@@ -129,7 +127,6 @@ export default function Show() {
 
                 {user.bio && <p className="text-gray-700 dark:text-gray-300">{user.bio}</p>}
 
-                {/* Additional User Info */}
                 <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                     {user.location && (
                         <div className="flex items-center gap-1">
@@ -167,7 +164,6 @@ export default function Show() {
                     )}
                 </div>
 
-                {/* Followers & Following */}
                 <div className="flex gap-4 text-gray-700 dark:text-gray-300 mt-4">
                     <Link href={`/user/${user.username}/followers`} className="hover:underline">
                         <strong>{user.followers_count}</strong> {followers_string}
@@ -178,7 +174,6 @@ export default function Show() {
                 </div>
             </div>
 
-            {/* Sorting and Posts */}
             <div className="divide-y">
                 <div className="flex items-center justify-between px-6 py-3">
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{translations['Posts']}</h2>

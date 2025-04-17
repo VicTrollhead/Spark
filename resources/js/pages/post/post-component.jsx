@@ -111,6 +111,26 @@ export default function PostComponent({ post }) {
                 </Avatar>
 
                 <div className="flex-1">
+                    {post.reposted_by_you && (
+                        <div className="mb-2 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <Repeat className="h-4 w-4" />
+                            Reposted by you
+                        </div>
+                    )}
+
+                    {!post.reposted_by_you && post.reposted_by_user && (
+                        <div className="mb-2 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <Repeat className="h-4 w-4" />
+                            Last reposted by
+                            <Link
+                                href={`/user/${post.reposted_by_user.username}`}
+                                className="ml-1 hover:underline text-blue-500"
+                            >
+                                {post.reposted_by_user.name}
+                            </Link>
+                        </div>
+                    )}
+
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <Link href={`/user/${post.user.username}`} className="font-semibold text-gray-900 hover:underline dark:text-white">
