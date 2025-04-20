@@ -1,11 +1,12 @@
 import AppLogoIcon from '../../components/app-logo-icon';
-import { Link } from '@inertiajs/react';
+import { usePage, Link } from '@inertiajs/react';
 import { Globe } from "lucide-react";
 import AppearanceToggle from "../../components/appearance-toggle";
 import Icon from "../../components/ui/logo-icon.jsx";
 
 
 export default function AuthSimpleLayout({ children, title, description, imageSrc, titleSrc }) {
+    const { translations } = usePage().props;
     return (
         <div className="bg-background flex min-h-svh">
             <div
@@ -30,9 +31,9 @@ export default function AuthSimpleLayout({ children, title, description, imageSr
 
                 <div className="flex flex-1 flex-col items-center justify-center">
                     <span className="mb-4 text-6xl font-extrabold sm:text-6xl md:text-5xl lg:text-6xl">
-                        In The Comfort
+                        {translations["In the Comfort"]}
                         <br />
-                        Zone
+                        {translations["Zone"]}
                     </span>
 
                     <div className="w-full max-w-sm">
@@ -51,17 +52,20 @@ export default function AuthSimpleLayout({ children, title, description, imageSr
                     </div>
                 </div>
 
-                <footer className="mt-8 flex flex-wrap gap-4 justify-center text-center text-sm text-gray-500"><a href="#" className="hover:underline">Про нас </a>
-                    <a href="#" className="hover:underline">Умови надання послуг </a>
-                    <a href="#" className="hover:underline">Політика конфіденційності </a>
-                    <a href="#" className="hover:underline">Політика щодо файлів cookie </a>
-                    <a href="#" className="hover:underline">Контактні та реєстраційні дані </a>
-                    <a href="#" className="hover:underline">Спеціальні можливості </a>
-                    <a href="#" className="hover:underline">Інформація про рекламу </a>
-                    <a href="#" className="hover:underline">Блог </a>
-                    <a href="#" className="hover:underline">Реклама </a>
-                    <a href="#" className="hover:underline">Налаштування </a>
-                    © 2025 SparkCorp.</footer>
+                <footer className="mt-8 flex flex-wrap gap-4 justify-center text-center text-sm text-gray-500">
+                    <a href="#" className="hover:underline">{translations["About us"]}</a>
+                    <a href="#" className="hover:underline">{translations["Terms of service"]}</a>
+                    <a href="#" className="hover:underline">{translations["Privacy Policy"]}</a>
+                    <a href="#" className="hover:underline">{translations["Cookie Policy"]}</a>
+                    <a href="#" className="hover:underline">{translations["Contact and Registration Information"]}</a>
+                    <a href="#" className="hover:underline">{translations["Accessibility"]}</a>
+                    <a href="#" className="hover:underline">{translations["Advertising Information"]}</a>
+                    <a href="#" className="hover:underline">{translations["Blog"]}</a>
+                    <a href="#" className="hover:underline">{translations["Advertising"]}</a>
+                    <a href="#" className="hover:underline">{translations["Settings"]}</a>
+                    © 2025 SparkCorp
+                    .</footer>
+
             </div>
         </div>
     );

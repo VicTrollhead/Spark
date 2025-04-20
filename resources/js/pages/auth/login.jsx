@@ -1,4 +1,4 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { LoaderCircle, EyeOff } from 'lucide-react';
 import InputError from '../../components/input-error';
 import TextLink from '../../components/text-link';
@@ -17,6 +17,7 @@ export default function Login({ status, canResetPassword, googleClientId }) {
         password: "",
         remember: false,
     });
+    const { translations } = usePage().props;
 
     const [passwordVisible, setPasswordVisible] = useState(false);
 
@@ -61,9 +62,9 @@ export default function Login({ status, canResetPassword, googleClientId }) {
     }, []);
 
     return (
-        <AuthLayout title="Log in to Spark" description="Use google authentication or email to log in">
-            <Head title="Log in" />
 
+        <AuthLayout title={translations["Log in to Spark"]} description={translations["Use google authentication or email to log in"]}>
+            <Head title={translations['Log In']} />
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-5">
 
