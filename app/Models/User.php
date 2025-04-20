@@ -47,7 +47,6 @@ class User extends Authenticatable
         ];
     }
 
-    // Polymorphic Relationship to Media
     public function profileImage(): HasOne
     {
         return $this->hasOne(Media::class, 'mediable_id')
@@ -101,6 +100,17 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Post::class, 'likes', 'user_id', 'post_id');
     }
+
+    public function reposts()
+    {
+        return $this->hasMany(Repost::class);
+    }
+
+    public function repostedPosts()
+    {
+        return $this->belongsToMany(Post::class, 'reposts');
+    }
+
 
     public function followingPosts(): HasManyThrough
     {

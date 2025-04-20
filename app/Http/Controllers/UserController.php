@@ -8,6 +8,7 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -18,7 +19,8 @@ class UserController extends Controller
 {
     use AuthorizesRequests;
 
-    public function show(User $user = null): Response
+
+    public function show(Request $request, User $user = null): Response
     {
         $currentUser = Auth::user();
         $user = $user ?? $currentUser;
@@ -27,14 +29,14 @@ class UserController extends Controller
             abort(404, 'User not found');
         }
 
+        $sort = $request->input('sort', 'latest');
         $canViewFullProfile = Gate::allows('view', $user);
-        $user->loadCount(['followers', 'following']);
+        $user->loadCount(['followers', 'following', 'repostedPosts']);
 
-        // Apply privacy filtering for posts
-        $postsQuery = $user->posts()
-            ->with(['user.profileImage', 'comments', 'likes', 'media'])
+        $originalPostsQuery = $user->posts()
+            ->with(['user.profileImage', 'comments', 'likes', 'media', 'hashtags', 'favorites', 'repostedByUsers'])
             ->where(function ($query) use ($currentUser) {
-                $query->where('is_private', 0); // Public posts
+                $query->where('is_private', 0);
 
                 if ($currentUser) {
                     $query->orWhere(function ($subQuery) use ($currentUser) {
@@ -44,10 +46,34 @@ class UserController extends Controller
                             });
                     });
                 }
-            })
-            ->latest();
+            });
 
-        $posts = $postsQuery->get()->map(function ($post) use ($currentUser) {
+        $repostedPostsQuery = Post::whereHas('repostedByUsers', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })->with(['user.profileImage', 'comments', 'likes', 'media', 'hashtags', 'favorites', 'repostedByUsers']);
+
+        if ($sort === 'reposts') {
+            $originalPosts = collect();
+            $repostedPosts = $repostedPostsQuery->latest()->get();
+        } elseif ($sort === 'originals') {
+            $originalPosts = $originalPostsQuery->latest()->get();
+            $repostedPosts = collect();
+        } else {
+            $originalPosts = $originalPostsQuery->get();
+            $repostedPosts = $repostedPostsQuery->get();
+        }
+
+        $combinedPosts = $originalPosts->merge($repostedPosts);
+
+        if ($sort === 'most_liked') {
+            $combinedPosts = $combinedPosts->sortByDesc(fn($post) => $post->likes->count())->values();
+        } elseif ($sort === 'oldest') {
+            $combinedPosts = $combinedPosts->sortBy('created_at')->values();
+        } else {
+            $combinedPosts = $combinedPosts->sortByDesc('created_at')->values();
+        }
+
+        $posts = $combinedPosts->map(function ($post) use ($user, $currentUser) {
             return [
                 'id' => $post->id,
                 'content' => $post->content,
@@ -56,15 +82,27 @@ class UserController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
+                    'profile_image_url' => $post->user->profileImage?->url,
                 ],
-                'media' => $post->media->map(fn ($media) => $media->file_path),
+                'media' => $post->media->map(fn ($media) => [
+                    'file_path' => $media->file_path,
+                    'file_type' => $media->file_type,
+                ]),
+                'hashtags' => $post->hashtags->map(fn ($tag) => [
+                    'id' => $tag->id,
+                    'hashtag' => $tag->hashtag,
+                ]),
                 'is_private' => $post->is_private,
                 'likes_count' => $post->likes->count(),
                 'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
                 'favorites_count' => $post->favorites->count(),
                 'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
                 'comments_count' => $post->comments->count(),
+                'is_reposted' => $user->repostedPosts->contains($post->id),
+                'reposts_count' => $post->repostedByUsers->count(),
+                'reposted_by_you' => $currentUser && $post->repostedByUsers->contains('id', $currentUser->id),
+                'reposted_by_user' => $post->repostedByUsers
+                    ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
             ];
         });
 
@@ -74,7 +112,7 @@ class UserController extends Controller
                 'username' => $user->username,
                 'name' => $canViewFullProfile ? $user->name : null,
                 'bio' => $canViewFullProfile ? $user->bio : null,
-                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'profile_image_url' => $user->profileImage?->url,
                 'cover_image_url' => $canViewFullProfile && $user->coverImage ? $user->coverImage->url : null,
                 'location' => $canViewFullProfile ? $user->location : null,
                 'website' => $canViewFullProfile ? $user->website : null,
@@ -88,250 +126,14 @@ class UserController extends Controller
                 'is_following' => Auth::check() && $user->followers()->where('follower_id', Auth::id())->exists(),
                 'canViewFullProfile' => $canViewFullProfile,
             ],
-            'posts' => $posts
-        ]);
-    }
-
-
-
-
-    public function index(): Response
-    {
-        $currentUser = Auth::user();
-
-        $users = User::with(['profileImage'])->get();
-
-        $posts = $user->posts()
-            ->with(['user', 'comments', 'likes', 'media'])
-            ->where(function ($query) use ($currentUser, $user) {
-                $query->where('is_private', false);
-
-                if ($currentUser) {
-                    $query->orWhere(function ($q) use ($currentUser, $user) {
-                        $q->where('is_private', true)
-                            ->where(function ($innerQuery) use ($currentUser, $user) {
-                                $innerQuery->where('user_id', $currentUser->id)
-                                    ->orWhereIn('user_id', $user->followers()->pluck('follower_id'));
-                            });
-                    });
-                }
-            })
-            ->latest()
-            ->get()
-            ->filter(fn($post) => Gate::allows('view', $post))
-            ->map(function ($post) use ($currentUser) {
-                return [
-                    'id' => $post->id,
-                    'content' => $post->content,
-                    'created_at' => $post->created_at->format('n/j/Y'),
-                    'user' => [
-                        'id' => $post->user->id,
-                        'name' => $post->user->name,
-                        'username' => $post->user->username,
-                        'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
-                    ],
-                    'media' => $post->media->map(fn($media) => $media->url),
-                    'is_private' => $post->is_private,
-                    'likes_count' => $post->likes->count(),
-                    'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
-                    'favorites_count' => $post->favorites->count(),
-                    'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
-                    'comments_count' => $post->comments->count(),
-                ];
-            });
-
-        return Inertia::render('dashboard', [
-            'users' => $users,
             'posts' => $posts,
+            'filters' => [
+                'sort' => $sort,
+            ],
+            'followers_string' => trans_choice('common.followers_count', $user->followers_count),
+            'following_string' => trans_choice('common.following_count', $user->following_count),
         ]);
     }
-
-    public function users(Request $request): Response
-    {
-        $currentUser = Auth::user();
-        $sort = $request->query('sort', 'newest');
-
-        $usersQuery = User::with('profileImage')->withCount('followers');
-
-        switch ($sort) {
-            case 'oldest':
-                $usersQuery->oldest();
-                break;
-            case 'popular':
-                $usersQuery->orderByDesc('followers_count');
-                break;
-            case 'least_followed':
-                $usersQuery->orderBy('followers_count');
-                break;
-            case 'following':
-                if ($currentUser) {
-                    $usersQuery->whereHas('followers', fn($query) => $query->where('follower_id', $currentUser->id));
-                }
-                break;
-            case 'followers':
-                if ($currentUser) {
-                    $usersQuery->whereHas('following', fn($query) => $query->where('followee_id', $currentUser->id));
-                }
-                break;
-            case 'mutual_subscribers':
-                if ($currentUser) {
-                    $usersQuery->whereHas('followers', function ($query) use ($currentUser) {
-                        $query->where('follower_id', $currentUser->id);
-                    })->whereHas('following', function ($query) use ($currentUser) {
-                        $query->where('followee_id', $currentUser->id);
-                    });
-                }
-                break;
-            default:
-                $usersQuery->latest();
-                break;
-        }
-
-        $users = $usersQuery->get()->map(function ($user) {
-            return [
-                'id' => $user->id,
-                'name' => $user->name,
-                'username' => $user->username,
-                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
-                'followers_count' => $user->followers_count,
-            ];
-        });
-
-        return Inertia::render('user-dashboard', [
-            'users' => $users,
-            'sort' => $sort,
-        ]);
-    }
-
-
-    public function favorites(): Response
-    {
-        $currentUser = Auth::user();
-
-        if (!$currentUser) {
-            abort(403, 'Unauthorized');
-        }
-
-        $favoritedPosts = $currentUser->favorites()
-            ->with(['user.profileImage', 'comments', 'likes', 'media'])
-            ->where(function ($query) use ($currentUser) {
-                $query->where('posts.is_private', 0)
-                ->orWhere(function ($subQuery) use ($currentUser) {
-                    $subQuery->where('posts.user_id', $currentUser->id)
-                    ->orWhereHas('user.followers', function ($followersQuery) use ($currentUser) {
-                        $followersQuery->where('follower_id', $currentUser->id);
-                    });
-                });
-            })
-            ->latest()
-            ->get()
-            ->filter(fn ($post) => $post->is_private == 0 || $post->user_id == $currentUser->id || $post->user->followers->contains('id', $currentUser->id)) // Double-check filtering
-            ->map(function ($post) use ($currentUser) {
-                return [
-                    'id' => $post->id,
-                    'content' => $post->content,
-                    'created_at' => $post->created_at->format('n/j/Y'),
-                    'user' => [
-                        'id' => $post->user->id,
-                        'name' => $post->user->name,
-                        'username' => $post->user->username,
-                        'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
-                    ],
-                    'media' => $post->media->map(fn ($media) => $media->url),
-                    'is_private' => $post->is_private,
-                    'likes_count' => $post->likes->count(),
-                    'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
-                    'favorites_count' => $post->favorites->count(),
-                    'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
-                    'comments_count' => $post->comments->count(),
-                ];
-            });
-
-        return Inertia::render('user/favorites', [
-            'user' => $currentUser,
-            'posts' => $favoritedPosts,
-        ]);
-    }
-
-    public function liked(): Response
-    {
-        $currentUser = Auth::user();
-
-        if (!$currentUser) {
-            abort(403, 'Unauthorized');
-        }
-
-        $likedPosts = $currentUser->likes()
-            ->with(['user.profileImage', 'comments', 'likes', 'media'])
-            ->latest()
-            ->get()
-            ->map(function ($post) use ($currentUser) {
-                return [
-                    'id' => $post->id,
-                    'content' => $post->content,
-                    'created_at' => $post->created_at->format('n/j/Y'),
-                    'user' => [
-                        'id' => $post->user->id,
-                        'name' => $post->user->name,
-                        'username' => $post->user->username,
-                        'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
-                    ],
-                    'media' => $post->media->map(fn($media) => $media->url),
-                    'is_private' => $post->is_private,
-                    'likes_count' => $post->likes->count(),
-                    'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
-                    'favorites_count' => $post->favorites->count(),
-                    'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
-                    'comments_count' => $post->comments->count(),
-                ];
-            });
-
-        return Inertia::render('user/liked', [
-            'user' => $currentUser,
-            'posts' => $likedPosts,
-        ]);
-    }
-
-    public function followingPosts(): Response
-    {
-        $currentUser = Auth::user();
-
-        if (!$currentUser) {
-            abort(403, 'Unauthorized');
-        }
-
-        $followingPosts = $currentUser->followingPosts()
-            ->with(['user.profileImage', 'comments', 'likes', 'media'])
-            ->latest()
-            ->get()
-            ->map(function ($post) use ($currentUser) {
-                return [
-                    'id' => $post->id,
-                    'content' => $post->content,
-                    'created_at' => $post->created_at->format('n/j/Y'),
-                    'user' => [
-                        'id' => $post->user->id,
-                        'name' => $post->user->name,
-                        'username' => $post->user->username,
-                        'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
-                    ],
-                    'media' => $post->media->map(fn($media) => $media->url),
-                    'is_private' => $post->is_private,
-                    'likes_count' => $post->likes->count(),
-                    'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
-                    'favorites_count' => $post->favorites->count(),
-                    'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
-                    'comments_count' => $post->comments->count(),
-                ];
-            });
-
-        return Inertia::render('user/following-posts', [
-            'user' => $currentUser,
-            'posts' => $followingPosts,
-        ]);
-    }
-
-
 
     public function edit(User $user): Response
     {
@@ -394,4 +196,488 @@ class UserController extends Controller
         return redirect()->route('user.show', $user->username)
             ->with('success', 'Profile updated successfully.');
     }
+
+    public function users(Request $request): Response
+    {
+        $currentUser = Auth::user();
+        $sort = $request->query('sort', 'newest');
+
+        $usersQuery = User::with('profileImage')->withCount('followers');
+
+        switch ($sort) {
+            case 'oldest':
+                $usersQuery->oldest();
+                break;
+            case 'popular':
+                $usersQuery->orderByDesc('followers_count');
+                break;
+            case 'least_followed':
+                $usersQuery->orderBy('followers_count');
+                break;
+            case 'following':
+                if ($currentUser) {
+                    $usersQuery->whereHas('followers', fn($query) => $query->where('follower_id', $currentUser->id));
+                }
+                break;
+            case 'followers':
+                if ($currentUser) {
+                    $usersQuery->whereHas('following', fn($query) => $query->where('followee_id', $currentUser->id));
+                }
+                break;
+            case 'mutual_subscribers':
+                if ($currentUser) {
+                    $usersQuery->whereHas('followers', function ($query) use ($currentUser) {
+                        $query->where('follower_id', $currentUser->id);
+                    })->whereHas('following', function ($query) use ($currentUser) {
+                        $query->where('followee_id', $currentUser->id);
+                    });
+                }
+                break;
+            default:
+                $usersQuery->latest();
+                break;
+        }
+
+        $users = $usersQuery->get()->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'followers_count' => $user->followers_count,
+            ];
+        });
+
+        return Inertia::render('user-dashboard', [
+            'users' => $users,
+            'sort' => $sort,
+        ]);
+    }
+
+    public function search(Request $request, string $searchText = ''): Response
+    {
+        $currentUser = Auth::user();
+        $sort = $request->query('sort', 'newest');
+
+        $usersQuery = User::with('profileImage')->withCount('followers');
+
+        if (trim($searchText) !== '') {
+            $usersQuery->where(function ($query) use ($searchText) {
+                $query->where('name', 'like', "%{$searchText}%")
+                    ->orWhere('username', 'like', "%{$searchText}%");
+            });
+        }
+
+        switch ($sort) {
+            case 'oldest':
+                $usersQuery->oldest();
+                break;
+            case 'popular':
+                $usersQuery->orderByDesc('followers_count');
+                break;
+            case 'least_followed':
+                $usersQuery->orderBy('followers_count');
+                break;
+            case 'following':
+                if ($currentUser) {
+                    $usersQuery->whereHas('followers', fn($query) => $query->where('follower_id', $currentUser->id));
+                }
+                break;
+            case 'followers':
+                if ($currentUser) {
+                    $usersQuery->whereHas('following', fn($query) => $query->where('followee_id', $currentUser->id));
+                }
+                break;
+            case 'mutual_subscribers':
+                if ($currentUser) {
+                    $usersQuery->whereHas('followers', function ($query) use ($currentUser) {
+                        $query->where('follower_id', $currentUser->id);
+                    })->whereHas('following', function ($query) use ($currentUser) {
+                        $query->where('followee_id', $currentUser->id);
+                    });
+                }
+                break;
+            default:
+                $usersQuery->latest();
+                break;
+        }
+
+        $users = $usersQuery->get()->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'followers_count' => $user->followers_count,
+            ];
+        });
+
+        return Inertia::render('user/search-users', [
+            'users' => $users,
+            'sort' => $sort,
+            'searchText' => $searchText,
+        ]);
+    }
+
+    public function usersList(Request $request)
+    {
+        $usersQuery = User::with('profileImage')->withCount('followers');
+
+        $users = $usersQuery->oldest()->take(3)->get();
+
+        return $users->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'followers_count' => $user->followers_count,
+            ];
+        });
+    }
+
+
+    public function favorites(Request $request): Response
+    {
+        $currentUser = Auth::user();
+
+        if (!$currentUser) {
+            abort(403, 'Unauthorized');
+        }
+
+        $sort = $request->input('sort', 'latest');
+
+        $favoritedPostsQuery = $currentUser->favorites()
+            ->with(['user.profileImage', 'comments', 'likes', 'media', 'hashtags', 'favorites', 'repostedByUsers', 'user.followers'])
+            ->where(function ($query) use ($currentUser) {
+                $query->where('posts.is_private', 0)
+                    ->orWhere(function ($subQuery) use ($currentUser) {
+                        $subQuery->where('posts.user_id', $currentUser->id)
+                            ->orWhereHas('user.followers', function ($followersQuery) use ($currentUser) {
+                                $followersQuery->where('follower_id', $currentUser->id);
+                            });
+                    });
+            });
+
+        $favoritedPosts = match ($sort) {
+            'oldest' => $favoritedPostsQuery->oldest()->get(),
+            'most_liked' => $favoritedPostsQuery->get()->sortByDesc(fn($post) => $post->likes->count())->values(),
+            'reposted_friends' => $favoritedPostsQuery->get()->filter(function ($post) use ($currentUser) {
+                return $currentUser->following->contains('id', $post->user_id);
+            })->values(),
+            default => $favoritedPostsQuery->latest()->get(),
+        };
+
+        $posts = $favoritedPosts->map(function ($post) use ($currentUser) {
+            return [
+                'id' => $post->id,
+                'content' => $post->content,
+                'created_at' => $post->created_at->format('n/j/Y'),
+                'user' => [
+                    'id' => $post->user->id,
+                    'name' => $post->user->name,
+                    'username' => $post->user->username,
+                    'profile_image_url' => $post->user->profileImage?->url,
+                ],
+                'media' => $post->media->map(fn ($media) => [
+                    'file_path' => $media->file_path,
+                    'file_type' => $media->file_type,
+                ]),
+                'hashtags' => $post->hashtags->map(fn ($tag) => [
+                    'id' => $tag->id,
+                    'hashtag' => $tag->hashtag,
+                ]),
+                'is_private' => $post->is_private,
+                'likes_count' => $post->likes->count(),
+                'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                'favorites_count' => $post->favorites->count(),
+                'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
+                'comments_count' => $post->comments->count(),
+                'is_reposted' => $currentUser ? $post->repostedByUsers->contains('id', $currentUser->id) : false,
+                'reposts_count' => $post->repostedByUsers->count(),
+                'reposted_by_you' => $currentUser && $post->repostedByUsers->contains('id', $currentUser->id),
+                'reposted_by_user' => $post->repostedByUsers
+                    ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
+            ];
+        });
+
+        return Inertia::render('user/favorites', [
+            'user' => [
+                'id' => $currentUser->id,
+                'username' => $currentUser->username,
+                'name' => $currentUser->name,
+                'profile_image_url' => $currentUser->profileImage?->url,
+            ],
+            'posts' => $posts,
+            'filters' => [
+                'sort' => $sort,
+            ],
+        ]);
+    }
+
+
+    public function liked(Request $request): Response
+    {
+        $currentUser = Auth::user();
+
+        if (!$currentUser) {
+            abort(403, 'Unauthorized');
+        }
+
+        $sort = $request->query('sort', 'latest');
+
+        $likedQuery = $currentUser->likes()
+            ->with(['user.profileImage', 'comments', 'likes', 'media', 'user.followers', 'favorites', 'hashtags', 'repostedByUsers'])
+            ->where(function ($query) use ($currentUser) {
+                $query->where('posts.is_private', 0)
+                    ->orWhere(function ($subQuery) use ($currentUser) {
+                        $subQuery->where('posts.user_id', $currentUser->id)
+                            ->orWhereHas('user.followers', function ($followersQuery) use ($currentUser) {
+                                $followersQuery->where('follower_id', $currentUser->id);
+                            });
+                    });
+            });
+
+        switch ($sort) {
+            case 'oldest':
+                $likedQuery->oldest();
+                break;
+            case 'most_liked':
+                $likedQuery->withCount('likes')->orderByDesc('likes_count');
+                break;
+            case 'reposted_friends':
+                $likedQuery->whereHas('repostedByUsers', function ($q) use ($currentUser) {
+                    $q->whereIn('id', $currentUser->following->pluck('users.id'));
+                });
+                break;
+            case 'latest':
+            default:
+                $likedQuery->latest();
+                break;
+        }
+
+        $likedPosts = $likedQuery->get()
+            ->filter(fn ($post) => $post->is_private == 0 || $post->user_id == $currentUser->id || $post->user->followers->contains('id', $currentUser->id))
+            ->map(function ($post) use ($currentUser) {
+                return [
+                    'id' => $post->id,
+                    'content' => $post->content,
+                    'created_at' => $post->created_at->format('n/j/Y'),
+                    'user' => [
+                        'id' => $post->user->id,
+                        'name' => $post->user->name,
+                        'username' => $post->user->username,
+                        'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
+                    ],
+                    'media' => $post->media->map(fn ($media) => [
+                        'file_path' => $media->file_path,
+                        'file_type' => $media->file_type,
+                    ]),
+                    'hashtags' => $post->hashtags->map(fn ($tag) => [
+                        'id' => $tag->id,
+                        'hashtag' => $tag->hashtag,
+                    ]),
+                    'is_private' => $post->is_private,
+                    'likes_count' => $post->likes->count(),
+                    'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                    'favorites_count' => $post->favorites->count(),
+                    'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
+                    'comments_count' => $post->comments->count(),
+                    'is_reposted' => $currentUser ? $post->repostedByUsers->contains('id', $currentUser->id) : false,
+                    'reposts_count' => $post->repostedByUsers->count(),
+                    'reposted_by_you' => $currentUser && $post->repostedByUsers->contains('id', $currentUser->id),
+                    'reposted_by_user' => $post->repostedByUsers
+                        ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
+                ];
+            });
+
+        return Inertia::render('user/liked', [
+            'user' => $currentUser,
+            'posts' => $likedPosts,
+            'filters' => [
+                'sort' => $sort,
+            ],
+        ]);
+    }
+
+
+    public function followingPosts(Request $request): Response
+    {
+        $currentUser = Auth::user();
+
+        if (!$currentUser) {
+            abort(403, 'Unauthorized');
+        }
+
+        $sort = $request->query('sort', 'latest');
+
+        $query = $currentUser->followingPosts()
+            ->with(['user.profileImage', 'comments', 'likes', 'media', 'favorites', 'hashtags', 'repostedByUsers']);
+
+        switch ($sort) {
+            case 'oldest':
+                $query->oldest();
+                break;
+            case 'most_liked':
+                $query->withCount('likes')->orderByDesc('likes_count');
+                break;
+            default:
+                $query->latest();
+                break;
+        }
+
+        $followingPosts = $query->get()
+            ->map(function ($post) use ($currentUser) {
+                return [
+                    'id' => $post->id,
+                    'content' => $post->content,
+                    'created_at' => $post->created_at->format('n/j/Y'),
+                    'user' => [
+                        'id' => $post->user->id,
+                        'name' => $post->user->name,
+                        'username' => $post->user->username,
+                        'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
+                    ],
+                    'media' => $post->media->map(fn ($media) => [
+                        'file_path' => $media->file_path,
+                        'file_type' => $media->file_type,
+                    ]),
+                    'hashtags' => $post->hashtags->map(fn ($tag) => [
+                        'id' => $tag->id,
+                        'hashtag' => $tag->hashtag,
+                    ]),
+                    'is_private' => $post->is_private,
+                    'likes_count' => $post->likes->count(),
+                    'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                    'favorites_count' => $post->favorites->count(),
+                    'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
+                    'comments_count' => $post->comments->count(),
+                    'is_reposted' => $currentUser ? $post->repostedByUsers->contains('id', $currentUser->id) : false,
+                    'reposts_count' => $post->repostedByUsers->count(),
+                    'reposted_by_you' => $currentUser && $post->repostedByUsers->contains('id', $currentUser->id),
+                    'reposted_by_user' => $post->repostedByUsers
+                        ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
+                ];
+            });
+
+        return Inertia::render('user/following-posts', [
+            'user' => $currentUser,
+            'posts' => $followingPosts,
+            'filters' => [
+                'sort' => $sort,
+            ],
+        ]);
+    }
+
+
+
+    public function friends(User $user): Response
+    {
+        $friends = $user->friends()
+            ->with('profileImage')
+            ->select('id', 'name', 'username')
+            ->get()
+            ->map(function ($friend) {
+                return [
+                    'id' => $friend->id,
+                    'name' => $friend->name,
+                    'username' => $friend->username,
+                    'profile_image_url' => $friend->profileImage ? $friend->profileImage->url : null,
+                ];
+            });
+
+        return Inertia::render('user/friends', [
+            'title' => 'Friends',
+            'users' => $friends,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+            ],
+        ]);
+    }
+
+    public function reposts(Request $request, User $user = null): Response
+    {
+        $currentUser = Auth::user();
+        $user = $user ?? $currentUser;
+
+        if (!$user) {
+            abort(404, 'User not found');
+        }
+
+        $sort = $request->input('sort', 'latest');
+
+        $repostedPostsQuery = Post::whereHas('repostedByUsers', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })
+            ->with(['user.profileImage', 'comments', 'likes', 'media', 'hashtags', 'favorites', 'repostedByUsers'])
+            ->where(function ($query) use ($currentUser) {
+                $query->where('is_private', 0)
+                    ->orWhere(function ($subQuery) use ($currentUser) {
+                        $subQuery->where('user_id', $currentUser->id)
+                            ->orWhereHas('user.followers', function ($followersQuery) use ($currentUser) {
+                                $followersQuery->where('follower_id', $currentUser->id);
+                            });
+                    });
+            });
+
+        $repostedPosts = match ($sort) {
+            'oldest' => $repostedPostsQuery->oldest()->get(),
+            'most_liked' => $repostedPostsQuery->get()->sortByDesc(fn($post) => $post->likes->count())->values(),
+            'reposted_friends' => $repostedPostsQuery->get()->filter(function ($post) use ($currentUser) {
+                return $currentUser->following->contains('id', $post->user_id);
+            })->values(),
+            default => $repostedPostsQuery->latest()->get(),
+        };
+
+        $posts = $repostedPosts->map(function ($post) use ($user, $currentUser) {
+            return [
+                'id' => $post->id,
+                'content' => $post->content,
+                'created_at' => $post->created_at->format('n/j/Y'),
+                'user' => [
+                    'id' => $post->user->id,
+                    'name' => $post->user->name,
+                    'username' => $post->user->username,
+                    'profile_image_url' => $post->user->profileImage?->url,
+                ],
+                'media' => $post->media->map(fn ($media) => [
+                    'file_path' => $media->file_path,
+                    'file_type' => $media->file_type,
+                ]),
+                'hashtags' => $post->hashtags->map(fn ($tag) => [
+                    'id' => $tag->id,
+                    'hashtag' => $tag->hashtag,
+                ]),
+                'is_private' => $post->is_private,
+                'likes_count' => $post->likes->count(),
+                'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
+                'favorites_count' => $post->favorites->count(),
+                'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
+                'comments_count' => $post->comments->count(),
+                'is_reposted' => $user->repostedPosts->contains($post->id),
+                'reposts_count' => $post->repostedByUsers->count(),
+                'reposted_by_you' => $currentUser && $post->repostedByUsers->contains('id', $currentUser->id),
+                'reposted_by_user' => $post->repostedByUsers
+                    ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
+            ];
+        });
+
+        return Inertia::render('user/reposts', [
+            'user' => [
+                'id' => $user->id,
+                'username' => $user->username,
+                'name' => $user->name,
+                'profile_image_url' => $user->profileImage?->url,
+            ],
+            'posts' => $posts,
+            'filters' => [
+                'sort' => $sort,
+            ],
+        ]);
+    }
+
+
+
 }

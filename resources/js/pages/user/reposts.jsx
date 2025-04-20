@@ -1,12 +1,12 @@
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, usePage, router } from '@inertiajs/react';
 import AppLayout from '../../layouts/app-layout';
 import PostComponent from '../post/post-component';
 
-export default function Favorites() {
+export default function Reposts() {
     const { user, posts, translations, filters } = usePage().props;
 
     const handleSortChange = (e) => {
-        router.get(route('user.favorites', { username: user.username }), {
+        router.get(route('user.reposts', { username: user.username }), {
             sort: e.target.value,
         }, {
             preserveScroll: true,
@@ -16,10 +16,10 @@ export default function Favorites() {
 
     return (
         <AppLayout>
-            <Head title={translations['Favorites']} />
+            <Head title={translations['Reposts']} />
 
             <div className="flex justify-between items-center p-6">
-                <h1 className="text-2xl font-extrabold">{translations['Favorites']}</h1>
+                <h1 className="text-2xl font-extrabold">{translations['Reposts']}</h1>
 
                 <select
                     className="ml-4 px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
@@ -37,7 +37,7 @@ export default function Favorites() {
                 {posts.length > 0 ? (
                     posts.map((post) => <PostComponent key={post.id} post={post} />)
                 ) : (
-                    <p className="text-gray-500 dark:text-gray-400 px-6 py-4">{translations['No favorite posts yet.']}</p>
+                    <p className="text-gray-500 dark:text-gray-400 px-6 py-4">{translations['No reposts yet.']}</p>
                 )}
             </div>
         </AppLayout>

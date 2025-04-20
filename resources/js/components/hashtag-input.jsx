@@ -1,52 +1,64 @@
-import { useState } from "react";
+import React, { useState, useImperativeHandle, forwardRef, useEffect } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { X } from 'lucide-react';
 
-export default function HashtagInput({ onChange }) {
-    const [input, setInput] = useState("");
-    const [hashtags, setHashtags] = useState([]);
-
-    const handleKeyDown = (e) => {
-        if (["Enter", ",", " "].includes(e.key)) {
-            e.preventDefault();
-            addTag(input.trim());
-        }
-    };
+export const HashtagInput = forwardRef(function HashtagInput({ onChange, placeholder, value = [] }, ref) {
+    const [input, setInput] = useState('');
 
     const addTag = (tag) => {
-        if (!tag) return;
-        const formatted = tag.startsWith("#") ? tag : `#${tag}`;
-        const lower = formatted.toLowerCase();
-
-        if (!hashtags.includes(lower)) {
-            const updated = [...hashtags, lower];
-            setHashtags(updated);
-            onChange(updated);
+        const clean = tag.trim().replace(/^#/, '');
+        if (clean && !value.includes(clean)) {
+            const newTags = [...value, clean];
+            onChange?.(newTags);
         }
-
-        setInput("");
     };
 
-    const removeTag = (tagToRemove) => {
-        const updated = hashtags.filter(tag => tag !== tagToRemove);
-        setHashtags(updated);
-        onChange(updated);
+    const removeTag = (index) => {
+        const newTags = value.filter((_, i) => i !== index);
+        onChange?.(newTags);
+    };
+
+    useImperativeHandle(ref, () => ({
+        reset: () => {
+            onChange?.([]);
+            setInput('');
+        },
+    }));
+
+    const handleKeyDown = (e) => {
+        if (['Enter', ' ', ','].includes(e.key)) {
+            e.preventDefault();
+            if (input.trim()) {
+                addTag(input);
+                setInput('');
+            }
+        }
     };
 
     return (
-        <div className="flex flex-wrap items-center gap-2 border p-2 rounded bg-gray-100 dark:bg-neutral-900">
-            {hashtags.map((tag, i) => (
-                <div key={i} className="bg-blue-200 text-blue-800 px-2 py-1 rounded flex items-center">
-                    {tag}
-                    <button onClick={() => removeTag(tag)} className="ml-2 text-red-500">&times;</button>
-                </div>
+        <div className="flex w-full flex-wrap items-center gap-2 rounded-md  bg-gray-100 p-1.5 text-neutral-900 transition-colors focus-within:ring-2 focus-within:ring-blue-500 dark:bg-neutral-900 dark:text-white dark:focus-within:ring-blue-600">
+            {value.map((tag, index) => (
+                <Badge
+                    key={index}
+                    variant="secondary"
+                    className="flex items-center gap-1 bg-zinc-200 px-2 py-1 text-sm text-black dark:bg-zinc-800 dark:text-white"
+                >
+                    #{tag}
+                    <button type="button" onClick={() => removeTag(index)} className="transition hover:text-red-500">
+                        <X className="h-3 w-3" />
+                    </button>
+                </Badge>
             ))}
-            <input
+            <Input
                 type="text"
                 value={input}
-                onChange={e => setInput(e.target.value)}
+                onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Add hashtags..."
-                className="flex-grow bg-transparent outline-none text-sm text-black dark:text-white"
+                placeholder={placeholder}
+                className="placeholder:text-muted-foreground flex-1 border-none bg-transparent text-sm text-black shadow-none outline-none dark:text-white"
             />
         </div>
     );
-}
+});
+

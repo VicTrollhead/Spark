@@ -17,19 +17,6 @@ class UserPolicy
             : Response::deny('You can only update your own profile.');
     }
 
-//    public function view(User $currentUser = null, User $user) : Response
-//    {
-//        if (!$user->is_private) {
-//            return Response::allow();
-//        }
-//
-//        if ($currentUser && ($currentUser->id === $user->id || $user->followers()->where('follower_id', $currentUser->id)->exists())) {
-//            return Response::allow();
-//        }
-//
-//        return Response::deny('This account is private.');
-//    }
-
     public function view(?User $currentUser, User $user): bool
     {
         if (!$user->is_private) {

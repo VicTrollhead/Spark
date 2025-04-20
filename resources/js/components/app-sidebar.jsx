@@ -9,70 +9,62 @@ import {
     SidebarMenuButton,
     SidebarSeparator
 } from './ui/sidebar';
-import { Link, router, usePage } from '@inertiajs/react';
-import { Bookmark, BookOpen, Folder, Home, LogOut, Mail, Settings, User, Users } from 'lucide-react';
+import { Link, router, useForm, usePage } from '@inertiajs/react';
+import { Bookmark, BookOpen, Folder, Home, LogOut, Mail, Repeat, Settings, User, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useMobileNavigation } from '../hooks/use-mobile-navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx';
 import { useInitials } from '@/hooks/use-initials.jsx';
 
 export function AppSidebar() {
-    const { auth } = usePage().props;
+    const { auth, translations } = usePage().props;
     const user = auth?.user;
-    const getInitials = useInitials();
+    const { post } = useForm();
 
     if (!user) return null;
 
     const mainNavItems = [
         {
-            title: 'Dashboard',
+            title: translations['Dashboard'],
             url: '/dashboard',
             icon: Home,
         },
         {
-            title: 'Friends',
+            title: translations['Friends'],
             url: `/user/${user.username}/friends`,
             icon: Users,
         },
         {
-            title: 'All users',
+            title: translations['All users'],
             url: '/dashboard/users',
             icon: Users,
         },
         {
-            title: 'Notifications',
+            title: translations['Notifications'],
             url: '#',
             icon: Mail,
         },
         {
-            title: 'Favorites',
+            title: translations['Favorites'],
             url: '/user/favorites',
             icon: Bookmark,
         },
         {
-            title: 'Profile',
+            title: translations['Reposts'],
+            url: '/user/reposts',
+            icon: Repeat,
+        },
+        {
+            title: translations['Profile'],
             url: user.username ? `/user/${user.username}` : '/user',
             icon: User,
         },
         {
-            title: 'Settings',
+            title: translations['Settings'],
             url: '/settings/profile',
             icon: Settings,
         },
     ];
-
-    const footerNavItems = [
-        {
-            title: 'Repository',
-            url: 'https://github.com/VicTrollhead/Spark',
-            icon: Folder,
-        },
-    ];
-
-    const handleLogout = () => {
-        router.post(`/logout`);
-        window.location.href = "/login";
-    };
 
     return (
         <Sidebar
@@ -84,7 +76,6 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent className="-mt-2">
-
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 
@@ -93,15 +84,15 @@ export function AppSidebar() {
                 <a className="flex cursor-pointer" href="https://github.com/VicTrollhead/Spark">
                     <SidebarMenuButton size="lg" className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group cursor-pointer">
                         <Folder/>
-                        Repository
+                        {translations['Repository']}
                     </SidebarMenuButton>
                 </a>
                 <SidebarMenuButton
-                    onClick={handleLogout}
+                    onClick={() => post(route('logout'))}
                     size="lg"
                     className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group cursor-pointer">
                     <LogOut/>
-                    Log out
+                    {translations['Log out']}
                 </SidebarMenuButton>
             </SidebarFooter>
         </Sidebar>

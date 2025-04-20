@@ -7,6 +7,7 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\RepostController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -20,14 +21,17 @@ Route::post('/api/auth/google/callback', [GoogleAuthController::class, 'callback
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [PostController::class, 'index'])->name('dashboard');
     Route::get('dashboard/users', [UserController::class, 'users'])->name('dashboard.users');
+    Route::get('/users-list', [UserController::class, 'usersList'])->name('users.list');
 
     Route::get('/user/favorites', [UserController::class, 'favorites'])->name('user.favorites');
     Route::get('/user/liked', [UserController::class, 'liked'])->name('user.liked');
+    Route::get('/user/reposts', [UserController::class, 'reposts'])->name('user.reposts');
     Route::get('/user/following-posts', [UserController::class, 'followingPosts'])->name('user.followingPosts');
     Route::get('/user', [UserController::class, 'show'])->name('user.show');
     Route::get('/user/{user}/edit', [UserController::class, 'edit'])->name('user.edit');
     Route::patch('/user/{user}/update', [UserController::class, 'update'])->name('user.update');
     Route::get('/user/{user}', [UserController::class, 'show'])->name('user.show');
+    Route::get('/user/search/{searchText}', [UserController::class, 'search'])->name('user.search');
 
 
     Route::post('/user/{user}/follow', [FollowController::class, 'follow'])->name('user.follow');
@@ -35,11 +39,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/is-following/{user}', [FollowController::class, 'isFollowing'])->name('isFollowing');
     Route::get('/user/{user}/followers', [FollowController::class, 'followers'])->name('user.followers');
     Route::get('/user/{user}/following', [FollowController::class, 'following'])->name('user.following');
-    Route::get('/user/{user}/friends', [FollowController::class, 'friends'])->name('user.friends');
+    Route::get('/user/{user}/friends', [UserController::class, 'friends'])->name('user.friends');
+
 
     Route::post('/dashboard', [PostController::class, 'store'])->name('posts.store');
     Route::get('/post/{post}', [PostController::class, 'show'])->name('post.show');
-    Route::delete('/posts/{post}', [PostController::class, 'destroy']);
+    Route::delete('/post/{post}', [PostController::class, 'destroy']);
+    Route::get('/popular-hashtags', [PostController::class, 'popularHashtags'])->name('popularHashtags');
+    Route::get('/posts-by-hashtag/{hashtag}', [PostController::class, 'postsByHashtag'])->name('postsByHashtag');
 
     Route::post('/post/{post}/like', [LikeController::class, 'like'])->name('post.like');
     Route::post('/post/{post}/unlike', [LikeController::class, 'unlike'])->name('post.unlike');
@@ -52,10 +59,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/post/{post}/comment', [CommentController::class, 'store'])->name('post.comment');
     Route::post('/comment/{comment}/delete', [CommentController::class, 'destroy'])->name('comment.delete');
 
+    Route::post('/post/{post}/repost', [RepostController::class, 'repost']);
+    Route::post('/post/{post}/undo', [RepostController::class, 'undo']);
 
-
-
-
+    Route::get('/post/{post}/edit', [PostController::class, 'edit'])->name('post.edit');
+    Route::patch('/post/{post}/update', [PostController::class, 'update'])->name('post.update');
 
 });
 

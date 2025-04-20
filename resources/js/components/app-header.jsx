@@ -19,11 +19,13 @@ import { Input } from '@/components/ui/input.jsx';
 import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu.jsx';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx';
 import { useInitials } from '@/hooks/use-initials.jsx';
+import AppearanceToggle from '@/components/appearance-toggle.jsx';
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
 export function AppHeader({ breadcrumbs = [] }) {
     const page = usePage();
+    const { translations } = usePage().props;
     const { auth } = page.props;
     const user = auth?.user;
     const getInitials = useInitials();
@@ -31,66 +33,74 @@ export function AppHeader({ breadcrumbs = [] }) {
 
     const mainNavItems = [
         {
-            title: 'News',
+            title: translations['News'],
             url: '/dashboard',
         },
         {
-            title: 'Following',
+            title: translations['Following'],
             url: `/user/following-posts`,
         },
         {
-            title: 'Liked',
+            title: translations['Liked'],
             url: '/user/liked',
         },
     ];
 
     const sideBarNavItems = [
         {
-            title: 'Dashboard',
+            title: translations['Dashboard'],
             url: '/dashboard',
             icon: Home,
         },
         {
-            title: 'Following',
+            title: translations['Following'],
             url: `/user/following-posts`,
             icon: List,
         },
         {
-            title: 'Liked posts',
+            title: translations['Liked'],
             url: '/user/liked',
             icon: FolderHeart,
         },
         {
-            title: 'Friends',
+            title: translations['Friends'],
             url: `/user/${user.username}/friends`,
             icon: Users,
         },
         {
-            title: 'All users',
+            title: translations['All users'],
             url: '/dashboard/users',
             icon: Users,
         },
         {
-            title: 'Notifications',
+            title: translations['Notifications'],
             url: '#',
             icon: Mail,
         },
         {
-            title: 'Favourites',
+            title: translations['Favorites'],
             url: '/user/favorites',
             icon: Bookmark,
         },
         {
-            title: 'Profile',
+            title: translations['Profile'],
             url: user.username ? `/user/${user.username}` : '/user',
             icon: User,
         },
         {
-            title: 'Settings',
+            title: translations['Settings'],
             url: '/settings/profile',
             icon: Settings,
         },
     ];
+
+    const onKeyDownSearch = async (e) => {
+        if (e.code === 'Enter') {
+            const searchText = e.currentTarget.value;
+            router.get(`/user/search/${searchText}`, { sort: 'newest' }, { preserveScroll: true });
+        }
+    };
+
     const handleLogout = () => {
         router.post(`/logout`);
         window.location.href = "/login";
@@ -103,7 +113,7 @@ export function AppHeader({ breadcrumbs = [] }) {
                     <div className="lg:hidden">
                         <Sheet>
                             <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" className="mr-2 my-4 h-9 w-9 hover:bg-gray-300 dark:hover:bg-gray-800">
+                                <Button variant="ghost" size="icon" className="mr-2 my-4 h-9 w-9 hover:bg-neutral-300 dark:hover:bg-neutral-800">
                                     <Menu className="h-6 w-6"/>
                                 </Button>
                             </SheetTrigger>
@@ -119,29 +129,29 @@ export function AppHeader({ breadcrumbs = [] }) {
                                                 </AvatarFallback>
                                             </Avatar>
                                         </Link>
-                                        <div className="ml-2">
+                                        <Link href={user.username ? `/user/${user.username}` : '/user'} prefetch className="ml-2">
                                             <h1 className="text-1l ml-1 font-bold text-gray-900 dark:text-white">{user.name}</h1>
                                             <p className="text-gray-500 dark:text-gray-400">@{user.username}</p>
-                                        </div>
+                                        </Link>
                                     </div>
                                 </SheetHeader>
                                 <div className="mt-4 flex h-full flex-1 flex-col ">
                                     <div className="flex h-full flex-col justify-between text-sm">
                                         <div className="flex flex-col space-y-4">
                                             {sideBarNavItems.map((item) => (
-                                                <Link key={item.title} href={item.url} className="flex items-center space-x-2 ">
+                                                <Link key={item.title + item.url} href={item.url} className="flex items-center space-x-2 ">
                                                     {item.icon && <Icon iconNode={item.icon} className="h-5 w-5"/>}
                                                     <span>{item.title}</span>
                                                 </Link>))}
                                            <DropdownMenuSeparator className="mb-5"/>
                                             <a className="flex items-center space-x-2 " href="https://github.com/VicTrollhead/Spark">
                                                 <Folder className="h-5 w-5"/>
-                                                <span>Repository</span>
+                                                <span>{translations['Repository']}</span>
                                             </a>
                                             <p onClick={handleLogout}
                                                 className="flex items-center space-x-2 cursor-pointer">
                                                 <LogOut className="h-5 w-5 mr-2"/>
-                                                Log out
+                                                {translations['Log out']}
                                             </p>
                                         </div>
                                     </div>
@@ -150,9 +160,12 @@ export function AppHeader({ breadcrumbs = [] }) {
                         </Sheet>
                     </div>
 
-                    <Link href="/dashboard" prefetch className="flex items-center space-x-2 w-1/6">
-                        <AppLogo />
-                    </Link>
+                    <div className="flex items-center space-x-2 w-1/6">
+                        <Link href="/dashboard" prefetch>
+                            <AppLogo />
+                        </Link>
+                        <AppearanceToggle className="justify-center ml-4 p-2.5"/>
+                    </div>
 
                     {/* Desktop Navigation */}
                     <div className="hidden w-full h-full items-center justify-around lg:flex">
@@ -172,7 +185,7 @@ export function AppHeader({ breadcrumbs = [] }) {
                         <div className="relative flex items-center space-x-1">
                             <div className="flex items-center space-x-3">
                                 <Search className="size-1/8 opacity-80 group-hover:opacity-100"/>
-                                <Input placeholder="Search" className="w-full" />
+                                <Input placeholder={translations['Search users']} className="w-full" onKeyDown={onKeyDownSearch}  />
                             </div>
                         </div>
                     </div>

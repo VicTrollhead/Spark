@@ -1,11 +1,12 @@
-import { Link, useForm, router } from '@inertiajs/react';
-import { Heart, MessageCircle, EyeOff, Bookmark } from 'lucide-react';
-import { useState } from 'react';
+import { Link, router, useForm, usePage } from '@inertiajs/react';
+import { Bookmark, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 
 export default function PostComponent({ post }) {
     const { post: sendPost, processing } = useForm();
+    const { auth, translations } = usePage().props;
     const getInitials = useInitials();
 
     const [isLiked, setIsLiked] = useState(post.is_liked);
@@ -14,6 +15,29 @@ export default function PostComponent({ post }) {
     const [isFavorited, setIsFavorited] = useState(post.is_favorited);
     const [favoritesCount, setFavoritesCount] = useState(post.favorites_count);
 
+    const [isReposted, setIsReposted] = useState(post.is_reposted);
+    const [repostsCount, setRepostsCount] = useState(post.reposts_count);
+
+    const [showOptions, setShowOptions] = useState(false);
+    const optionsRef = useRef(null);
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (optionsRef.current && !optionsRef.current.contains(event.target)) {
+                setShowOptions(false);
+            }
+        }
+
+        if (showOptions) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showOptions]);
+
+    const toggleOptions = () => setShowOptions(prev => !prev);
 
     const handleLike = async () => {
         setIsLiked(!isLiked);
@@ -28,7 +52,7 @@ export default function PostComponent({ post }) {
                     setIsLiked(post.is_liked);
                     setLikesCount(post.likes_count);
                 },
-            }
+            },
         );
     };
 
@@ -45,12 +69,39 @@ export default function PostComponent({ post }) {
                     setIsFavorited(post.is_favorited);
                     setFavoritesCount(post.favorites_count);
                 },
+            },
+        );
+    };
+
+    const handleRepost = async () => {
+        if (post.is_private || post.user.is_private) {
+            alert(translations['You cannot repost private posts.']);
+            return;
+        }
+        setIsReposted(!isReposted);
+        setRepostsCount(isReposted ? repostsCount - 1 : repostsCount + 1);
+
+        await router.post(
+            isReposted ? `/post/${post.id}/undo` : `/post/${post.id}/repost`,
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setRepostsCount(isReposted ? repostsCount - 1 : repostsCount + 1);
+                    setIsReposted(!isReposted);
+                },
+                onError: (error) => {
+                    console.error("Repost error:", error);
+                    setIsReposted(post.is_reposted);
+                    setRepostsCount(post.reposts_count);
+                },
             }
         );
     };
 
+
     return (
-        <div className="border-b border-gray-200 p-4 dark:border-gray-800">
+        <div className="relative border-b border-gray-200 p-4 dark:border-gray-800">
             <div className="flex items-start space-x-3">
                 <Avatar className="h-16 w-16">
                     <AvatarImage src={post.user.profile_image_url} alt={post.user.name} />
@@ -60,24 +111,104 @@ export default function PostComponent({ post }) {
                 </Avatar>
 
                 <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                        <Link href={`/user/${post.user.username}`} className="font-semibold text-gray-900 hover:underline dark:text-white">
-                            {post.user.name}
-                        </Link>
-                        <span className="text-sm text-gray-500">{post.created_at}</span>
+                    {post.reposted_by_you && (
+                        <div className="mb-2 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <Repeat className="h-4 w-4" />
+                            Reposted by you
+                        </div>
+                    )}
 
+                    {!post.reposted_by_you && post.reposted_by_user && (
+                        <div className="mb-2 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <Repeat className="h-4 w-4" />
+                            Last reposted by
+                            <Link
+                                href={`/user/${post.reposted_by_user.username}`}
+                                className="ml-1 hover:underline text-blue-500"
+                            >
+                                {post.reposted_by_user.name}
+                            </Link>
+                        </div>
+                    )}
+
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Link href={`/user/${post.user.username}`} className="font-semibold text-gray-900 hover:underline dark:text-white">
+                                {post.user.name}
+                            </Link>
+                            <span className="text-sm text-gray-500">{post.created_at}</span>
+                        </div>
+
+                        {post.user.id === auth.user.id && (
+                            <div className="relative" ref={optionsRef}>
+                                <EllipsisVertical
+                                    className="h-6 w-6 cursor-pointer text-gray-500 hover:text-gray-700 dark:text-white dark:hover:text-gray-300"
+                                    onClick={toggleOptions}
+                                />
+
+                                {showOptions && (
+                                    <div className="absolute right-0 z-50 mt-1 min-w-[160px] rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-neutral-800">
+                                        <button
+                                            onClick={() => router.get(`/post/${post.id}/edit`)}
+                                            className="block w-full rounded-t-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600">
+                                            {translations['Edit']}
+                                        </button>
+                                        <button
+                                            onClick={() => router.delete(`/post/${post.id}`)}
+                                            className="block w-full rounded-b-lg px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-neutral-600"
+                                        >
+                                            {translations['Delete']}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
+
                     <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username}</p>
-                    <p className="mt-1 text-gray-700 dark:text-gray-300">{post.content}</p>
+                    <p className="mt-1 text-lg text-gray-700 dark:text-gray-300">{post.content}</p>
+
+                    {post.media.length > 0 && (
+                        <div className="mt-2 grid grid-cols-1 gap-3 py-1 sm:grid-cols-2">
+                            {post.media.map((file, index) => {
+                                const uniqueKey = `${post.id}-${file.id ?? file.file_path ?? index}`;
+                                return file.file_type === 'image' ? (
+                                    <div key={uniqueKey} className="relative w-full overflow-hidden rounded-lg border dark:border-gray-700 flex items-center justify-center">
+                                        <img
+                                            src={`/storage/${file.file_path}`}
+                                            alt="Post Media"
+                                            className=" object-contain transition-transform duration-300 hover:scale-102"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div key={uniqueKey} className="relative w-full overflow-hidden rounded-lg border dark:border-gray-700">
+                                        <video controls className="h-auto w-full rounded-lg object-contain">
+                                            <source src={`/storage/${file.file_path}`} type="video/mp4" />
+                                        </video>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    {post.hashtags?.length > 0 && (
+                        <div className="mt-0.5 flex flex-wrap gap-x-1 text-[16px] break-all">
+                            {post.hashtags.map((hashtag) => (
+                                <Link key={hashtag.id} href={`/posts-by-hashtag/${hashtag.hashtag}`} className="text-blue-500 hover:underline">
+                                    #{hashtag.hashtag}
+                                </Link>
+                            ))}
+                        </div>
+                    )}
 
                     <div className="mt-3 flex items-center gap-3 text-gray-500 dark:text-gray-400">
                         <button
                             onClick={handleLike}
                             disabled={processing}
-                            className={`flex items-center gap-1 ${post.is_liked ? 'text-red-500' : 'hover:text-red-500'}`}
+                            className={`flex items-center gap-1 ${isLiked ? 'text-red-500' : 'hover:text-red-500'}`}
                         >
                             <Heart className="h-5 w-5" />
-                            <span>{post.likes_count}</span>
+                            <span>{likesCount}</span>
                         </button>
 
                         <Link href={`/post/${post.id}`} className="flex items-center gap-1 hover:text-blue-500">
@@ -88,14 +219,24 @@ export default function PostComponent({ post }) {
                         <button
                             onClick={handleFavorite}
                             disabled={processing}
-                            className={`flex items-center gap-1 ${post.is_favorited ? 'text-yellow-500' : 'hover:text-yellow-500'}`}
+                            className={`flex items-center gap-1 ${isFavorited ? 'text-yellow-500' : 'hover:text-yellow-500'}`}
                         >
                             <Bookmark className="h-5 w-5" />
-                            <span>{post.favorites_count}</span>
+                            <span>{favoritesCount}</span>
                         </button>
 
-                        {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
+                        {post.user.id !== auth.user.id && !post.is_private && !post.user.is_private && (
+                            <button
+                                onClick={handleRepost}
+                                disabled={processing}
+                                className={`flex items-center gap-1 ${isReposted ? 'text-green-500' : 'hover:text-green-500'}`}
+                            >
+                                <Repeat className="h-5 w-5" />
+                                <span>{repostsCount}</span>
+                            </button>
+                        )}
 
+                        {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
                     </div>
                 </div>
             </div>

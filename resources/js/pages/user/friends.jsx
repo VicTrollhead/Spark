@@ -3,30 +3,24 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar'
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
 export default function Friends() {
-    const { title, users, user, auth } = usePage().props;
+    const { users, user, auth, translations } = usePage().props;
     const getInitials = useInitials();
-    const isOwnProfile = auth.user && auth.user.id === user.id;
-
-    const breadcrumbs = [
-        { title: isOwnProfile ? 'My Profile' : "@" + user.username + "'s Profile", href: `/user/${user.username}` },
-        { title:  'Friends', href: `/user/${user.username}` },
-    ];
 
     const handleFollow = (user) => {
         router.post(`/user/${user.username}/unfollow`, {}, {
             onSuccess: () => {
-                router.reload({ only: ['posts'] });
+                router.reload({ only: ['users'] });
             }
         });
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={isOwnProfile ? 'Friends' : user.name + "'s Friends"} />
+        <AppLayout>
+            <Head title={translations['Friends']} />
             <div className="max-w-lg p-6">
-                <h1 className="mb-4 text-2xl font-bold">{title}</h1>
+                <h1 className="mb-4 text-2xl font-bold">{translations['Friends']}</h1>
                 {users.length === 0 ? (
-                    <p className="text-gray-500">Not friends anyone yet.</p>
+                    <p className="text-gray-500">{translations['Not friends anyone yet.']}</p>
                 ) : (
                     <ul>
                         {users.map((user) => (
@@ -47,7 +41,7 @@ export default function Friends() {
                                     <button
                                         onClick={() => handleFollow(user)}
                                         className={`ml-auto px-4 py-2 rounded-md bg-gray-600 hover:bg-gray-500 text-white dark:bg-gray-800 dark:hover:bg-gray-700`}>
-                                        Unfollow
+                                        {translations['Unfollow']}
                                     </button>
                                 </div>
                             </li>

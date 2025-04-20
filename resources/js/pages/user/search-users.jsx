@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { Head, usePage, Link, router } from '@inertiajs/react';
-import AppLayout from '../layouts/app-layout';
-import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-import { useInitials } from '../hooks/use-initials';
-import { RefreshCw } from 'lucide-react';
+import AppLayout from '../../layouts/app-layout';
+import { RefreshCw, Search } from 'lucide-react';
+import { useInitials } from '../../hooks/use-initials.jsx';
+import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar.jsx';
+import { Input } from '../../components/ui/input.jsx';
 
-export default function Dashboard() {
-    const { users, sort, translations } = usePage().props;
+export default function SearchUsers() {
+    const { users, sort, searchText, translations } = usePage().props;
     const [sortOption, setSortOption] = useState(sort || 'latest');
+    const [searchTextOption, setSearchTextOption] = useState(searchText || '');
+    const [usersList, setUsersList] = useState(users || []);
     const getInitials = useInitials();
 
     const [isLoading, setIsLoading] = useState(false);
@@ -15,25 +18,54 @@ export default function Dashboard() {
     const handleSortChange = (e) => {
         const selectedSort = e.target.value;
         setSortOption(selectedSort);
-        router.get('/dashboard/users', { sort: selectedSort }, { preserveScroll: true });
+        if (!searchTextOption) {
+            setUsersList([]);
+            return;
+        }
+        router.get(`/user/search/${searchTextOption}`, { sort: selectedSort }, { preserveScroll: true });
+    };
+
+    const onKeyDownSearch = async (e) => {
+        if (e.code === 'Enter') {
+            const searchText = e.currentTarget.value;
+            setSearchTextOption(searchText);
+            if (!searchText) {
+                setUsersList([]);
+                return;
+            }
+            router.get(`/user/search/${searchTextOption}`, { sort: `${sortOption}` }, { preserveScroll: true });
+        }
     };
 
     const handleReload = () => {
         setIsLoading(true);
-        router.reload({ only: ['posts'] });
+        if(searchTextOption)
+            router.reload({ only: ['users'] });
         setTimeout(() => {
+            if (searchTextOption)
+                setUsersList(users);
             setIsLoading(false);
         }, 1000);
     };
 
     return (
         <AppLayout>
-            <Head title={translations["All users"]} />
+            <Head title={translations['Search users']} />
 
             <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-2xl font-bold mr-2">{translations["All users"]}</h1>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 w-full flex-wrap md:flex-nowrap">
+                        <div className="flex items-center space-x-3 w-full">
+                            <Search className="size-10 opacity-80 group-hover:opacity-100"/>
+                            <Input
+                                placeholder={translations['Search users by name or username']}
+                                className="w-full"
+                                value={searchTextOption}
+                                onChange={(e) => setSearchTextOption(e.target.value)}
+                                onKeyDown={onKeyDownSearch}
+                            />
+                        </div>
+
                         <select
                             value={sortOption}
                             onChange={handleSortChange}
@@ -59,9 +91,9 @@ export default function Dashboard() {
 
                 </div>
 
-                {users.length > 0 ? (
+                {usersList.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {users.map((user) => (
+                        {usersList.map((user) => (
                             <Link
                                 key={user.id}
                                 href={`/user/${user.username}`}
@@ -78,13 +110,14 @@ export default function Dashboard() {
                                         <h2 className="text-lg font-semibold truncate">{user.name}</h2>
                                         <p className="text-sm text-gray-500 dark:text-gray-400 truncate">@{user.username}</p>
                                     </div>
+
                                 </div>
                             </Link>
                         ))}
                     </div>
                 ) : (
                     <p className="text-gray-500 dark:text-gray-400 px-6 py-4 text-center">
-                        {translations['No users found for this sorting option.']}
+                        {translations['No users found.']}
                     </p>
                 )}
             </div>
