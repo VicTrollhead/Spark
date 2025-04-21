@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCommentRequest;
 use App\Models\Post;
+use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -46,6 +47,15 @@ class CommentController extends Controller
             'parent_comment_id' =>  $request['parent_comment_id'],
             'content' => $request['content'],
         ]);
+
+        if ($post->user_id !== Auth::id()) {
+            NotificationService::create([
+                'user_id' => $post->user_id,
+                'source_user_id' => Auth::id(),
+                'type' => 'comment',
+                'post_id' => $post->id,
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Comment added successfully.');
     }
