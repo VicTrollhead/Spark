@@ -96,5 +96,6 @@ return [
     "Update" => "Update",
     "followers_count" => "{1} Follower|[2,*] Followers",
     "following_count" => "{1} Following|[2,*] Followings",
+    "No notifications yet." => "No notifications yet.",
 ];
 

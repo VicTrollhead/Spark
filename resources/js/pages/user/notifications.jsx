@@ -8,6 +8,7 @@ import { useInitials } from '../../hooks/use-initials';
 export default function Notifications() {
     const { auth, notifications, translations } = usePage().props;
     const getInitials = useInitials();
+    console.log(notifications);
     const renderUserLink = (username, name) => (
         <a
             href={`/user/${username}`}
@@ -45,7 +46,7 @@ export default function Notifications() {
             case 'comment':
                 return (
                     <>
-                        {renderUserLink(username, name)} commented on your post: {renderPostLink(post.id)}.
+                        {renderUserLink(username, name)} commented on your post: <div className="text-sm">"{notification.extra_data}"</div>
                     </>
                 );
             case 'follow':

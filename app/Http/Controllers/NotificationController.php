@@ -27,29 +27,29 @@ class NotificationController extends Controller
             $post = $notification->post;
 
             return [
-                'id'         => $notification->id,
-                'type'       => $notification->type,
-                'is_read'    => $notification->is_read,
+                'id' => $notification->id,
+                'type' => $notification->type,
+                'is_read' => $notification->is_read,
                 'created_at' => $notification->created_at->diffForHumans(),
 
                 'source_user' => $notification->sourceUser
                     ? [
-                        'id'                => $notification->sourceUser->id,
-                        'name'              => $notification->sourceUser->name,
-                        'username'          => $notification->sourceUser->username,
+                        'id' => $notification->sourceUser->id,
+                        'name' => $notification->sourceUser->name,
+                        'username' => $notification->sourceUser->username,
                         'profile_image_url' => $notification->sourceUser->profileImage?->url,
                     ]
                     : null,
 
                 'post' => $post
                     ? [
-                        'id'      => $post->id,
+                        'id' => $post->id,
                         'content' => $post->content,
 
                         'user' => [
-                            'id'                => $post->user->id,
-                            'name'              => $post->user->name,
-                            'username'          => $post->user->username,
+                            'id' => $post->user->id,
+                            'name' => $post->user->name,
+                            'username' => $post->user->username,
                             'profile_image_url' => $post->user->profileImage?->url,
                         ],
 
@@ -65,17 +65,13 @@ class NotificationController extends Controller
         });
 
         return Inertia::render('user/notifications', [
-            'user'          => [
-                'id'                => $currentUser->id,
-                'name'              => $currentUser->name,
-                'username'          => $currentUser->username,
+            'user' => [
+                'id' => $currentUser->id,
+                'name' => $currentUser->name,
+                'username' => $currentUser->username,
                 'profile_image_url' => $currentUser->profileImage?->url,
             ],
             'notifications' => $formattedNotifications,
-            'translations'  => [
-                'Notifications'      => 'Notifications',
-                'No notifications yet.' => 'No notifications yet.',
-            ],
         ]);
     }
 

@@ -54,6 +54,7 @@ class CommentController extends Controller
                 'source_user_id' => Auth::id(),
                 'type' => 'comment',
                 'post_id' => $post->id,
+                'extra_data' => $request['content'],
             ]);
         }
 
