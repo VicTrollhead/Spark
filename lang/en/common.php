@@ -96,5 +96,7 @@ return [
     "Update" => "Update",
     "followers_count" => "{1} Follower|[2,*] Followers",
     "following_count" => "{1} Following|[2,*] Followings",
+    "Write..." => "Write...",
+    "Everyone chat" => "Everyone chat",
 ];
 

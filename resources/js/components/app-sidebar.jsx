@@ -5,16 +5,11 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
-    SidebarMenu,
     SidebarMenuButton,
     SidebarSeparator
 } from './ui/sidebar';
-import { Link, router, useForm, usePage } from '@inertiajs/react';
-import { Bookmark, BookOpen, Folder, Home, LogOut, Mail, Repeat, Settings, User, Users } from 'lucide-react';
-import AppLogo from './app-logo';
-import { useMobileNavigation } from '../hooks/use-mobile-navigation';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx';
-import { useInitials } from '@/hooks/use-initials.jsx';
+import { useForm, usePage } from '@inertiajs/react';
+import { Bookmark, Folder, Home, LogOut, Mail, Settings, User, Users, Repeat, MessagesSquareIcon  } from 'lucide-react';
 
 export function AppSidebar() {
     const { auth, translations } = usePage().props;
@@ -28,6 +23,11 @@ export function AppSidebar() {
             title: translations['Dashboard'],
             url: '/dashboard',
             icon: Home,
+        },
+        {
+            title: translations['Everyone chat'],
+            url: `/chat`,
+            icon: MessagesSquareIcon,
         },
         {
             title: translations['Friends'],

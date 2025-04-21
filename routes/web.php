@@ -2,6 +2,7 @@
 
 //use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\FollowController;
@@ -69,6 +70,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/post/{post}/edit', [PostController::class, 'edit'])->name('post.edit');
     Route::patch('/post/{post}/update', [PostController::class, 'update'])->name('post.update');
 
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::post('/message', [ChatController::class, 'message'])->name('chat.message');
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+
+    // Отправка сообщения в чат
+    Route::post('/message/{userId}', [ChatController::class, 'sendMessage'])->name('chat.sendMessage');
+
+    // Получение всех сообщений в чате
+    Route::get('/chat/{chatId}/messages', [ChatController::class, 'getMessages'])->name('chat.getMessages');
+
+    // Получение всех чатов пользователя
+    Route::get('/user-chats', [ChatController::class, 'getUserChats'])->name('chat.getUserChats');
 });
 
 

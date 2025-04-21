@@ -9,7 +9,7 @@ import {
     Home, List,
     LogOut,
     Mail,
-    Menu, Search,
+    Menu, MessagesSquareIcon, Repeat, Search,
     Settings,
     User,
     Users
@@ -63,6 +63,11 @@ export function AppHeader({ breadcrumbs = [] }) {
             icon: FolderHeart,
         },
         {
+            title: translations['Everyone chat'],
+            url: `/chat`,
+            icon: MessagesSquareIcon,
+        },
+        {
             title: translations['Friends'],
             url: `/user/${user.username}/friends`,
             icon: Users,
@@ -81,6 +86,11 @@ export function AppHeader({ breadcrumbs = [] }) {
             title: translations['Favorites'],
             url: '/user/favorites',
             icon: Bookmark,
+        },
+        {
+            title: translations['Reposts'],
+            url: '/user/reposts',
+            icon: Repeat,
         },
         {
             title: translations['Profile'],
