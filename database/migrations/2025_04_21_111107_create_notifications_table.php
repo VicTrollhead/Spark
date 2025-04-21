@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('source_user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('post_id')->nullable()->constrained()->onDelete('cascade');
             $table->enum('type', ['like', 'repost', 'follow', 'comment', 'mention', 'favorite']);
-            $table->json('extra_data')->nullable();
+            $table->string('extra_data',100)->nullable();
             $table->boolean('is_read')->default(false);
             $table->timestamps();
         });

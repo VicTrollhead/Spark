@@ -98,5 +98,6 @@ return [
     "following_count" => "{1} Following|[2,*] Followings",
     "Write..." => "Write...",
     "Everyone chat" => "Everyone chat",
+    "No notifications yet." => "No notifications yet.",
 ];
 
