@@ -41,7 +41,7 @@ export function AppSidebar() {
         },
         {
             title: translations['Notifications'],
-            url: '#',
+            url: '/user/notifications',
             icon: Mail,
         },
         {

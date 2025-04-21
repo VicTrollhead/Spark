@@ -101,12 +101,12 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Post::class, 'likes', 'user_id', 'post_id');
     }
 
-    public function reposts()
+    public function reposts() : HasMany
     {
         return $this->hasMany(Repost::class);
     }
 
-    public function repostedPosts()
+    public function repostedPosts() : BelongsToMany
     {
         return $this->belongsToMany(Post::class, 'reposts');
     }
@@ -123,4 +123,15 @@ class User extends Authenticatable implements MustVerifyEmail
             'followee_id'
         );
     }
+
+    public function notifications() : HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function sentNotifications() : HasMany
+    {
+        return $this->hasMany(Notification::class, 'source_user_id');
+    }
+
 }

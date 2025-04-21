@@ -29,7 +29,7 @@ export default function Liked() {
                     <option value="latest">{translations['Latest']}</option>
                     <option value="oldest">{translations['Oldest']}</option>
                     <option value="most_liked">{translations['Most Liked']}</option>
-                    <option value="reposted_friends">{translations['People I Follow']}</option>
+                    <option value="following">{translations['People I Follow']}</option>
                 </select>
             </div>
 

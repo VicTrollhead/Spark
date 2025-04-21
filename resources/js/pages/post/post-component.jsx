@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 
-export default function PostComponent({ post }) {
+export default function PostComponent({ post, compact = false }) {
     const { post: sendPost, processing } = useForm();
     const { auth, translations } = usePage().props;
     const getInitials = useInitials();
@@ -37,7 +37,7 @@ export default function PostComponent({ post }) {
         };
     }, [showOptions]);
 
-    const toggleOptions = () => setShowOptions(prev => !prev);
+    const toggleOptions = () => setShowOptions((prev) => !prev);
 
     const handleLike = async () => {
         setIsLiked(!isLiked);
@@ -91,17 +91,15 @@ export default function PostComponent({ post }) {
                     setIsReposted(!isReposted);
                 },
                 onError: (error) => {
-                    console.error("Repost error:", error);
                     setIsReposted(post.is_reposted);
                     setRepostsCount(post.reposts_count);
                 },
-            }
+            },
         );
     };
 
-
     return (
-        <div className="relative border-b border-gray-200 p-4 dark:border-gray-800">
+        <div className={`relative ${compact ? 'border rounded-lg p-3 bg-muted/30' : 'border-b p-4'} border-gray-200 dark:border-gray-800`}>
             <div className="flex items-start space-x-3">
                 <Avatar className="h-16 w-16">
                     <AvatarImage src={post.user.profile_image_url} alt={post.user.name} />
@@ -112,22 +110,24 @@ export default function PostComponent({ post }) {
 
                 <div className="flex-1">
                     {post.reposted_by_you && (
-                        <div className="mb-2 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        <div className="mb-2 flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                             <Repeat className="h-4 w-4" />
                             Reposted by you
                         </div>
                     )}
 
-                    {!post.reposted_by_you && post.reposted_by_user && (
-                        <div className="mb-2 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                    {!post.reposted_by_you && post.reposted_by_recent?.length > 0 && (
+                        <div className="mb-2 flex flex-wrap items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                             <Repeat className="h-4 w-4" />
-                            Last reposted by
-                            <Link
-                                href={`/user/${post.reposted_by_user.username}`}
-                                className="ml-1 hover:underline text-blue-500"
-                            >
-                                {post.reposted_by_user.name}
-                            </Link>
+                            Reposted by
+                            {post.reposted_by_recent.map((user, index) => (
+                                <span key={user.id} className="ml-1 flex items-center">
+                                    <Link href={`/user/${user.username}`} className="text-blue-500 hover:underline">
+                                        {user.name}
+                                    </Link>
+                                    {index < post.reposted_by_recent.length - 1 && <span>,&nbsp;</span>}
+                                </span>
+                            ))}
                         </div>
                     )}
 
@@ -150,7 +150,8 @@ export default function PostComponent({ post }) {
                                     <div className="absolute right-0 z-50 mt-1 min-w-[160px] rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-neutral-800">
                                         <button
                                             onClick={() => router.get(`/post/${post.id}/edit`)}
-                                            className="block w-full rounded-t-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600">
+                                            className="block w-full rounded-t-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600"
+                                        >
                                             {translations['Edit']}
                                         </button>
                                         <button
@@ -165,19 +166,22 @@ export default function PostComponent({ post }) {
                         )}
                     </div>
 
-                    <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username}</p>
-                    <p className="mt-1 text-lg text-gray-700 dark:text-gray-300">{post.content}</p>
+                    {!compact && <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username}</p>}
+                    <p className={`mt-1 ${compact ? 'text-sm' : 'text-lg'} text-gray-700 dark:text-gray-300`}>{post.content}</p>
 
                     {post.media.length > 0 && (
                         <div className="mt-2 grid grid-cols-1 gap-3 py-1 sm:grid-cols-2">
                             {post.media.map((file, index) => {
                                 const uniqueKey = `${post.id}-${file.id ?? file.file_path ?? index}`;
                                 return file.file_type === 'image' ? (
-                                    <div key={uniqueKey} className="relative w-full overflow-hidden rounded-lg border dark:border-gray-700 flex items-center justify-center">
+                                    <div
+                                        key={uniqueKey}
+                                        className="relative flex w-full items-center justify-center overflow-hidden rounded-lg border dark:border-gray-700"
+                                    >
                                         <img
                                             src={`/storage/${file.file_path}`}
                                             alt="Post Media"
-                                            className=" object-contain transition-transform duration-300 hover:scale-102"
+                                            className="object-contain transition-transform duration-300 hover:scale-102"
                                         />
                                     </div>
                                 ) : (
@@ -201,43 +205,45 @@ export default function PostComponent({ post }) {
                         </div>
                     )}
 
-                    <div className="mt-3 flex items-center gap-3 text-gray-500 dark:text-gray-400">
-                        <button
-                            onClick={handleLike}
-                            disabled={processing}
-                            className={`flex items-center gap-1 ${isLiked ? 'text-red-500' : 'hover:text-red-500'}`}
-                        >
-                            <Heart className="h-5 w-5" />
-                            <span>{likesCount}</span>
-                        </button>
-
-                        <Link href={`/post/${post.id}`} className="flex items-center gap-1 hover:text-blue-500">
-                            <MessageCircle className="h-5 w-5" />
-                            <span>{post.comments_count}</span>
-                        </Link>
-
-                        <button
-                            onClick={handleFavorite}
-                            disabled={processing}
-                            className={`flex items-center gap-1 ${isFavorited ? 'text-yellow-500' : 'hover:text-yellow-500'}`}
-                        >
-                            <Bookmark className="h-5 w-5" />
-                            <span>{favoritesCount}</span>
-                        </button>
-
-                        {post.user.id !== auth.user.id && !post.is_private && !post.user.is_private && (
+                    {!compact && (
+                        <div className="mt-3 flex items-center gap-3 text-gray-500 dark:text-gray-400">
                             <button
-                                onClick={handleRepost}
+                                onClick={handleLike}
                                 disabled={processing}
-                                className={`flex items-center gap-1 ${isReposted ? 'text-green-500' : 'hover:text-green-500'}`}
+                                className={`flex items-center gap-1 ${isLiked ? 'text-red-500' : 'hover:text-red-500'}`}
                             >
-                                <Repeat className="h-5 w-5" />
-                                <span>{repostsCount}</span>
+                                <Heart className="h-5 w-5" />
+                                <span>{likesCount}</span>
                             </button>
-                        )}
 
-                        {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
-                    </div>
+                            <Link href={`/post/${post.id}`} className="flex items-center gap-1 hover:text-blue-500">
+                                <MessageCircle className="h-5 w-5" />
+                                <span>{post.comments_count}</span>
+                            </Link>
+
+                            <button
+                                onClick={handleFavorite}
+                                disabled={processing}
+                                className={`flex items-center gap-1 ${isFavorited ? 'text-yellow-500' : 'hover:text-yellow-500'}`}
+                            >
+                                <Bookmark className="h-5 w-5" />
+                                <span>{favoritesCount}</span>
+                            </button>
+
+                            {post.user.id !== auth.user.id && !post.is_private && !post.user.is_private && (
+                                <button
+                                    onClick={handleRepost}
+                                    disabled={processing}
+                                    className={`flex items-center gap-1 ${isReposted ? 'text-green-500' : 'hover:text-green-500'}`}
+                                >
+                                    <Repeat className="h-5 w-5" />
+                                    <span>{repostsCount}</span>
+                                </button>
+                            )}
+
+                            {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

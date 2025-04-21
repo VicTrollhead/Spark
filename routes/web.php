@@ -6,6 +6,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\RepostController;
 use App\Http\Controllers\UserController;
@@ -27,11 +28,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/user/liked', [UserController::class, 'liked'])->name('user.liked');
     Route::get('/user/reposts', [UserController::class, 'reposts'])->name('user.reposts');
     Route::get('/user/following-posts', [UserController::class, 'followingPosts'])->name('user.followingPosts');
+    Route::get('/user/notifications', [NotificationController::class, 'index'])->name('notification.index');
     Route::get('/user', [UserController::class, 'show'])->name('user.show');
     Route::get('/user/{user}/edit', [UserController::class, 'edit'])->name('user.edit');
     Route::patch('/user/{user}/update', [UserController::class, 'update'])->name('user.update');
+
     Route::get('/user/{user}', [UserController::class, 'show'])->name('user.show');
     Route::get('/user/search/{searchText}', [UserController::class, 'search'])->name('user.search');
+
 
 
     Route::post('/user/{user}/follow', [FollowController::class, 'follow'])->name('user.follow');

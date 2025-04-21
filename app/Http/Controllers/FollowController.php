@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -37,6 +38,12 @@ class FollowController extends Controller
         Follow::create([
             'follower_id' => $followerId,
             'followee_id' => $followeeId,
+        ]);
+
+        NotificationService::create([
+            'user_id' => $followeeId,
+            'source_user_id' => $followerId,
+            'type' => 'follow',
         ]);
 
         return back()->with('success', 'Followed successfully.');

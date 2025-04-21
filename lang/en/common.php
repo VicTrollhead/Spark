@@ -80,7 +80,6 @@ return [
     "Deactivated" => "Deactivated",
     "Cancel" => "Cancel",
     "Save Changes" => "Save Changes",
-    "Reposts" => "Reposts",
     "You cannot repost private posts." => "You cannot repost private posts.",
     "Edit" => "Edit",
     "Delete" => "Delete",
