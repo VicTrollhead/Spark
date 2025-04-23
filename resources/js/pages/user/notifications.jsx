@@ -8,7 +8,6 @@ import { useInitials } from '../../hooks/use-initials';
 export default function Notifications() {
     const { auth, notifications, translations } = usePage().props;
     const getInitials = useInitials();
-    console.log(notifications);
     const renderUserLink = (username, name) => (
         <Link
             href={`/user/${username}`}

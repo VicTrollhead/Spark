@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('type', ['like', 'repost', 'follow', 'comment', 'mention', 'favorite']);
             $table->string('extra_data',100)->nullable();
             $table->boolean('is_read')->default(false);
+            $table->foreignId('comment_id')->nullable()->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

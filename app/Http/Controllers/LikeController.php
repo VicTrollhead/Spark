@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\Post;
 use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
@@ -16,9 +17,6 @@ use Illuminate\Validation\Rule;
 
 class LikeController extends Controller
 {
-    /**
-     * Like a post.
-     */
     public function like(Post $post): RedirectResponse
     {
         Like::firstOrCreate([
@@ -38,10 +36,6 @@ class LikeController extends Controller
         return back()->with('success', 'Post liked successfully.');
     }
 
-
-    /**
-     * Unlike a post.
-     */
     public function unlike(Post $post): RedirectResponse
     {
         Like::where([
@@ -49,13 +43,15 @@ class LikeController extends Controller
             'post_id' => $post->id,
         ])->delete();
 
+        Notification::where('type', 'like')
+            ->where('source_user_id', Auth::id())
+            ->where('post_id', $post->id)
+            ->where('user_id', $post->user_id)
+            ->delete();
+
         return back()->with('success', 'Post unliked successfully.');
     }
 
-
-    /**
-     * Check if the authenticated user has liked a post.
-     */
     public function isLiked(Post $post, Request $request)
     {
         $userId = Auth::id();

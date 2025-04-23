@@ -14,6 +14,7 @@ class NotificationService
             'type'           => $data['type'],
             'post_id'        => $data['post_id'] ?? null,
             'extra_data'     => $data['extra_data'] ?? null,
+            'comment_id'     => $data['comment_id'] ?? null,
         ]);
     }
 }

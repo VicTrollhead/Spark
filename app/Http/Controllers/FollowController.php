@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
@@ -15,9 +16,6 @@ use Illuminate\Validation\Rule;
 
 class FollowController extends Controller
 {
-    /**
-     * Follow a user.
-     */
     public function follow(User $user): RedirectResponse
     {
         $followerId = Auth::id();
@@ -49,9 +47,6 @@ class FollowController extends Controller
         return back()->with('success', 'Followed successfully.');
     }
 
-    /**
-     * Unfollow a user.
-     */
     public function unfollow(User $user): RedirectResponse
     {
         $followerId = Auth::id();
@@ -62,15 +57,17 @@ class FollowController extends Controller
             ->delete();
 
         if ($deleted) {
+            Notification::where('type', 'follow')
+                ->where('source_user_id', $followerId)
+                ->where('user_id', $followeeId)
+                ->delete();
+
             return back()->with('success', 'Unfollowed successfully.');
         }
 
         return back()->with('error', 'You are not following this user.');
     }
 
-    /**
-     * Check if the authenticated user is following another user.
-     */
     public function isFollowing(User $user)
     {
         $followerId = Auth::id();

@@ -37,6 +37,17 @@ export default function PostComponent({ post, compact = false }) {
         };
     }, [showOptions]);
 
+    useEffect(() => {
+        setIsLiked(post.is_liked);
+        setLikesCount(post.likes_count);
+
+        setIsFavorited(post.is_favorited);
+        setFavoritesCount(post.favorites_count);
+
+        setIsReposted(post.is_reposted);
+        setRepostsCount(post.reposts_count);
+    }, [post]);
+
     const toggleOptions = () => setShowOptions((prev) => !prev);
 
     const handleLike = async () => {
@@ -90,7 +101,7 @@ export default function PostComponent({ post, compact = false }) {
                     setRepostsCount(isReposted ? repostsCount - 1 : repostsCount + 1);
                     setIsReposted(!isReposted);
                 },
-                onError: () => {
+                onError: (error) => {
                     setIsReposted(post.is_reposted);
                     setRepostsCount(post.reposts_count);
                 },
@@ -99,34 +110,53 @@ export default function PostComponent({ post, compact = false }) {
     };
 
     return (
-        <div className={`relative ${compact ? 'border rounded-lg p-3 bg-muted/30' : 'border-b p-4'} border-gray-200 dark:border-gray-800`}>
-            <div className="flex items-start gap-3">
-                <Avatar className={compact ? 'h-10 w-10' : 'h-16 w-16'}>
+        <div className={`relative ${compact ? 'bg-muted/30 rounded-lg border p-3' : 'border-b p-4'} border-gray-200 dark:border-gray-800`}>
+            <div className="flex items-start space-x-3">
+                <Avatar className="h-16 w-16">
                     <AvatarImage src={post.user.profile_image_url} alt={post.user.name} />
                     <AvatarFallback className="rounded-full bg-gray-300 text-black dark:bg-gray-700 dark:text-white">
                         {getInitials(post.user.name)}
                     </AvatarFallback>
                 </Avatar>
 
-                <div className="flex-1 space-y-1">
-                    <div className="flex justify-between items-start">
-                        <div className="flex flex-col">
-                            <div className="flex items-center gap-2">
-                                <Link href={`/user/${post.user.username}`} className="font-semibold text-gray-900 hover:underline dark:text-white">
-                                    {post.user.name}
-                                </Link>
-                                <span className="text-sm text-gray-500">{post.created_at}</span>
-                            </div>
-                            {compact && (
-                                <p className="text-xs text-gray-500 dark:text-gray-400">@{post.user.username}</p>
-                            )}
+                <div className="flex-1">
+                    {post.reposted_by_you && (
+                        <div className="mb-2 flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                            <Repeat className="h-4 w-4" />
+                            Reposted by you
                         </div>
+                    )}
+
+                    {!post.reposted_by_you && post.reposted_by_recent?.length > 0 && (
+                        <div className="mb-2 flex flex-wrap items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                            <Repeat className="h-4 w-4" />
+                            Reposted by
+                            {post.reposted_by_recent.map((user, index) => (
+                                <span key={user.id} className="ml-1 flex items-center">
+                                    <Link href={`/user/${user.username}`} className="text-blue-500 hover:underline">
+                                        {user.name}
+                                    </Link>
+                                    {index < post.reposted_by_recent.length - 1 && <span>,&nbsp;</span>}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Link href={`/user/${post.user.username}`} className="font-semibold text-gray-900 hover:underline dark:text-white">
+                                {post.user.name}
+                            </Link>
+                            <span className="text-sm text-gray-500">{post.created_at}</span>
+                        </div>
+
                         {post.user.id === auth.user.id && (
                             <div className="relative" ref={optionsRef}>
                                 <EllipsisVertical
-                                    className="h-5 w-5 cursor-pointer text-gray-500 hover:text-gray-700 dark:text-white dark:hover:text-gray-300"
+                                    className="h-6 w-6 cursor-pointer text-gray-500 hover:text-gray-700 dark:text-white dark:hover:text-gray-300"
                                     onClick={toggleOptions}
                                 />
+
                                 {showOptions && (
                                     <div className="absolute right-0 z-50 mt-1 min-w-[160px] rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-neutral-800">
                                         <button
@@ -147,32 +177,11 @@ export default function PostComponent({ post, compact = false }) {
                         )}
                     </div>
 
-                    {post.reposted_by_you && (
-                        <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-                            <Repeat className="h-4 w-4" />
-                            Reposted by you
-                        </div>
-                    )}
-
-                    {!post.reposted_by_you && post.reposted_by_recent?.length > 0 && (
-                        <div className="flex flex-wrap items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-                            <Repeat className="h-4 w-4" />
-                            Reposted by
-                            {post.reposted_by_recent.map((user, index) => (
-                                <span key={user.id} className="ml-1 flex items-center">
-                                    <Link href={`/user/${user.username}`} className="text-blue-500 hover:underline">
-                                        {user.name}
-                                    </Link>
-                                    {index < post.reposted_by_recent.length - 1 && <span>,&nbsp;</span>}
-                                </span>
-                            ))}
-                        </div>
-                    )}
-
-                    <p className={`text-gray-700 dark:text-gray-300 ${compact ? 'text-[15px]' : 'text-[16px]'}`}>{post.content}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username}</p>
+                    <p className={`mt-1 ${compact ? 'text-sm' : 'text-lg'} text-gray-700 dark:text-gray-300`}>{post.content}</p>
 
                     {post.media.length > 0 && (
-                        <div className={`mt-2 grid gap-2 ${compact ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
+                        <div className="mt-2 grid grid-cols-1 gap-3 py-1 sm:grid-cols-2">
                             {post.media.map((file, index) => {
                                 const uniqueKey = `${post.id}-${file.id ?? file.file_path ?? index}`;
                                 return file.file_type === 'image' ? (
@@ -183,7 +192,7 @@ export default function PostComponent({ post, compact = false }) {
                                         <img
                                             src={`/storage/${file.file_path}`}
                                             alt="Post Media"
-                                            className="object-contain transition-transform duration-300 hover:scale-101"
+                                            className="object-contain transition-transform duration-300 hover:scale-102"
                                         />
                                     </div>
                                 ) : (
@@ -198,7 +207,7 @@ export default function PostComponent({ post, compact = false }) {
                     )}
 
                     {post.hashtags?.length > 0 && (
-                        <div className="mt-1 flex flex-wrap gap-x-1 text-sm break-all">
+                        <div className="mt-0.5 flex flex-wrap gap-x-1 text-[16px] break-all">
                             {post.hashtags.map((hashtag) => (
                                 <Link key={hashtag.id} href={`/posts-by-hashtag/${hashtag.hashtag}`} className="text-blue-500 hover:underline">
                                     #{hashtag.hashtag}

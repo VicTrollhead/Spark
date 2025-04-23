@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\Post;
 use App\Models\Repost;
 use App\Services\NotificationService;
@@ -36,6 +37,12 @@ class RepostController extends Controller
             'user_id' => Auth::id(),
             'post_id' => $post->id,
         ])->delete();
+
+        Notification::where('type', 'repost')
+            ->where('source_user_id', Auth::id())
+            ->where('post_id', $post->id)
+            ->where('user_id', $post->user_id)
+            ->delete();
 
         return back()->with('success', 'Repost removed successfully.');
     }

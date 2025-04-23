@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Favorite;
+use App\Models\Notification;
 use App\Models\Post;
 use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
@@ -11,9 +12,6 @@ use Illuminate\Support\Facades\Auth;
 
 class FavoriteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function addFavorite(Post $post): RedirectResponse
     {
         Favorite::firstOrCreate([
@@ -33,15 +31,17 @@ class FavoriteController extends Controller
         return back()->with('success', 'Post liked successfully.');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function removeFavorite(Post $post): RedirectResponse
     {
         Favorite::where([
             'user_id' => Auth::id(),
             'post_id' => $post->id,
         ])->delete();
+
+        Notification::where('type', 'favorite')
+            ->where('source_user_id', Auth::id())
+            ->where('post_id', $post->id)
+            ->delete();
 
         return back()->with('success', 'Post unliked successfully.');
     }
