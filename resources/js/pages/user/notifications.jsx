@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, usePage, Link } from '@inertiajs/react';
 import AppLayout from '../../layouts/app-layout';
 import PostComponent from '../post/post-component';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
@@ -10,20 +10,20 @@ export default function Notifications() {
     const getInitials = useInitials();
     console.log(notifications);
     const renderUserLink = (username, name) => (
-        <a
+        <Link
             href={`/user/${username}`}
             className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
         >
-            {name}
-        </a>
+            {name} (@{username})
+        </Link>
     );
     const renderPostLink = (postId) => (
-        <a
+        <Link
             href={`/post/${postId}`}
             className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
         >
             View Post
-        </a>
+        </Link>
     );
     const renderMessage = (notification) => {
         const { type, source_user, post } = notification;
@@ -89,7 +89,7 @@ export default function Notifications() {
                         return (
                             <div
                                 key={notification.id + notification.created_at}
-                                className="flex items-start gap-4 px-6 py-5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all rounded-lg"
+                                className="flex items-start gap-4 px-6 py-5 hover:bg-gray-50 dark:hover:bg-neutral-900 transition-all rounded-lg"
                             >
                                 <div className="flex items-center gap-3">
                                     {post?.user ? (
@@ -120,12 +120,12 @@ export default function Notifications() {
                                     )}
                                 </div>
                                 {post && post.user && (
-                                    <a
+                                    <Link
                                         href={`/post/${post.id}`}
-                                        className=" hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg p-2 transition-all"
+                                        className=" hover:bg-gray-200 dark:hover:bg-neutral-800 rounded-lg p-2 transition-all"
                                     >
-                                        <ArrowRight className="text-gray-400 ml-auto" size={28} />
-                                    </a>
+                                        <ArrowRight className="text-gray-500 dark:text-gray-400 ml-auto" size={28} />
+                                    </Link>
                                 )}
 
                             </div>

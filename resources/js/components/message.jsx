@@ -57,7 +57,7 @@ export default function Message({ userId, message }) {
                                 <div className="flex items-center gap-2">
                                     <div className="grid flex-1 text-left leading-tight">
                                         <div>
-                                            <span className="truncate text-lg text-black dark:text-white">
+                                            <span className="truncate text-lg hover:underline text-black dark:text-white">
                                                 {message.user.name}
                                             </span>
                                         </div>

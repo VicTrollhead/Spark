@@ -74,13 +74,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/message', [ChatController::class, 'message'])->name('chat.message');
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
 
-    // Отправка сообщения в чат
     Route::post('/message/{userId}', [ChatController::class, 'sendMessage'])->name('chat.sendMessage');
-
-    // Получение всех сообщений в чате
     Route::get('/chat/{chatId}/messages', [ChatController::class, 'getMessages'])->name('chat.getMessages');
-
-    // Получение всех чатов пользователя
     Route::get('/user-chats', [ChatController::class, 'getUserChats'])->name('chat.getUserChats');
 });
 
