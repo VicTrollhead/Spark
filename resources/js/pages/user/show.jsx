@@ -1,5 +1,5 @@
 import { Head, usePage, Link, router } from '@inertiajs/react';
-import { Check, MapPin, Globe, Calendar, UserCheck, AlertCircle } from 'lucide-react';
+import { Check, MapPin, Globe, Calendar, UserCheck, AlertCircle, RefreshCw } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
@@ -10,7 +10,14 @@ export default function Show() {
     const { user, auth, posts, translations, filters, followers_string, following_string } = usePage().props;
     const getInitials = useInitials();
     const [sort, setSort] = useState(filters?.sort || 'latest');
-
+    const [isLoading, setIsLoading] = useState(false);
+    const handleReload = () => {
+        setIsLoading(true);
+        router.reload();
+        setTimeout(() => {
+            setIsLoading(false);
+        }, 1000);
+    };
     const handleFollow = () => {
         const route = user.is_following ? 'unfollow' : 'follow';
         router.post(`/user/${user.username}/${route}`, {}, {
@@ -177,22 +184,31 @@ export default function Show() {
             <div className="divide-y">
                 <div className="flex items-center justify-between px-6 py-3">
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{translations['Posts']}</h2>
-                    <select
-                        className="ml-4 px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
-                        value={sort}
-                        onChange={(e) => {
-                            setSort(e.target.value);
-                            router.get(window.location.pathname, { sort: e.target.value }, {
-                                preserveScroll: true,
-                                preserveState: true,
-                            });
-                        }}
-                    >
-                        <option value="latest">{translations['Latest']}</option>
-                        <option value="oldest">{translations['Oldest']}</option>
-                        <option value="most_liked">{translations['Most Liked']}</option>
-                        <option value="reposts">{translations['Reposts']}</option>
-                    </select>
+
+                    <div className="flex items-center gap-2">
+                        <select
+                            className="ml-4 px-3 py-1.5 border rounded-md dark:bg-neutral-900 dark:text-white"
+                            value={sort}
+                            onChange={(e) => {
+                                setSort(e.target.value);
+                                router.get(window.location.pathname, { sort: e.target.value }, {
+                                    preserveScroll: true,
+                                    preserveState: true,
+                                });
+                            }}
+                        >
+                            <option value="latest">{translations['Latest']}</option>
+                            <option value="oldest">{translations['Oldest']}</option>
+                            <option value="most_liked">{translations['Most Liked']}</option>
+                            <option value="reposts">{translations['Reposts']}</option>
+                        </select>
+                        <button
+                            onClick={handleReload}
+                            className="flex items-center rounded-md border p-2 text-sm font-semibold text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800"
+                        >
+                            <RefreshCw className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
+                        </button>
+                    </div>
                 </div>
 
                 <div className="divide-y divide-gray-200 dark:divide-gray-800">

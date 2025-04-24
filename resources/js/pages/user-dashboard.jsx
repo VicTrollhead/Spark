@@ -33,11 +33,11 @@ export default function Dashboard() {
             <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
                     <h1 className="text-2xl font-bold mr-2">{translations["All users"]}</h1>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2">
                         <select
                             value={sortOption}
                             onChange={handleSortChange}
-                            className="px-1 py-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
+                            className="ml-4 px-3 py-2 border rounded-md dark:bg-neutral-900 dark:text-white"
                         >
                             <option value="latest">{translations['Latest']}</option>
                             <option value="oldest">{translations['Oldest']}</option>
@@ -52,7 +52,7 @@ export default function Dashboard() {
                             className="p-2 text-sm font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition flex items-center"
                         >
                             <RefreshCw
-                                className={`w-6 h-6 ${isLoading ? 'animate-spin' : ''}`}
+                                className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`}
                             />
                         </button>
                     </div>
