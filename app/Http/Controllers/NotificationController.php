@@ -32,7 +32,10 @@ class NotificationController extends Controller
                 $query->where('is_read', true)->latest();
                 break;
             case 'unread':
+                $query->where('is_read', false)->latest();
+                break;
             default:
+                $query->latest();
                 $query->where('is_read', false)->latest();
                 break;
         }

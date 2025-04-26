@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,6 +17,7 @@ use Illuminate\Validation\Rule;
 
 class FollowController extends Controller
 {
+    use AuthorizesRequests;
     public function follow(User $user): RedirectResponse
     {
         $followerId = Auth::id();
@@ -36,6 +38,7 @@ class FollowController extends Controller
         Follow::create([
             'follower_id' => $followerId,
             'followee_id' => $followeeId,
+            'is_accepted' => !$user->is_private,
         ]);
 
         NotificationService::create([
@@ -85,6 +88,7 @@ class FollowController extends Controller
         $authUser = Auth::user();
 
         $followers = $user->followers()
+            ->wherePivot('is_accepted', true)
             ->with('profileImage')
             ->withCount('followers')
             ->get()
@@ -116,6 +120,7 @@ class FollowController extends Controller
         $authUser = Auth::user();
 
         $following = $user->following()
+            ->wherePivot('is_accepted', true)
             ->with('profileImage')
             ->withCount('followers')
             ->get()
@@ -140,6 +145,61 @@ class FollowController extends Controller
                 'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
             ],
         ]);
+    }
+
+    public function acceptRequest(Follow $follow)
+    {
+        $this->authorize('accept', $follow);
+
+        $follow->is_accepted = true;
+        $follow->save();
+
+        return back()->with('success', 'Follow request accepted.');
+    }
+
+    public function rejectRequest(Follow $follow)
+    {
+        $this->authorize('reject', $follow);
+
+        $follow->delete();
+
+        return back()->with('success', 'Follow request rejected.');
+    }
+
+    public function followRequests()
+    {
+        $user = Auth::user();
+
+        $requests = Follow::with('follower.profileImage')
+            ->where('followee_id', $user->id)
+            ->where('is_accepted', false)
+            ->get();
+
+        return Inertia::render('user/follow-requests', [
+            'requests' => $requests,
+        ]);
+    }
+
+    public function sendFollowRequest(User $user)
+    {
+        $authUser = auth()->user();
+
+        if ($user->id === $authUser->id) {
+            return back()->with('error', 'You cannot follow yourself.');
+        }
+
+        if ($authUser->pendingFollowRequests()->where('followee_id', $user->id)->where('is_accepted', 0)->exists()) {
+            return back()->with('error', 'Request already sent.');
+        }
+        
+        Notification::create([
+            'type' => 'follow_request',
+            'user_id' => $user->id,
+            'source_user_id' => $authUser->id,
+            'is_read' => false,
+        ]);
+
+        return back()->with('success', 'Follow request sent.');
     }
 
 

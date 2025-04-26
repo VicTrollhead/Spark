@@ -144,7 +144,10 @@ class UserController extends Controller
                 'following_count' => $user->following_count,
                 'is_following' => Auth::check() && $user->followers()->where('follower_id', Auth::id())->exists(),
                 'canViewFullProfile' => $canViewFullProfile,
-            ],
+                'has_sent_follow_request' => Auth::check() && auth()->user()->pendingFollowRequests()->where('followee_id', $user->id)->where('is_accepted', 0)->exists(),
+
+
+        ],
             'posts' => $posts,
             'filters' => [
                 'sort' => $sort,

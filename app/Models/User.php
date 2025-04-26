@@ -134,4 +134,9 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Notification::class, 'source_user_id');
     }
 
+    public function pendingFollowRequests(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'follows', 'followee_id', 'follower_id')
+            ->wherePivot('is_accepted', false);
+    }
 }

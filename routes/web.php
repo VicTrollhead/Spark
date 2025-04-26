@@ -39,6 +39,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/user/{user}/follow', [FollowController::class, 'follow'])->name('user.follow');
     Route::post('/user/{user}/unfollow', [FollowController::class, 'unfollow'])->name('user.unfollow');
+    Route::post('/user/{user}/follow-request', [FollowController::class, 'sendFollowRequest'])->name('follow.request');
     Route::get('/is-following/{user}', [FollowController::class, 'isFollowing'])->name('isFollowing');
     Route::get('/user/{user}/followers', [FollowController::class, 'followers'])->name('user.followers');
     Route::get('/user/{user}/following', [FollowController::class, 'following'])->name('user.following');
