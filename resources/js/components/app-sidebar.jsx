@@ -10,11 +10,27 @@ import {
 } from './ui/sidebar';
 import { useForm, usePage } from '@inertiajs/react';
 import { Bookmark, Folder, Home, LogOut, Mail, Settings, User, Users, Repeat, MessagesSquareIcon  } from 'lucide-react';
+import {useEffect, useState} from "react";
 
 export function AppSidebar() {
     const { auth, translations } = usePage().props;
     const user = auth?.user;
     const { post } = useForm();
+    const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+
+    useEffect(() => {
+        const fetchUnreadCount = async () => {
+            try {
+                const response = await fetch('/notifications/unread-count');
+                const data = await response.json();
+                setUnreadNotificationsCount(data.unread_count);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchUnreadCount();
+    }, []);
 
     if (!user) return null;
 
@@ -43,6 +59,7 @@ export function AppSidebar() {
             title: translations['Notifications'],
             url: '/user/notifications',
             icon: Mail,
+            count: unreadNotificationsCount,
         },
         {
             title: translations['Favorites'],
