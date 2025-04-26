@@ -13,3 +13,11 @@ Broadcast::channel('channel_for_everyone', function ($user) {
 Broadcast::channel('chat.{chatId}', function ($user, $chatId) {
     return $user->chats()->where('chat_id', $chatId)->exists();
 });
+
+Broadcast::channel('notifications.{userId}', function ($user, $userId) {
+    return (int) $user->id === (int) $userId;
+});
+
+Broadcast::channel('post.{postId}', function ($user, $postId) {
+    return true;
+});
