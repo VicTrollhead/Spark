@@ -69,7 +69,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::post('/message', [ChatController::class, 'message'])->name('chat.message');
-    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
 
     Route::post('/message/{userId}', [ChatController::class, 'sendMessage'])->name('chat.sendMessage');
     Route::get('/chat/{chatId}/messages', [ChatController::class, 'getMessages'])->name('chat.getMessages');

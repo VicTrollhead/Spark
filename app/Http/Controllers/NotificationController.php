@@ -12,7 +12,7 @@ class NotificationController extends Controller
     {
         $currentUser = Auth::user();
 
-        $sort = $request->get('sort', 'latest');
+        $sort = $request->get('sort', 'unread');
 
         $query = Notification::with([
             'post.user.profileImage',
@@ -26,15 +26,15 @@ class NotificationController extends Controller
             case 'oldest':
                 $query->oldest();
                 break;
+            case 'latest':
+                $query->latest();
+                break;
             case 'read':
                 $query->where('is_read', true)->latest();
                 break;
             case 'unread':
-                $query->where('is_read', false)->latest();
-                break;
-            case 'latest':
             default:
-                $query->latest();
+                $query->where('is_read', false)->latest();
                 break;
         }
 
