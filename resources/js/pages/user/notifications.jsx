@@ -2,7 +2,7 @@ import { Head, usePage, router } from '@inertiajs/react';
 import AppLayout from '../../layouts/app-layout';
 import {RefreshCw} from 'lucide-react';
 import { useState } from 'react';
-import {Notification} from "@/components/notification.jsx";
+import {Notification} from "../../components/notification.jsx";
 
 export default function Notifications() {
     const { notifications, translations } = usePage().props;

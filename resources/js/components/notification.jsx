@@ -1,5 +1,5 @@
 import React from 'react';
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar.jsx";
+import {Avatar, AvatarFallback, AvatarImage} from "../components/ui/avatar.jsx";
 import {Link, router, usePage} from "@inertiajs/react";
 import {ArrowRight, Heart, Repeat, Bookmark, Users, MessageSquare, Eye, EyeClosed, EyeOff} from "lucide-react";
 import {useInitials} from "../hooks/use-initials.jsx";
