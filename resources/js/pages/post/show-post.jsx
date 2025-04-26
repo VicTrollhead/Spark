@@ -279,7 +279,7 @@ export default function Show() {
                 </select>
             </div>
             <div className="mt-2 px-6">
-                <div className="divide-y divide-gray-200 dark:divide-gray-800">
+                <div className="divide-y divide-gray-200 dark:divide-neutral-800">
                     {post.comments.length > 0 ? (
                         post.comments.map((comment) => (
                             <div key={comment.id } className="py-4 flex items-center space-x-3">

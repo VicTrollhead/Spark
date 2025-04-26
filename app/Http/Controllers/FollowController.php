@@ -191,12 +191,18 @@ class FollowController extends Controller
         if ($authUser->pendingFollowRequests()->where('followee_id', $user->id)->where('is_accepted', 0)->exists()) {
             return back()->with('error', 'Request already sent.');
         }
-        
+
+        Follow::create([
+            'follower_id' => $authUser->id,
+            'followee_id' => $user->id,
+            'is_accepted' => false,
+        ]);
+
         Notification::create([
-            'type' => 'follow_request',
-            'user_id' => $user->id,
+            'type'           => 'follow_request',
+            'user_id'        => $user->id,
             'source_user_id' => $authUser->id,
-            'is_read' => false,
+            'is_read'        => false,
         ]);
 
         return back()->with('success', 'Follow request sent.');

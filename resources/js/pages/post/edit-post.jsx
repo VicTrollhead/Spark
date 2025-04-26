@@ -28,11 +28,8 @@ export default function EditPost() {
         formData.append('is_private', data.is_private ? '1' : '0');
         formData.append('_method', 'PATCH');
 
-        // console.log("Removed media paths:", removedMediaPaths);
-
         removedMediaPaths.forEach(path => {
             formData.append('remove_media[]', path);
-            // console.log("Adding to formData:", path);
         });
 
         data.hashtags.forEach(tag => {
@@ -85,7 +82,7 @@ export default function EditPost() {
                             value={data.content}
                             onChange={(e) => setData('content', e.target.value)}
                             rows={5}
-                            className={`w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                            className={`w-full rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                                 errors.content ? 'border-red-500' : ''
                             }`}
                         />
@@ -104,13 +101,13 @@ export default function EditPost() {
                                                 <img
                                                     src={`/storage/${m.file_path}`}
                                                     alt=""
-                                                    className="h-40 w-full object-contain bg-gray-100 dark:bg-gray-800"
+                                                    className="h-40 w-full object-contain bg-gray-100 dark:bg-neutral-800"
                                                 />
                                             ) : (
                                                 <video
                                                     src={`/storage/${m.file_path}`}
                                                     controls
-                                                    className="h-40 w-full object-contain bg-gray-100 dark:bg-gray-800"
+                                                    className="h-40 w-full object-contain bg-gray-100 dark:bg-neutral-800"
                                                 />
                                             )}
 

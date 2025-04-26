@@ -41,7 +41,7 @@ class ChatController extends Controller
             ->values();
 
 
-        return Inertia::render('chat', [
+        return Inertia::render('chat/everyone-chat', [
             'user' => [
                 'id' => $user->id,
                 'username' => $user->username,

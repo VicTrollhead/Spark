@@ -29,7 +29,6 @@ export default function Show() {
         });
     };
 
-
     const handleEditProfile = () => {
         router.get(`/user/${user.username}/edit`);
     };
@@ -215,7 +214,7 @@ export default function Show() {
                     </div>
                 </div>
 
-                <div className="divide-y divide-gray-200 dark:divide-gray-800">
+                <div className="divide-y divide-gray-200 dark:divide-neutral-800">
                     {posts.length > 0 ? (
                         posts.map((post) => (
                             <PostComponent key={post.id} post={post} user={user} auth={auth} />

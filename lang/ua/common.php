@@ -105,6 +105,7 @@ return [
     "Read" => "Прочитано",
     "Unread" => "Непрочитано",
     "Mark all as read" => "Позначити всі як прочитані",
+    "Mark all as unread" => "Mark all as unread",
     "Someone" => "Аноним",
     "liked your post." => "лайкнув ваш пост.",
     "reposted your post." => "репостнув ваш пост.",

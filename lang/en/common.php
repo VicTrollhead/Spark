@@ -105,6 +105,7 @@ return [
     "Read" => "Read",
     "Unread" => "Unread",
     "Mark all as read" => "Mark all as read",
+    "Mark all as unread" => "Mark all as unread",
     "Someone" => "Someone",
     "liked your post." => "liked your post.",
     "reposted your post." => "reposted your post.",

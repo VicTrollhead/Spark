@@ -135,7 +135,7 @@ export function Notification({ notification }) {
             {post && post.user && (
                 <Link
                     href={`/post/${post.id}`}
-                    className="text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 rounded-lg p-2 transition-all my-auto"
+                    className="text-gray-700 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-200 rounded-lg p-2 transition-all my-auto"
                 >
                     <ArrowRight className="ml-auto" size={28}/>
                 </Link>

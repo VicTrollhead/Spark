@@ -28,17 +28,32 @@ export default function Notifications() {
                 <h1 className="text-2xl font-extrabold text-gray-800 dark:text-white">
                     {translations['Notifications']}
                 </h1>
-                <div className="flex justify-between items-centerak gap-2">
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => router.patch(route('notifications.markAllAsRead'), {}, { preserveScroll: true })}
+                        className="px-3 py-1 border rounded-md text-sm text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800 dark:bg-neutral-900"
+                    >
+                        {translations['Mark all as read']}
+                    </button>
+
+                    <button
+                        onClick={() => router.patch(route('notifications.markAllAsUnread'), {}, { preserveScroll: true })}
+                        className="px-3 py-1 border rounded-md text-sm text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800 dark:bg-neutral-900"
+                    >
+                        {translations['Mark all as unread']}
+                    </button>
+
                     <select
                         value={sort}
                         onChange={(e) => handleSortChange(e.target.value)}
-                        className="ml-4 px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
+                        className="ml-2 px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
                     >
                         <option value="latest">{translations['Latest']}</option>
                         <option value="oldest">{translations['Oldest']}</option>
                         <option value="read">{translations['Read']}</option>
                         <option value="unread">{translations['Unread']}</option>
                     </select>
+
                     <button
                         onClick={handleReload}
                         className="flex items-center rounded-md border p-2 text-sm font-semibold text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800"
@@ -46,9 +61,10 @@ export default function Notifications() {
                         <RefreshCw className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
                     </button>
                 </div>
+
             </div>
 
-            <div className="divide-y divide-gray-200 dark:divide-gray-800 -mt-2">
+            <div className="divide-y divide-gray-200 dark:divide-neutral-800 -mt-2">
                 {notifications.length > 0 ? (
                     notifications.map((notification) => <Notification key={notification.id + notification.created_at} notification={notification}/>)
                 ) : (

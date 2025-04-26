@@ -123,6 +123,20 @@ class NotificationController extends Controller
         ]);
     }
 
+    public function markAllAsRead()
+    {
+        $user = Auth::user();
+        Notification::where('user_id', $user->id)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
 
+        return back();
+    }
+
+    public function markAllAsUnread()
+    {
+        Auth::user()->notifications()->update(['is_read' => false]);
+        return back();
+    }
 }
 

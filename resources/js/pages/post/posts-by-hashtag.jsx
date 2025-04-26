@@ -11,7 +11,7 @@ export default function PostsByHashtag() {
 
             <div className="p-6 text-2xl font-extrabold">{`${translations['Posts by hashtag']}  `}<span className="text-blue-500">{`#${hashtag.hashtag}`}</span></div>
 
-            <div className="divide-y divide-gray-200 dark:divide-gray-800">
+            <div className="divide-y divide-gray-200 dark:divide-neutral-800">
                 {posts.length > 0 ? (
                     posts.map((post) => <PostComponent key={post.id} post={post} />)
                 ) : (
