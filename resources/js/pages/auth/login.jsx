@@ -62,7 +62,7 @@ export default function Login({ status, canResetPassword, googleClientId }) {
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-5">
                     <div id="g_id_onload"
-                         data-client_id={googleClientId}
+                         data-client_id={googleClientId || '980020201753-diubrb4qni06ji66kvfpvem23bfcgiur.apps.googleusercontent.com'}
                          data-callback="handleCredentialResponse">
                     </div>
                     <div className="g_id_signin" data-type="standard"></div>

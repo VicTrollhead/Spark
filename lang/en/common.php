@@ -99,8 +99,18 @@ return [
     "Write..." => "Write...",
     "Everyone chat" => "Everyone chat",
     "No notifications yet." => "No notifications yet.",
+    "User chats" => "User chats",
+    "No reposts yet." => "No reposts yet.",
+    "No user chats yet." => "No user chats yet.",
     "Read" => "Read",
     "Unread" => "Unread",
     "Mark all as read" => "Mark all as read",
+    "Someone" => "Someone",
+    "liked your post." => "liked your post.",
+    "reposted your post." => "reposted your post.",
+    "commented on your post:" => "commented on your post:",
+    "followed to you." => "followed to you.",
+    "favorited your post." => "favorited your post.",
+    "interacted with you." => "interacted with you.",
 ];
 
