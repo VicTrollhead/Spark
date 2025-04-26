@@ -29,7 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/user/liked', [UserController::class, 'liked'])->name('user.liked');
     Route::get('/user/reposts', [UserController::class, 'reposts'])->name('user.reposts');
     Route::get('/user/following-posts', [UserController::class, 'followingPosts'])->name('user.followingPosts');
-    Route::get('/user/notifications', [NotificationController::class, 'index'])->name('notification.index');
+    Route::get('/user/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('/user', [UserController::class, 'show'])->name('user.show');
     Route::get('/user/{user}/edit', [UserController::class, 'edit'])->name('user.edit');
     Route::patch('/user/{user}/update', [UserController::class, 'update'])->name('user.update');
@@ -37,15 +37,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/user/{user}', [UserController::class, 'show'])->name('user.show');
     Route::get('/user/search/{searchText}', [UserController::class, 'search'])->name('user.search');
 
-
-
     Route::post('/user/{user}/follow', [FollowController::class, 'follow'])->name('user.follow');
     Route::post('/user/{user}/unfollow', [FollowController::class, 'unfollow'])->name('user.unfollow');
     Route::get('/is-following/{user}', [FollowController::class, 'isFollowing'])->name('isFollowing');
     Route::get('/user/{user}/followers', [FollowController::class, 'followers'])->name('user.followers');
     Route::get('/user/{user}/following', [FollowController::class, 'following'])->name('user.following');
     Route::get('/user/{user}/friends', [UserController::class, 'friends'])->name('user.friends');
-
 
     Route::post('/dashboard', [PostController::class, 'store'])->name('posts.store');
     Route::get('/post/{post}', [PostController::class, 'show'])->name('post.show');
@@ -77,6 +74,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/message/{userId}', [ChatController::class, 'sendMessage'])->name('chat.sendMessage');
     Route::get('/chat/{chatId}/messages', [ChatController::class, 'getMessages'])->name('chat.getMessages');
     Route::get('/user-chats', [ChatController::class, 'getUserChats'])->name('chat.getUserChats');
+
+    Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::patch('/notifications/{notification}/unread', [NotificationController::class, 'markAsUnread'])->name('notifications.unread');
 });
 
 

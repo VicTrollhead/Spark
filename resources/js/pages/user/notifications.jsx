@@ -10,6 +10,19 @@ export default function Notifications() {
     const { auth, notifications, translations } = usePage().props;
     const [isLoading, setIsLoading] = useState(false);
     const getInitials = useInitials();
+    const [sort, setSort] = useState(usePage().props.sort || 'latest');
+
+    const handleSortChange = (value) => {
+        router.get(route('notifications.index'), { sort: value }, { preserveScroll: true });
+    };
+
+    const toggleReadStatus = (notification) => {
+        const routeName = notification.is_read ? 'notifications.unread' : 'notifications.read';
+        router.patch(route(routeName, notification.id), {}, {
+            preserveScroll: true,
+        });
+    };
+
     const renderUserLink = (username, name) => (
         <Link
             href={`/user/${username}`}
@@ -87,13 +100,27 @@ export default function Notifications() {
                 <h1 className="text-2xl font-extrabold text-gray-800 dark:text-white">
                     {translations['Notifications']}
                 </h1>
-                <button
-                    onClick={handleReload}
-                    className="flex items-center rounded-md border p-2 text-sm font-semibold text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800"
-                >
-                    <RefreshCw className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
-                </button>
+                <div className="flex justify-between items-centerak gap-2">
+                    <select
+                        value={sort}
+                        onChange={(e) => handleSortChange(e.target.value)}
+                        className="ml-4 px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
+                    >
+                        <option value="latest">{translations['Latest']}</option>
+                        <option value="oldest">{translations['Oldest']}</option>
+                        <option value="read">{translations['Read']}</option>
+                        <option value="unread">{translations['Unread']}</option>
+                    </select>
+                    <button
+                        onClick={handleReload}
+                        className="flex items-center rounded-md border p-2 text-sm font-semibold text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800"
+                    >
+                        <RefreshCw className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
+                    </button>
+                </div>
             </div>
+
+
 
 
             <div className="divide-y divide-gray-200 dark:divide-gray-800 -mt-2">

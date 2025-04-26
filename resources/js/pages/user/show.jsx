@@ -18,6 +18,8 @@ export default function Show() {
             setIsLoading(false);
         }, 1000);
     };
+
+    console.log(user.profile_image_url);
     const handleFollow = () => {
         const route = user.is_following ? 'unfollow' : 'follow';
         router.post(`/user/${user.username}/${route}`, {}, {

@@ -1,9 +1,7 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Notification;
-use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -14,14 +12,33 @@ class NotificationController extends Controller
     {
         $currentUser = Auth::user();
 
-        $notifications = Notification::with([
+        $sort = $request->get('sort', 'latest');
+
+        $query = Notification::with([
             'post.user.profileImage',
             'post.media',
             'sourceUser.profileImage',
         ])
-            ->where('user_id', $currentUser->id)
-            ->latest()
-            ->get();
+            ->where('user_id', $currentUser->id);
+
+        // Apply sorting
+        switch ($sort) {
+            case 'oldest':
+                $query->oldest();
+                break;
+            case 'read':
+                $query->where('is_read', true)->latest();
+                break;
+            case 'unread':
+                $query->where('is_read', false)->latest();
+                break;
+            case 'latest':
+            default:
+                $query->latest();
+                break;
+        }
+
+        $notifications = $query->get();
 
         $formattedNotifications = $notifications->map(function ($notification) {
             $post = $notification->post;
@@ -45,14 +62,12 @@ class NotificationController extends Controller
                     ? [
                         'id' => $post->id,
                         'content' => $post->content,
-
                         'user' => [
                             'id' => $post->user->id,
                             'name' => $post->user->name,
                             'username' => $post->user->username,
                             'profile_image_url' => $post->user->profileImage?->url,
                         ],
-
                         'media' => $post->media->map(fn($m) => [
                             'file_path' => $m->file_path,
                             'file_type' => $m->file_type,
@@ -72,7 +87,24 @@ class NotificationController extends Controller
                 'profile_image_url' => $currentUser->profileImage?->url,
             ],
             'notifications' => $formattedNotifications,
+            'sort' => $sort,
         ]);
     }
 
+    public function markAsRead(Notification $notification)
+    {
+        $notification->is_read = true;
+        $notification->save();
+
+        return back();
+    }
+
+    public function markAsUnread(Notification $notification)
+    {
+        $notification->is_read = false;
+        $notification->save();
+
+        return back();
+    }
 }
+

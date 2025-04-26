@@ -99,5 +99,8 @@ return [
     "Write..." => "Write...",
     "Everyone chat" => "Everyone chat",
     "No notifications yet." => "No notifications yet.",
+    "Read" => "Read",
+    "Unread" => "Unread",
+    "Mark all as read" => "Mark all as read",
 ];
 
