@@ -1,14 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import Message from "../components/message.jsx";
-import MessageInput from "../components/message-input.jsx";
+import Message from "../../components/message.jsx";
+import MessageInput from "../../components/message-input.jsx";
 import {Head, router, usePage} from "@inertiajs/react";
 import AppLayout from "@/layouts/app-layout.jsx";
 
-export default function Chat () {
+export default function EveryoneChat () {
     const { user, init_messages, translations } = usePage().props;
-
-    const webSocketChannel = `channel_for_everyone`;
-
     const [messages, setMessages] = useState(init_messages || []);
     const scroll = useRef();
     const scrollToBottom = () => {
@@ -16,6 +13,7 @@ export default function Chat () {
             scroll.current.scrollIntoView({ behavior: "smooth" });
     };
 
+    const webSocketChannel = `channel_for_everyone`;
     const connectWebSocket = () => {
         window.Echo.private(webSocketChannel)
             .listen('GotMessage', async (e) => {

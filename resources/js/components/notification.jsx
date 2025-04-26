@@ -103,13 +103,8 @@ export function Notification({ notification }) {
 
     return (
         <div
-            className={`
-                border-l-4
-                ${getColor(notification.type)}
-                border-t-0 border-r-0 border-b-gray-400
-                shadow-xl dark:border-b-neutral-600 flex items-start gap-4 p-5
-                bg-gray-50 hover:bg-gray-200 dark:bg-neutral-900 dark:hover:bg-neutral-950 transition-all
-            `}
+            className={`border-l-4 ${getColor(notification.type)} border-t-0 border-r-0 border-b-gray-400 flex items-start gap-4 p-5 bg-gray-100 hover:bg-gray-200 dark:bg-neutral-900 dark:hover:bg-neutral-950 transition-all`}
+
         >
 
             <div className="hidden md:flex items-center gap-4">
