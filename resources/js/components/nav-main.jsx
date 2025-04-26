@@ -13,7 +13,7 @@ export function NavMain({ items = [] }) {
 
                                 {item.icon && <item.icon />}
                                 <span>{item.title}</span>
-                                {item.count && item.count !== 0 ? (<Badge className="bg-red-600">{item.count}</Badge>) : ''}
+                                {item.count && item.count !== 0 ? (<Badge className="bg-neutral-500 dark:bg-neutral-300">{item.count}</Badge>) : ''}
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>))}

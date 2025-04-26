@@ -19,15 +19,16 @@ export default function Show() {
         }, 1000);
     };
 
-    console.log(user.profile_image_url);
     const handleFollow = () => {
-        const route = user.is_following ? 'unfollow' : 'follow';
+        const route = user.is_following ? 'unfollow' : (user.is_private ? 'follow-request' : 'follow');
+
         router.post(`/user/${user.username}/${route}`, {}, {
             onSuccess: () => {
-                router.reload({ only: ['posts'] });
+                router.reload({ only: ['user', 'posts'] });
             }
         });
     };
+
 
     const handleEditProfile = () => {
         router.get(`/user/${user.username}/edit`);
@@ -56,9 +57,10 @@ export default function Show() {
                             onClick={handleFollow}
                             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
                         >
-                            {translations['Follow to See More']}
+                            {user.has_sent_follow_request ? translations['Request Sent'] : translations['Follow to See More']}
                         </button>
                     )}
+
                 </div>
             </AppLayout>
         );

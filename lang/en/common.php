@@ -95,7 +95,7 @@ return [
     "Upload New Media" => "Upload New Media",
     "Update" => "Update",
     "followers_count" => "{1} Follower|[2,*] Followers",
-    "following_count" => "{1} Following|[2,*] Followings",
+    "following_count" => "{1} Following|[2,*] Following",
     "Write..." => "Write...",
     "Everyone chat" => "Everyone chat",
     "No notifications yet." => "No notifications yet.",

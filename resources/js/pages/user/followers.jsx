@@ -18,7 +18,7 @@ export default function Followers() {
     return (
         <AppLayout>
             <Head title={translations['Followers']} />
-            <div className="max-w-lg px-6">
+            <div className="px-6">
                 <h1 className="text-2xl font-bold my-6">{translations['Followers']}</h1>
                 {users.length === 0 ? (
                     <p className="text-gray-500">{translations['No followers yet.']}</p>
