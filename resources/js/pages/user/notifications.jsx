@@ -28,7 +28,17 @@ export default function Notifications() {
             href={`/user/${username}`}
             className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
         >
-            {name} (@{username})
+            {name ? (
+                <>
+                    {name} (@{username})
+                </>
+            ) : (
+                <>
+                    (@{username})
+                </>
+            )}
+
+
         </Link>
     );
     const renderPostLink = (postId) => (
@@ -48,37 +58,37 @@ export default function Notifications() {
             case 'like':
                 return (
                     <>
-                        {renderUserLink(username, name)} liked your post.
+                        {renderUserLink(username, name)} liked your post. <span className="text-sm text-gray-500 dark:text-gray-400">{notification.created_at}</span>
                     </>
                 );
             case 'repost':
                 return (
                     <>
-                        {renderUserLink(username, name)} reposted your post.
+                        {renderUserLink(username, name)} reposted your post. <span className="text-sm text-gray-500 dark:text-gray-400">{notification.created_at}</span>
                     </>
                 );
             case 'comment':
                 return (
                     <>
-                        {renderUserLink(username, name)} commented on your post: <div className="text-sm">"{notification.extra_data}"</div>
+                        {renderUserLink(username, name)} commented on your post: <span className="text-[16px]">"{notification.extra_data}"</span> <span className="text-sm text-gray-500 dark:text-gray-400">{notification.created_at}</span>
                     </>
                 );
             case 'follow':
                 return (
                     <>
-                        {renderUserLink(username, name)} followed you.
+                        {renderUserLink(username, name)} followed you. <span className="text-sm text-gray-500 dark:text-gray-400">{notification.created_at}</span>
                     </>
                 );
             case 'favorite':
                 return (
                     <>
-                        {renderUserLink(username, name)} favorited your post.
+                        {renderUserLink(username, name)} favorited your post. <span className="text-sm text-gray-500 dark:text-gray-400">{notification.created_at}</span>
                     </>
                 );
             default:
                 return (
                     <>
-                        {renderUserLink(username, name)} interacted with you.
+                        {renderUserLink(username, name)} interacted with you. <span className="text-sm text-gray-500 dark:text-gray-400">{notification.created_at}</span>
                     </>
                 );
         }
@@ -132,45 +142,41 @@ export default function Notifications() {
                         return (
                             <div
                                 key={notification.id + notification.created_at}
-                                className="flex items-start gap-4 p-5 hover:bg-gray-50 dark:hover:bg-neutral-900 transition-all "
+                                className="flex items-start gap-4 p-5 hover:bg-gray-50 dark:hover:bg-neutral-900 transition-all"
                             >
-                                <div className="flex items-center gap-4">
-                                    {post?.user ? (
-                                        <Avatar className="h-14 w-14">
+                                <div className="flex-shrink-0">
+                                    <Avatar className="h-12 w-12">
+                                        {sourceUser?.profile_image_url ? (
                                             <AvatarImage
                                                 src={sourceUser.profile_image_url}
                                                 alt={sourceUser.name}
                                             />
+                                        ) : (
                                             <AvatarFallback className="rounded-full bg-gray-300 text-black dark:bg-gray-700 dark:text-white">
                                                 {getInitials(sourceUser.name)}
                                             </AvatarFallback>
-                                        </Avatar>
-                                    ) : (
-                                        <Avatar className="h-14 w-14">
-                                            <AvatarFallback className="rounded-full bg-gray-300 text-black dark:bg-gray-700 dark:text-white">
-                                                {getInitials(sourceUser.name)}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                    )}
+                                        )}
+                                    </Avatar>
                                 </div>
 
-                                <div className="flex flex-col w-full">
-                                    <div className="text-lg text-gray-800 p-2 mb-1 dark:text-gray-100 font-medium">
+                                <div className={`flex flex-col w-full gap-1 ${!post ? 'justify-center' : ''}`}>
+                                    <div className={`text-gray-800 dark:text-gray-100 text-lg p-2 mb-1 font-medium`}>
                                         {renderMessage(notification)}
                                     </div>
+
                                     {post && post.user && (
                                         <PostComponent post={post} compact />
                                     )}
                                 </div>
+
                                 {post && post.user && (
                                     <Link
                                         href={`/post/${post.id}`}
-                                        className=" hover:bg-gray-200 dark:hover:bg-neutral-800 rounded-lg p-2 transition-all"
+                                        className="hover:bg-gray-200 dark:hover:bg-neutral-800 rounded-lg p-2 transition-all"
                                     >
-                                        <ArrowRight className="text-gray-500 dark:text-gray-400 ml-auto" size={28} />
+                                        <ArrowRight className="text-gray-500 dark:text-gray-400" size={24} />
                                     </Link>
                                 )}
-
                             </div>
                         );
                     })

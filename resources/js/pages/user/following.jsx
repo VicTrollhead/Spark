@@ -8,13 +8,14 @@ export default function Following() {
     const getInitials = useInitials();
     const isOwnProfile = auth.user && auth.user.id === user.id;
 
-    const handleFollowToggle = (targetUser, isFollowed) => {eposted_friends
+    const handleFollowToggle = (targetUser, isFollowed) => {
         const action = isFollowed ? 'unfollow' : 'follow';
         router.post(`/user/${targetUser.username}/${action}`, {}, {
             preserveScroll: true,
             onSuccess: () => router.reload({ only: ['users'] }),
         });
     };
+
 
     return (
         <AppLayout>

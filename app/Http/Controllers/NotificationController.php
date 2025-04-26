@@ -21,7 +21,6 @@ class NotificationController extends Controller
         ])
             ->where('user_id', $currentUser->id);
 
-        // Apply sorting
         switch ($sort) {
             case 'oldest':
                 $query->oldest();
@@ -40,8 +39,9 @@ class NotificationController extends Controller
 
         $notifications = $query->get();
 
-        $formattedNotifications = $notifications->map(function ($notification) {
+        $formattedNotifications = $notifications->map(function ($notification) use ($currentUser) {
             $post = $notification->post;
+            $sourceUser = $notification->sourceUser;
 
             return [
                 'id' => $notification->id,
@@ -49,31 +49,30 @@ class NotificationController extends Controller
                 'is_read' => $notification->is_read,
                 'created_at' => $notification->created_at->diffForHumans(),
 
-                'source_user' => $notification->sourceUser
-                    ? [
-                        'id' => $notification->sourceUser->id,
-                        'name' => $notification->sourceUser->name,
-                        'username' => $notification->sourceUser->username,
-                        'profile_image_url' => $notification->sourceUser->profileImage?->url,
-                    ]
-                    : null,
 
-                'post' => $post
-                    ? [
-                        'id' => $post->id,
-                        'content' => $post->content,
-                        'user' => [
-                            'id' => $post->user->id,
-                            'name' => $post->user->name,
-                            'username' => $post->user->username,
-                            'profile_image_url' => $post->user->profileImage?->url,
-                        ],
-                        'media' => $post->media->map(fn($m) => [
-                            'file_path' => $m->file_path,
-                            'file_type' => $m->file_type,
-                        ])->values(),
-                    ]
-                    : null,
+                'source_user' => $sourceUser ? [
+                    'id' => $sourceUser->id,
+                    'name' => $sourceUser->name,
+                    'username' => $sourceUser->username,
+                    'profile_image_url' => $sourceUser->profileImage?->url,
+                    'is_private' => (bool) $sourceUser->is_private,
+                    'is_subscribed' => $currentUser->isFollowing($sourceUser),
+                ] : null,
+
+                'post' => $post ? [
+                    'id' => $post->id,
+                    'content' => $post->content,
+                    'user' => [
+                        'id' => $post->user->id,
+                        'name' => $post->user->name,
+                        'username' => $post->user->username,
+                        'profile_image_url' => $post->user->profileImage?->url,
+                    ],
+                    'media' => $post->media->map(fn($m) => [
+                        'file_path' => $m->file_path,
+                        'file_type' => $m->file_type,
+                    ])->values(),
+                ] : null,
 
                 'extra_data' => $notification->extra_data,
             ];
@@ -91,6 +90,7 @@ class NotificationController extends Controller
         ]);
     }
 
+
     public function markAsRead(Notification $notification)
     {
         $notification->is_read = true;
@@ -106,5 +106,8 @@ class NotificationController extends Controller
 
         return back();
     }
+
+
+
 }
 
