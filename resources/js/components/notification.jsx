@@ -29,17 +29,17 @@ export function Notification({ notification }) {
     const getColor = (type) => {
         switch (type) {
             case 'like':
-                return 'pink-700';
+                return 'border-l-pink-700';
             case 'repost':
-                return 'green-600';
+                return 'border-l-green-600';
             case 'comment':
-                return 'gray-800';
+                return 'border-l-gray-800';
             case 'follow':
-                return 'blue-800';
+                return 'border-l-blue-800';
             case 'favorite':
-                return 'yellow-500';
+                return 'border-l-yellow-500';
             default:
-                return 'gray-700'
+                return 'border-l-gray-700'
         }
     }
 
@@ -97,7 +97,7 @@ export function Notification({ notification }) {
 
     return (
         <div
-            className={`border-l-4 border-l-${getColor(notification.type)} border-t-0 border-r-0 border-b-gray-400 flex items-start gap-4 p-5 bg-gray-100 hover:bg-gray-200 dark:bg-neutral-900 dark:hover:bg-neutral-950 transition-all`}
+            className={`border-l-4 ${getColor(notification.type)} border-t-0 border-r-0 border-b-gray-400 flex items-start gap-4 p-5 bg-gray-100 hover:bg-gray-200 dark:bg-neutral-900 dark:hover:bg-neutral-950 transition-all`}
         >
 
             <div className="hidden md:flex items-center gap-4">
