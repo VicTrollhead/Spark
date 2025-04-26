@@ -41,12 +41,42 @@ class ChatController extends Controller
             ->values();
 
 
-        return Inertia::render('chat', [
+        return Inertia::render('chat/everyone-chat', [
             'user' => [
                 'id' => $user->id,
                 'username' => $user->username,
             ],
             'init_messages' => $messages,
+        ]);
+    }
+
+    public function getUserChats(Request $request): Response
+    {
+        $user = Auth::user();
+
+        $chats = Chat::with(['user1.profileImage', 'user2.profileImage'])
+            ->where('user1_id', $user->id)
+            ->orWhere('user2_id', $user->id)
+            ->get()
+            ->map(function ($chat) use ($user) {
+                $otherUser = $chat->user1_id === $user->id ? $chat->user2 : $chat->user1;
+                return [
+                    'id' => $chat->id,
+                    'user' => [
+                        'id' => $otherUser->id,
+                        'name' => $otherUser->name,
+                        'username' => $otherUser->username,
+                        'profile_image_url' => $otherUser->profileImage?->url,
+                    ],
+                ];
+            });
+
+        return Inertia::render('chat/user-chats', [
+            'user' => [
+                'id' => $user->id,
+                'username' => $user->username,
+            ],
+            'chats' => $chats,
         ]);
     }
 

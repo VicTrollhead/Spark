@@ -32,6 +32,21 @@ export function AppSidebar() {
         fetchUnreadCount();
     }, []);
 
+    window.Echo.private(`notifications.${user.id}`)
+        .listen('NotificationCreated', (e) => {
+            setUnreadNotificationsCount(unreadNotificationsCount+1);
+        })
+        .listen('NotificationIsReadChange', (e) => {
+            if(e.operation === 'read')
+            {
+                setUnreadNotificationsCount(unreadNotificationsCount-1);
+            }
+            else
+            {
+                setUnreadNotificationsCount(unreadNotificationsCount+1);
+            }
+        });
+
     if (!user) return null;
 
     const mainNavItems = [

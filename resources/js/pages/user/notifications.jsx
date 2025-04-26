@@ -5,9 +5,15 @@ import { useState } from 'react';
 import {Notification} from "../../components/notification.jsx";
 
 export default function Notifications() {
-    const { notifications, translations } = usePage().props;
+    const { auth, notifications, translations } = usePage().props;
+    const user = auth?.user;
     const [isLoading, setIsLoading] = useState(false);
     const [sort, setSort] = useState(usePage().props.sort || 'unread');
+
+    window.Echo.private(`notifications.${user.id}`)
+        .listen('NotificationCreated', (e) => {
+            handleReload();
+        });
 
     const handleSortChange = (value) => {
         router.get(route('notifications.index'), { sort: value }, { preserveScroll: true });

@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Events\NotificationIsReadChange;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,10 +33,7 @@ class NotificationController extends Controller
                 $query->where('is_read', true)->latest();
                 break;
             case 'unread':
-                $query->where('is_read', false)->latest();
-                break;
             default:
-                $query->latest();
                 $query->where('is_read', false)->latest();
                 break;
         }
@@ -98,7 +96,7 @@ class NotificationController extends Controller
     {
         $notification->is_read = true;
         $notification->save();
-
+        event(new NotificationIsReadChange($notification, 'read'));
         return back();
     }
 
@@ -106,7 +104,7 @@ class NotificationController extends Controller
     {
         $notification->is_read = false;
         $notification->save();
-
+        event(new NotificationIsReadChange($notification, 'unread'));
         return back();
     }
 
