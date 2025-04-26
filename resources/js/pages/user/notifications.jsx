@@ -1,7 +1,7 @@
 import { Head, usePage, router } from '@inertiajs/react';
 import AppLayout from '../../layouts/app-layout';
 import {RefreshCw} from 'lucide-react';
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import {Notification} from "../../components/notification.jsx";
 
 export default function Notifications() {
@@ -10,10 +10,13 @@ export default function Notifications() {
     const [isLoading, setIsLoading] = useState(false);
     const [sort, setSort] = useState(usePage().props.sort || 'unread');
 
-    window.Echo.private(`notifications.${user.id}`)
-        .listen('NotificationCreated', (e) => {
-            handleReload();
-        });
+    useEffect(() => {
+        window.Echo.private(`notifications.${user.id}`)
+            .listen('NotificationCreated', handleReload);
+        return () => {
+            window.Echo.leave(`notifications.${user.id}`);
+        };
+    }, []);
 
     const handleSortChange = (value) => {
         router.get(route('notifications.index'), { sort: value }, { preserveScroll: true });

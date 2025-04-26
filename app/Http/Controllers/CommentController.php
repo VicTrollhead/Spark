@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CommentCreated;
 use App\Http\Requests\StoreCommentRequest;
 use App\Models\Notification;
 use App\Models\Post;
@@ -39,6 +40,7 @@ class CommentController extends Controller
             ]);
         }
 
+        event(new CommentCreated($comment));
 
         return redirect()->back()->with('success', 'Comment added successfully.');
     }
