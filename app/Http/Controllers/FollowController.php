@@ -188,10 +188,10 @@ class FollowController extends Controller
             return back()->with('error', 'You cannot follow yourself.');
         }
 
-        if ($authUser->pendingFollowRequests()->where('target_user_id', $user->id)->exists()) {
+        if ($authUser->pendingFollowRequests()->where('followee_id', $user->id)->where('is_accepted', 0)->exists()) {
             return back()->with('error', 'Request already sent.');
         }
-
+        
         Notification::create([
             'type' => 'follow_request',
             'user_id' => $user->id,
