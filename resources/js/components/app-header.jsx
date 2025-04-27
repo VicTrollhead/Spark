@@ -123,8 +123,8 @@ export function AppHeader({ breadcrumbs = [] }) {
                     <div className="lg:hidden">
                         <Sheet>
                             <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" className="mr-2 my-4 h-9 w-9 hover:bg-neutral-300 dark:hover:bg-neutral-800">
-                                    <Menu className="h-6 w-6"/>
+                                <Button variant="ghost" size="icon" className="mr-2.5 -ml-1 Avatar my-4 h-9 w-9 hover:bg-neutral-300 dark:hover:bg-neutral-800">
+                                    <Menu className="h-8 w-8"/>
                                 </Button>
                             </SheetTrigger>
                             <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between pl-5 gap-0">
@@ -134,7 +134,7 @@ export function AppHeader({ breadcrumbs = [] }) {
                                         <Link href={user.username ? `/user/${user.username}` : '/user'} prefetch>
                                             <Avatar className="my-3 size-10">
                                                 <AvatarImage src={user.profile_image_url} alt={user.name}/>
-                                                <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                                <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-gray-700 dark:text-white">
                                                     {getInitials(user.name)}
                                                 </AvatarFallback>
                                             </Avatar>
