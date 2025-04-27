@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NotificationCreated;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationService;
@@ -154,37 +155,58 @@ class FollowController extends Controller
     }
 
 
-    public function acceptRequest(Follow $follow)
+    public function acceptRequest(User $sourceUser, Notification $notification): RedirectResponse
     {
+        $user = Auth::user();
+
+        $follow = Follow::where('follower_id', $sourceUser->id)
+            ->where('followee_id', $user->id)
+            ->firstOrFail();
+
         $this->authorize('accept', $follow);
 
-        $follow->is_accepted = true;
-        $follow->save();
+        Follow::where('follower_id', $sourceUser->id)
+            ->where('followee_id', $user->id)
+            ->update(['is_accepted' => true]);
 
-        Notification::create([
+        $new_notification = Notification::create([
             'user_id' => $follow->follower_id,
             'source_user_id' => $follow->followee_id,
-            'type' => 'follow_request_accepted',
+            'type' => 'follow',
             'is_read' => false,
             'extra_data' => 'accepted',
         ]);
+        event(new NotificationCreated($new_notification));
+
+        $notification->delete();
 
         return back()->with('success', 'Follow request accepted.');
     }
 
-    public function rejectRequest(Follow $follow)
+    public function rejectRequest(User $sourceUser, Notification $notification): RedirectResponse
     {
+        $user = Auth::user();
+
+        $follow = Follow::where('follower_id', $sourceUser->id)
+            ->where('followee_id', $user->id)
+            ->firstOrFail();
+
         $this->authorize('reject', $follow);
 
-        Notification::create([
+        $new_notification = Notification::create([
             'user_id' => $follow->follower_id,
             'source_user_id' => $follow->followee_id,
-            'type' => 'follow_request_rejected',
+            'type' => 'follow',
             'is_read' => false,
             'extra_data' => 'rejected',
         ]);
+        event(new NotificationCreated($new_notification));
 
-        $follow->delete();
+        Follow::where('follower_id', $sourceUser->id)
+            ->where('followee_id', $user->id)
+            ->delete();
+
+        $notification->delete();
 
         return back()->with('success', 'Follow request rejected.');
     }
@@ -220,10 +242,11 @@ class FollowController extends Controller
         if ($existingRequest) {
             $existingRequest->delete();
 
-            Notification::where('type', 'follow')
+            $new_notification = Notification::where('type', 'follow')
                 ->where('source_user_id', $authUser->id)
                 ->where('user_id', $user->id)
                 ->delete();
+            event(new NotificationCreated($new_notification));
 
             return back()->with('success', 'Follow request deleted.');
         } else {
@@ -233,13 +256,15 @@ class FollowController extends Controller
                 'is_accepted' => false,
             ]);
 
-            Notification::create([
+            $new_notification = Notification::create([
                 'type' => 'follow',
                 'user_id' => $user->id,
                 'source_user_id' => $authUser->id,
                 'is_read' => false,
                 'extra_data' => 'pending',
             ]);
+
+            event(new NotificationCreated($new_notification));
 
             return back()->with('success', 'Follow request sent.');
         }

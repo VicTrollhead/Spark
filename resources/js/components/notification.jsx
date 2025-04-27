@@ -26,8 +26,8 @@ export function Notification({ notification }) {
         </Link>
     );
 
-    const handleFollowRequest = (user, action) => {
-        router.post(`/user/${user}/${action}`, {}, {
+    const handleFollowRequest = (action) => {
+        router.post(`/user/${sourceUser.id}/${notification.id}/${action}`, {}, {
             preserveScroll: true,
         });
     };
@@ -82,7 +82,9 @@ export function Notification({ notification }) {
                     </div>
                 );
             case 'follow':
-                const isFollowRequest = notification.extra_data === 'pending'; // <-- you can adjust this depending on your backend
+                const isFollowRequest = notification.extra_data === 'pending';
+                const isAcceptedAnswerForFollowRequest = notification.extra_data === 'accepted';
+                const isRejectedAnswerForFollowRequest = notification.extra_data === 'rejected';
                 return (
                     <div className="flex flex-col gap-1">
                         <span>{renderUserLink(username, name)}</span>
@@ -95,20 +97,30 @@ export function Notification({ notification }) {
                                 </div>
                                 <div className="flex gap-2 mt-2">
                                     <button
-                                        onClick={() => handleFollowRequest(notification.id, 'accept-request')}
-                                        className="px-3 py-1 text-white bg-green-600 rounded-md hover:bg-green-700"
+                                        onClick={() => handleFollowRequest('accept-request')}
+                                        className="px-3 py-1 text-white bg-green-700 rounded-md hover:bg-green-900"
                                     >
                                         {translations['Accept']}
                                     </button>
                                     <button
-                                        onClick={() => handleFollowRequest(notification.id, 'decline-request')}
-                                        className="px-3 py-1 text-white bg-red-600 rounded-md hover:bg-red-700"
+                                        onClick={() => handleFollowRequest('reject-request')}
+                                        className="px-3 py-1 text-white bg-red-700 rounded-md hover:bg-red-900"
                                     >
                                         {translations['Decline']}
                                     </button>
                                 </div>
                             </div>
-                        ) : (
+                        ) : isAcceptedAnswerForFollowRequest ? (
+                            <div className="flex flex-row">
+                                <Users className="h-5 w-5 my-auto" />
+                                <span className="ml-2">{translations['accepted your follow request.']}</span>
+                            </div>
+                        ) : isRejectedAnswerForFollowRequest ? (
+                            <div className="flex flex-row">
+                                <Users className="h-5 w-5 my-auto" />
+                                <span className="ml-2">{translations['rejected your follow request.']}</span>
+                            </div>
+                        ) :  (
                             <div className="flex flex-row">
                                 <Users className="h-5 w-5 my-auto" />
                                 <span className="ml-2">{translations['followed you.']}</span>

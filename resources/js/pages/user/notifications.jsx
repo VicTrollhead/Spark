@@ -1,6 +1,6 @@
 import { Head, usePage, router } from '@inertiajs/react';
 import AppLayout from '../../layouts/app-layout';
-import {RefreshCw} from 'lucide-react';
+import {Eye, EyeOff, RefreshCw} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {Notification} from "../../components/notification.jsx";
 
@@ -12,7 +12,9 @@ export default function Notifications() {
 
     useEffect(() => {
         window.Echo.private(`notifications.${user.id}`)
-            .listen('NotificationCreated', handleReload);
+            .listen('NotificationCreated', handleReload)
+            .listen('NotificationIsReadChange', handleReload);
+
         return () => {
             window.Echo.leave(`notifications.${user.id}`);
         };
@@ -33,29 +35,30 @@ export default function Notifications() {
         <AppLayout>
             <Head title={translations['Notifications']} />
 
-            <div className="flex justify-between items-center p-6">
+            <div className="flex flex-wrap justify-between items-center p-6">
                 <h1 className="text-2xl font-extrabold text-gray-800 dark:text-white">
                     {translations['Notifications']}
                 </h1>
                 <div className="flex items-center gap-2">
-                    <div className="flex lg:flex-row gap-2 flex-col ml-2">
+                    <div className="flex flex-row gap-2 ml-2">
+                        <h4 className="py-1">{translations['All:']}</h4>
                         <button
                             onClick={() => router.patch(route('notifications.markAllAsRead'), {}, { preserveScroll: true })}
-                            className="px-3 py-1 border rounded-md text-sm text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800 dark:bg-neutral-900"
+                            className="w-fit px-2 py-1 border rounded-md text-sm text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800 dark:bg-neutral-900"
                         >
-                            {translations['Mark all as read']}
+                            <Eye className='h-5 w-5'/>
                         </button>
 
                         <button
                             onClick={() => router.patch(route('notifications.markAllAsUnread'), {}, { preserveScroll: true })}
-                            className="px-3 py-1 border rounded-md text-sm text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800 dark:bg-neutral-900"
+                            className="w-fit px-2 py-1 border rounded-md text-sm text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800 dark:bg-neutral-900"
                         >
-                            {translations['Mark all as unread']}
+                            <EyeOff className='h-5 w-5'/>
                         </button>
                         <select
                             value={sort}
                             onChange={(e) => handleSortChange(e.target.value)}
-                            className=" px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
+                            className="px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
                         >
                             <option value="latest">{translations['Latest']}</option>
                             <option value="oldest">{translations['Oldest']}</option>
@@ -63,8 +66,6 @@ export default function Notifications() {
                             <option value="unread">{translations['Unread']}</option>
                         </select>
                     </div>
-
-
 
                     <button
                         onClick={handleReload}

@@ -119,5 +119,8 @@ return [
     "Request Sent" => "Request Sent",
     "Subscribers" => "Subscribers",
     "You follow each other" => "You follow each other.",
+    "accepted your follow request." => "accepted your follow request.",
+    "rejected your follow request." => "rejected your follow request.",
+    "All:" => "All:",
 ];
 

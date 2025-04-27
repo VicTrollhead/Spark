@@ -32,7 +32,6 @@ export default function Show() {
             }
         });
     };
-    console.log(user.has_sent_follow_request);
     const handleEditProfile = () => {
         router.get(`/user/${user.username}/edit`);
     };
