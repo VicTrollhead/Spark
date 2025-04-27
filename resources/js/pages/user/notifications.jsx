@@ -38,30 +38,33 @@ export default function Notifications() {
                     {translations['Notifications']}
                 </h1>
                 <div className="flex items-center gap-2">
-                    <button
-                        onClick={() => router.patch(route('notifications.markAllAsRead'), {}, { preserveScroll: true })}
-                        className="px-3 py-1 border rounded-md text-sm text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800 dark:bg-neutral-900"
-                    >
-                        {translations['Mark all as read']}
-                    </button>
+                    <div className="flex lg:flex-row gap-2 sm:flex-col ml-2">
+                        <button
+                            onClick={() => router.patch(route('notifications.markAllAsRead'), {}, { preserveScroll: true })}
+                            className="px-3 py-1 border rounded-md text-sm text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800 dark:bg-neutral-900"
+                        >
+                            {translations['Mark all as read']}
+                        </button>
 
-                    <button
-                        onClick={() => router.patch(route('notifications.markAllAsUnread'), {}, { preserveScroll: true })}
-                        className="px-3 py-1 border rounded-md text-sm text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800 dark:bg-neutral-900"
-                    >
-                        {translations['Mark all as unread']}
-                    </button>
+                        <button
+                            onClick={() => router.patch(route('notifications.markAllAsUnread'), {}, { preserveScroll: true })}
+                            className="px-3 py-1 border rounded-md text-sm text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800 dark:bg-neutral-900"
+                        >
+                            {translations['Mark all as unread']}
+                        </button>
+                        <select
+                            value={sort}
+                            onChange={(e) => handleSortChange(e.target.value)}
+                            className=" px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
+                        >
+                            <option value="latest">{translations['Latest']}</option>
+                            <option value="oldest">{translations['Oldest']}</option>
+                            <option value="read">{translations['Read']}</option>
+                            <option value="unread">{translations['Unread']}</option>
+                        </select>
+                    </div>
 
-                    <select
-                        value={sort}
-                        onChange={(e) => handleSortChange(e.target.value)}
-                        className="ml-2 px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
-                    >
-                        <option value="latest">{translations['Latest']}</option>
-                        <option value="oldest">{translations['Oldest']}</option>
-                        <option value="read">{translations['Read']}</option>
-                        <option value="unread">{translations['Unread']}</option>
-                    </select>
+
 
                     <button
                         onClick={handleReload}

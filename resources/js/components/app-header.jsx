@@ -79,7 +79,7 @@ export function AppHeader({ breadcrumbs = [] }) {
         },
         {
             title: translations['Notifications'],
-            url: '#',
+            url: '/user/notifications',
             icon: Mail,
         },
         {

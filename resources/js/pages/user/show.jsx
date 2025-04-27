@@ -11,6 +11,7 @@ export default function Show() {
     const getInitials = useInitials();
     const [sort, setSort] = useState(filters?.sort || 'latest');
     const [isLoading, setIsLoading] = useState(false);
+    const [hasSentRequest, setHasSentRequest] = useState(user.has_sent_follow_request);
     const handleReload = () => {
         setIsLoading(true);
         router.reload();
@@ -20,15 +21,18 @@ export default function Show() {
     };
 
     const handleFollow = () => {
-        const route = user.is_following ? 'unfollow' : (user.is_private ? 'follow-request' : 'follow');
+        const route = hasSentRequest ? 'unfollow' : (user.is_private ? 'follow-request' : 'follow');
+
+        // Toggle request status
+        setHasSentRequest(!hasSentRequest);
 
         router.post(`/user/${user.username}/${route}`, {}, {
             onSuccess: () => {
-                router.reload({ only: ['user', 'posts'] });
+                router.reload({});
             }
         });
     };
-
+    console.log(user.has_sent_follow_request);
     const handleEditProfile = () => {
         router.get(`/user/${user.username}/edit`);
     };
@@ -56,7 +60,7 @@ export default function Show() {
                             onClick={handleFollow}
                             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
                         >
-                            {user.has_sent_follow_request ? translations['Request Sent'] : translations['Follow to See More']}
+                            {hasSentRequest ? translations['Request Sent'] : translations['Follow to See More']}
                         </button>
                     )}
 

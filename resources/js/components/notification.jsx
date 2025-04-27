@@ -26,6 +26,13 @@ export function Notification({ notification }) {
         </Link>
     );
 
+    const handleFollowRequest = (user, action) => {
+        router.post(`/user/${user}/${action}`, {}, {
+            preserveScroll: true,
+        });
+    };
+
+
     const getColor = (type) => {
         switch (type) {
             case 'like':
@@ -75,13 +82,41 @@ export function Notification({ notification }) {
                     </div>
                 );
             case 'follow':
+                const isFollowRequest = notification.extra_data === 'pending'; // <-- you can adjust this depending on your backend
                 return (
                     <div className="flex flex-col gap-1">
                         <span>{renderUserLink(username, name)}</span>
                         <span className="text-sm text-gray-500 dark:text-gray-400">{notification.created_at}</span>
-                        <div className="flex flex-row"><Users className="h-5 w-5 my-auto"/><span className="ml-2">{translations['followed to you.']}</span></div>
+                        {isFollowRequest ? (
+                            <div className="flex flex-col gap-2">
+                                <div className="flex flex-row items-center">
+                                    <Users className="h-5 w-5 my-auto" />
+                                    <span className="ml-2">{translations['has sent you a follow request.']}</span>
+                                </div>
+                                <div className="flex gap-2 mt-2">
+                                    <button
+                                        onClick={() => handleFollowRequest(notification.id, 'accept-request')}
+                                        className="px-3 py-1 text-white bg-green-600 rounded-md hover:bg-green-700"
+                                    >
+                                        {translations['Accept']}
+                                    </button>
+                                    <button
+                                        onClick={() => handleFollowRequest(notification.id, 'decline-request')}
+                                        className="px-3 py-1 text-white bg-red-600 rounded-md hover:bg-red-700"
+                                    >
+                                        {translations['Decline']}
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex flex-row">
+                                <Users className="h-5 w-5 my-auto" />
+                                <span className="ml-2">{translations['followed you.']}</span>
+                            </div>
+                        )}
                     </div>
                 );
+
             case 'favorite':
                 return (
                     <div className="flex flex-col gap-1">

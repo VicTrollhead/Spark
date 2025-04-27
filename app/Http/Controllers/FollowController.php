@@ -18,6 +18,7 @@ use Illuminate\Validation\Rule;
 class FollowController extends Controller
 {
     use AuthorizesRequests;
+
     public function follow(User $user): RedirectResponse
     {
         $followerId = Auth::id();
@@ -154,6 +155,14 @@ class FollowController extends Controller
         $follow->is_accepted = true;
         $follow->save();
 
+        Notification::create([
+            'user_id' => $follow->follower_id,
+            'source_user_id' => $follow->followee_id,
+            'type' => 'follow_request_accepted',
+            'is_read' => false,
+            'extra_data' => 'accepted',
+        ]);
+
         return back()->with('success', 'Follow request accepted.');
     }
 
@@ -161,10 +170,19 @@ class FollowController extends Controller
     {
         $this->authorize('reject', $follow);
 
+        Notification::create([
+            'user_id' => $follow->follower_id,
+            'source_user_id' => $follow->followee_id,
+            'type' => 'follow_request_rejected',
+            'is_read' => false,
+            'extra_data' => 'rejected',
+        ]);
+
         $follow->delete();
 
         return back()->with('success', 'Follow request rejected.');
     }
+
 
     public function followRequests()
     {
@@ -188,24 +206,37 @@ class FollowController extends Controller
             return back()->with('error', 'You cannot follow yourself.');
         }
 
-        if ($authUser->pendingFollowRequests()->where('followee_id', $user->id)->where('is_accepted', 0)->exists()) {
-            return back()->with('error', 'Request already sent.');
+        $existingRequest = Follow::where('follower_id', $authUser->id)
+            ->where('followee_id', $user->id)
+            ->where('is_accepted', false)
+            ->first();
+
+        if ($existingRequest) {
+            $existingRequest->delete();
+
+            Notification::where('type', 'follow')
+                ->where('source_user_id', $authUser->id)
+                ->where('user_id', $user->id)
+                ->delete();
+
+            return back()->with('success', 'Follow request deleted.');
+        } else {
+            Follow::create([
+                'follower_id' => $authUser->id,
+                'followee_id' => $user->id,
+                'is_accepted' => false,
+            ]);
+
+            Notification::create([
+                'type' => 'follow',
+                'user_id' => $user->id,
+                'source_user_id' => $authUser->id,
+                'is_read' => false,
+                'extra_data' => 'pending',
+            ]);
+
+            return back()->with('success', 'Follow request sent.');
         }
-
-        Follow::create([
-            'follower_id' => $authUser->id,
-            'followee_id' => $user->id,
-            'is_accepted' => false,
-        ]);
-
-        Notification::create([
-            'type'           => 'follow_request',
-            'user_id'        => $user->id,
-            'source_user_id' => $authUser->id,
-            'is_read'        => false,
-        ]);
-
-        return back()->with('success', 'Follow request sent.');
     }
 
 

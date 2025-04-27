@@ -111,6 +111,10 @@ return [
     "reposted your post." => "репостнув ваш пост.",
     "commented on your post:" => "прокоментував ваш пост:",
     "followed to you." => "підписався на вас.",
+    "has sent you a follow request." => "відправив вам запит на підписку.",
     "favorited your post." => "добавив ваш пост в обрані.",
     "interacted with you." => "взаємодіяв з вами.",
+    "Accept" => "Прийняти",
+    "Decline" => "Відхилити",
+    "Request Sent" => "Запит відправлено",
 ];
