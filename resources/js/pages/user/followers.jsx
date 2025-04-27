@@ -2,19 +2,40 @@ import { usePage, Link, Head, router } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
+import { useState } from 'react';
 
 export default function Followers() {
-    const { title, users, user, auth, translations } = usePage().props;
+    const { title, users: initialUsers, user, auth, translations } = usePage().props;
     const getInitials = useInitials();
+    const [users, setUsers] = useState(initialUsers);
 
     const handleFollowToggle = (targetUser, isFollowed) => {
-        const action = isFollowed ? 'unfollow' : 'follow';
+        const action = isFollowed
+            ? 'unfollow'
+            : targetUser.is_private && !isFollowed
+                ? 'follow-request'
+                : 'follow';
+        console.log(targetUser.has_sent_follow_request);
+
         router.post(`/user/${targetUser.username}/${action}`, {}, {
             preserveScroll: true,
-            onSuccess: () => router.reload({ only: ['users'] }),
+            onSuccess: () => {
+                setUsers(prevUsers =>
+                    prevUsers.map(u =>
+                        u.id === targetUser.id
+                            ? {
+                                ...u,
+                                is_followed: action === 'follow',
+                                has_sent_follow_request: action === 'follow-request',
+                            }
+                            : u
+                    )
+                );
+            },
+            onError: () => {
+            },
         });
     };
-
 
 
     return (
@@ -50,18 +71,25 @@ export default function Followers() {
                                                 </p>
                                             )}
                                         </div>
-                                        {/* Follow/Unfollow button */}
+
                                         {auth.user.id !== follower.id && (
                                             <button
-                                                onClick={() => handleFollowToggle(follower, follower.is_followed)}
+                                                onClick={() => handleFollowToggle(follower, follower.is_followed || follower.has_sent_follow_request)}
                                                 className={`ml-auto px-4 py-2 rounded-md text-white ${
-                                                    follower.is_followed
+                                                    follower.has_sent_follow_request
                                                         ? 'bg-gray-600 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700'
-                                                        : 'bg-blue-600 hover:bg-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600'
+                                                        : (follower.is_followed
+                                                            ? 'bg-gray-600 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700'
+                                                            : 'bg-blue-600 hover:bg-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600')
                                                 }`}
                                             >
-                                                {follower.is_followed ? translations['Unfollow'] : translations['Follow']}
+                                                {(follower.has_sent_follow_request && !follower.is_followed)
+                                                    ? translations['Request Sent']
+                                                    : (follower.is_followed
+                                                        ? translations['Unfollow']
+                                                        : translations['Follow'])}
                                             </button>
+
                                         )}
                                     </div>
                                 </div>

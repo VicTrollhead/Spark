@@ -89,20 +89,24 @@ class FollowController extends Controller
     {
         $authUser = Auth::user();
 
-        $authUserFriends = $authUser->friends->pluck('id')->toArray(); // fetch once for performance
+        $authUserFriends = $authUser->friends->pluck('id')->toArray();
+        $pendingFollowRequests = $authUser->pendingFollowRequests()->pluck('followee_id')->toArray();
 
         $followers = $user->followers()
             ->with('profileImage')
             ->withCount('followers')
             ->get()
-            ->map(function ($follower) use ($authUser, $authUserFriends) {
+            ->map(function ($follower) use ($authUser, $authUserFriends, $pendingFollowRequests) {
+                $hasSentFollowRequest = in_array($follower->id, $pendingFollowRequests);
+
                 return [
                     'id' => $follower->id,
                     'name' => $follower->name,
                     'username' => $follower->username,
                     'profile_image_url' => $follower->profileImage ? $follower->profileImage->url : null,
                     'followers_count' => $follower->followers_count,
-                    'is_followed' => $authUser->following->contains($follower->id),
+                    'is_followed' => $authUser->following->contains('id', $follower->id),
+                    'has_sent_follow_request' => $hasSentFollowRequest,
                     'is_friend' => in_array($follower->id, $authUserFriends),
                 ];
             });
@@ -120,11 +124,13 @@ class FollowController extends Controller
     }
 
 
+
+
     public function following(User $user)
     {
         $authUser = Auth::user();
 
-        $authUserFriends = $authUser->friends->pluck('id')->toArray(); // fetch once for performance
+        $authUserFriends = $authUser->friends->pluck('id')->toArray();
 
         $following = $user->following()
             ->with('profileImage')

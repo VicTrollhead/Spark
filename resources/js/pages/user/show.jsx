@@ -20,18 +20,32 @@ export default function Show() {
         }, 1000);
     };
 
+    console.log(hasSentRequest, user.has_sent_follow_request);
     const handleFollow = () => {
-        const route = hasSentRequest ? 'unfollow' : (user.is_private ? 'follow-request' : 'follow');
+        const isCurrentlyFollowing = user.is_following || hasSentRequest;
 
-        // Toggle request status
-        setHasSentRequest(!hasSentRequest);
+        const route = isCurrentlyFollowing
+            ? 'unfollow'
+            : (user.is_private ? 'follow-request' : 'follow');
+
+        setIsLoading(true);
 
         router.post(`/user/${user.username}/${route}`, {}, {
             onSuccess: () => {
-                router.reload({});
+                if (user.is_private && !isCurrentlyFollowing) {
+                    setHasSentRequest(true);
+                } else {
+                    setHasSentRequest(false);
+                }
+                setIsLoading(false);
+            },
+            onError: () => {
+                setIsLoading(false);
             }
         });
     };
+
+
     const handleEditProfile = () => {
         router.get(`/user/${user.username}/edit`);
     };
