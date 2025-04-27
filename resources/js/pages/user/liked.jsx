@@ -29,11 +29,11 @@ export default function Liked() {
                     <option value="latest">{translations['Latest']}</option>
                     <option value="oldest">{translations['Oldest']}</option>
                     <option value="most_liked">{translations['Most Liked']}</option>
-                    <option value="reposted_friends">{translations['People I Follow']}</option>
+                    <option value="following">{translations['People I Follow']}</option>
                 </select>
             </div>
 
-            <div className="divide-y divide-gray-200 dark:divide-gray-800">
+            <div className="divide-y divide-gray-200 dark:divide-neutral-800">
                 {posts.length > 0 ? (
                     posts.map((post) => <PostComponent key={post.id} post={post} />)
                 ) : (

@@ -139,9 +139,9 @@ export default function Edit() {
                                 <SelectValue placeholder={translations['Select Status']} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="active">{translations['Active']}</SelectItem>
-                                <SelectItem value="suspended">{translations['Suspended']}</SelectItem>
-                                <SelectItem value="deactivated">{translations['Deactivated']}</SelectItem>
+                                <SelectItem value="active">{translations['active']}</SelectItem>
+                                <SelectItem value="suspended">{translations['suspended']}</SelectItem>
+                                <SelectItem value="deactivated">{translations['deactivated']}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

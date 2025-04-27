@@ -16,10 +16,11 @@ export default function Following() {
         });
     };
 
+
     return (
         <AppLayout>
             <Head title={translations['Following']} />
-            <div className="max-w-lg px-6">
+            <div className="px-6">
                 <h1 className="my-6 text-2xl font-bold">{translations['Following']}</h1>
                 {users.length === 0 ? (
                     <p className="text-gray-500">{translations['Not following anyone yet.']}</p>

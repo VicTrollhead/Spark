@@ -31,9 +31,17 @@ export default function Show() {
                 setShowOptions(false);
             }
         };
+
         document.addEventListener("mousedown", handleClickOutside);
+
+        window.Echo.private(`post.${post.id}`)
+            .listen('CommentCreated', (e) => {
+                router.reload();
+            });
+        console.log('подписался')
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
+            window.Echo.leave(`post.${post.id}`);
         };
     }, []);
 
@@ -279,7 +287,7 @@ export default function Show() {
                 </select>
             </div>
             <div className="mt-2 px-6">
-                <div className="divide-y divide-gray-200 dark:divide-gray-800">
+                <div className="divide-y divide-gray-200 dark:divide-neutral-800">
                     {post.comments.length > 0 ? (
                         post.comments.map((comment) => (
                             <div key={comment.id } className="py-4 flex items-center space-x-3">

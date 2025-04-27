@@ -103,7 +103,7 @@ export default function Dashboard() {
 
             <div className="p-6 text-2xl font-extrabold">{translations["What's new?"]}</div>
 
-            <div className="border-y bg-white p-4 dark:border-gray-800 dark:bg-neutral-950">
+            <div className="border-y bg-white p-4 dark:border-neutral-800 dark:bg-neutral-950">
                 <form onSubmit={handlePostSubmit} className="flex flex-col space-y-4">
                     <div className="my-3 flex items-center justify-start">
                         <label className="text-sm text-gray-700 dark:text-gray-200">
@@ -182,7 +182,7 @@ export default function Dashboard() {
                 </form>
             </div>
 
-            <div className="flex items-center justify-between border-b bg-white p-4 dark:border-gray-800 dark:bg-neutral-950">
+            <div className="flex items-center justify-between border-b bg-white p-4 dark:border-neutral-800 dark:bg-neutral-950">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{translations['Posts']}</h2>
                 <div className="flex items-center gap-2">
                     <select
@@ -207,7 +207,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            <div className="divide-y divide-gray-200 dark:divide-gray-800">
+            <div className="divide-y divide-gray-200 dark:divide-neutral-800">
                 {posts.length > 0 ? (
                     posts.map((post) => <PostComponent key={post.id} post={post} />)
                 ) : (

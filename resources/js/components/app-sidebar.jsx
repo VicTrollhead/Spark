@@ -5,21 +5,47 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
-    SidebarMenu,
     SidebarMenuButton,
     SidebarSeparator
 } from './ui/sidebar';
-import { Link, router, useForm, usePage } from '@inertiajs/react';
-import { Bookmark, BookOpen, Folder, Home, LogOut, Mail, Repeat, Settings, User, Users } from 'lucide-react';
-import AppLogo from './app-logo';
-import { useMobileNavigation } from '../hooks/use-mobile-navigation';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx';
-import { useInitials } from '@/hooks/use-initials.jsx';
+import { useForm, usePage } from '@inertiajs/react';
+import { Bookmark, Folder, Home, LogOut, Mail, Settings, User, Users, Repeat, MessagesSquareIcon  } from 'lucide-react';
+import {useEffect, useState} from "react";
 
 export function AppSidebar() {
     const { auth, translations } = usePage().props;
     const user = auth?.user;
     const { post } = useForm();
+    const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+
+    useEffect(() => {
+        const fetchUnreadCount = async () => {
+            try {
+                const response = await fetch('/notifications/unread-count');
+                const data = await response.json();
+                setUnreadNotificationsCount(data.unread_count);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchUnreadCount();
+    }, []);
+
+    window.Echo.private(`notifications.${user.id}`)
+        .listen('NotificationCreated', (e) => {
+            setUnreadNotificationsCount(unreadNotificationsCount+1);
+        })
+        .listen('NotificationIsReadChange', (e) => {
+            if(e.operation === 'read')
+            {
+                setUnreadNotificationsCount(unreadNotificationsCount-1);
+            }
+            else
+            {
+                setUnreadNotificationsCount(unreadNotificationsCount+1);
+            }
+        });
 
     if (!user) return null;
 
@@ -28,6 +54,11 @@ export function AppSidebar() {
             title: translations['Dashboard'],
             url: '/dashboard',
             icon: Home,
+        },
+        {
+            title: translations['Everyone chat'],
+            url: `/chat`,
+            icon: MessagesSquareIcon,
         },
         {
             title: translations['Friends'],
@@ -41,8 +72,9 @@ export function AppSidebar() {
         },
         {
             title: translations['Notifications'],
-            url: '#',
+            url: '/user/notifications',
             icon: Mail,
+            count: unreadNotificationsCount,
         },
         {
             title: translations['Favorites'],

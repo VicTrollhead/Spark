@@ -73,4 +73,10 @@ class Post extends Model
         return $this->belongsToMany(User::class, 'reposts');
     }
 
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+
 }

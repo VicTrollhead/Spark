@@ -119,6 +119,19 @@ class PostController extends Controller
                 'reposted_by_you' => $currentUser && $post->repostedByUsers->contains('id', $currentUser->id),
                 'reposted_by_user' => $post->repostedByUsers
                     ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
+                'reposted_by_recent' => $post->repostedByUsers()
+                    ->where('user_id', '!=', $post->user_id)
+                    ->orderByPivot('created_at', 'desc')
+                    ->take(3)
+                    ->get()
+                    ->map(function ($user) {
+                        return [
+                            'id' => $user->id,
+                            'name' => $user->name,
+                            'username' => $user->username,
+                            'profile_image_url' => $user->profileImage?->url,
+                        ];
+                    }),
             ];
         });
 
@@ -253,6 +266,19 @@ class PostController extends Controller
                 'reposted_by_you' => $currentUser && $post->repostedByUsers->contains('id', $currentUser->id),
                 'reposted_by_user' => $post->repostedByUsers
                     ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
+                'reposted_by_recent' => $post->repostedByUsers()
+                    ->where('user_id', '!=', $post->user_id)
+                    ->orderByPivot('created_at', 'desc')
+                    ->take(3)
+                    ->get()
+                    ->map(function ($user) {
+                        return [
+                            'id' => $user->id,
+                            'name' => $user->name,
+                            'username' => $user->username,
+                            'profile_image_url' => $user->profileImage?->url,
+                        ];
+                    }),
             ],
             'sort' => $sort
         ]);
@@ -347,6 +373,19 @@ class PostController extends Controller
                     'reposted_by_you' => $currentUser && $post->repostedByUsers->contains('id', $currentUser->id),
                     'reposted_by_user' => $post->repostedByUsers
                         ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
+                    'reposted_by_recent' => $post->repostedByUsers()
+                        ->where('user_id', '!=', $post->user_id)
+                        ->orderByPivot('created_at', 'desc')
+                        ->take(3)
+                        ->get()
+                        ->map(function ($user) {
+                            return [
+                                'id' => $user->id,
+                                'name' => $user->name,
+                                'username' => $user->username,
+                                'profile_image_url' => $user->profileImage?->url,
+                            ];
+                        }),
                 ];
             });
 

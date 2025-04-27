@@ -2,10 +2,12 @@
 
 //use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\RepostController;
 use App\Http\Controllers\UserController;
@@ -13,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return Inertia::render('auth/login');
 })->name('home');
 
 Route::post('/api/auth/google/callback', [GoogleAuthController::class, 'callback']);
@@ -27,20 +29,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/user/liked', [UserController::class, 'liked'])->name('user.liked');
     Route::get('/user/reposts', [UserController::class, 'reposts'])->name('user.reposts');
     Route::get('/user/following-posts', [UserController::class, 'followingPosts'])->name('user.followingPosts');
+    Route::get('/user/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('/user', [UserController::class, 'show'])->name('user.show');
     Route::get('/user/{user}/edit', [UserController::class, 'edit'])->name('user.edit');
     Route::patch('/user/{user}/update', [UserController::class, 'update'])->name('user.update');
+
     Route::get('/user/{user}', [UserController::class, 'show'])->name('user.show');
     Route::get('/user/search/{searchText}', [UserController::class, 'search'])->name('user.search');
 
-
     Route::post('/user/{user}/follow', [FollowController::class, 'follow'])->name('user.follow');
     Route::post('/user/{user}/unfollow', [FollowController::class, 'unfollow'])->name('user.unfollow');
+    Route::post('/user/{user}/follow-request', [FollowController::class, 'sendFollowRequest'])->name('follow.request');
     Route::get('/is-following/{user}', [FollowController::class, 'isFollowing'])->name('isFollowing');
     Route::get('/user/{user}/followers', [FollowController::class, 'followers'])->name('user.followers');
     Route::get('/user/{user}/following', [FollowController::class, 'following'])->name('user.following');
     Route::get('/user/{user}/friends', [UserController::class, 'friends'])->name('user.friends');
-
 
     Route::post('/dashboard', [PostController::class, 'store'])->name('posts.store');
     Route::get('/post/{post}', [PostController::class, 'show'])->name('post.show');
@@ -64,6 +67,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/post/{post}/edit', [PostController::class, 'edit'])->name('post.edit');
     Route::patch('/post/{post}/update', [PostController::class, 'update'])->name('post.update');
+
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::post('/message', [ChatController::class, 'message'])->name('chat.message');
+
+    Route::post('/message/{userId}', [ChatController::class, 'sendMessage'])->name('chat.sendMessage');
+    Route::get('/chat/{chatId}/messages', [ChatController::class, 'getMessages'])->name('chat.getMessages');
+    Route::get('/user-chats', [ChatController::class, 'getUserChats'])->name('chat.getUserChats');
+
+    Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::patch('/notifications/{notification}/unread', [NotificationController::class, 'markAsUnread'])->name('notifications.unread');
+    Route::patch('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+    Route::patch('/notifications/mark-all-unread', [NotificationController::class, 'markAllAsUnread'])->name('notifications.markAllAsUnread');
+
+    Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadNotificationsCount'])->name('notifications.unreadCount');
 
 });
 
