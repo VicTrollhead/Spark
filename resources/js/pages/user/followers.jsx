@@ -8,14 +8,17 @@ export default function Followers() {
     const { title, users: initialUsers, user, auth, translations } = usePage().props;
     const getInitials = useInitials();
     const [users, setUsers] = useState(initialUsers);
+    const [hasSentRequest, setHasSentRequest] = useState(user.has_sent_follow_request);
 
     const handleFollowToggle = (targetUser, isFollowed) => {
-        const action = isFollowed
-            ? 'unfollow'
-            : targetUser.is_private && !isFollowed
-                ? 'follow-request'
-                : 'follow';
-        console.log(targetUser.has_sent_follow_request);
+        let action;
+        if (isFollowed) {
+            action = 'unfollow';
+        } else if (targetUser.is_private && !isFollowed) {
+            action = 'follow-request';
+        } else {
+            action = 'follow';
+        }
 
         router.post(`/user/${targetUser.username}/${action}`, {}, {
             preserveScroll: true,
@@ -32,11 +35,8 @@ export default function Followers() {
                     )
                 );
             },
-            onError: () => {
-            },
         });
     };
-
 
     return (
         <AppLayout>
@@ -83,13 +83,15 @@ export default function Followers() {
                                                             : 'bg-blue-600 hover:bg-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600')
                                                 }`}
                                             >
-                                                {(follower.has_sent_follow_request && !follower.is_followed)
-                                                    ? translations['Request Sent']
-                                                    : (follower.is_followed
-                                                        ? translations['Unfollow']
-                                                        : translations['Follow'])}
+                                                {follower.is_private && !follower.is_followed && !follower.has_sent_follow_request
+                                                    ? translations['Send Follow Request']
+                                                    : (follower.has_sent_follow_request && !follower.is_followed
+                                                        ? translations['Request Sent']
+                                                        : (follower.is_followed
+                                                            ? translations['Unfollow']
+                                                            : translations['Follow']))
+                                                }
                                             </button>
-
                                         )}
                                     </div>
                                 </div>
@@ -101,3 +103,4 @@ export default function Followers() {
         </AppLayout>
     );
 }
+

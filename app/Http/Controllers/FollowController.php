@@ -43,7 +43,12 @@ class FollowController extends Controller
             'is_accepted' => !$user->is_private,
         ]);
 
-        NotificationService::create([
+        Notification::where('type', 'follow')
+            ->where('source_user_id', $followerId)
+            ->where('user_id', $followeeId)
+            ->delete();
+
+        $notification = NotificationService::create([
             'user_id' => $followeeId,
             'source_user_id' => $followerId,
             'type' => 'follow',
@@ -107,6 +112,7 @@ class FollowController extends Controller
                     'followers_count' => $follower->followers_count,
                     'is_followed' => $authUser->following->contains('id', $follower->id),
                     'has_sent_follow_request' => $hasSentFollowRequest,
+                    'is_private' => $follower->is_private,
                     'is_friend' => in_array($follower->id, $authUserFriends),
                 ];
             });
@@ -126,7 +132,6 @@ class FollowController extends Controller
     public function following(User $user)
     {
         $authUser = Auth::user();
-
         $authUserFriends = $authUser->friends->pluck('id')->toArray();
 
         $following = $user->following()
@@ -141,6 +146,7 @@ class FollowController extends Controller
                     'profile_image_url' => $followingUser->profileImage ? $followingUser->profileImage->url : null,
                     'followers_count' => $followingUser->followers_count,
                     'is_followed' => $authUser->following->contains($followingUser->id),
+                    'is_private' => $followingUser->is_private,
                     'is_friend' => in_array($followingUser->id, $authUserFriends),
                 ];
             });
@@ -176,14 +182,20 @@ class FollowController extends Controller
             ->where('user_id', $user->id)
             ->delete();
 
-        $new_notification = Notification::create([
+        Notification::create([
             'user_id' => $follow->follower_id,
             'source_user_id' => $follow->followee_id,
             'type' => 'follow',
             'is_read' => false,
             'extra_data' => 'accepted',
         ]);
-        event(new NotificationCreated($new_notification));
+
+        Notification::create([
+            'user_id' => $follow->followee_id,
+            'source_user_id' => $follow->follower_id,
+            'type' => 'follow',
+            'is_read' => false,
+        ]);
 
         $notification->delete();
 
@@ -205,14 +217,13 @@ class FollowController extends Controller
             ->where('user_id', $user->id)
             ->delete();
 
-        $new_notification = Notification::create([
+        Notification::create([
             'user_id' => $follow->follower_id,
             'source_user_id' => $follow->followee_id,
             'type' => 'follow',
             'is_read' => false,
             'extra_data' => 'rejected',
         ]);
-        event(new NotificationCreated($new_notification));
 
         Follow::where('follower_id', $sourceUser->id)
             ->where('followee_id', $user->id)
@@ -257,7 +268,6 @@ class FollowController extends Controller
                 ->where('source_user_id', $authUser->id)
                 ->where('user_id', $user->id)
                 ->delete();
-            event(new NotificationCreated($existingRequest->notification));
 
             return back()->with('success', 'Follow request deleted.');
         } else {
@@ -272,14 +282,13 @@ class FollowController extends Controller
                 ->where('user_id', $user->id)
                 ->delete();
 
-            $new_notification = Notification::create([
+            Notification::create([
                 'user_id' => $user->id,
                 'source_user_id' => $authUser->id,
                 'type' => 'follow',
                 'is_read' => false,
                 'extra_data' => 'pending',
             ]);
-            event(new NotificationCreated($new_notification));
 
             return back()->with('success', 'Follow request sent.');
         }

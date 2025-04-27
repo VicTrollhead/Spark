@@ -110,7 +110,7 @@ return [
     "liked your post." => "liked your post.",
     "reposted your post." => "reposted your post.",
     "commented on your post:" => "commented on your post:",
-    "followed to you." => "followed to you.",
+    "followed you." => "followed you.",
     "has sent you a follow request." => "has sent you a follow request.",
     "favorited your post." => "favorited your post.",
     "interacted with you." => "interacted with you.",
@@ -122,5 +122,6 @@ return [
     "accepted your follow request." => "accepted your follow request.",
     "rejected your follow request." => "rejected your follow request.",
     "All:" => "All:",
+    "Send Follow Request" => "Send Follow Request",
 ];
 
