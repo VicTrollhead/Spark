@@ -128,12 +128,21 @@ class NotificationController extends Controller
             ->where('is_read', false)
             ->update(['is_read' => true]);
 
+        $notification = Notification::where('user_id', $user->id)->first();
+
+        event(new NotificationIsReadChange($notification, 'allRead'));
         return back();
     }
 
     public function markAllAsUnread()
     {
-        Auth::user()->notifications()->update(['is_read' => false]);
+        $user = Auth::user();
+
+        $user->notifications()->update(['is_read' => false]);
+
+        $notification = Notification::where('user_id', $user->id)->first();
+
+        event(new NotificationIsReadChange($notification, 'allUnread'));
         return back();
     }
 }

@@ -19,18 +19,18 @@ export function AppSidebar() {
     const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
 
     useEffect(() => {
-        const fetchUnreadCount = async () => {
-            try {
-                const response = await fetch('/notifications/unread-count');
-                const data = await response.json();
-                setUnreadNotificationsCount(data.unread_count);
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        fetchUnreadCount();
+        fetchUnreadCount().catch(error => console.error(error));
     }, []);
+
+    const fetchUnreadCount = async () => {
+        try {
+            const response = await fetch('/notifications/unread-count');
+            const data = await response.json();
+            setUnreadNotificationsCount(data.unread_count);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     window.Echo.private(`notifications.${user.id}`)
         .listen('NotificationCreated', (e) => {
@@ -41,9 +41,17 @@ export function AppSidebar() {
             {
                 setUnreadNotificationsCount(unreadNotificationsCount-1);
             }
-            else
+            else if (e.operation === 'unread')
             {
                 setUnreadNotificationsCount(unreadNotificationsCount+1);
+            }
+            else if (e.operation === 'allRead')
+            {
+                setUnreadNotificationsCount(0);
+            }
+            else if (e.operation === 'allUnread')
+            {
+                fetchUnreadCount().catch(error => console.error(error));
             }
         });
 

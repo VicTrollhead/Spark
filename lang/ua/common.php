@@ -119,4 +119,7 @@ return [
     "Request Sent" => "Запит відправлено",
     "Subscribers" => "Підписників",
     "You follow each other" => "Ви підписані один на одного.",
+    "accepted your follow request." => "прийняв ваш запит на підписку.",
+    "rejected your follow request." => "відхилив ваш запит на підписку.",
+    "All:" => "Усі:",
 ];
