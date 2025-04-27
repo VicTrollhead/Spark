@@ -117,5 +117,7 @@ return [
     "Accept" => "Accept",
     "Decline" => "Decline",
     "Request Sent" => "Request Sent",
+    "Subscribers" => "Subscribers",
+    "You follow each other" => "You follow each other.",
 ];
 

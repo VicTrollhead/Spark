@@ -38,7 +38,7 @@ export default function Notifications() {
                     {translations['Notifications']}
                 </h1>
                 <div className="flex items-center gap-2">
-                    <div className="flex lg:flex-row gap-2 sm:flex-col ml-2">
+                    <div className="flex lg:flex-row gap-2 flex-col ml-2">
                         <button
                             onClick={() => router.patch(route('notifications.markAllAsRead'), {}, { preserveScroll: true })}
                             className="px-3 py-1 border rounded-md text-sm text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800 dark:bg-neutral-900"

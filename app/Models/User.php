@@ -77,13 +77,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsToMany(User::class, 'follows', 'follower_id', 'followee_id')
             ->wherePivot('is_accepted', true)
-            ->join('follows as f2', function ($join) {
-                $join->on('follows.followee_id', '=', 'f2.follower_id')
-                    ->whereColumn('f2.followee_id', 'users.id')
-                    ->where('f2.is_accepted', true);
-            })
-            ->select('users.*');
+            ->whereIn('followee_id', function ($query) {
+                $query->select('follower_id')
+                    ->from('follows')
+                    ->where('is_accepted', true)
+                    ->where('followee_id', $this->id);
+            });
     }
+
 
     public function isFollowing(User $user): bool
     {

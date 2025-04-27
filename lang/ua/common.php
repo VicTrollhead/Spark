@@ -105,7 +105,7 @@ return [
     "Read" => "Прочитано",
     "Unread" => "Непрочитано",
     "Mark all as read" => "Позначити всі як прочитані",
-    "Mark all as unread" => "Mark all as unread",
+    "Mark all as unread" => "Позначити всі як непрочитані",
     "Someone" => "Аноним",
     "liked your post." => "лайкнув ваш пост.",
     "reposted your post." => "репостнув ваш пост.",
@@ -117,4 +117,6 @@ return [
     "Accept" => "Прийняти",
     "Decline" => "Відхилити",
     "Request Sent" => "Запит відправлено",
+    "Subscribers" => "Підписників",
+    "You follow each other" => "Ви підписані один на одного.",
 ];

@@ -88,12 +88,13 @@ class FollowController extends Controller
     {
         $authUser = Auth::user();
 
+        $authUserFriends = $authUser->friends->pluck('id')->toArray(); // fetch once for performance
+
         $followers = $user->followers()
-            ->wherePivot('is_accepted', true)
             ->with('profileImage')
             ->withCount('followers')
             ->get()
-            ->map(function ($follower) use ($authUser) {
+            ->map(function ($follower) use ($authUser, $authUserFriends) {
                 return [
                     'id' => $follower->id,
                     'name' => $follower->name,
@@ -101,6 +102,7 @@ class FollowController extends Controller
                     'profile_image_url' => $follower->profileImage ? $follower->profileImage->url : null,
                     'followers_count' => $follower->followers_count,
                     'is_followed' => $authUser->following->contains($follower->id),
+                    'is_friend' => in_array($follower->id, $authUserFriends),
                 ];
             });
 
@@ -116,16 +118,18 @@ class FollowController extends Controller
         ]);
     }
 
+
     public function following(User $user)
     {
         $authUser = Auth::user();
 
+        $authUserFriends = $authUser->friends->pluck('id')->toArray(); // fetch once for performance
+
         $following = $user->following()
-            ->wherePivot('is_accepted', true)
             ->with('profileImage')
             ->withCount('followers')
             ->get()
-            ->map(function ($followingUser) use ($authUser) {
+            ->map(function ($followingUser) use ($authUser, $authUserFriends) {
                 return [
                     'id' => $followingUser->id,
                     'name' => $followingUser->name,
@@ -133,6 +137,7 @@ class FollowController extends Controller
                     'profile_image_url' => $followingUser->profileImage ? $followingUser->profileImage->url : null,
                     'followers_count' => $followingUser->followers_count,
                     'is_followed' => $authUser->following->contains($followingUser->id),
+                    'is_friend' => in_array($followingUser->id, $authUserFriends),
                 ];
             });
 
@@ -147,6 +152,7 @@ class FollowController extends Controller
             ],
         ]);
     }
+
 
     public function acceptRequest(Follow $follow)
     {
