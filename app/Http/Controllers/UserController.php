@@ -644,16 +644,27 @@ class UserController extends Controller
 
     public function friends(User $user): Response
     {
+        $currentUser = Auth::user();
+
+        // Get friends and their related information
         $friends = $user->friends()
             ->with('profileImage')
-            ->select('id', 'name', 'username')
+            ->select('id', 'name', 'username', 'is_private') // Include the is_private field
             ->get()
-            ->map(function ($friend) {
+            ->map(function ($friend) use ($currentUser) {
+                $isFollowed = $currentUser ? $currentUser->following->contains('id', $friend->id) : false;
+                $hasSentFollowRequest = $currentUser ? $currentUser->pendingFollowRequests()->where('followee_id', $friend->id)->exists() : false;
+                $isPrivate = $friend->is_private;
+                $isFriend = in_array($friend->id, $currentUser->friends()->pluck('id')->toArray());
                 return [
                     'id' => $friend->id,
                     'name' => $friend->name,
                     'username' => $friend->username,
                     'profile_image_url' => $friend->profileImage ? $friend->profileImage->url : null,
+                    'is_private' => $isPrivate,
+                    'is_followed' => $isFollowed,
+                    'has_sent_follow_request' => $hasSentFollowRequest,
+                    'is_friend' => $isFriend,
                 ];
             });
 
@@ -664,9 +675,13 @@ class UserController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
+                'is_following' => $currentUser ? $user->followers()->where('follower_id', $currentUser->id)->exists() : false,
+                'has_sent_follow_request' => $currentUser ? $currentUser->pendingFollowRequests()->where('followee_id', $user->id)->exists() : false,
             ],
         ]);
     }
+
+
 
     public function reposts(Request $request, User $user = null): Response
     {
