@@ -132,6 +132,12 @@ class PostController extends Controller
                             'profile_image_url' => $user->profileImage?->url,
                         ];
                     }),
+                'current_user' => [
+                    'id' => $currentUser->id,
+                    'username' => $currentUser->username,
+                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'name' => $currentUser->name,
+                ],
             ];
         });
 
@@ -279,6 +285,12 @@ class PostController extends Controller
                             'profile_image_url' => $user->profileImage?->url,
                         ];
                     }),
+                'current_user' => [
+                    'id' => $currentUser->id,
+                    'username' => $currentUser->username,
+                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'name' => $currentUser->name,
+                ],
             ],
             'sort' => $sort
         ]);
@@ -386,6 +398,12 @@ class PostController extends Controller
                                 'profile_image_url' => $user->profileImage?->url,
                             ];
                         }),
+                    'current_user' => [
+                        'id' => $currentUser->id,
+                        'username' => $currentUser->username,
+                        'profile_image_url' => $currentUser->profileImage?->url,
+                        'name' => $currentUser->name,
+                    ],
                 ];
             });
 

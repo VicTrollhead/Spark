@@ -103,15 +103,11 @@ class UserController extends Controller
                 'reposted_by_you' => $currentUser && $post->repostedByUsers->contains('id', $currentUser->id),
                 'reposted_by_user' => $post->repostedByUsers
                     ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
-                'reposted_by_recent' => collect($post->repostedByUsers()
+                'reposted_by_recent' => $post->repostedByUsers()
                     ->where('user_id', '!=', $post->user_id)
                     ->orderByPivot('created_at', 'desc')
-                    ->get()
-                )->when($currentUser && $post->repostedByUsers->contains('id', $currentUser->id), function ($collection) use ($currentUser) {
-                    return collect([$collection->firstWhere('id', $currentUser->id)])
-                        ->merge($collection->where('id', '!=', $currentUser->id));
-                })
                     ->take(3)
+                    ->get()
                     ->map(function ($user) {
                         return [
                             'id' => $user->id,
@@ -120,6 +116,12 @@ class UserController extends Controller
                             'profile_image_url' => $user->profileImage?->url,
                         ];
                     }),
+                'current_user' => [
+                    'id' => $currentUser->id,
+                    'username' => $currentUser->username,
+                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'name' => $currentUser->name,
+                ],
 
 
             ];
@@ -433,6 +435,12 @@ class UserController extends Controller
                             'profile_image_url' => $user->profileImage?->url,
                         ];
                     }),
+                'current_user' => [
+                    'id' => $currentUser->id,
+                    'username' => $currentUser->username,
+                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'name' => $currentUser->name,
+                ],
             ];
         });
 
@@ -544,6 +552,12 @@ class UserController extends Controller
                         'username' => $user->username,
                         'profile_image_url' => $user->profileImage?->url,
                     ]),
+                'current_user' => [
+                    'id' => $currentUser->id,
+                    'username' => $currentUser->username,
+                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'name' => $currentUser->name,
+                ],
             ];
         });
 
@@ -628,6 +642,12 @@ class UserController extends Controller
                                 'profile_image_url' => $user->profileImage?->url,
                             ];
                         }),
+                    'current_user' => [
+                        'id' => $currentUser->id,
+                        'username' => $currentUser->username,
+                        'profile_image_url' => $currentUser->profileImage?->url,
+                        'name' => $currentUser->name,
+                    ],
                 ];
             });
 
@@ -760,6 +780,12 @@ class UserController extends Controller
                             'profile_image_url' => $user->profileImage?->url,
                         ];
                     }),
+                'current_user' => [
+                    'id' => $currentUser->id,
+                    'username' => $currentUser->username,
+                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'name' => $currentUser->name,
+                ],
             ];
         });
 
