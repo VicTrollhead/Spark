@@ -50,7 +50,20 @@ class UserController extends Controller
 
         $repostedPostsQuery = Post::whereHas('repostedByUsers', function ($query) use ($user) {
             $query->where('user_id', $user->id);
-        })->with(['user.profileImage', 'comments', 'likes', 'media', 'hashtags', 'favorites', 'repostedByUsers']);
+        })
+            ->with(['user.profileImage', 'comments', 'likes', 'media', 'hashtags', 'favorites', 'repostedByUsers'])
+            ->where(function ($query) use ($currentUser) {
+                $query->where('is_private', 0);
+
+                if ($currentUser) {
+                    $query->orWhere(function ($subQuery) use ($currentUser) {
+                        $subQuery->where('user_id', $currentUser->id)
+                            ->orWhereHas('user.followers', function ($followersQuery) use ($currentUser) {
+                                $followersQuery->where('follower_id', $currentUser->id);
+                            });
+                    });
+                }
+            });
 
         if ($sort === 'reposts') {
             $originalPosts = collect();
@@ -122,8 +135,6 @@ class UserController extends Controller
                     'profile_image_url' => $currentUser->profileImage?->url,
                     'name' => $currentUser->name,
                 ],
-
-
             ];
         });
 
@@ -149,7 +160,7 @@ class UserController extends Controller
                 'has_sent_follow_request' => Auth::check() && auth()->user()->pendingFollowRequests()
                         ->where('followee_id', $user->id)
                         ->exists(),
-        ],
+            ],
             'posts' => $posts,
             'filters' => [
                 'sort' => $sort,
@@ -158,6 +169,7 @@ class UserController extends Controller
             'following_string' => trans_choice('common.following_count', $user->following_count),
         ]);
     }
+
 
     public function edit(User $user): Response
     {

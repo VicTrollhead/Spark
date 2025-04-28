@@ -56,7 +56,7 @@ export default function Followers() {
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="flex flex-col w-full">
-                                    <div className="flex items-center">
+                                    <div className="flex items-center gap-2">
                                         <div>
                                             <Link href={`/user/${follower.username}`} className="font-medium text-blue-500 hover:underline">
                                                 {follower.name}

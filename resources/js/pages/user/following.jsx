@@ -44,7 +44,7 @@ export default function Following() {
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="flex flex-col w-full">
-                                    <div className="flex items-center">
+                                    <div className="flex items-center gap-2">
                                         <div>
                                             <Link href={`/user/${followee.username}`} className="font-medium text-blue-500 hover:underline">
                                                 {followee.name}
