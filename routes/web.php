@@ -36,6 +36,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/user/{user}', [UserController::class, 'show'])->name('user.show');
     Route::get('/user/search/{searchText}', [UserController::class, 'search'])->name('user.search');
+    Route::get('/search-empty', [UserController::class, 'searchEmpty'])->name('user.searchEmpty');
 
     Route::post('/user/{user}/follow', [FollowController::class, 'follow'])->name('user.follow');
     Route::post('/user/{user}/unfollow', [FollowController::class, 'unfollow'])->name('user.unfollow');

@@ -343,6 +343,15 @@ class UserController extends Controller
         ]);
     }
 
+    public function searchEmpty(Request $request): Response
+    {
+        return Inertia::render('user/search-users', [
+            'users' => [],
+            'sort' => 'oldest',
+            'searchText' => '',
+        ]);
+    }
+
     public function usersList(Request $request)
     {
         $usersQuery = User::with('profileImage')->withCount('followers');
