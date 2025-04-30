@@ -9,7 +9,7 @@ import {
     SidebarSeparator
 } from './ui/sidebar';
 import { useForm, usePage } from '@inertiajs/react';
-import { Bookmark, Folder, Home, LogOut, Mail, Settings, User, Users, Repeat, MessagesSquareIcon  } from 'lucide-react';
+import { Bookmark, Folder, Home, LogOut, Mail, Settings, User, Users, Repeat, MessagesSquareIcon, Hash  } from 'lucide-react';
 import {useEffect, useState} from "react";
 
 export function AppSidebar() {
@@ -98,6 +98,11 @@ export function AppSidebar() {
             title: translations['Reposts'],
             url: '/user/reposts',
             icon: Repeat,
+        },
+        {
+            title: 'Popular hashtags',
+            url: '/show-popular-hashtags',
+            icon: Hash,
         },
         {
             title: translations['Profile'],

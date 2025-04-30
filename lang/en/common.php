@@ -128,5 +128,8 @@ return [
     "No messages anyone yet." => "No messages anyone yet.",
     "Chat with" => "Chat with",
     "Select user to start new chat" => "Select user to start chat",
+    "Explore trending topics by post engagement." => "Explore trending topics by post engagement.",
+    "Likes" => "Likes",
+    "Most Posts" => "Most Posts",
 ];
 

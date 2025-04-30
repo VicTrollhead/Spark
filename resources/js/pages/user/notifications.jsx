@@ -5,7 +5,7 @@ import {useEffect, useState} from 'react';
 import {Notification} from "../../components/notification.jsx";
 
 export default function Notifications() {
-    const { auth, notifications, translations } = usePage().props;
+    const { auth, notifications, translations, read_count, unread_count } = usePage().props;
     const user = auth?.user;
     const [isLoading, setIsLoading] = useState(false);
     const [sort, setSort] = useState(usePage().props.sort || 'unread');
@@ -31,12 +31,13 @@ export default function Notifications() {
         }, 1000);
     };
 
+
     return (
         <AppLayout>
             <Head title={translations['Notifications']} />
 
             <div className="flex flex-wrap justify-between items-center p-6">
-                <h1 className="text-2xl font-extrabold text-gray-800 dark:text-white">
+                <h1 className="text-2xl font-extrabold ">
                     {translations['Notifications']}
                 </h1>
                 <div className="flex items-center gap-2">
@@ -58,12 +59,12 @@ export default function Notifications() {
                         <select
                             value={sort}
                             onChange={(e) => handleSortChange(e.target.value)}
-                            className="px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
+                            className="px-3 py-2 border rounded-md dark:bg-neutral-900 dark:text-white"
                         >
-                            <option value="latest">{translations['Latest']}</option>
-                            <option value="oldest">{translations['Oldest']}</option>
-                            <option value="read">{translations['Read']}</option>
-                            <option value="unread">{translations['Unread']}</option>
+                            <option value="latest">{translations['Latest']} ({read_count + unread_count})</option>
+                            <option value="oldest">{translations['Oldest']} ({read_count + unread_count})</option>
+                            <option value="read">{translations['Read']} ({read_count})</option>
+                            <option value="unread">{translations['Unread']} ({unread_count})</option>
                         </select>
                     </div>
 

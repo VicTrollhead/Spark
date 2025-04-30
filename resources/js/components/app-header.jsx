@@ -20,6 +20,8 @@ import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu.jsx';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx';
 import { useInitials } from '@/hooks/use-initials.jsx';
 import AppearanceToggle from '@/components/appearance-toggle.jsx';
+import { useEffect, useState } from 'react';
+import { Badge } from '@/components/ui/badge.jsx';
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
@@ -29,6 +31,46 @@ export function AppHeader({ breadcrumbs = [] }) {
     const { auth } = page.props;
     const user = auth?.user;
     const getInitials = useInitials();
+    const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+
+    useEffect(() => {
+        fetchUnreadCount().catch(error => console.error(error));
+    }, []);
+
+    const fetchUnreadCount = async () => {
+        try {
+            const response = await fetch('/notifications/unread-count');
+            const data = await response.json();
+            console.log(data);
+            setUnreadNotificationsCount(data.unread_count);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    window.Echo.private(`notifications.${user.id}`)
+        .listen('NotificationCreated', (e) => {
+            setUnreadNotificationsCount(unreadNotificationsCount+1);
+        })
+        .listen('NotificationIsReadChange', (e) => {
+            if(e.operation === 'read')
+            {
+                setUnreadNotificationsCount(unreadNotificationsCount-1);
+            }
+            else if (e.operation === 'unread')
+            {
+                setUnreadNotificationsCount(unreadNotificationsCount+1);
+            }
+            else if (e.operation === 'allRead')
+            {
+                setUnreadNotificationsCount(0);
+            }
+            else if (e.operation === 'allUnread')
+            {
+                fetchUnreadCount().catch(error => console.error(error));
+            }
+        });
+
     if (!user) return null;
 
     const mainNavItems = [
@@ -86,6 +128,7 @@ export function AppHeader({ breadcrumbs = [] }) {
             title: translations['Notifications'],
             url: '/user/notifications',
             icon: Mail,
+            count: unreadNotificationsCount,
         },
         {
             title: translations['Favorites'],
@@ -157,11 +200,12 @@ export function AppHeader({ breadcrumbs = [] }) {
                                 </SheetHeader>
                                 <div className="mt-4 flex h-full flex-1 flex-col">
                                     <div className="flex h-full flex-col justify-between text-sm">
-                                        <div className="flex flex-col space-y-4">
+                                        <div className="flex flex-col space-y-4 gap-0.5">
                                             {sideBarNavItems.map((item) => (
-                                                <Link key={item.title + item.url} href={item.url} className="flex items-center space-x-2">
+                                                <Link key={item.title + item.url} href={item.url} className="flex items-center space-x-2 gap-1">
                                                     {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
                                                     <span>{item.title}</span>
+                                                    {item.count && item.count !== 0 ? (<Badge className="bg-neutral-500 dark:bg-neutral-300">{item.count}</Badge>) : ''}
                                                 </Link>
                                             ))}
                                             <DropdownMenuSeparator className="mb-5" />

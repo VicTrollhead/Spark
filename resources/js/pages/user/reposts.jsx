@@ -57,7 +57,7 @@ export default function Reposts() {
                 {posts.length > 0 ? (
                     posts.map((post) => <PostComponent key={post.id} post={post} />)
                 ) : (
-                    <p className="text-gray-500 dark:text-gray-400 px-6 py-4">{translations['No reposts yet.']}</p>
+                    <p className="text-gray-600 dark:text-gray-300 px-6 py-4">{translations['No reposts yet.']}</p>
                 )}
             </div>
         </AppLayout>

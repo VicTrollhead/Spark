@@ -40,6 +40,9 @@ class NotificationController extends Controller
 
         $notifications = $query->get();
 
+        $readCount = Notification::where('user_id', $currentUser->id)->where('is_read', true)->count();
+        $unreadCount = Notification::where('user_id', $currentUser->id)->where('is_read', false)->count();
+
         $formattedNotifications = $notifications->map(function ($notification) use ($currentUser) {
             $post = $notification->post;
             $sourceUser = $notification->sourceUser;
@@ -79,6 +82,8 @@ class NotificationController extends Controller
             ];
         });
 
+
+
         return Inertia::render('user/notifications', [
             'user' => [
                 'id' => $currentUser->id,
@@ -88,6 +93,8 @@ class NotificationController extends Controller
             ],
             'notifications' => $formattedNotifications,
             'sort' => $sort,
+            'read_count' => $readCount,
+            'unread_count' => $unreadCount,
         ]);
     }
 

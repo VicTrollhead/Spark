@@ -34,7 +34,7 @@ return [
     "What's new?" => "Що нового?",
     "Private (Only for subscribers)" => "Приватний (тільки для підписників)",
     "What's on your mind?" => "Що у вас на думці?",
-    "Upload Media (Images or Videos)" => "Завантажити мультимедіа (зображення або відео)",
+    "Upload Media (Images or Videos)" => "Завантажте мультимедіа",
     "Hashtags" => "Хештеги",
     "Add hashtag..." => "Додайте хештег...",
     "Publish" => "Опублікувати",
@@ -128,4 +128,7 @@ return [
     "No messages anyone yet." => "Немає жодного повідомлення.",
     "Chat with" => "Чат з",
     "Select user to start new chat" => "Виберіть юзера для початку нового чату",
+    "Explore trending topics by post engagement." => "Знаходьте трендові теми за взаємодіями з постами.",
+    "Likes" => "Лайки",
+    "Most Posts" => "Наибільше постів",
 ];

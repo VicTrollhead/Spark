@@ -418,6 +418,38 @@ class PostController extends Controller
         ]);
     }
 
+    public function showPopularHashtags(Request $request)
+    {
+        $sort = $request->query('sort', 'likes');
+
+        $hashtags = Hashtag::withCount('posts')
+            ->with(['posts' => function ($query) {
+                $query->withCount('likes');
+            }])
+            ->get()
+            ->map(function ($hashtag) {
+                $totalLikes = $hashtag->posts->sum('likes_count');
+
+                return [
+                    'id' => $hashtag->id,
+                    'hashtag' => $hashtag->hashtag,
+                    'posts_count' => $hashtag->posts_count,
+                    'total_likes' => $totalLikes,
+                ];
+            });
+        if ($sort === 'posts') {
+            $hashtags = $hashtags->sortByDesc('posts_count')->values();
+        } else {
+            $hashtags = $hashtags->sortByDesc('total_likes')->values();
+        }
+
+        return Inertia::render('post/popular-hashtags', [
+            'hashtags' => $hashtags,
+            'sort' => $sort,
+        ]);
+    }
+
+
 
     public function edit(Post $post): Response
     {

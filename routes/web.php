@@ -52,6 +52,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/dashboard', [PostController::class, 'store'])->name('posts.store');
     Route::get('/post/{post}', [PostController::class, 'show'])->name('post.show');
     Route::delete('/post/{post}', [PostController::class, 'destroy']);
+    Route::get('/show-popular-hashtags', [PostController::class, 'showPopularHashtags'])->name('showPopularHashtags');
     Route::get('/popular-hashtags', [PostController::class, 'popularHashtags'])->name('popularHashtags');
     Route::get('/posts-by-hashtag/{hashtag}', [PostController::class, 'postsByHashtag'])->name('postsByHashtag');
 
