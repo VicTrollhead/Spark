@@ -53,7 +53,7 @@ export default function Message({ userId, message }) {
                 <div className="flex mb-2">
                     <div className="w-full sm:max-w-md">
                         <div className="flex justify-between text-xs text-gray-500 mb-1">
-                            <Link href={`/user/${message.user.username}`} className="w-full flex items-center">
+                            <Link href={`/user/${message.user.username}`} className="w-fit flex items-center">
                                 <div className="flex items-center gap-2">
                                     <div className="grid flex-1 text-left leading-tight">
                                         <div>

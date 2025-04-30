@@ -9,7 +9,7 @@ class Chat extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user1_id', 'user2_id'];
+    protected $fillable = ['user1_id', 'user2_id', 'last_message_id'];
 
     public static function getChat($userId1, $userId2)
     {
@@ -18,6 +18,11 @@ class Chat extends Model
         })->orWhere(function ($query) use ($userId1, $userId2) {
             $query->where('user1_id', $userId2)->where('user2_id', $userId1);
         })->first();
+    }
+
+    public function lastMessage()
+    {
+        return $this->belongsTo(Message::class, 'last_message_id');
     }
 
     public static function firstOrCreateChat($userId1, $userId2)

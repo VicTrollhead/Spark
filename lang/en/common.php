@@ -123,5 +123,10 @@ return [
     "rejected your follow request." => "rejected your follow request.",
     "All:" => "All:",
     "Send Follow Request" => "Send Follow Request",
+    "Start new chat" => "Start new chat",
+    "Not chats anyone yet." => "Not chats anyone yet.",
+    "No messages anyone yet." => "No messages anyone yet.",
+    "Chat with" => "Chat with",
+    "Select user to start new chat" => "Select user to start chat",
 ];
 

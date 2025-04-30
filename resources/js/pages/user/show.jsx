@@ -20,7 +20,6 @@ export default function Show() {
         }, 1000);
     };
 
-    console.log(hasSentRequest, user.has_sent_follow_request);
     const handleFollow = () => {
         const isCurrentlyFollowing = user.is_following || hasSentRequest;
 

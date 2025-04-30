@@ -2,16 +2,24 @@ import React, {useRef, useState} from "react";
 import {router, usePage} from "@inertiajs/react";
 import {SendIcon} from "lucide-react";
 
-export default function MessageInput() {
+export default function MessageInput({ chatId }) {
     const { translations } = usePage().props;
     const [message, setMessage] = useState("");
     const textareaRef = useRef(null);
 
     const messageRequest = async (text) => {
         try {
-            await router.post(`/message`, {
-                text,
-            });
+            if (!chatId){
+                await router.post(`/chat/message`, {
+                    text,
+                });
+            }
+            else{
+                await router.post(`/chat/user-chat/post-message`, {
+                    chatId,
+                    text,
+                });
+            }
         } catch (err) {
             console.log(err.message);
         }
@@ -39,8 +47,8 @@ export default function MessageInput() {
 
     const handleChange = (e) => {
         const el = e.target;
-        el.style.height = 'auto'; // сбрасываем текущую высоту
-        el.style.height = el.scrollHeight + 'px'; // задаем новую высоту
+        el.style.height = 'auto';
+        el.style.height = el.scrollHeight + 'px';
         setMessage(el.value);
     };
 
