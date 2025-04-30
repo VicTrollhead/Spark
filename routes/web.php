@@ -21,6 +21,7 @@ Route::get('/', function () {
 Route::post('/api/auth/google/callback', [GoogleAuthController::class, 'callback']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/', [PostController::class, 'index'])->name('home');
     Route::get('dashboard', [PostController::class, 'index'])->name('dashboard');
     Route::get('dashboard/users', [UserController::class, 'users'])->name('dashboard.users');
     Route::get('/users-list', [UserController::class, 'usersList'])->name('users.list');
@@ -71,12 +72,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/post/{post}/edit', [PostController::class, 'edit'])->name('post.edit');
     Route::patch('/post/{post}/update', [PostController::class, 'update'])->name('post.update');
 
-    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
-    Route::post('/message', [ChatController::class, 'message'])->name('chat.message');
+    Route::get('/chat/everyone', [ChatController::class, 'getEveryoneChat'])->name('chat.getEveryoneChat');
+    Route::post('/chat/message', [ChatController::class, 'message'])->name('chat.message');
 
-    Route::post('/message/{userId}', [ChatController::class, 'sendMessage'])->name('chat.sendMessage');
-    Route::get('/chat/{chatId}/messages', [ChatController::class, 'getMessages'])->name('chat.getMessages');
-    Route::get('/user-chats', [ChatController::class, 'getUserChats'])->name('chat.getUserChats');
+    Route::get('/chat/user-chats', [ChatController::class, 'getUserChats'])->name('chat.getUserChats');
+    Route::get('/chat/user-chat/{user}', [ChatController::class, 'getUserChat'])->name('chat.getUserChat');
+    Route::post('/chat/user-chat/new/{user}', [ChatController::class, 'createUserChat'])->name('chat.createUserChat');
+    Route::post('/chat/user-chat/post-message', [ChatController::class, 'postMessageToUserChat'])->name('chat.postMessageToUserChat');
 
     Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::patch('/notifications/{notification}/unread', [NotificationController::class, 'markAsUnread'])->name('notifications.unread');

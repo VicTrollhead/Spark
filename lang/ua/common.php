@@ -123,4 +123,9 @@ return [
     "rejected your follow request." => "відхилив ваш запит на підписку.",
     "All:" => "Усі:",
     "Send Follow Request" => "Відправити запит на підписку",
+    "Start new chat" => "Розпочати новий чат",
+    "Not chats anyone yet." => "Немає жодного чату.",
+    "No messages anyone yet." => "Немає жодного повідомлення.",
+    "Chat with" => "Чат з",
+    "Select user to start new chat" => "Виберіть юзера для початку нового чату",
 ];

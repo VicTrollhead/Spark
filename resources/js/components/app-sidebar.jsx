@@ -65,7 +65,12 @@ export function AppSidebar() {
         },
         {
             title: translations['Everyone chat'],
-            url: `/chat`,
+            url: `/chat/everyone`,
+            icon: MessagesSquareIcon,
+        },
+        {
+            title: translations['User chats'],
+            url: `/chat/user-chats`,
             icon: MessagesSquareIcon,
         },
         {

@@ -47,9 +47,4 @@ class GotPersonalMessage implements ShouldBroadcast
             'chat_id' => $this->chatId,
         ];
     }
-
-    public function broadcastAs(): string
-    {
-        return 'personal.message';
-    }
 }
