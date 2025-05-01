@@ -2,8 +2,8 @@ import { usePage, Link, Head, router } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
-import {useEffect, useState} from 'react';
-import {RefreshCw, SendIcon} from 'lucide-react';
+import {useState} from 'react';
+import {RefreshCw, Search, SendIcon} from 'lucide-react';
 import {
     Dialog, DialogClose,
     DialogContent,
@@ -11,18 +11,23 @@ import {
     DialogTitle,
     DialogTrigger
 } from "../../components/ui/dialog.jsx";
+import {Input} from "../../components/ui/input.jsx";
 
 export default function UserChats() {
     const { chats, users, translations } = usePage().props;
     const getInitials = useInitials();
     const [isLoading, setIsLoading] = useState(false);
+    const [usersSearch, setUsersSearch] = useState(users || []);
 
-    const handleNewChat = async (user_id) => {
-        try {
-            await router.post(`/chat/user-chat/new/${user_id}`);
-        } catch (err) {
-            console.log(err.message);
-        }
+    const onSearchChange = async (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+
+        const filteredUsers = users.filter(user =>
+            user.name.toLowerCase().includes(searchTerm) ||
+            user.username.toLowerCase().includes(searchTerm)
+        );
+
+        setUsersSearch(filteredUsers);
     };
 
     const handleReload = () => {
@@ -76,9 +81,14 @@ export default function UserChats() {
                                         {translations['Select user to start new chat']}
                                     </DialogTitle>
                                     <DialogDescription className="h-[50vh] overflow-y-auto flex flex-col gap-3">
-                                        {users.map((user) => (
+                                        <span className="flex items-center space-x-3">
+                                            <Input placeholder={translations['Search users']} className="w-full" onChange={onSearchChange} />
+                                        </span>
+                                        {usersSearch.length === 0 ? (
+                                            <DialogClose className="text-gray-500 text-center text-lg mt-4">{translations['Not friends for chat anyone yet.']}</DialogClose>
+                                        ) : (usersSearch.map((user) => (
                                             <DialogClose key={user.id}
-                                                         onClick={() => handleNewChat(user.id)}
+                                                         onClick={() => router.post(`/chat/user-chat/new/${user.id}`)}
                                                          className="flex flex-row gap-3 border dark:border-gray-600 rounded-md px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer">
                                                 <Avatar className="my-auto h-12 w-12 md:h-15 md:w-15 border-2 border-neutral-800 dark:border-gray-400">
                                                     <AvatarImage src={user.profile_image_url} alt={user.name} />
@@ -93,7 +103,7 @@ export default function UserChats() {
                                                     </div>
                                                 </div>
                                             </DialogClose>
-                                        ))}
+                                        )))}
                                     </DialogDescription>
                                 </DialogHeader>
                             </DialogContent>

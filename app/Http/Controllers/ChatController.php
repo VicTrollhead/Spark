@@ -94,8 +94,9 @@ class ChatController extends Controller
             ];
         });
 
-        $users = User::with('profileImage')
-            ->whereNotIn('id', $chatUserIds)
+        $users = $user->friends()
+            ->whereNotIn('users.id', $chatUserIds)
+            ->with('profileImage')
             ->latest()
             ->get()
             ->map(function ($user) {
@@ -161,7 +162,7 @@ class ChatController extends Controller
         ]);
     }
 
-    public function createUserChat(User $otherUser): RedirectResponse
+    public function searchOrCreateUserChat(User $otherUser): RedirectResponse
     {
         $user = Auth::user();
 
@@ -196,6 +197,30 @@ class ChatController extends Controller
         event(new GotPersonalMessage($message, $validated['chatId']));
 
         return redirect()->back();
+    }
+
+    public function deleteMessage(Message $message): RedirectResponse
+    {
+        $user = Auth::user();
+
+        if ($message->user_id !== $user->id) {
+            abort(403, 'You cannot delete this message.');
+        }
+
+        $chat = $message->chat;
+
+        $message->delete();
+
+        if ($chat != null && $chat->last_message_id === $message->id) {
+            $previousMessage = Message::where('chat_id', $chat->id)
+                ->latest('created_at')
+                ->first();
+
+            $chat->last_message_id = $previousMessage?->id;
+            $chat->save();
+        }
+
+        return redirect()->back()->with('success', 'The message has been deleted.');
     }
 
 }

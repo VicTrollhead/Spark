@@ -131,5 +131,7 @@ return [
     "Explore trending topics by post engagement." => "Explore trending topics by post engagement.",
     "Likes" => "Likes",
     "Most Posts" => "Most Posts",
+    "Not friends for chat anyone yet." => "Not friends for chat anyone yet.",
+    "Write" => "Write",
 ];
 

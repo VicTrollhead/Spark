@@ -75,11 +75,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/chat/everyone', [ChatController::class, 'getEveryoneChat'])->name('chat.getEveryoneChat');
     Route::post('/chat/message', [ChatController::class, 'message'])->name('chat.message');
-
     Route::get('/chat/user-chats', [ChatController::class, 'getUserChats'])->name('chat.getUserChats');
     Route::get('/chat/user-chat/{user}', [ChatController::class, 'getUserChat'])->name('chat.getUserChat');
-    Route::post('/chat/user-chat/new/{user}', [ChatController::class, 'createUserChat'])->name('chat.createUserChat');
+    Route::post('/chat/user-chat/new/{user}', [ChatController::class, 'searchOrCreateUserChat'])->name('chat.createUserChat');
     Route::post('/chat/user-chat/post-message', [ChatController::class, 'postMessageToUserChat'])->name('chat.postMessageToUserChat');
+    Route::delete('/chat/message/{message}', [ChatController::class, 'deleteMessage'])->name('chat.deleteMessage');
 
     Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::patch('/notifications/{notification}/unread', [NotificationController::class, 'markAsUnread'])->name('notifications.unread');

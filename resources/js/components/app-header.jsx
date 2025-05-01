@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { cn } from '@/lib/utils';
 import { Link, router, usePage } from '@inertiajs/react';
 import {
-    Bookmark, Folder, FolderHeart,
+    Bookmark, Folder, FolderHeart, Hash,
     Home, List,
     LogOut,
     Mail,
@@ -41,7 +41,6 @@ export function AppHeader({ breadcrumbs = [] }) {
         try {
             const response = await fetch('/notifications/unread-count');
             const data = await response.json();
-            console.log(data);
             setUnreadNotificationsCount(data.unread_count);
         } catch (error) {
             console.error(error);
@@ -139,6 +138,11 @@ export function AppHeader({ breadcrumbs = [] }) {
             title: translations['Reposts'],
             url: '/user/reposts',
             icon: Repeat,
+        },
+        {
+            title: translations['Popular hashtags'],
+            url: '/show-popular-hashtags',
+            icon: Hash,
         },
         {
             title: translations['Profile'],

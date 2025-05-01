@@ -100,7 +100,7 @@ export function AppSidebar() {
             icon: Repeat,
         },
         {
-            title: 'Popular hashtags',
+            title: translations['Popular hashtags'],
             url: '/show-popular-hashtags',
             icon: Hash,
         },

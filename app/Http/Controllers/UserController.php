@@ -156,6 +156,7 @@ class UserController extends Controller
                 'followers_count' => $user->followers_count,
                 'following_count' => $user->following_count,
                 'is_following' => Auth::check() && $user->followers()->where('follower_id', Auth::id())->exists(),
+                'is_friend' => Auth::check() && Auth::user()->friends()->where('followee_id', $user->id)->exists(),
                 'canViewFullProfile' => $canViewFullProfile,
                 'has_sent_follow_request' => Auth::check() && auth()->user()->pendingFollowRequests()
                         ->where('followee_id', $user->id)
@@ -687,10 +688,10 @@ class UserController extends Controller
     {
         $currentUser = Auth::user();
 
-        // Get friends and their related information
+
         $friends = $user->friends()
             ->with('profileImage')
-            ->select('id', 'name', 'username', 'is_private') // Include the is_private field
+            ->select('id', 'name', 'username', 'is_private')
             ->get()
             ->map(function ($friend) use ($currentUser) {
                 $isFollowed = $currentUser ? $currentUser->following->contains('id', $friend->id) : false;
