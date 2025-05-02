@@ -1,6 +1,6 @@
 import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from './ui/sidebar.jsx';
 import { Link, usePage } from '@inertiajs/react';
-import {Badge} from "@/components/ui/badge.jsx";
+import {Badge} from "../components/ui/badge.jsx";
 
 export function NavMain({ items = [] }) {
     const page = usePage();

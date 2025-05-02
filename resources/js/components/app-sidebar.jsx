@@ -17,12 +17,9 @@ export function AppSidebar() {
     const user = auth?.user;
     const { post } = useForm();
     const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+    const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
-    useEffect(() => {
-        fetchUnreadCount().catch(error => console.error(error));
-    }, []);
-
-    const fetchUnreadCount = async () => {
+    const fetchUnreadNotificationsCount = async () => {
         try {
             const response = await fetch('/notifications/unread-count');
             const data = await response.json();
@@ -32,28 +29,63 @@ export function AppSidebar() {
         }
     };
 
-    window.Echo.private(`notifications.${user.id}`)
-        .listen('NotificationCreated', (e) => {
-            setUnreadNotificationsCount(unreadNotificationsCount+1);
-        })
-        .listen('NotificationIsReadChange', (e) => {
-            if(e.operation === 'read')
-            {
-                setUnreadNotificationsCount(unreadNotificationsCount-1);
-            }
-            else if (e.operation === 'unread')
-            {
+    const fetchUnreadMessagesCount = async () => {
+        try {
+            const response = await fetch('/chat/user-chat/messages/unread-count');
+            const data = await response.json();
+            setUnreadMessagesCount(data.unread_count);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchUnreadNotificationsCount().catch(error => console.error(error));
+        fetchUnreadMessagesCount().catch(error => console.error(error));
+
+        window.Echo.private(`notifications.${user.id}`)
+            .listen('NotificationCreated', (e) => {
                 setUnreadNotificationsCount(unreadNotificationsCount+1);
-            }
-            else if (e.operation === 'allRead')
-            {
-                setUnreadNotificationsCount(0);
-            }
-            else if (e.operation === 'allUnread')
-            {
-                fetchUnreadCount().catch(error => console.error(error));
-            }
-        });
+            })
+            .listen('NotificationIsReadChange', (e) => {
+                if(e.operation === 'read')
+                {
+                    setUnreadNotificationsCount(unreadNotificationsCount-1);
+                }
+                else if (e.operation === 'unread')
+                {
+                    setUnreadNotificationsCount(unreadNotificationsCount+1);
+                }
+                else if (e.operation === 'allRead')
+                {
+                    setUnreadNotificationsCount(0);
+                }
+                else if (e.operation === 'allUnread')
+                {
+                    fetchUnreadNotificationsCount().catch(error => console.error(error));
+                }
+            });
+
+        window.Echo.private(`user-chats.${user.id}`)
+            .listen('UserMessageCreated',  (e) => {
+                fetchUnreadMessagesCount().catch(error => console.error(error));
+            }).listen('UserMessageIsReadChange', (e) => {
+                if(e.operation === 'read')
+                {
+                    fetchUnreadMessagesCount().catch(error => console.error(error));
+                }
+                else if (e.operation === 'delete')
+                {
+                    fetchUnreadMessagesCount().catch(error => console.error(error));
+                }
+            });
+
+        return () => {
+            window.Echo.leave(`notifications.${user.id}`);
+            window.Echo.leave(`user-chats.${user.id}`);
+        };
+    }, []);
+
 
     if (!user) return null;
 
@@ -72,6 +104,7 @@ export function AppSidebar() {
             title: translations['User chats'],
             url: `/chat/user-chats`,
             icon: MessagesSquareIcon,
+            count: unreadMessagesCount,
         },
         {
             title: translations['Friends'],

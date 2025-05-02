@@ -2,8 +2,8 @@ import { usePage, Link, Head, router } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
-import {useState} from 'react';
-import {RefreshCw, Search, SendIcon} from 'lucide-react';
+import {useEffect, useState} from 'react';
+import {RefreshCw, SendIcon} from 'lucide-react';
 import {
     Dialog, DialogClose,
     DialogContent,
@@ -12,13 +12,14 @@ import {
     DialogTrigger
 } from "../../components/ui/dialog.jsx";
 import {Input} from "../../components/ui/input.jsx";
+import {Badge} from "../../components/ui/badge.jsx";
 
 export default function UserChats() {
-    const { chats, users, translations } = usePage().props;
+    const { auth, chats, users, translations } = usePage().props;
+    const user = auth?.user;
     const getInitials = useInitials();
     const [isLoading, setIsLoading] = useState(false);
     const [usersSearch, setUsersSearch] = useState(users || []);
-
     const onSearchChange = async (e) => {
         const searchTerm = e.target.value.toLowerCase();
 
@@ -30,9 +31,25 @@ export default function UserChats() {
         setUsersSearch(filteredUsers);
     };
 
+    useEffect(() => {
+
+        window.Echo.private(`user-chats.${user.id}`)
+            .listen('UserMessageCreated', handleReload)
+            .listen('UserMessageIsReadChange', handleReload);
+
+        setTimeout(handleReload, 0);
+        return () => {
+            window.Echo.leave(`user-chats.${user.id}`);
+        };
+    }, []);
+
     const handleReload = () => {
         setIsLoading(true);
-        router.reload();
+        router.reload({
+            only: ['chats'],
+            preserveState: true,
+            preserveScroll: true,
+        });
         setTimeout(() => {
             setIsLoading(false);
         }, 1000);
@@ -136,12 +153,13 @@ export default function UserChats() {
                                             <span className="ml-1 font-bold">{chat.user.name}</span>
                                             <span className="text-gray-500 dark:text-gray-400 hidden sm:flex">@{chat.user.username}</span>
                                         </div>
-                                        <div className="ml-1 text-sm">
+                                        <div className="ml-1 text-sm flex flex-row gap-2">
                                             <p>
                                                 {chat.last_message
                                                 ? chat.last_message.text
                                                 : translations['No messages anyone yet.']}
                                             </p>
+                                            {chat.unread_count && chat.unread_count !== 0 ? (<Badge className="bg-neutral-500 dark:bg-neutral-300">{chat.unread_count}</Badge>) : ''}
                                         </div>
                                     </div>
                                     <div>
