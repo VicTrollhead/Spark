@@ -1,5 +1,5 @@
 import { Head, usePage, Link, router } from '@inertiajs/react';
-import { Check, MapPin, Globe, Calendar, UserCheck, AlertCircle, RefreshCw } from 'lucide-react';
+import {Check, MapPin, Globe, Calendar, UserCheck, AlertCircle, RefreshCw, SendIcon} from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
@@ -119,16 +119,26 @@ export default function Show() {
                         <p className="text-gray-500 dark:text-gray-400 mt-1">@{user.username}</p>
                     </div>
                     {!isOwnProfile && (
-                        <button
-                            onClick={handleFollow}
-                            className={`px-4 py-2 rounded-md ${
-                                user.is_following
-                                    ? 'bg-gray-600 hover:bg-gray-500 text-white dark:bg-gray-800 dark:hover:bg-gray-700'
-                                    : 'bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-800'
-                            }`}
-                        >
-                            {user.is_following ? translations['Unfollow'] : translations['Follow']}
-                        </button>
+                        <div className="flex flex-row gap-2">
+                            {user.is_friend ? (
+                                <button
+                                    onClick={() => router.post(`/chat/user-chat/new/${user.id}`)}
+                                    className={`px-4 py-2 flex gap-2 items-center rounded-md bg-gray-600 hover:bg-gray-500 text-white dark:bg-gray-800 dark:hover:bg-gray-700`}
+                                >
+                                    {translations['Write']}<SendIcon className="w-5 h-5" />
+                                </button>
+                            ) : ''}
+                            <button
+                                onClick={handleFollow}
+                                className={`px-4 py-2 rounded-md ${
+                                    user.is_following
+                                        ? 'bg-gray-600 hover:bg-gray-500 text-white dark:bg-gray-800 dark:hover:bg-gray-700'
+                                        : 'bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-800'
+                                }`}
+                            >
+                                {user.is_following ? translations['Unfollow'] : translations['Follow']}
+                            </button>
+                        </div>
                     )}
                     {isOwnProfile && (
                         <div className="flex flex-col lg:items-end sm:items-center pl-1 sm:ml-10 space-y-2">

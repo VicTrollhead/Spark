@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Events\GotPersonalMessage;
+use App\Events\UserMessageCreated;
+use App\Events\UserMessageIsReadChange;
 use App\Jobs\SendMessage;
 use App\Jobs\SendPersonalMessage;
 use App\Models\Chat;
@@ -80,6 +82,12 @@ class ChatController extends Controller
 
         $chatData = $chats->map(function ($chat) use ($user) {
             $otherUser = $chat->user1_id === $user->id ? $chat->user2 : $chat->user1;
+
+            $unreadCount = $chat->messages()
+                ->whereNull('read_at')
+                ->where('user_id', '!=', $user->id)
+                ->count();
+
             return [
                 'id' => $chat->id,
                 'user' => [
@@ -94,11 +102,13 @@ class ChatController extends Controller
                     'text' => $chat->lastMessage->text,
                     'time' => $chat->lastMessage->created_at->format('d M Y, H:i:s'),
                 ] : null,
+                'unread_count' => $unreadCount,
             ];
         });
 
-        $users = User::with('profileImage')
-            ->whereNotIn('id', $chatUserIds)
+        $users = $user->friends()
+            ->whereNotIn('users.id', $chatUserIds)
+            ->with('profileImage')
             ->latest()
             ->get()
             ->map(function ($user) {
@@ -145,6 +155,7 @@ class ChatController extends Controller
                         'profile_image_url' => $message->user->profileImage?->url,
                         'is_verified' => $message->user->is_verified,
                     ],
+                    'read_at' => $message->read_at,
                 ];
             })
             ->values();
@@ -167,7 +178,7 @@ class ChatController extends Controller
         ]);
     }
 
-    public function createUserChat(User $otherUser): RedirectResponse
+    public function searchOrCreateUserChat(User $otherUser): RedirectResponse
     {
         $user = Auth::user();
 
@@ -175,7 +186,7 @@ class ChatController extends Controller
             abort(400, "You can't create a chat with yourself");
         }
 
-        $chat = Chat::firstOrCreateChat($user->id, $otherUser->id);
+        Chat::firstOrCreateChat($user->id, $otherUser->id);
 
         return redirect()->route('chat.getUserChat', ['user' => $otherUser->id]);
     }
@@ -190,6 +201,10 @@ class ChatController extends Controller
 
         $user = Auth::user();
 
+        $chat = Chat::findOrFail($validated['chatId']);
+
+        $recipientId = $chat->user1_id === $user->id ? $chat->user2_id : $chat->user1_id;
+
         $message = Message::create([
             'user_id' => $user->id,
             'chat_id' => $validated['chatId'],
@@ -200,8 +215,84 @@ class ChatController extends Controller
             ->update(['last_message_id' => $message->id]);
 
         event(new GotPersonalMessage($message, $validated['chatId']));
+        event(new UserMessageCreated($message, $recipientId));
 
         return redirect()->back();
+    }
+
+    public function deleteMessage(Message $message): RedirectResponse
+    {
+        $user = Auth::user();
+
+        if ($message->user_id !== $user->id) {
+            abort(403, 'You cannot delete this message.');
+        }
+
+        $chat = $message->chat;
+
+        $recipientId = $chat->user1_id === $user->id ? $chat->user2_id : $chat->user1_id;
+
+        $message->delete();
+
+        if ($chat != null && $chat->last_message_id === $message->id) {
+            $previousMessage = Message::where('chat_id', $chat->id)
+                ->latest('created_at')
+                ->first();
+
+            $chat->last_message_id = $previousMessage?->id;
+            $chat->save();
+        }
+
+        event(new UserMessageIsReadChange($recipientId, "delete"));
+
+        return redirect()->back()->with('success', 'The message has been deleted.');
+    }
+
+    public function markAsRead(Request $request, Chat $chat)
+    {
+        $user = Auth::user();
+
+        $messages = Message::where('chat_id', $chat->id)
+            ->where('user_id', '!=', $user->id)
+            ->whereNull('read_at')
+            ->get();
+
+        if ($messages->isEmpty()) {
+            return redirect()->back()->with('error', 'No unread messages to mark as read.');
+        }
+
+        $messages->each(function ($message) {
+            $message->update(['read_at' => now()]);
+        });
+
+        $recipientId = $chat->user1_id === $user->id ? $chat->user2_id : $chat->user1_id;
+
+        if (is_null($recipientId)) {
+            return redirect()->back()->with('error', 'Recipient not found.');
+        }
+
+        if (!is_null($recipientId)) {
+            event(new UserMessageIsReadChange($recipientId, "read"));
+        }
+
+        return redirect()->back()->with('success', 'The message has been read.');
+    }
+
+    public function getUnreadMessagesCount(Request $request)
+    {
+        $currentUser = Auth::user();
+
+        $unreadCount = Message::whereHas('chat', function ($query) use ($currentUser) {
+            $query->where('user1_id', $currentUser->id)
+                ->orWhere('user2_id', $currentUser->id);
+        })
+            ->where('user_id', '!=', $currentUser->id)
+            ->whereNull('read_at')
+            ->count();
+
+        return response()->json([
+            'unread_count' => $unreadCount,
+        ]);
     }
 
 }

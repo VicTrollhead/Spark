@@ -1,10 +1,14 @@
-import React from "react";
-import {Link} from "@inertiajs/react";
+import React, {useEffect, useRef, useState} from "react";
+import {Link, router, usePage} from "@inertiajs/react";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar.jsx";
-import {useInitials} from "@/hooks/use-initials.jsx";
+import {useInitials} from "../hooks/use-initials.jsx";
+import {EllipsisVertical} from "lucide-react";
 
 export default function Message({ userId, message }) {
+    const { translations } = usePage().props;
     const getInitials = useInitials();
+    const [showOptions, setShowOptions] = useState(false);
+    const optionsRef = useRef(null);
     const formatMessageTime = (timestamp) => {
         const date = new Date(timestamp);
 
@@ -29,6 +33,24 @@ export default function Message({ userId, message }) {
             });
     };
 
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (optionsRef.current && !optionsRef.current.contains(event.target)) {
+                setShowOptions(false);
+            }
+        }
+
+        if (showOptions) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showOptions]);
+
+    const toggleOptions = () => setShowOptions((prev) => !prev);
+
     return (
         <>
             {userId === message.user.id ? (
@@ -36,6 +58,22 @@ export default function Message({ userId, message }) {
                 <div className="flex justify-end mb-2">
                     <div className="w-full sm:max-w-md">
                         <div className="flex justify-end">
+                            <div className="relative my-auto" ref={optionsRef}>
+                                <EllipsisVertical
+                                    className="h-6 w-6 cursor-pointer text-gray-500 hover:text-gray-700 dark:text-white dark:hover:text-gray-300"
+                                    onClick={toggleOptions}
+                                />
+                                {showOptions && (
+                                    <div className="absolute right-0 z-50 mt-1 min-w-[160px] rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-neutral-800">
+                                        <button
+                                            onClick={() => router.delete(`/chat/message/${message.id}`)}
+                                            className="block w-full rounded-b-lg px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-neutral-600"
+                                        >
+                                            {translations['Delete']}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                             <div className="rounded-md px-4 py-2 flex flex-col gap-1 text-lg bg-blue-500 text-white dark:bg-blue-900 break-words w-fit max-w-full">
                                 <span className="whitespace-pre-wrap break-words">
                                     {message.text}

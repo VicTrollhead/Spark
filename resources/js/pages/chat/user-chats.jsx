@@ -11,23 +11,45 @@ import {
     DialogTitle,
     DialogTrigger
 } from "../../components/ui/dialog.jsx";
+import {Input} from "../../components/ui/input.jsx";
+import {Badge} from "../../components/ui/badge.jsx";
 
 export default function UserChats() {
-    const { chats, users, translations } = usePage().props;
+    const { auth, chats, users, translations } = usePage().props;
+    const user = auth?.user;
     const getInitials = useInitials();
     const [isLoading, setIsLoading] = useState(false);
+    const [usersSearch, setUsersSearch] = useState(users || []);
+    const onSearchChange = async (e) => {
+        const searchTerm = e.target.value.toLowerCase();
 
-    const handleNewChat = async (user_id) => {
-        try {
-            await router.post(`/chat/user-chat/new/${user_id}`);
-        } catch (err) {
-            console.log(err.message);
-        }
+        const filteredUsers = users.filter(user =>
+            user.name.toLowerCase().includes(searchTerm) ||
+            user.username.toLowerCase().includes(searchTerm)
+        );
+
+        setUsersSearch(filteredUsers);
     };
+
+    useEffect(() => {
+
+        window.Echo.private(`user-chats.${user.id}`)
+            .listen('UserMessageCreated', handleReload)
+            .listen('UserMessageIsReadChange', handleReload);
+
+        setTimeout(handleReload, 0);
+        return () => {
+            window.Echo.leave(`user-chats.${user.id}`);
+        };
+    }, []);
 
     const handleReload = () => {
         setIsLoading(true);
-        router.reload();
+        router.reload({
+            only: ['chats'],
+            preserveState: true,
+            preserveScroll: true,
+        });
         setTimeout(() => {
             setIsLoading(false);
         }, 1000);
@@ -76,9 +98,14 @@ export default function UserChats() {
                                         {translations['Select user to start new chat']}
                                     </DialogTitle>
                                     <DialogDescription className="h-[50vh] overflow-y-auto flex flex-col gap-3">
-                                        {users.map((user) => (
+                                        <span className="flex items-center space-x-3">
+                                            <Input placeholder={translations['Search users']} className="w-full" onChange={onSearchChange} />
+                                        </span>
+                                        {usersSearch.length === 0 ? (
+                                            <DialogClose className="text-gray-500 text-center text-lg mt-4">{translations['Not friends for chat anyone yet.']}</DialogClose>
+                                        ) : (usersSearch.map((user) => (
                                             <DialogClose key={user.id}
-                                                         onClick={() => handleNewChat(user.id)}
+                                                         onClick={() => router.post(`/chat/user-chat/new/${user.id}`)}
                                                          className="flex flex-row gap-3 border dark:border-gray-600 rounded-md px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer">
                                                 <Avatar className="my-auto h-12 w-12 md:h-15 md:w-15 border-2 border-neutral-800 dark:border-gray-400">
                                                     <AvatarImage src={user.profile_image_url} alt={user.name} />
@@ -93,7 +120,7 @@ export default function UserChats() {
                                                     </div>
                                                 </div>
                                             </DialogClose>
-                                        ))}
+                                        )))}
                                     </DialogDescription>
                                 </DialogHeader>
                             </DialogContent>
@@ -126,12 +153,13 @@ export default function UserChats() {
                                             <span className="ml-1 font-bold">{chat.user.name}</span>
                                             <span className="text-gray-500 dark:text-gray-400 hidden sm:flex">@{chat.user.username}</span>
                                         </div>
-                                        <div className="ml-1 text-sm">
+                                        <div className="ml-1 text-sm flex flex-row gap-2">
                                             <p>
                                                 {chat.last_message
                                                 ? chat.last_message.text
                                                 : translations['No messages anyone yet.']}
                                             </p>
+                                            {chat.unread_count && chat.unread_count !== 0 ? (<Badge className="bg-neutral-500 dark:bg-neutral-300">{chat.unread_count}</Badge>) : ''}
                                         </div>
                                     </div>
                                     <div>

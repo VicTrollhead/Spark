@@ -159,6 +159,7 @@ class UserController extends Controller
                 'followers_count' => $user->followers_count,
                 'following_count' => $user->following_count,
                 'is_following' => Auth::check() && $user->followers()->where('follower_id', Auth::id())->exists(),
+                'is_friend' => Auth::check() && Auth::user()->friends()->where('followee_id', $user->id)->exists(),
                 'canViewFullProfile' => $canViewFullProfile,
                 'has_sent_follow_request' => Auth::check() && auth()->user()->pendingFollowRequests()
                         ->where('followee_id', $user->id)
@@ -724,6 +725,7 @@ class UserController extends Controller
     public function friends(User $user): Response
     {
         $currentUser = Auth::user();
+
 
         $friends = $user->friends()
             ->with('profileImage')

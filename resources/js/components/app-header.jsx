@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { cn } from '@/lib/utils';
 import { Link, router, usePage } from '@inertiajs/react';
 import {
-    Bookmark, Folder, FolderHeart,
+    Bookmark, Folder, FolderHeart, Hash,
     Home, List,
     LogOut,
     Mail,
@@ -32,16 +32,28 @@ export function AppHeader({ breadcrumbs = [] }) {
     const user = auth?.user;
     const getInitials = useInitials();
     const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+    const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
     useEffect(() => {
-        fetchUnreadCount().catch(error => console.error(error));
+        fetchUnreadNotificationsCount().catch(error => console.error(error));
+        fetchUnreadMessagesCount().catch(error => console.error(error));
     }, []);
 
-    const fetchUnreadCount = async () => {
+    const fetchUnreadNotificationsCount = async () => {
         try {
             const response = await fetch('/notifications/unread-count');
             const data = await response.json();
             setUnreadNotificationsCount(data.unread_count);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchUnreadMessagesCount = async () => {
+        try {
+            const response = await fetch('/chat/user-chat/messages/unread-count');
+            const data = await response.json();
+            setUnreadMessagesCount(data.unread_count);
         } catch (error) {
             console.error(error);
         }
@@ -66,7 +78,7 @@ export function AppHeader({ breadcrumbs = [] }) {
             }
             else if (e.operation === 'allUnread')
             {
-                fetchUnreadCount().catch(error => console.error(error));
+                fetchUnreadNotificationsCount().catch(error => console.error(error));
             }
         });
 
@@ -112,6 +124,7 @@ export function AppHeader({ breadcrumbs = [] }) {
             title: translations['User chats'],
             url: `/chat/user-chats`,
             icon: MessagesSquareIcon,
+            count: unreadMessagesCount,
         },
         {
             title: translations['Friends'],
@@ -138,6 +151,11 @@ export function AppHeader({ breadcrumbs = [] }) {
             title: translations['Reposts'],
             url: '/user/reposts',
             icon: Repeat,
+        },
+        {
+            title: translations['Popular hashtags'],
+            url: '/show-popular-hashtags',
+            icon: Hash,
         },
         {
             title: translations['Profile'],

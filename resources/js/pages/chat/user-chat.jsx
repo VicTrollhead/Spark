@@ -24,6 +24,15 @@ export default function UserChat () {
             });
     }
 
+    const isUserAtBottom = () => {
+        const container = document.getElementById('chat-scroll-container');
+        if (!container) return false;
+
+        const threshold = 10;
+        const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+        return distanceFromBottom < threshold;
+    };
+
     const getMessages = async () => {
         try {
             router.reload({
@@ -43,14 +52,32 @@ export default function UserChat () {
     useEffect(() => {
         connectWebSocket();
         setTimeout(scrollToBottom, 0);
+
+        const container = document.getElementById('chat-scroll-container');
+
+        const handleScroll = async () => {
+            const threshold = 10;
+            const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+
+            if (distanceFromBottom < threshold) {
+                router.post(`/chat/user-chat/${chat_id}/mark-messages-as-read`);
+            }
+        };
+
+        container.addEventListener('scroll', handleScroll);
+
         return () => {
+            container.removeEventListener('scroll', handleScroll);
             window.Echo.leave(webSocketChannel);
         }
     }, []);
 
     useEffect(() => {
         setMessages(init_messages);
-        setTimeout(scrollToBottom, 0);
+        const shouldScroll = isUserAtBottom();
+        if (shouldScroll) {
+            setTimeout(scrollToBottom, 0);
+        }
     }, [init_messages]);
 
     return (
@@ -74,7 +101,7 @@ export default function UserChat () {
                         </Link>
                     </div>
                     <div className="bg-white dark:border-gray-800 dark:bg-neutral-950 shadow-md rounded-lg flex flex-col h-[82vh] max-h-[82vh]">
-                        <div className="flex-1 flex flex-col overflow-y-auto px-4 py-3">
+                        <div id={"chat-scroll-container"} className="flex-1 flex flex-col overflow-y-auto px-4 py-3">
                             {messages?.length > 0 ? (
                                 <>
                                     <div className="mt-auto flex flex-col gap-2">

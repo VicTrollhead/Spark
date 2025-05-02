@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar'
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
 import { useState } from 'react';
-import { Check, RefreshCw } from 'lucide-react';
+import {RefreshCw, SendIcon, Check} from 'lucide-react';
 
 export default function Friends() {
     const { users, user, auth, translations } = usePage().props;
@@ -84,25 +84,35 @@ export default function Friends() {
 
                                         <p className="text-gray-500 dark:text-gray-400">@{friend.username}</p>
                                     </div>
-                                    <button
-                                        onClick={() => handleFollowToggle(friend, friend.is_followed, friend.is_private, friend.has_sent_follow_request)}
-                                        className={`ml-auto px-4 py-1 rounded-md ${
-                                            friend.has_sent_follow_request
-                                                ? 'bg-gray-600 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700'
-                                                : (friend.is_followed
+                                    <div className="flex flex-row gap-2">
+                                        {friend.is_friend ? (
+                                            <button
+                                                onClick={() => router.post(`/chat/user-chat/new/${friend.id}`)}
+                                                className={`px-4 py-2 flex gap-2 items-center rounded-md bg-gray-600 hover:bg-gray-500 text-white dark:bg-gray-800 dark:hover:bg-gray-700`}
+                                            >
+                                                {translations['Write']}<SendIcon className="w-5 h-5" />
+                                            </button>
+                                        ) : ''}
+                                        <button
+                                            onClick={() => handleFollowToggle(friend, friend.is_followed, friend.is_private, friend.has_sent_follow_request)}
+                                            className={`px-4 py-1 rounded-md ${
+                                                friend.has_sent_follow_request
                                                     ? 'bg-gray-600 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700'
-                                                    : 'bg-blue-600 hover:bg-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600')
-                                        } text-white`}
-                                    >
-                                        {friend.is_private && !friend.is_followed && !friend.has_sent_follow_request
-                                            ? translations['Send Follow Request']
-                                            : (friend.has_sent_follow_request && !friend.is_followed
-                                                ? translations['Request Sent']
-                                                : (friend.is_followed
-                                                    ? translations['Unfollow']
-                                                    : translations['Follow']))
-                                        }
-                                    </button>
+                                                    : (friend.is_followed
+                                                        ? 'bg-gray-600 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700'
+                                                        : 'bg-blue-600 hover:bg-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600')
+                                            } text-white`}
+                                        >
+                                            {friend.is_private && !friend.is_followed && !friend.has_sent_follow_request
+                                                ? translations['Send Follow Request']
+                                                : (friend.has_sent_follow_request && !friend.is_followed
+                                                    ? translations['Request Sent']
+                                                    : (friend.is_followed
+                                                        ? translations['Unfollow']
+                                                        : translations['Follow']))
+                                            }
+                                        </button>
+                                    </div>
                                 </div>
                             </li>
                         ))}
