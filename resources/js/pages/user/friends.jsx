@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar'
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
 import { useState } from 'react';
-import {RefreshCw, SendIcon} from 'lucide-react';
+import {RefreshCw, SendIcon, Check} from 'lucide-react';
 
 export default function Friends() {
     const { users, user, auth, translations } = usePage().props;
@@ -64,11 +64,24 @@ export default function Friends() {
                                         {getInitials(friend.name)}
                                     </AvatarFallback>
                                 </Avatar>
-                                <div className="flex flex-row w-full justify-between">
-                                    <div>
-                                        <Link href={`/user/${friend.username}`} className="font-medium text-blue-500 hover:underline">
-                                            {friend.name}
-                                        </Link>
+                                <div className="flex flex-row w-full">
+                                    <div className="flex flex-col">
+                                        <div className="flex items-center gap-1.5">
+                                            <Link href={`/user/${friend.username}`} className="font-medium text-blue-500 hover:underline">
+                                                {friend.name}
+                                            </Link>
+                                            {friend.is_verified && (
+                                                <span className="group relative">
+                                                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                                        Verified
+                                                    </span>
+                                                    <span className="flex items-center rounded-md bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                        <Check className="h-4 w-4" />
+                                                    </span>
+                                                </span>
+                                            )}
+                                        </div>
+
                                         <p className="text-gray-500 dark:text-gray-400">@{friend.username}</p>
                                     </div>
                                     <div className="flex flex-row gap-2">

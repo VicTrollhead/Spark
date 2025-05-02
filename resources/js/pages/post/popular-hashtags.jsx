@@ -49,7 +49,7 @@ export default function PopularHashtags() {
                 </div>
             </div>
 
-            <div className="space-y-2.5 px-6 py-2">
+            <div className="space-y-2.5 px-6">
                 {hashtags.length > 0 ? (
                     hashtags.map((hashtag) => (
                         <Link

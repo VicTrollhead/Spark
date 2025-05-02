@@ -8,9 +8,9 @@ window.Echo = new Echo({
     key: import.meta.env.VITE_PUSHER_APP_KEY,
     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
     forceTLS: true,
-    // wsHost: import.meta.env.VITE_PUSHER_HOST || 'ws-eu.pusher.com',
-    // wsPort: import.meta.env.VITE_PUSHER_PORT || 443,
-    // wssPort: import.meta.env.VITE_PUSHER_PORT || 443,
-    // disableStats: true,
+    wsHost: import.meta.env.VITE_PUSHER_HOST || 'ws-eu.pusher.com',
+    wsPort: import.meta.env.VITE_PUSHER_PORT || 443,
+    wssPort: import.meta.env.VITE_PUSHER_PORT || 443,
+    disableStats: true,
     encrypted: true,
 });

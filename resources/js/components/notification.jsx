@@ -1,8 +1,7 @@
-import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar.jsx";
-import { Link, router, usePage } from "@inertiajs/react";
-import { ArrowRight, Heart, Repeat, Bookmark, Users, MessageSquare, Eye, EyeClosed, EyeOff } from "lucide-react";
-import { useInitials } from "../hooks/use-initials.jsx";
+import { Link, router, usePage } from '@inertiajs/react';
+import { ArrowRight, Bookmark, Check, Eye, EyeOff, Heart, MessageSquare, Repeat, Users } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar.jsx';
+import { useInitials } from '../hooks/use-initials.jsx';
 
 export function Notification({ notification }) {
     const { translations } = usePage().props;
@@ -12,26 +11,47 @@ export function Notification({ notification }) {
 
     const toggleReadStatus = () => {
         const routeName = notification.is_read ? 'unread' : 'read';
-        router.patch(`/notifications/${notification.id}/${routeName}`, {}, {
-            preserveScroll: true,
-        });
+        router.patch(
+            `/notifications/${notification.id}/${routeName}`,
+            {},
+            {
+                preserveScroll: true,
+            },
+        );
     };
 
     const renderUserLink = (username, name) => (
         <Link
             href={`/user/${username}`}
-            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
+            className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
         >
+        <span>
             {name} <span className="text-sm">(@{username})</span>
+        </span>
+            {sourceUser.is_verified && (
+                <span className="group relative inline-block">
+                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                    Verified
+                </span>
+                    <span className="flex items-center justify-center rounded-md bg-blue-500 p-0.5 ml-0.5 text-white">
+                    <Check className="h-4 w-4" />
+                </span>
+            </span>
+            )}
         </Link>
     );
 
-    const handleFollowRequest = (action) => {
-        router.post(`/user/${sourceUser.id}/${notification.id}/${action}`, {}, {
-            preserveScroll: true,
-        });
-    };
 
+
+    const handleFollowRequest = (action) => {
+        router.post(
+            `/user/${sourceUser.id}/${notification.id}/${action}`,
+            {},
+            {
+                preserveScroll: true,
+            },
+        );
+    };
 
     const getColor = (type) => {
         switch (type) {
@@ -40,15 +60,15 @@ export function Notification({ notification }) {
             case 'repost':
                 return 'border-l-green-500';
             case 'comment':
-                return 'border-l-gray-700';
+                return 'border-l-blue-600';
             case 'follow':
-                return 'border-l-blue-800';
+                return 'border-l-gray-700';
             case 'favorite':
                 return 'border-l-yellow-500';
             default:
                 return 'border-l-gray-600';
         }
-    }
+    };
 
     const renderMessage = (notification) => {
         const { type, source_user, post } = notification;
@@ -61,7 +81,10 @@ export function Notification({ notification }) {
                     <div className="flex flex-col gap-1">
                         <span>{renderUserLink(username, name)}</span>
                         <span className="text-sm text-gray-500 dark:text-gray-400">{notification.created_at}</span>
-                        <div className="flex flex-row"><Heart className="h-5 w-5 my-auto" /><span className="ml-2">{translations['liked your post.']}</span></div>
+                        <div className="flex flex-row">
+                            <Heart className="my-auto h-5 w-5" />
+                            <span className="ml-2">{translations['liked your post.']}</span>
+                        </div>
                     </div>
                 );
             case 'repost':
@@ -69,7 +92,10 @@ export function Notification({ notification }) {
                     <div className="flex flex-col gap-1">
                         <span>{renderUserLink(username, name)}</span>
                         <span className="text-sm text-gray-500 dark:text-gray-400">{notification.created_at}</span>
-                        <div className="flex flex-row"><Repeat className="h-5 w-5 my-auto"/><span className="ml-2">{translations['reposted your post.']}</span></div>
+                        <div className="flex flex-row">
+                            <Repeat className="my-auto h-5 w-5" />
+                            <span className="ml-2">{translations['reposted your post.']}</span>
+                        </div>
                     </div>
                 );
             case 'comment':
@@ -77,7 +103,10 @@ export function Notification({ notification }) {
                     <div className="flex flex-col gap-1">
                         <span>{renderUserLink(username, name)}</span>
                         <span className="text-sm text-gray-500 dark:text-gray-400">{notification.created_at}</span>
-                        <div className="flex flex-row"><MessageSquare className="h-5 w-5 my-auto"/><span className="ml-2">{translations['commented on your post:']}</span></div>
+                        <div className="flex flex-row">
+                            <MessageSquare className="my-auto h-5 w-5" />
+                            <span className="ml-2">{translations['commented on your post:']}</span>
+                        </div>
                         <div className="text-[16px]">"{notification.extra_data}"</div>
                     </div>
                 );
@@ -92,19 +121,19 @@ export function Notification({ notification }) {
                         {isFollowRequest ? (
                             <div className="flex flex-col gap-2">
                                 <div className="flex flex-row items-center">
-                                    <Users className="h-5 w-5 my-auto" />
+                                    <Users className="my-auto h-5 w-5" />
                                     <span className="ml-2">{translations['has sent you a follow request.']}</span>
                                 </div>
-                                <div className="flex gap-2 mt-2">
+                                <div className="mt-2 flex gap-2">
                                     <button
                                         onClick={() => handleFollowRequest('accept-request')}
-                                        className="px-3 py-1 text-white bg-green-700 rounded-md hover:bg-green-900"
+                                        className="rounded-md bg-green-700 px-3 py-1 text-white hover:bg-green-900"
                                     >
                                         {translations['Accept']}
                                     </button>
                                     <button
                                         onClick={() => handleFollowRequest('reject-request')}
-                                        className="px-3 py-1 text-white bg-red-700 rounded-md hover:bg-red-900"
+                                        className="rounded-md bg-red-700 px-3 py-1 text-white hover:bg-red-900"
                                     >
                                         {translations['Decline']}
                                     </button>
@@ -112,17 +141,17 @@ export function Notification({ notification }) {
                             </div>
                         ) : isAcceptedAnswerForFollowRequest ? (
                             <div className="flex flex-row">
-                                <Users className="h-5 w-5 my-auto" />
+                                <Users className="my-auto h-5 w-5" />
                                 <span className="ml-2">{translations['accepted your follow request.']}</span>
                             </div>
                         ) : isRejectedAnswerForFollowRequest ? (
                             <div className="flex flex-row">
-                                <Users className="h-5 w-5 my-auto" />
+                                <Users className="my-auto h-5 w-5" />
                                 <span className="ml-2">{translations['rejected your follow request.']}</span>
                             </div>
-                        ) :  (
+                        ) : (
                             <div className="flex flex-row">
-                                <Users className="h-5 w-5 my-auto" />
+                                <Users className="my-auto h-5 w-5" />
                                 <span className="ml-2">{translations['followed you.']}</span>
                             </div>
                         )}
@@ -134,7 +163,10 @@ export function Notification({ notification }) {
                     <div className="flex flex-col gap-1">
                         <span>{renderUserLink(username, name)}</span>
                         <span className="text-sm text-gray-500 dark:text-gray-400">{notification.created_at}</span>
-                        <div className="flex flex-row"><Bookmark className="h-5 w-5 my-auto"/><span className="ml-2">{translations['favorited your post.']}</span></div>
+                        <div className="flex flex-row">
+                            <Bookmark className="my-auto h-5 w-5" />
+                            <span className="ml-2">{translations['favorited your post.']}</span>
+                        </div>
                     </div>
                 );
             default:
@@ -142,7 +174,9 @@ export function Notification({ notification }) {
                     <div className="flex flex-col gap-1">
                         <span>{renderUserLink(username, name)}</span>
                         <span className="text-sm text-gray-500 dark:text-gray-400">{notification.created_at}</span>
-                        <div className="flex flex-row"><span className="ml-2">{translations['interacted with you.']}</span></div>
+                        <div className="flex flex-row">
+                            <span className="ml-2">{translations['interacted with you.']}</span>
+                        </div>
                     </div>
                 );
         }
@@ -150,41 +184,33 @@ export function Notification({ notification }) {
 
     return (
         <div
-            className={`border-l-4 ${getColor(notification.type)} border-t-0 border-r-0 border-b-gray-400 flex items-start gap-4 p-5 bg-gray-100 hover:bg-gray-200 dark:bg-neutral-900 dark:hover:bg-neutral-950 transition-all`}
-
+            className={`border-l-4 ${getColor(notification.type)} flex items-start gap-4 border-t-0 border-r-0 border-b-gray-400 bg-gray-100 p-5 transition-all hover:bg-gray-200 dark:bg-neutral-900 dark:hover:bg-neutral-950`}
         >
-
-            <div className="hidden md:flex items-center gap-4">
+            <div className="hidden items-center gap-4 md:flex">
                 <Avatar className="h-14 w-14">
-                    <AvatarImage
-                        src={sourceUser.profile_image_url}
-                        alt={sourceUser.name}
-                    />
-                    <AvatarFallback
-                        className="rounded-full bg-gray-300 text-black dark:bg-gray-700 dark:text-white">
+                    <AvatarImage src={sourceUser.profile_image_url} alt={sourceUser.name} />
+                    <AvatarFallback className="rounded-full bg-gray-300 text-black dark:bg-gray-700 dark:text-white">
                         {getInitials(sourceUser.name)}
                     </AvatarFallback>
                 </Avatar>
             </div>
 
-            <div className="flex flex-col w-full">
-                <div className="text-sm md:text-lg text-gray-800 p-1 mb-1 dark:text-gray-100 font-medium">
-                    {renderMessage(notification)}
-                </div>
+            <div className="flex w-full flex-col">
+                <div className="mb-1 p-1 text-sm font-medium text-gray-800 md:text-lg dark:text-gray-100">{renderMessage(notification)}</div>
             </div>
             <div className="my-auto">
                 {notification.is_read ? (
-                    <EyeOff size={28} onClick={toggleReadStatus} className="cursor-pointer"/>
+                    <EyeOff size={28} onClick={toggleReadStatus} className="cursor-pointer" />
                 ) : (
-                    <Eye size={28} onClick={toggleReadStatus} className="cursor-pointer"/>
+                    <Eye size={28} onClick={toggleReadStatus} className="cursor-pointer" />
                 )}
             </div>
             {post && post.user && (
                 <Link
                     href={`/post/${post.id}`}
-                    className="text-gray-700 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-200 rounded-lg p-2 transition-all my-auto"
+                    className="my-auto rounded-lg p-2 text-gray-700 transition-all hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-200"
                 >
-                    <ArrowRight className="ml-auto" size={28}/>
+                    <ArrowRight className="ml-auto" size={28} />
                 </Link>
             )}
         </div>

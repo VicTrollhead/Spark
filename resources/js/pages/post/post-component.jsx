@@ -1,5 +1,5 @@
 import { Link, router, useForm, usePage } from '@inertiajs/react';
-import { Bookmark, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat } from 'lucide-react';
+import { Bookmark, Check, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
@@ -108,7 +108,6 @@ export default function PostComponent({ post, compact = false }) {
             },
         );
     };
-
     return (
         <div className={`relative ${compact ? 'bg-muted/30 rounded-lg border p-3' : 'border-b p-4'} border-gray-200 dark:border-gray-800`}>
             <div className="flex items-start space-x-3">
@@ -130,13 +129,23 @@ export default function PostComponent({ post, compact = false }) {
                                     <Link href={`/user/${post.current_user.username}`}>
                                         <Avatar className="h-6 w-6 border">
                                             <AvatarImage src={post.current_user.profile_image_url} alt={post.current_user.name} />
-                                            <AvatarFallback>{getInitials(post.current_user.name)}</AvatarFallback>
+                                            <AvatarFallback className="text-xs">{getInitials(post.current_user.name)}</AvatarFallback>
                                         </Avatar>
                                     </Link>
                                     <Link href={`/user/${post.current_user.username}`} className="ml-1 text-blue-500 hover:underline">
                                         {post.current_user.name}
                                     </Link>
                                     <span className="ml-1">(you)</span>
+                                    {post.current_user.is_verified && (
+                                        <div className="group relative">
+                                            <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                                Verified
+                                            </span>
+                                            <span className="ml-1 flex items-center rounded-md bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                <Check className="h-3 w-3" />
+                                            </span>
+                                        </div>
+                                    )}
                                     {post.reposted_by_you && post.reposted_by_recent?.length > 1 && <span>,</span>}
                                 </span>
                             )}
@@ -148,12 +157,22 @@ export default function PostComponent({ post, compact = false }) {
                                             <Link href={`/user/${user.username}`}>
                                                 <Avatar className="h-6 w-6 border">
                                                     <AvatarImage src={user.profile_image_url} alt={user.name} />
-                                                    <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                                                    <AvatarFallback className="text-xs">{getInitials(user.name)}</AvatarFallback>
                                                 </Avatar>
                                             </Link>
                                             <Link href={`/user/${user.username}`} className="ml-1 text-blue-500 hover:underline">
                                                 {user.name}
                                             </Link>
+                                            {user.is_verified && (
+                                                <div className="group relative">
+                                                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                                        Verified
+                                                    </span>
+                                                    <span className="ml-1 flex items-center rounded-md bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                        <Check className="h-3 w-3" />
+                                                    </span>
+                                                </div>
+                                            )}
                                             {index < post.reposted_by_recent.length - 1 && <span>,</span>}
                                         </span>
                                     );
@@ -168,6 +187,16 @@ export default function PostComponent({ post, compact = false }) {
                             <Link href={`/user/${post.user.username}`} className="font-semibold text-gray-900 hover:underline dark:text-white">
                                 {post.user.name}
                             </Link>
+                            {post.user.is_verified && (
+                                <div className="group relative">
+                                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                        Verified
+                                    </span>
+                                    <span className="flex items-center rounded-md bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                        <Check className="h-4 w-4" />
+                                    </span>
+                                </div>
+                            )}
                             <span className="text-sm text-gray-500">{post.created_at}</span>
                         </div>
 

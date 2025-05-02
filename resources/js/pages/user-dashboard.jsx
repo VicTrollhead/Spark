@@ -1,9 +1,9 @@
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Check, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
-import { Head, usePage, Link, router } from '@inertiajs/react';
-import AppLayout from '../layouts/app-layout';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { useInitials } from '../hooks/use-initials';
-import { RefreshCw } from 'lucide-react';
+import AppLayout from '../layouts/app-layout';
 
 export default function Dashboard() {
     const { users, sort, translations } = usePage().props;
@@ -28,16 +28,16 @@ export default function Dashboard() {
 
     return (
         <AppLayout>
-            <Head title={translations["All users"]} />
+            <Head title={translations['All users']} />
 
             <div className="p-6">
-                <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-2xl font-bold mr-2">{translations["All users"]}</h1>
+                <div className="mb-4 flex items-center justify-between">
+                    <h1 className="mr-2 text-2xl font-bold">{translations['All users']}</h1>
                     <div className="flex items-center gap-2">
                         <select
                             value={sortOption}
                             onChange={handleSortChange}
-                            className="ml-4 px-3 py-2 border rounded-md dark:bg-neutral-900 dark:text-white"
+                            className="ml-4 rounded-md border px-3 py-2 dark:bg-neutral-900 dark:text-white"
                         >
                             <option value="latest">{translations['Latest']}</option>
                             <option value="oldest">{translations['Oldest']}</option>
@@ -49,41 +49,52 @@ export default function Dashboard() {
                         </select>
                         <button
                             onClick={handleReload}
-                            className="p-2 text-sm font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition flex items-center"
+                            className="flex items-center rounded-md border p-2 text-sm font-semibold text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800"
                         >
-                            <RefreshCw
-                                className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`}
-                            />
+                            <RefreshCw className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
                         </button>
                     </div>
-
                 </div>
 
                 {users.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
                         {users.map((user) => (
                             <Link
                                 key={user.id}
                                 href={`/user/${user.username}`}
-                                className="block p-4 border rounded-md hover:shadow-md transition-shadow dark:border-gray-700 dark:bg-transparent"
+                                className="block rounded-md border p-4 transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-transparent"
                             >
-                                <div className="flex items-center space-x-3 min-w-0">
+                                <div className="flex min-w-0 items-center space-x-3">
                                     <Avatar className="h-10 w-10 flex-shrink-0">
                                         <AvatarImage src={user.profile_image_url} alt={user.name} />
                                         <AvatarFallback className="rounded-full bg-gray-300 text-lg text-black dark:bg-gray-700 dark:text-white">
                                             {getInitials(user.name)}
                                         </AvatarFallback>
                                     </Avatar>
-                                    <div className="min-w-0 flex-1">
-                                        <h2 className="text-lg font-semibold truncate">{user.name}</h2>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate">@{user.username}</p>
+
+                                    <div className="flex flex-col">
+                                        <div className="flex items-center gap-1.5">
+                                            <h2 className="truncate text-lg font-semibold">{user.name}</h2>
+                                            {user.is_verified && (
+                                                <span className="group relative">
+                                                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                                        Verified
+                                                    </span>
+                                                    <span className="flex items-center rounded-md bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                        <Check className="h-4 w-4" />
+                                                    </span>
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <p className="truncate text-sm text-gray-500 dark:text-gray-400">@{user.username}</p>
                                     </div>
                                 </div>
                             </Link>
                         ))}
                     </div>
                 ) : (
-                    <p className="text-gray-500 dark:text-gray-400 px-6 py-4 text-center">
+                    <p className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                         {translations['No users found for this sorting option.']}
                     </p>
                 )}
@@ -91,4 +102,3 @@ export default function Dashboard() {
         </AppLayout>
     );
 }
-
