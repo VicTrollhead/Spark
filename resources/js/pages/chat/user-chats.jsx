@@ -1,18 +1,12 @@
-import { usePage, Link, Head, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { RefreshCw, SendIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
+import { Badge } from '../../components/ui/badge.jsx';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/dialog.jsx';
+import { Input } from '../../components/ui/input.jsx';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
-import {useEffect, useState} from 'react';
-import {RefreshCw, SendIcon} from 'lucide-react';
-import {
-    Dialog, DialogClose,
-    DialogContent,
-    DialogDescription, DialogHeader,
-    DialogTitle,
-    DialogTrigger
-} from "../../components/ui/dialog.jsx";
-import {Input} from "../../components/ui/input.jsx";
-import {Badge} from "../../components/ui/badge.jsx";
 
 export default function UserChats() {
     const { auth, chats, users, translations } = usePage().props;
@@ -20,22 +14,10 @@ export default function UserChats() {
     const getInitials = useInitials();
     const [isLoading, setIsLoading] = useState(false);
     const [usersSearch, setUsersSearch] = useState(users || []);
-    const onSearchChange = async (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-
-        const filteredUsers = users.filter(user =>
-            user.name.toLowerCase().includes(searchTerm) ||
-            user.username.toLowerCase().includes(searchTerm)
-        );
-
-        setUsersSearch(filteredUsers);
-    };
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-
-        window.Echo.private(`user-chats.${user.id}`)
-            .listen('UserMessageCreated', handleReload)
-            .listen('UserMessageIsReadChange', handleReload);
+        window.Echo.private(`user-chats.${user.id}`).listen('UserMessageCreated', handleReload).listen('UserMessageIsReadChange', handleReload);
 
         setTimeout(handleReload, 0);
         return () => {
@@ -57,117 +39,140 @@ export default function UserChats() {
 
     const formatMessageTime = (timestamp) => {
         const date = new Date(timestamp);
-
         date.setHours(date.getHours() + 3);
-
         const shiftedNow = new Date();
         shiftedNow.setHours(shiftedNow.getHours() + 3);
-
         const isToday =
-            date.getFullYear() === shiftedNow.getFullYear() &&
-            date.getMonth() === shiftedNow.getMonth() &&
-            date.getDate() === shiftedNow.getDate();
-
+            date.getFullYear() === shiftedNow.getFullYear() && date.getMonth() === shiftedNow.getMonth() && date.getDate() === shiftedNow.getDate();
         return isToday
             ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             : date.toLocaleString([], {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-            });
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+              });
+    };
+
+    const onSearchChange = (e) => {
+        const value = e.target.value.toLowerCase();
+        setSearchTerm(value);
+        const filtered = users
+            .map((group) => ({
+                label: group.label,
+                users: group.users.filter((user) => user.name.toLowerCase().includes(value) || user.username.toLowerCase().includes(value)),
+            }))
+            .filter((group) => group.users.length > 0);
+        setUsersSearch(filtered);
     };
 
     return (
         <AppLayout>
             <Head title={translations['User chats']} />
             <div className="p-6">
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">{translations['User chats']}</h1>
-                    <div className="flex items-center flex-row gap-2">
+                    <div className="flex flex-row items-center gap-2">
                         <Dialog>
-                            <DialogTrigger >
-                                <div className="flex gap-1 items-center p-2 font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition cursor-pointer">
-                                    <SendIcon className="w-5 h-5" /><span className="hidden md:flex">{translations['Start new chat']}</span>
+                            <DialogTrigger>
+                                <div className="flex cursor-pointer items-center gap-1 rounded-md border p-2 font-semibold text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800">
+                                    <SendIcon className="h-5 w-5" />
+                                    <span className="hidden md:flex">{translations['Start new chat']}</span>
                                 </div>
                             </DialogTrigger>
                             <DialogContent>
                                 <DialogHeader>
-                                    <DialogTitle>
-                                        {translations['Select user to start new chat']}
-                                    </DialogTitle>
-                                    <DialogDescription className="h-[50vh] overflow-y-auto flex flex-col gap-3">
+                                    <DialogTitle>{translations['Select user to start new chat']}</DialogTitle>
+                                    <DialogDescription className="flex h-[50vh] flex-col gap-3 overflow-y-auto">
                                         <span className="flex items-center space-x-3">
                                             <Input placeholder={translations['Search users']} className="w-full" onChange={onSearchChange} />
                                         </span>
                                         {usersSearch.length === 0 ? (
-                                            <DialogClose className="text-gray-500 text-center text-lg mt-4">{translations['Not friends for chat anyone yet.']}</DialogClose>
-                                        ) : (usersSearch.map((user) => (
-                                            <DialogClose key={user.id}
-                                                         onClick={() => router.post(`/chat/user-chat/new/${user.id}`)}
-                                                         className="flex flex-row gap-3 border dark:border-gray-600 rounded-md px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer">
-                                                <Avatar className="my-auto h-12 w-12 md:h-15 md:w-15 border-2 border-neutral-800 dark:border-gray-400">
-                                                    <AvatarImage src={user.profile_image_url} alt={user.name} />
-                                                    <AvatarFallback className="rounded-full bg-gray-300 text-2xl text-black dark:bg-gray-700 dark:text-white">
-                                                        {getInitials(user.name)}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                                <div className="flex flex-col w-full gap-2 text-sm md:text-lg">
-                                                    <div className="flex flex-row gap-1 flex-wrap">
-                                                        <span className="ml-1 font-bold">{user.name}</span>
-                                                        <span className="text-gray-500 dark:text-gray-400 hidden sm:flex">@{user.username}</span>
-                                                    </div>
-                                                </div>
+                                            <DialogClose className="mt-4 text-center text-lg text-gray-500">
+                                                {translations['No friends to chat yet.']}
                                             </DialogClose>
-                                        )))}
+                                        ) : (
+                                            usersSearch
+                                                .filter((group) => group.users.length > 0)
+                                                .map((group, idx) => (
+                                                    <div key={idx} className="flex flex-col gap-2">
+                                                        <h4 className="text-md font-semibold text-neutral-700 dark:text-white">
+                                                            {translations[group.label] || group.label}
+                                                        </h4>
+                                                        {group.users.map((user) => (
+                                                            <DialogClose
+                                                                key={user.id}
+                                                                onClick={() => router.post(`/chat/user-chat/new/${user.id}`)}
+                                                                className="flex cursor-pointer flex-row gap-3 rounded-md border px-4 py-2 hover:bg-gray-200 dark:border-gray-600 dark:hover:bg-gray-700"
+                                                            >
+                                                                <Avatar className="my-auto h-12 w-12 border-2 border-neutral-800 md:h-15 md:w-15 dark:border-gray-400">
+                                                                    <AvatarImage src={user.profile_image_url} alt={user.name} />
+                                                                    <AvatarFallback className="rounded-full bg-gray-300 text-2xl text-black dark:bg-gray-700 dark:text-white">
+                                                                        {getInitials(user.name)}
+                                                                    </AvatarFallback>
+                                                                </Avatar>
+                                                                <div className="flex w-full flex-col gap-2 text-sm md:text-lg">
+                                                                    <div className="flex flex-row flex-wrap gap-1">
+                                                                        <span className="ml-1 font-bold">{user.name}</span>
+                                                                        <span className="hidden text-gray-500 sm:flex dark:text-gray-400">
+                                                                            @{user.username}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </DialogClose>
+                                                        ))}
+                                                    </div>
+                                                ))
+                                        )}
                                     </DialogDescription>
                                 </DialogHeader>
                             </DialogContent>
                         </Dialog>
                         <button
                             onClick={handleReload}
-                            className="p-2 font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition cursor-pointer"
+                            className="cursor-pointer rounded-md border p-2 font-semibold text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800"
                         >
-                            <RefreshCw
-                                className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`}
-                            />
+                            <RefreshCw className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
                         </button>
                     </div>
                 </div>
                 {chats.length === 0 ? (
-                    <p className="text-gray-500 mt-1">{translations['Not chats anyone yet.']}</p>
+                    <p className="mt-1 text-gray-500">{translations['Not chats anyone yet.']}</p>
                 ) : (
                     <ul className="overflow-y-auto">
                         {chats.map((chat) => (
-                            <li key={chat.id} className="border dark:border-gray-600 rounded-md px-4 py-2 mt-2 hover:bg-gray-200 dark:hover:bg-gray-700">
+                            <li
+                                key={chat.id}
+                                className="mt-2 rounded-md border px-4 py-2 hover:bg-gray-200 dark:border-gray-600 dark:hover:bg-gray-700"
+                            >
                                 <Link href={`/chat/user-chat/${chat.user.username}`} className="flex flex-row gap-3">
-                                    <Avatar className="my-auto h-12 w-12 md:h-15 md:w-15 border-2 border-neutral-800 dark:border-gray-400">
+                                    <Avatar className="my-auto h-12 w-12 border-2 border-neutral-800 md:h-15 md:w-15 dark:border-gray-400">
                                         <AvatarImage src={chat.user.profile_image_url} alt={chat.user.name} />
                                         <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
                                             {getInitials(chat.user.name)}
                                         </AvatarFallback>
                                     </Avatar>
-                                    <div className="flex flex-col w-full gap-2 text-sm md:text-lg">
-                                        <div className="flex flex-row gap-1 flex-wrap">
+                                    <div className="flex w-full flex-col gap-2 text-sm md:text-lg">
+                                        <div className="flex flex-row flex-wrap gap-1">
                                             <span className="ml-1 font-bold">{chat.user.name}</span>
-                                            <span className="text-gray-500 dark:text-gray-400 hidden sm:flex">@{chat.user.username}</span>
+                                            <span className="hidden text-gray-500 sm:flex dark:text-gray-400">@{chat.user.username}</span>
                                         </div>
-                                        <div className="ml-1 text-sm flex flex-row gap-2">
-                                            <p>
-                                                {chat.last_message
-                                                ? chat.last_message.text
-                                                : translations['No messages anyone yet.']}
-                                            </p>
-                                            {chat.unread_count && chat.unread_count !== 0 ? (<Badge className="bg-neutral-500 dark:bg-neutral-300">{chat.unread_count}</Badge>) : ''}
+                                        <div className="ml-1 flex flex-row gap-2 text-sm">
+                                            <p>{chat.last_message ? chat.last_message.text : translations['No messages anyone yet.']}</p>
+                                            {chat.unread_count && chat.unread_count !== 0 ? (
+                                                <Badge className="bg-neutral-500 dark:bg-neutral-300">{chat.unread_count}</Badge>
+                                            ) : (
+                                                ''
+                                            )}
                                         </div>
                                     </div>
                                     <div>
-                                        {chat.last_message
-                                            ? (
-                                                <p className="text-gray-500 text-sm">{formatMessageTime(chat.last_message.time)}</p>
-                                            )
-                                            : ''}
+                                        {chat.last_message ? (
+                                            <p className="text-sm text-gray-500">{formatMessageTime(chat.last_message.time)}</p>
+                                        ) : (
+                                            ''
+                                        )}
                                     </div>
                                 </Link>
                             </li>

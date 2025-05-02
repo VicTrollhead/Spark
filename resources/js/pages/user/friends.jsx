@@ -53,7 +53,7 @@ export default function Friends() {
                 </div>
 
                 {users.length === 0 ? (
-                    <p className="text-gray-500 mt-1">{translations['Not friends anyone yet.']}</p>
+                    <p className="text-gray-500 mt-1">{translations['No friends yet.']}</p>
                 ) : (
                     <ul>
                         {users.map((friend) => (

@@ -23,7 +23,7 @@ return [
     "Not hashtags anyone yet." => "Немає жодного хештега.",
     "No following posts yet." => "Немає жодного поста.",
     "No liked posts yet." => "Немає жодного лайкнутого поста.",
-    "Not friends anyone yet." => "Немає жодного друга.",
+    "No friends yet." => "Немає жодного друга.",
     "No favorite posts yet." => "Немає жодного обраного поста.",
     "No users found for this sorting option." => "Не знайдено користувачів для цього варіанту сортування.",
     "No users found." => "Не знайдено жодного користувача.",
@@ -131,6 +131,8 @@ return [
     "Explore trending topics by post engagement." => "Знаходьте трендові теми за взаємодіями з постами.",
     "Likes" => "Лайки",
     "Most Posts" => "Наибільше постів",
-    "Not friends for chat anyone yet." => "Немає жодного друга для початку чату.",
+    "No friends to chat yet." => "Немає жодного друга для початку чату.",
     "Write" => "Написати",
+    "Mutuals" => "Mutuals",
+    "Others" => "Others",
 ];

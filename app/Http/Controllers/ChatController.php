@@ -106,25 +106,55 @@ class ChatController extends Controller
             ];
         });
 
-        $users = $user->friends()
-            ->whereNotIn('users.id', $chatUserIds)
-            ->with('profileImage')
-            ->latest()
-            ->get()
-            ->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'username' => $user->username,
-                    'profile_image_url' => $user->profileImage?->url,
-                ];
-            });
+        $allUsers = User::with('profileImage')
+            ->where('id', '!=', $user->id)
+            ->whereNotIn('id', $chatUserIds)
+            ->get();
+
+        $mutuals = $user->friends()->pluck('id')->toArray();
+        $followers = $user->followers()->pluck('id')->toArray();
+        $following = $user->following()->pluck('id')->toArray();
+
+        $groupedUsers = [
+            'Mutuals' => [],
+            'Followers' => [],
+            'Following' => [],
+            'Others' => [],
+        ];
+
+        foreach ($allUsers as $u) {
+            if (in_array($u->id, $mutuals)) {
+                $groupedUsers['Mutuals'][] = $u;
+            } elseif (in_array($u->id, $followers)) {
+                $groupedUsers['Followers'][] = $u;
+            } elseif (in_array($u->id, $following)) {
+                $groupedUsers['Following'][] = $u;
+            } else {
+                $groupedUsers['Others'][] = $u;
+            }
+        }
+
+        $users = [];
+        foreach ($groupedUsers as $group => $list) {
+            $users[] = [
+                'label' => $group,
+                'users' => collect($list)->map(function ($user) {
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'username' => $user->username,
+                        'profile_image_url' => $user->profileImage?->url,
+                    ];
+                }),
+            ];
+        }
 
         return Inertia::render('chat/user-chats', [
             'chats' => $chatData,
             'users' => $users,
         ]);
     }
+
 
     public function getUserChat(User $otherUser): Response
     {
