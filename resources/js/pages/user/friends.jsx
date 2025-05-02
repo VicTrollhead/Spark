@@ -64,7 +64,7 @@ export default function Friends() {
                                         {getInitials(friend.name)}
                                     </AvatarFallback>
                                 </Avatar>
-                                <div className="flex flex-row w-full">
+                                <div className="flex flex-row justify-between w-full gap-2 items-center">
                                     <div className="flex flex-col">
                                         <div className="flex items-center gap-1.5">
                                             <Link href={`/user/${friend.username}`} className="font-medium text-blue-500 hover:underline">
@@ -84,7 +84,7 @@ export default function Friends() {
 
                                         <p className="text-gray-500 dark:text-gray-400">@{friend.username}</p>
                                     </div>
-                                    <div className="flex flex-row gap-2">
+                                    <div className="flex lg:flex-row flex-col gap-2">
                                         {friend.is_friend ? (
                                             <button
                                                 onClick={() => router.post(`/chat/user-chat/new/${friend.id}`)}
