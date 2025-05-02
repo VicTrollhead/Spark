@@ -82,7 +82,7 @@ export default function UserChats() {
                                                          className="flex flex-row gap-3 border dark:border-gray-600 rounded-md px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer">
                                                 <Avatar className="my-auto h-12 w-12 md:h-15 md:w-15 border-2 border-neutral-800 dark:border-gray-400">
                                                     <AvatarImage src={user.profile_image_url} alt={user.name} />
-                                                    <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
+                                                    <AvatarFallback className="rounded-full bg-gray-300 text-2xl text-black dark:bg-gray-700 dark:text-white">
                                                         {getInitials(user.name)}
                                                     </AvatarFallback>
                                                 </Avatar>

@@ -46,7 +46,6 @@ export default function Show() {
         window.Echo.private(`post.${post.id}`).listen('CommentCreated', (e) => {
             router.reload();
         });
-        console.log('подписался');
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
             window.Echo.leave(`post.${post.id}`);

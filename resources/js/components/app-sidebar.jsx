@@ -34,26 +34,20 @@ export function AppSidebar() {
 
     window.Echo.private(`notifications.${user.id}`)
         .listen('NotificationCreated', (e) => {
-            setUnreadNotificationsCount(unreadNotificationsCount+1);
+            setUnreadNotificationsCount(prev => prev + 1);
         })
         .listen('NotificationIsReadChange', (e) => {
-            if(e.operation === 'read')
-            {
-                setUnreadNotificationsCount(unreadNotificationsCount-1);
-            }
-            else if (e.operation === 'unread')
-            {
-                setUnreadNotificationsCount(unreadNotificationsCount+1);
-            }
-            else if (e.operation === 'allRead')
-            {
+            if (e.operation === 'read') {
+                setUnreadNotificationsCount(prev => Math.max(prev - 1, 0));
+            } else if (e.operation === 'unread') {
+                setUnreadNotificationsCount(prev => prev + 1);
+            } else if (e.operation === 'allRead') {
                 setUnreadNotificationsCount(0);
-            }
-            else if (e.operation === 'allUnread')
-            {
+            } else if (e.operation === 'allUnread') {
                 fetchUnreadCount().catch(error => console.error(error));
             }
         });
+
 
     if (!user) return null;
 

@@ -61,6 +61,7 @@ class NotificationController extends Controller
                     'profile_image_url' => $sourceUser->profileImage?->url,
                     'is_private' => (bool) $sourceUser->is_private,
                     'is_subscribed' => $currentUser->isFollowing($sourceUser),
+                    'is_verified' => $sourceUser->is_verified,
                 ] : null,
 
                 'post' => $post ? [
@@ -71,6 +72,7 @@ class NotificationController extends Controller
                         'name' => $post->user->name,
                         'username' => $post->user->username,
                         'profile_image_url' => $post->user->profileImage?->url,
+                        'is_verified' => $post->user->is_verified,
                     ],
                     'media' => $post->media->map(fn($m) => [
                         'file_path' => $m->file_path,
@@ -90,6 +92,7 @@ class NotificationController extends Controller
                 'name' => $currentUser->name,
                 'username' => $currentUser->username,
                 'profile_image_url' => $currentUser->profileImage?->url,
+                'is_verified' => $currentUser->is_verified
             ],
             'notifications' => $formattedNotifications,
             'sort' => $sort,
@@ -104,7 +107,7 @@ class NotificationController extends Controller
         $notification->is_read = true;
         $notification->save();
         event(new NotificationIsReadChange($notification, 'read'));
-        return back();
+        return redirect()->back();
     }
 
     public function markAsUnread(Notification $notification)
@@ -112,7 +115,7 @@ class NotificationController extends Controller
         $notification->is_read = false;
         $notification->save();
         event(new NotificationIsReadChange($notification, 'unread'));
-        return back();
+        return redirect()->back();
     }
 
     public function getUnreadNotificationsCount(Request $request)

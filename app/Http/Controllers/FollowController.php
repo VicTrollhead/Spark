@@ -114,6 +114,7 @@ class FollowController extends Controller
                     'has_sent_follow_request' => $hasSentFollowRequest,
                     'is_private' => $follower->is_private,
                     'is_friend' => in_array($follower->id, $authUserFriends),
+                    'is_verified' => $follower->is_verified
                 ];
             });
 
@@ -125,6 +126,7 @@ class FollowController extends Controller
                 'name' => $user->name,
                 'username' => $user->username,
                 'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'is_verified' => $user->is_verified
             ],
         ]);
     }
@@ -148,6 +150,7 @@ class FollowController extends Controller
                     'is_followed' => $authUser->following->contains($followingUser->id),
                     'is_private' => $followingUser->is_private,
                     'is_friend' => in_array($followingUser->id, $authUserFriends),
+                    'is_verified' => $followingUser->is_verified,
                 ];
             });
 
@@ -159,6 +162,7 @@ class FollowController extends Controller
                 'name' => $user->name,
                 'username' => $user->username,
                 'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'is_verified' => $user->is_verified
             ],
         ]);
     }

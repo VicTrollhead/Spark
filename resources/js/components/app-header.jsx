@@ -41,7 +41,6 @@ export function AppHeader({ breadcrumbs = [] }) {
         try {
             const response = await fetch('/notifications/unread-count');
             const data = await response.json();
-            console.log(data);
             setUnreadNotificationsCount(data.unread_count);
         } catch (error) {
             console.error(error);
