@@ -27,6 +27,7 @@ export function AppSidebar() {
         } catch (error) {
             console.error(error);
         }
+    }
 
     const fetchUnreadMessagesCount = async () => {
         try {
