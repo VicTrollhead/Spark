@@ -52,7 +52,7 @@ export function AppExtraSidebar() {
             variant="inset"
             // collapsible={isLargeScreen ? "offcanvas" : "none"}
             collapsible="none"
-            className="bg-transparent fixed top-16 right-0 w-65 h-[calc(100vh-4rem)] shadow-md hidden lg:block pr-2.5"
+            className="bg-transparent fixed top-16 right-0 w-[17rem] h-[calc(100vh-4rem)] shadow-md hidden lg:block pr-2.5"
         >
             <SidebarHeader>
 

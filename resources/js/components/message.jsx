@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx';
 import { Link, router, usePage } from '@inertiajs/react';
-import { EllipsisVertical } from 'lucide-react';
+import { Check, EllipsisVertical } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useInitials } from '../hooks/use-initials.jsx';
 
@@ -86,8 +86,18 @@ export default function Message({ userId, message }) {
                             <Link href={`/user/${message.user.username}`} className="flex w-fit items-center">
                                 <div className="flex items-center gap-2">
                                     <div className="grid flex-1 text-left leading-tight">
-                                        <div>
+                                        <div className="flex items-center gap-1">
                                             <span className="truncate text-lg text-black hover:underline dark:text-white">{message.user.name}</span>
+                                            {message.user.is_verified && (
+                                                <div className="group relative">
+                                                    <span className="top absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                                        Verified
+                                                    </span>
+                                                    <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                        <Check className="h-3 w-3" />
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <span className="text-xs text-neutral-700 dark:text-white">{formatMessageTime(message.time)}</span>

@@ -1,5 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { RefreshCw, SendIcon } from 'lucide-react';
+import { Check, RefreshCw, SendIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { Badge } from '../../components/ui/badge.jsx';
@@ -17,9 +17,7 @@ export default function UserChats() {
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        window.Echo.private(`user-chats.${user.id}`)
-            .listen('UserMessageCreated', handleReload)
-            .listen('UserMessageIsReadChange', handleReload);
+        window.Echo.private(`user-chats.${user.id}`).listen('UserMessageCreated', handleReload).listen('UserMessageIsReadChange', handleReload);
 
         setTimeout(handleReload, 0);
         return () => {
@@ -45,9 +43,7 @@ export default function UserChats() {
         const shiftedNow = new Date();
         shiftedNow.setHours(shiftedNow.getHours() + 3);
         const isToday =
-            date.getFullYear() === shiftedNow.getFullYear()
-            && date.getMonth() === shiftedNow.getMonth()
-            && date.getDate() === shiftedNow.getDate();
+            date.getFullYear() === shiftedNow.getFullYear() && date.getMonth() === shiftedNow.getMonth() && date.getDate() === shiftedNow.getDate();
         return isToday
             ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             : date.toLocaleString([], {
@@ -89,7 +85,7 @@ export default function UserChats() {
                                 <DialogHeader>
                                     <DialogTitle>{translations['Select user to start new chat']}</DialogTitle>
                                     <DialogDescription className="flex h-[50vh] flex-col gap-3 overflow-y-auto">
-                                        <span className="flex items-center space-x-3">
+                                        <span className="flex items-center space-x-5">
                                             <Input placeholder={translations['Search users']} className="w-full" onChange={onSearchChange} />
                                         </span>
                                         {usersSearch.length === 0 ? (
@@ -101,7 +97,7 @@ export default function UserChats() {
                                                 .filter((group) => group.users.length > 0)
                                                 .map((group, idx) => (
                                                     <span key={idx} className="flex flex-col gap-2">
-                                                        <span className="text-md font-semibold text-neutral-700 dark:text-white">
+                                                        <span className="text-[16px] font-semibold text-neutral-700 dark:text-white">
                                                             {translations[group.label] || group.label}
                                                         </span>
                                                         {group.users.map((user) => (
@@ -116,12 +112,10 @@ export default function UserChats() {
                                                                         {getInitials(user.name)}
                                                                     </AvatarFallback>
                                                                 </Avatar>
-                                                                <div className="flex w-full flex-col gap-2 text-sm md:text-lg">
-                                                                    <div className="flex flex-row flex-wrap gap-1">
-                                                                        <span className="ml-1 font-bold">{user.name}</span>
-                                                                        <span className="hidden text-gray-500 sm:flex dark:text-gray-400">
-                                                                            @{user.username}
-                                                                        </span>
+                                                                <div className="flex w-full flex-col items-start text-sm text-gray-700 sm:flex md:text-lg dark:text-gray-300">
+                                                                    <div className="flex flex-col items-start">
+                                                                        <span className="font-bold">{user.name}</span>
+                                                                        <span>@{user.username}</span>
                                                                     </div>
                                                                 </div>
                                                             </DialogClose>
@@ -157,12 +151,24 @@ export default function UserChats() {
                                             {getInitials(chat.user.name)}
                                         </AvatarFallback>
                                     </Avatar>
-                                    <div className="flex w-full flex-col gap-2 text-sm md:text-lg">
-                                        <div className="flex flex-row flex-wrap gap-1">
-                                            <span className="ml-1 font-bold">{chat.user.name}</span>
-                                            <span className="hidden text-gray-500 sm:flex dark:text-gray-400">@{chat.user.username}</span>
+                                    <div className="flex w-full flex-col gap-2 py-1 text-sm md:text-lg">
+                                        <div className="flexflex-wrap gap-1">
+                                            <div className="flex items-center gap-1">
+                                                <span className="ml-1 font-bold">{chat.user.name}</span>
+                                                <span className="hidden text-gray-500 sm:flex dark:text-gray-400">@{chat.user.username}</span>
+                                                {chat.user.is_verified && (
+                                                    <div className="group relative">
+                                                        <span className="top absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                                            Verified
+                                                        </span>
+                                                        <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                            <Check className="h-3 w-3" />
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
-                                        <div className="ml-1 flex flex-row gap-2 text-sm">
+                                        <div className="mb-1 ml-1 flex gap-2 text-sm">
                                             <p>{chat.last_message ? chat.last_message.text : translations['No messages anyone yet.']}</p>
                                             {chat.unread_count && chat.unread_count !== 0 ? (
                                                 <Badge className="bg-neutral-500 dark:bg-neutral-300">{chat.unread_count}</Badge>
@@ -171,7 +177,7 @@ export default function UserChats() {
                                             )}
                                         </div>
                                     </div>
-                                    <div>
+                                    <div className="flex w-1/4 items-center justify-end">
                                         {chat.last_message ? (
                                             <p className="text-sm text-gray-500">{formatMessageTime(chat.last_message.time)}</p>
                                         ) : (

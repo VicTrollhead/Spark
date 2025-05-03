@@ -128,7 +128,7 @@ return [
     "Not chats anyone yet." => "Not chats anyone yet.",
     "No messages anyone yet." => "No messages anyone yet.",
     "Chat with" => "Chat with",
-    "Select user to start new chat" => "Select user to start chat",
+    "Select user to start new chat" => "Select user to start a new chat",
     "Explore trending topics by post engagement." => "Explore trending topics by post engagement.",
     "Likes" => "Likes",
     "Most Posts" => "Most Posts",

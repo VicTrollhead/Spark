@@ -23,25 +23,23 @@ export function Notification({ notification }) {
     const renderUserLink = (username, name) => (
         <Link
             href={`/user/${username}`}
-            className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
+            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
         >
-        <span>
-            {name} <span className="text-sm">(@{username})</span>
-        </span>
-            {sourceUser.is_verified && (
-                <span className="group relative inline-block">
-                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
-                    Verified
-                </span>
-                    <span className="flex items-center justify-center rounded-md bg-blue-500 p-0.5 ml-0.5 text-white">
-                    <Check className="h-4 w-4" />
-                </span>
+            <span>
+                {name} <span className="text-sm">(@{username})</span>
             </span>
+            {sourceUser.is_verified && (
+                <div className="group relative">
+                    <span className="top absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                        Verified
+                    </span>
+                    <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
+                        <Check className="h-3 w-3" />
+                    </span>
+                </div>
             )}
         </Link>
     );
-
-
 
     const handleFollowRequest = (action) => {
         router.post(

@@ -81,8 +81,6 @@ export default function Show() {
         );
     }
 
-    console.log(user.total_likes);
-
     return (
         <AppLayout>
             <Head title={`${user.name} (@${user.username})`} />
@@ -109,10 +107,10 @@ export default function Show() {
                             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user.name}</h1>
                             {user.is_verified && (
                                 <div className="group relative ml-2">
-                                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-lg bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
                                         Verified
                                     </span>
-                                    <span className="flex items-center rounded-lg bg-blue-500 p-1 text-xs font-medium text-white">
+                                    <span className="flex items-center rounded-xl bg-blue-500 p-1 text-xs font-medium text-white">
                                         <Check className="h-4 w-4" />
                                     </span>
                                 </div>

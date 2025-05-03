@@ -188,12 +188,12 @@ export default function PostComponent({ post, compact = false }) {
                                 {post.user.name}
                             </Link>
                             {post.user.is_verified && (
-                                <div className="group relative">
-                                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                <div className="group relative -ml-1">
+                                    <span className="top absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
                                         Verified
                                     </span>
-                                    <span className="flex items-center rounded-md bg-blue-500 p-0.5 text-xs font-medium text-white">
-                                        <Check className="h-4 w-4" />
+                                    <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                        <Check className="h-3 w-3" />
                                     </span>
                                 </div>
                             )}

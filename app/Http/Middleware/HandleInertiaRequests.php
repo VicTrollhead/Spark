@@ -63,6 +63,7 @@ class HandleInertiaRequests extends Middleware
                     'profile_image_url' => $user->profileImage
                         ? asset('storage/' . $user->profileImage->file_path)
                         : null,
+                    'is_verified' => $user->is_verified,
                 ] : null,
             ],
         ];

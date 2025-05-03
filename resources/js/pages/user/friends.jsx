@@ -71,14 +71,14 @@ export default function Friends() {
                                                 {friend.name}
                                             </Link>
                                             {friend.is_verified && (
-                                                <span className="group relative">
-                                                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                                <div className="group relative">
+                                                    <span className="absolute -top-7 left-1/2 top -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
                                                         Verified
                                                     </span>
-                                                    <span className="flex items-center rounded-md bg-blue-500 p-0.5 text-xs font-medium text-white">
-                                                        <Check className="h-4 w-4" />
+                                                    <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                        <Check className="h-3 w-3" />
                                                     </span>
-                                                </span>
+                                                </div>
                                             )}
                                         </div>
 
