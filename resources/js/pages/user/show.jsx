@@ -1,5 +1,5 @@
 import { Head, usePage, Link, router } from '@inertiajs/react';
-import { Check, MapPin, Globe, Calendar, UserCheck, AlertCircle, RefreshCw } from 'lucide-react';
+import {Check, MapPin, Globe, Calendar, UserCheck, AlertCircle, RefreshCw, SendIcon} from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
@@ -11,6 +11,7 @@ export default function Show() {
     const getInitials = useInitials();
     const [sort, setSort] = useState(filters?.sort || 'latest');
     const [isLoading, setIsLoading] = useState(false);
+    const [hasSentRequest, setHasSentRequest] = useState(user.has_sent_follow_request);
     const handleReload = () => {
         setIsLoading(true);
         router.reload();
@@ -20,14 +21,29 @@ export default function Show() {
     };
 
     const handleFollow = () => {
-        const route = user.is_following ? 'unfollow' : (user.is_private ? 'follow-request' : 'follow');
+        const isCurrentlyFollowing = user.is_following || hasSentRequest;
+
+        const route = isCurrentlyFollowing
+            ? 'unfollow'
+            : (user.is_private ? 'follow-request' : 'follow');
+
+        setIsLoading(true);
 
         router.post(`/user/${user.username}/${route}`, {}, {
             onSuccess: () => {
-                router.reload({ only: ['user', 'posts'] });
+                if (user.is_private && !isCurrentlyFollowing) {
+                    setHasSentRequest(true);
+                } else {
+                    setHasSentRequest(false);
+                }
+                setIsLoading(false);
+            },
+            onError: () => {
+                setIsLoading(false);
             }
         });
     };
+
 
     const handleEditProfile = () => {
         router.get(`/user/${user.username}/edit`);
@@ -56,7 +72,7 @@ export default function Show() {
                             onClick={handleFollow}
                             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
                         >
-                            {user.has_sent_follow_request ? translations['Request Sent'] : translations['Follow to See More']}
+                            {hasSentRequest ? translations['Request Sent'] : translations['Follow to See More']}
                         </button>
                     )}
 
@@ -64,6 +80,8 @@ export default function Show() {
             </AppLayout>
         );
     }
+
+    console.log(user.total_likes);
 
     return (
         <AppLayout>
@@ -103,16 +121,26 @@ export default function Show() {
                         <p className="text-gray-500 dark:text-gray-400 mt-1">@{user.username}</p>
                     </div>
                     {!isOwnProfile && (
-                        <button
-                            onClick={handleFollow}
-                            className={`px-4 py-2 rounded-md ${
-                                user.is_following
-                                    ? 'bg-gray-600 hover:bg-gray-500 text-white dark:bg-gray-800 dark:hover:bg-gray-700'
-                                    : 'bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-800'
-                            }`}
-                        >
-                            {user.is_following ? translations['Unfollow'] : translations['Follow']}
-                        </button>
+                        <div className="flex flex-row gap-2">
+                            {user.is_friend ? (
+                                <button
+                                    onClick={() => router.post(`/chat/user-chat/new/${user.id}`)}
+                                    className={`px-4 py-2 flex gap-2 items-center rounded-md bg-gray-600 hover:bg-gray-500 text-white dark:bg-gray-800 dark:hover:bg-gray-700`}
+                                >
+                                    {translations['Write']}<SendIcon className="w-5 h-5" />
+                                </button>
+                            ) : ''}
+                            <button
+                                onClick={handleFollow}
+                                className={`px-4 py-2 rounded-md ${
+                                    user.is_following
+                                        ? 'bg-gray-600 hover:bg-gray-500 text-white dark:bg-gray-800 dark:hover:bg-gray-700'
+                                        : 'bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-800'
+                                }`}
+                            >
+                                {user.is_following ? translations['Unfollow'] : translations['Follow']}
+                            </button>
+                        </div>
                     )}
                     {isOwnProfile && (
                         <div className="flex flex-col lg:items-end sm:items-center pl-1 sm:ml-10 space-y-2">
@@ -181,6 +209,9 @@ export default function Show() {
                     <Link href={`/user/${user.username}/following`} className="hover:underline">
                         <strong>{user.following_count}</strong> {following_string}
                     </Link>
+                    <div>
+                        <strong>{user.total_likes}</strong> {translations['Likes']}
+                    </div>
                 </div>
             </div>
 

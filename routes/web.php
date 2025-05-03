@@ -21,6 +21,7 @@ Route::get('/', function () {
 Route::post('/api/auth/google/callback', [GoogleAuthController::class, 'callback']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/', [PostController::class, 'index'])->name('home');
     Route::get('dashboard', [PostController::class, 'index'])->name('dashboard');
     Route::get('dashboard/users', [UserController::class, 'users'])->name('dashboard.users');
     Route::get('/users-list', [UserController::class, 'usersList'])->name('users.list');
@@ -36,10 +37,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/user/{user}', [UserController::class, 'show'])->name('user.show');
     Route::get('/user/search/{searchText}', [UserController::class, 'search'])->name('user.search');
+    Route::get('/search-empty', [UserController::class, 'searchEmpty'])->name('user.searchEmpty');
 
     Route::post('/user/{user}/follow', [FollowController::class, 'follow'])->name('user.follow');
     Route::post('/user/{user}/unfollow', [FollowController::class, 'unfollow'])->name('user.unfollow');
     Route::post('/user/{user}/follow-request', [FollowController::class, 'sendFollowRequest'])->name('follow.request');
+    Route::post('/user/{user}/{notification}/accept-request', [FollowController::class, 'acceptRequest'])->name('follow.acceptRequest');
+    Route::post('/user/{user}/{notification}/reject-request', [FollowController::class, 'rejectRequest'])->name('follow.rejectRequest');
     Route::get('/is-following/{user}', [FollowController::class, 'isFollowing'])->name('isFollowing');
     Route::get('/user/{user}/followers', [FollowController::class, 'followers'])->name('user.followers');
     Route::get('/user/{user}/following', [FollowController::class, 'following'])->name('user.following');
@@ -48,6 +52,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/dashboard', [PostController::class, 'store'])->name('posts.store');
     Route::get('/post/{post}', [PostController::class, 'show'])->name('post.show');
     Route::delete('/post/{post}', [PostController::class, 'destroy']);
+    Route::get('/show-popular-hashtags', [PostController::class, 'showPopularHashtags'])->name('showPopularHashtags');
     Route::get('/popular-hashtags', [PostController::class, 'popularHashtags'])->name('popularHashtags');
     Route::get('/posts-by-hashtag/{hashtag}', [PostController::class, 'postsByHashtag'])->name('postsByHashtag');
 
@@ -68,12 +73,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/post/{post}/edit', [PostController::class, 'edit'])->name('post.edit');
     Route::patch('/post/{post}/update', [PostController::class, 'update'])->name('post.update');
 
-    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
-    Route::post('/message', [ChatController::class, 'message'])->name('chat.message');
-
-    Route::post('/message/{userId}', [ChatController::class, 'sendMessage'])->name('chat.sendMessage');
-    Route::get('/chat/{chatId}/messages', [ChatController::class, 'getMessages'])->name('chat.getMessages');
-    Route::get('/user-chats', [ChatController::class, 'getUserChats'])->name('chat.getUserChats');
+    Route::get('/chat/everyone', [ChatController::class, 'getEveryoneChat'])->name('chat.getEveryoneChat');
+    Route::post('/chat/message', [ChatController::class, 'message'])->name('chat.message');
+    Route::get('/chat/user-chats', [ChatController::class, 'getUserChats'])->name('chat.getUserChats');
+    Route::get('/chat/user-chat/{user}', [ChatController::class, 'getUserChat'])->name('chat.getUserChat');
+    Route::post('/chat/user-chat/new/{user}', [ChatController::class, 'searchOrCreateUserChat'])->name('chat.createUserChat');
+    Route::post('/chat/user-chat/post-message', [ChatController::class, 'postMessageToUserChat'])->name('chat.postMessageToUserChat');
+    Route::delete('/chat/message/{message}', [ChatController::class, 'deleteMessage'])->name('chat.deleteMessage');
+    Route::post('/chat/user-chat/{chat}/mark-messages-as-read', [ChatController::class, 'markAsRead'])->name('chat.markAsRead');
 
     Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::patch('/notifications/{notification}/unread', [NotificationController::class, 'markAsUnread'])->name('notifications.unread');
@@ -81,6 +88,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/notifications/mark-all-unread', [NotificationController::class, 'markAllAsUnread'])->name('notifications.markAllAsUnread');
 
     Route::get('/notifications/unread-count', [NotificationController::class, 'getUnreadNotificationsCount'])->name('notifications.unreadCount');
+    Route::get('/chat/user-chat/messages/unread-count', [ChatController::class, 'getUnreadMessagesCount'])->name('chat.getUnreadMessagesCount');
 
 });
 

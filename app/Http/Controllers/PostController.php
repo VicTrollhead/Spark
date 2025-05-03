@@ -99,6 +99,7 @@ class PostController extends Controller
                     'name' => $post->user->name,
                     'username' => $post->user->username,
                     'profile_image_url' => $post->user->profileImage?->url,
+                    'is_verified' => $post->user->is_verified,
                 ],
                 'hashtags' => $post->hashtags->map(fn ($tag) => [
                     'id' => $tag->id,
@@ -121,17 +122,34 @@ class PostController extends Controller
                     ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
                 'reposted_by_recent' => $post->repostedByUsers()
                     ->where('user_id', '!=', $post->user_id)
-                    ->orderByPivot('created_at', 'desc')
-                    ->take(3)
+                    ->where('user_id', '!=', $currentUser->id)
+                    ->with(['followers', 'following'])
                     ->get()
+                    ->sortByDesc(function ($user) use ($currentUser) {
+                        $isFollowed = $user->followers->contains('id', $currentUser->id);
+                        $isFollowing = $user->following->contains('id', $currentUser->id);
+                        return $isFollowed || $isFollowing ? 1 : 0;
+                    })
+                    ->values()
+                    ->take(3)
                     ->map(function ($user) {
                         return [
                             'id' => $user->id,
                             'name' => $user->name,
                             'username' => $user->username,
                             'profile_image_url' => $user->profileImage?->url,
+                            'is_verified' => $user->is_verified,
                         ];
-                    }),
+                    })
+                    ->values()
+                    ->toArray(),
+                'current_user' => [
+                    'id' => $currentUser->id,
+                    'username' => $currentUser->username,
+                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'name' => $currentUser->name,
+                    'is_verified' => $currentUser->is_verified,
+                ],
             ];
         });
 
@@ -234,6 +252,7 @@ class PostController extends Controller
                     'name' => $comment->user->name,
                     'username' => $comment->user->username,
                     'profile_image_url' => $comment->user->profileImage ? asset('storage/' . $comment->user->profileImage->file_path) : null,
+                    'is_verified' => $comment->user->is_verified,
                 ],
             ];
         });
@@ -251,7 +270,8 @@ class PostController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage ? asset('storage/' . $post->user->profileImage->file_path) : null, // ✅ Fix profile image URL
+                    'profile_image_url' => $post->user->profileImage ? asset('storage/' . $post->user->profileImage->file_path) : null,
+                    'is_verified' => $post->user->is_verified,
                 ],
                 'is_private' => $post->is_private,
                 'likes_count' => $post->likes->count(),
@@ -268,17 +288,34 @@ class PostController extends Controller
                     ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
                 'reposted_by_recent' => $post->repostedByUsers()
                     ->where('user_id', '!=', $post->user_id)
-                    ->orderByPivot('created_at', 'desc')
-                    ->take(3)
+                    ->where('user_id', '!=', $currentUser->id)
+                    ->with(['followers', 'following'])
                     ->get()
+                    ->sortByDesc(function ($user) use ($currentUser) {
+                        $isFollowed = $user->followers->contains('id', $currentUser->id);
+                        $isFollowing = $user->following->contains('id', $currentUser->id);
+                        return $isFollowed || $isFollowing ? 1 : 0;
+                    })
+                    ->values()
+                    ->take(3)
                     ->map(function ($user) {
                         return [
                             'id' => $user->id,
                             'name' => $user->name,
                             'username' => $user->username,
                             'profile_image_url' => $user->profileImage?->url,
+                            'is_verified' => $user->is_verified,
                         ];
-                    }),
+                    })
+                    ->values()
+                    ->toArray(),
+                'current_user' => [
+                    'id' => $currentUser->id,
+                    'username' => $currentUser->username,
+                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'name' => $currentUser->name,
+                    'is_verified' => $currentUser->is_verified,
+                ],
             ],
             'sort' => $sort
         ]);
@@ -352,6 +389,7 @@ class PostController extends Controller
                         'name' => $post->user->name,
                         'username' => $post->user->username,
                         'profile_image_url' => $post->user->profileImage?->url,
+                        'is_verified' => $post->user->is_verified,
                     ],
                     'media' => $post->media->map(fn ($media) => [
                         'file_path' => $media->file_path,
@@ -375,17 +413,34 @@ class PostController extends Controller
                         ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
                     'reposted_by_recent' => $post->repostedByUsers()
                         ->where('user_id', '!=', $post->user_id)
-                        ->orderByPivot('created_at', 'desc')
-                        ->take(3)
+                        ->where('user_id', '!=', $currentUser->id)
+                        ->with(['followers', 'following'])
                         ->get()
+                        ->sortByDesc(function ($user) use ($currentUser) {
+                            $isFollowed = $user->followers->contains('id', $currentUser->id);
+                            $isFollowing = $user->following->contains('id', $currentUser->id);
+                            return $isFollowed || $isFollowing ? 1 : 0;
+                        })
+                        ->values()
+                        ->take(3)
                         ->map(function ($user) {
                             return [
                                 'id' => $user->id,
                                 'name' => $user->name,
                                 'username' => $user->username,
                                 'profile_image_url' => $user->profileImage?->url,
+                                'is_verified' => $user->is_verified,
                             ];
-                        }),
+                        })
+                        ->values()
+                        ->toArray(),
+                    'current_user' => [
+                        'id' => $currentUser->id,
+                        'username' => $currentUser->username,
+                        'profile_image_url' => $currentUser->profileImage?->url,
+                        'name' => $currentUser->name,
+                        'is_verified' => $currentUser->is_verified,
+                    ],
                 ];
             });
 
@@ -399,6 +454,38 @@ class PostController extends Controller
             ],
         ]);
     }
+
+    public function showPopularHashtags(Request $request)
+    {
+        $sort = $request->query('sort', 'likes');
+
+        $hashtags = Hashtag::withCount('posts')
+            ->with(['posts' => function ($query) {
+                $query->withCount('likes');
+            }])
+            ->get()
+            ->map(function ($hashtag) {
+                $totalLikes = $hashtag->posts->sum('likes_count');
+
+                return [
+                    'id' => $hashtag->id,
+                    'hashtag' => $hashtag->hashtag,
+                    'posts_count' => $hashtag->posts_count,
+                    'total_likes' => $totalLikes,
+                ];
+            });
+        if ($sort === 'posts') {
+            $hashtags = $hashtags->sortByDesc('posts_count')->values();
+        } else {
+            $hashtags = $hashtags->sortByDesc('total_likes')->values();
+        }
+
+        return Inertia::render('post/popular-hashtags', [
+            'hashtags' => $hashtags,
+            'sort' => $sort,
+        ]);
+    }
+
 
 
     public function edit(Post $post): Response

@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { cn } from '@/lib/utils';
 import { Link, router, usePage } from '@inertiajs/react';
 import {
-    Bookmark, Folder, FolderHeart,
+    Bookmark, Folder, FolderHeart, Hash,
     Home, List,
     LogOut,
     Mail,
@@ -20,6 +20,8 @@ import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu.jsx';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx';
 import { useInitials } from '@/hooks/use-initials.jsx';
 import AppearanceToggle from '@/components/appearance-toggle.jsx';
+import { useEffect, useState } from 'react';
+import { Badge } from '@/components/ui/badge.jsx';
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
@@ -29,6 +31,57 @@ export function AppHeader({ breadcrumbs = [] }) {
     const { auth } = page.props;
     const user = auth?.user;
     const getInitials = useInitials();
+    const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+    const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+
+    useEffect(() => {
+        fetchUnreadNotificationsCount().catch(error => console.error(error));
+        fetchUnreadMessagesCount().catch(error => console.error(error));
+    }, []);
+
+    const fetchUnreadNotificationsCount = async () => {
+        try {
+            const response = await fetch('/notifications/unread-count');
+            const data = await response.json();
+            setUnreadNotificationsCount(data.unread_count);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchUnreadMessagesCount = async () => {
+        try {
+            const response = await fetch('/chat/user-chat/messages/unread-count');
+            const data = await response.json();
+            setUnreadMessagesCount(data.unread_count);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    window.Echo.private(`notifications.${user.id}`)
+        .listen('NotificationCreated', (e) => {
+            setUnreadNotificationsCount(unreadNotificationsCount+1);
+        })
+        .listen('NotificationIsReadChange', (e) => {
+            if(e.operation === 'read')
+            {
+                setUnreadNotificationsCount(unreadNotificationsCount-1);
+            }
+            else if (e.operation === 'unread')
+            {
+                setUnreadNotificationsCount(unreadNotificationsCount+1);
+            }
+            else if (e.operation === 'allRead')
+            {
+                setUnreadNotificationsCount(0);
+            }
+            else if (e.operation === 'allUnread')
+            {
+                fetchUnreadNotificationsCount().catch(error => console.error(error));
+            }
+        });
+
     if (!user) return null;
 
     const mainNavItems = [
@@ -64,8 +117,14 @@ export function AppHeader({ breadcrumbs = [] }) {
         },
         {
             title: translations['Everyone chat'],
-            url: `/chat`,
+            url: `/chat/everyone`,
             icon: MessagesSquareIcon,
+        },
+        {
+            title: translations['User chats'],
+            url: `/chat/user-chats`,
+            icon: MessagesSquareIcon,
+            count: unreadMessagesCount,
         },
         {
             title: translations['Friends'],
@@ -79,8 +138,9 @@ export function AppHeader({ breadcrumbs = [] }) {
         },
         {
             title: translations['Notifications'],
-            url: '#',
+            url: '/user/notifications',
             icon: Mail,
+            count: unreadNotificationsCount,
         },
         {
             title: translations['Favorites'],
@@ -91,6 +151,11 @@ export function AppHeader({ breadcrumbs = [] }) {
             title: translations['Reposts'],
             url: '/user/reposts',
             icon: Repeat,
+        },
+        {
+            title: translations['Popular hashtags'],
+            url: '/show-popular-hashtags',
+            icon: Hash,
         },
         {
             title: translations['Profile'],
@@ -116,25 +181,30 @@ export function AppHeader({ breadcrumbs = [] }) {
         window.location.href = "/login";
     };
 
-    return (<>
-            <div className="border-sidebar-border/80 border-b fixed top-0 left-0 w-full z-50 bg-white dark:bg-neutral-950">
+    return (
+        <>
+            <div className="border-sidebar-border/80 fixed top-0 left-0 z-50 w-full border-b bg-white dark:bg-neutral-950">
                 <div className="mx-4 flex h-16">
                     {/* Mobile Menu */}
                     <div className="lg:hidden">
                         <Sheet>
                             <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" className="mr-2 my-4 h-9 w-9 hover:bg-neutral-300 dark:hover:bg-neutral-800">
-                                    <Menu className="h-6 w-6"/>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="Avatar my-4 mr-2.5 -ml-1 h-9 w-9 hover:bg-neutral-300 dark:hover:bg-neutral-800"
+                                >
+                                    <Menu className="h-8 w-8" />
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between pl-5 gap-0">
+                            <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between gap-0 pl-5">
                                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                                <SheetHeader className="flex justify-start text-left p-0 pt-3">
+                                <SheetHeader className="flex justify-start p-0 pt-3 text-left">
                                     <div className="flex items-center gap-1">
                                         <Link href={user.username ? `/user/${user.username}` : '/user'} prefetch>
                                             <Avatar className="my-3 size-10">
-                                                <AvatarImage src={user.profile_image_url} alt={user.name}/>
-                                                <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                                <AvatarImage src={user.profile_image_url} alt={user.name} />
+                                                <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-gray-700 dark:text-white">
                                                     {getInitials(user.name)}
                                                 </AvatarFallback>
                                             </Avatar>
@@ -145,22 +215,23 @@ export function AppHeader({ breadcrumbs = [] }) {
                                         </Link>
                                     </div>
                                 </SheetHeader>
-                                <div className="mt-4 flex h-full flex-1 flex-col ">
+                                <div className="mt-4 flex h-full flex-1 flex-col">
                                     <div className="flex h-full flex-col justify-between text-sm">
-                                        <div className="flex flex-col space-y-4">
+                                        <div className="flex flex-col space-y-4 gap-0.5">
                                             {sideBarNavItems.map((item) => (
-                                                <Link key={item.title + item.url} href={item.url} className="flex items-center space-x-2 ">
-                                                    {item.icon && <Icon iconNode={item.icon} className="h-5 w-5"/>}
+                                                <Link key={item.title + item.url} href={item.url} className="flex items-center space-x-2 gap-1">
+                                                    {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
                                                     <span>{item.title}</span>
-                                                </Link>))}
-                                           <DropdownMenuSeparator className="mb-5"/>
-                                            <a className="flex items-center space-x-2 " href="https://github.com/VicTrollhead/Spark">
-                                                <Folder className="h-5 w-5"/>
+                                                    {item.count && item.count !== 0 ? (<Badge className="bg-neutral-500 dark:bg-neutral-300">{item.count}</Badge>) : ''}
+                                                </Link>
+                                            ))}
+                                            <DropdownMenuSeparator className="mb-5" />
+                                            <a className="flex items-center space-x-2" href="https://github.com/VicTrollhead/Spark">
+                                                <Folder className="h-5 w-5" />
                                                 <span>{translations['Repository']}</span>
                                             </a>
-                                            <p onClick={handleLogout}
-                                                className="flex items-center space-x-2 cursor-pointer">
-                                                <LogOut className="h-5 w-5 mr-2"/>
+                                            <p onClick={handleLogout} className="flex cursor-pointer items-center space-x-2">
+                                                <LogOut className="mr-2 h-5 w-5" />
                                                 {translations['Log out']}
                                             </p>
                                         </div>
@@ -170,32 +241,49 @@ export function AppHeader({ breadcrumbs = [] }) {
                         </Sheet>
                     </div>
 
-                    <div className="flex items-center space-x-2 w-1/6">
+                    <div className="flex w-1/6 items-center space-x-2">
                         <Link href="/dashboard" prefetch>
                             <AppLogo />
                         </Link>
-                        <AppearanceToggle className="justify-center ml-4 p-2.5"/>
+                        <AppearanceToggle className="ml-4 justify-center p-2.5" />
                     </div>
 
                     {/* Desktop Navigation */}
-                    <div className="hidden w-full h-full items-center justify-around lg:flex">
+                    <div className="hidden h-full w-full items-center justify-around lg:flex">
                         <NavigationMenu className="flex h-full w-full items-stretch">
-                            <NavigationMenuList className="flex h-full items-stretch space-x-70 w-full">
-                                {mainNavItems.map((item, index) => (<NavigationMenuItem key={index} className="relative flex h-full w-full items-center">
-                                        <Link href={item.url} className={cn(navigationMenuTriggerStyle(), page.url === item.url && activeItemStyles, 'h-9 cursor-pointer px-3')}>
+                            <NavigationMenuList className="flex h-full w-full items-stretch">
+                                {mainNavItems.map((item, index) => (
+                                    <NavigationMenuItem key={index} className="relative mx-20 flex h-full w-full items-center">
+                                        <Link
+                                            href={item.url}
+                                            className={cn(
+                                                navigationMenuTriggerStyle(),
+                                                page.url === item.url && activeItemStyles,
+                                                'h-9 cursor-pointer px-3',
+                                            )}
+                                        >
                                             {item.title}
                                         </Link>
-                                        {page.url === item.url && (<div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>)}
-                                    </NavigationMenuItem>))}
+                                        {page.url === item.url && (
+                                            <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
+                                        )}
+                                    </NavigationMenuItem>
+                                ))}
                             </NavigationMenuList>
                         </NavigationMenu>
                     </div>
 
-                    <div className="ml-auto items-center justify-end space-x-2 w-1/4 hidden xl:flex">
+                    <div className="mr-2 ml-auto flex items-center xl:hidden">
+                        <Link href={'/search-empty'}>
+                            <Search />
+                        </Link>
+                    </div>
+
+                    <div className="ml-auto hidden w-1/4 items-center justify-end space-x-2 xl:flex">
                         <div className="relative flex items-center space-x-1">
                             <div className="flex items-center space-x-3">
-                                <Search className="size-1/8 opacity-80 group-hover:opacity-100"/>
-                                <Input placeholder={translations['Search users']} className="w-full" onKeyDown={onKeyDownSearch}  />
+                                <Search className="size-1/8 opacity-80 group-hover:opacity-100" />
+                                <Input placeholder={translations['Search users']} className="w-full" onKeyDown={onKeyDownSearch} />
                             </div>
                         </div>
                     </div>
@@ -206,6 +294,7 @@ export function AppHeader({ breadcrumbs = [] }) {
             {/*            <Breadcrumbs breadcrumbs={breadcrumbs}/>*/}
             {/*        </div>*/}
             {/*    </div>)}*/}
-        </>);
+        </>
+    );
 }
 

@@ -66,27 +66,30 @@ export default function SearchUsers() {
                             />
                         </div>
 
-                        <select
-                            value={sortOption}
-                            onChange={handleSortChange}
-                            className="px-1 py-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
-                        >
-                            <option value="latest">{translations['Latest']}</option>
-                            <option value="oldest">{translations['Oldest']}</option>
-                            <option value="popular">{translations['Most Followed']}</option>
-                            <option value="least_followed">{translations['Least Followed']}</option>
-                            <option value="following">{translations['Following']}</option>
-                            <option value="followers">{translations['Followers']}</option>
-                            <option value="mutual_subscribers">{translations['Friends']}</option>
-                        </select>
-                        <button
-                            onClick={handleReload}
-                            className="p-2 text-sm font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition flex items-center"
-                        >
-                            <RefreshCw
-                                className={`w-6 h-6 ${isLoading ? 'animate-spin' : ''}`}
-                            />
-                        </button>
+                        <div className="flex gap-2 w-full">
+                            <button
+                                onClick={handleReload}
+                                className="p-2 text-sm font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition flex items-center"
+                            >
+                                <RefreshCw
+                                    className={`w-6 h-6 ${isLoading ? 'animate-spin' : ''}`}
+                                />
+                            </button>
+                            <select
+                                value={sortOption}
+                                onChange={handleSortChange}
+                                className="px-1 py-2 w-full border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
+                            >
+                                <option value="latest">{translations['Latest']}</option>
+                                <option value="oldest">{translations['Oldest']}</option>
+                                <option value="popular">{translations['Most Followed']}</option>
+                                <option value="least_followed">{translations['Least Followed']}</option>
+                                <option value="following">{translations['Following']}</option>
+                                <option value="followers">{translations['Followers']}</option>
+                                <option value="mutual_subscribers">{translations['Friends']}</option>
+                            </select>
+                        </div>
+
                     </div>
 
                 </div>

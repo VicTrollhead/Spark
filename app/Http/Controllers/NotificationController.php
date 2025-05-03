@@ -40,6 +40,9 @@ class NotificationController extends Controller
 
         $notifications = $query->get();
 
+        $readCount = Notification::where('user_id', $currentUser->id)->where('is_read', true)->count();
+        $unreadCount = Notification::where('user_id', $currentUser->id)->where('is_read', false)->count();
+
         $formattedNotifications = $notifications->map(function ($notification) use ($currentUser) {
             $post = $notification->post;
             $sourceUser = $notification->sourceUser;
@@ -58,6 +61,7 @@ class NotificationController extends Controller
                     'profile_image_url' => $sourceUser->profileImage?->url,
                     'is_private' => (bool) $sourceUser->is_private,
                     'is_subscribed' => $currentUser->isFollowing($sourceUser),
+                    'is_verified' => $sourceUser->is_verified,
                 ] : null,
 
                 'post' => $post ? [
@@ -68,6 +72,7 @@ class NotificationController extends Controller
                         'name' => $post->user->name,
                         'username' => $post->user->username,
                         'profile_image_url' => $post->user->profileImage?->url,
+                        'is_verified' => $post->user->is_verified,
                     ],
                     'media' => $post->media->map(fn($m) => [
                         'file_path' => $m->file_path,
@@ -79,15 +84,20 @@ class NotificationController extends Controller
             ];
         });
 
+
+
         return Inertia::render('user/notifications', [
             'user' => [
                 'id' => $currentUser->id,
                 'name' => $currentUser->name,
                 'username' => $currentUser->username,
                 'profile_image_url' => $currentUser->profileImage?->url,
+                'is_verified' => $currentUser->is_verified
             ],
             'notifications' => $formattedNotifications,
             'sort' => $sort,
+            'read_count' => $readCount,
+            'unread_count' => $unreadCount,
         ]);
     }
 
@@ -97,7 +107,7 @@ class NotificationController extends Controller
         $notification->is_read = true;
         $notification->save();
         event(new NotificationIsReadChange($notification, 'read'));
-        return back();
+        return redirect()->back();
     }
 
     public function markAsUnread(Notification $notification)
@@ -105,7 +115,7 @@ class NotificationController extends Controller
         $notification->is_read = false;
         $notification->save();
         event(new NotificationIsReadChange($notification, 'unread'));
-        return back();
+        return redirect()->back();
     }
 
     public function getUnreadNotificationsCount(Request $request)
@@ -128,12 +138,21 @@ class NotificationController extends Controller
             ->where('is_read', false)
             ->update(['is_read' => true]);
 
+        $notification = Notification::where('user_id', $user->id)->first();
+
+        event(new NotificationIsReadChange($notification, 'allRead'));
         return back();
     }
 
     public function markAllAsUnread()
     {
-        Auth::user()->notifications()->update(['is_read' => false]);
+        $user = Auth::user();
+
+        $user->notifications()->update(['is_read' => false]);
+
+        $notification = Notification::where('user_id', $user->id)->first();
+
+        event(new NotificationIsReadChange($notification, 'allUnread'));
         return back();
     }
 }

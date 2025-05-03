@@ -9,7 +9,7 @@ import {
     SidebarSeparator
 } from './ui/sidebar';
 import { useForm, usePage } from '@inertiajs/react';
-import { Bookmark, Folder, Home, LogOut, Mail, Settings, User, Users, Repeat, MessagesSquareIcon  } from 'lucide-react';
+import { Bookmark, Folder, Home, LogOut, Mail, Settings, User, Users, Repeat, MessagesSquareIcon, Hash  } from 'lucide-react';
 import {useEffect, useState} from "react";
 
 export function AppSidebar() {
@@ -17,35 +17,68 @@ export function AppSidebar() {
     const user = auth?.user;
     const { post } = useForm();
     const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+    const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+
+    const fetchUnreadNotificationsCount = async () => {
+        try {
+            const response = await fetch('/notifications/unread-count');
+            const data = await response.json();
+            setUnreadNotificationsCount(data.unread_count);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const fetchUnreadMessagesCount = async () => {
+        try {
+            const response = await fetch('/chat/user-chat/messages/unread-count');
+            const data = await response.json();
+            setUnreadMessagesCount(data.unread_count);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     useEffect(() => {
-        const fetchUnreadCount = async () => {
-            try {
-                const response = await fetch('/notifications/unread-count');
-                const data = await response.json();
-                setUnreadNotificationsCount(data.unread_count);
-            } catch (error) {
-                console.error(error);
-            }
-        };
+        fetchUnreadNotificationsCount().catch(error => console.error(error));
+        fetchUnreadMessagesCount().catch(error => console.error(error));
 
-        fetchUnreadCount();
+        window.Echo.private(`notifications.${user.id}`)
+            .listen('NotificationCreated', (e) => {
+                setUnreadNotificationsCount(prev => prev + 1);
+            })
+            .listen('NotificationIsReadChange', (e) => {
+                if (e.operation === 'read') {
+                    setUnreadNotificationsCount(prev => Math.max(prev - 1, 0));
+                } else if (e.operation === 'unread') {
+                    setUnreadNotificationsCount(prev => prev + 1);
+                } else if (e.operation === 'allRead') {
+                    setUnreadNotificationsCount(0);
+                } else if (e.operation === 'allUnread') {
+                    fetchUnreadNotificationsCount().catch(error => console.error(error));
+                }
+            });
+
+        window.Echo.private(`user-chats.${user.id}`)
+            .listen('UserMessageCreated',  (e) => {
+                fetchUnreadMessagesCount().catch(error => console.error(error));
+            }).listen('UserMessageIsReadChange', (e) => {
+                if(e.operation === 'read')
+                {
+                    fetchUnreadMessagesCount().catch(error => console.error(error));
+                }
+                else if (e.operation === 'delete')
+                {
+                    fetchUnreadMessagesCount().catch(error => console.error(error));
+                }
+            });
+
+        return () => {
+            window.Echo.leave(`notifications.${user.id}`);
+            window.Echo.leave(`user-chats.${user.id}`);
+        };
     }, []);
 
-    window.Echo.private(`notifications.${user.id}`)
-        .listen('NotificationCreated', (e) => {
-            setUnreadNotificationsCount(unreadNotificationsCount+1);
-        })
-        .listen('NotificationIsReadChange', (e) => {
-            if(e.operation === 'read')
-            {
-                setUnreadNotificationsCount(unreadNotificationsCount-1);
-            }
-            else
-            {
-                setUnreadNotificationsCount(unreadNotificationsCount+1);
-            }
-        });
 
     if (!user) return null;
 
@@ -57,8 +90,14 @@ export function AppSidebar() {
         },
         {
             title: translations['Everyone chat'],
-            url: `/chat`,
+            url: `/chat/everyone`,
             icon: MessagesSquareIcon,
+        },
+        {
+            title: translations['User chats'],
+            url: `/chat/user-chats`,
+            icon: MessagesSquareIcon,
+            count: unreadMessagesCount,
         },
         {
             title: translations['Friends'],
@@ -85,6 +124,11 @@ export function AppSidebar() {
             title: translations['Reposts'],
             url: '/user/reposts',
             icon: Repeat,
+        },
+        {
+            title: translations['Popular hashtags'],
+            url: '/show-popular-hashtags',
+            icon: Hash,
         },
         {
             title: translations['Profile'],

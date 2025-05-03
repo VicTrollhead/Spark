@@ -1,18 +1,27 @@
-import { Head, usePage, Link, useForm, router } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Bookmark, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat, Trash2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
-import { Bookmark, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat, Trash2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
 
 export default function Show() {
     const { post, auth, sort, translations } = usePage().props;
     const getInitials = useInitials();
-    const { data, setData, post: sendPost, processing, reset, errors } = useForm({
-        content: '', post_id: post.id, parent_comment_id: null
+    const {
+        data,
+        setData,
+        post: sendPost,
+        processing,
+        reset,
+        errors,
+    } = useForm({
+        content: '',
+        post_id: post.id,
+        parent_comment_id: null,
     });
 
-    const [sortOption, setSortOption] = useState(sort || "latest");
+    const [sortOption, setSortOption] = useState(sort || 'latest');
     const isOwnPost = auth.user && auth.user.id === post.user.id;
 
     const [isLiked, setIsLiked] = useState(post.is_liked);
@@ -32,15 +41,13 @@ export default function Show() {
             }
         };
 
-        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener('mousedown', handleClickOutside);
 
-        window.Echo.private(`post.${post.id}`)
-            .listen('CommentCreated', (e) => {
-                router.reload();
-            });
-        console.log('подписался')
+        window.Echo.private(`post.${post.id}`).listen('CommentCreated', (e) => {
+            router.reload();
+        });
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener('mousedown', handleClickOutside);
             window.Echo.leave(`post.${post.id}`);
         };
     }, []);
@@ -56,56 +63,72 @@ export default function Show() {
     const handleLike = async () => {
         setIsLiked(!isLiked);
         setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
-        await router.post(isLiked ? `/post/${post.id}/unlike` : `/post/${post.id}/like`, {}, {
-            preserveScroll: true,
-            onError: () => {
-                setIsLiked(post.is_liked);
-                setLikesCount(post.likes_count);
+        await router.post(
+            isLiked ? `/post/${post.id}/unlike` : `/post/${post.id}/like`,
+            {},
+            {
+                preserveScroll: true,
+                onError: () => {
+                    setIsLiked(post.is_liked);
+                    setLikesCount(post.likes_count);
+                },
             },
-        });
+        );
     };
 
     const handleFavorite = async () => {
         setIsFavorited(!isFavorited);
         setFavoritesCount(isFavorited ? favoritesCount - 1 : favoritesCount + 1);
-        await router.post(isFavorited ? `/post/${post.id}/remove-favorite` : `/post/${post.id}/add-favorite`, {}, {
-            preserveScroll: true,
-            onError: () => {
-                setIsFavorited(post.is_favorited);
-                setFavoritesCount(post.favorites_count);
+        await router.post(
+            isFavorited ? `/post/${post.id}/remove-favorite` : `/post/${post.id}/add-favorite`,
+            {},
+            {
+                preserveScroll: true,
+                onError: () => {
+                    setIsFavorited(post.is_favorited);
+                    setFavoritesCount(post.favorites_count);
+                },
             },
-        });
+        );
     };
 
     const handleCommentSubmit = (e) => {
         e.preventDefault();
-        router.post(`/post/${post.id}/comment`, {
-            content: data.content,
-            post_id: post.id,
-            parent_comment_id: data.parent_comment_id,
-        }, {
-            preserveScroll: true,
-            onSuccess: () => {
-                reset('content');
-                router.reload({ only: ['post'] });
-            }
-        });
+        router.post(
+            `/post/${post.id}/comment`,
+            {
+                content: data.content,
+                post_id: post.id,
+                parent_comment_id: data.parent_comment_id,
+            },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    reset('content');
+                    router.reload({ only: ['post'] });
+                },
+            },
+        );
         setData({ content: '', post_id: post.id, parent_comment_id: null });
     };
 
     const handleDeleteComment = async (commentId) => {
-        if (!window.confirm(translations["Are you sure you want to delete this comment?"])) return;
-        await router.post(`/comment/${commentId}/delete`, {}, {
-            preserveScroll: true,
-            onSuccess: () => {
-                router.reload({ only: ['post'] });
+        if (!window.confirm(translations['Are you sure you want to delete this comment?'])) return;
+        await router.post(
+            `/comment/${commentId}/delete`,
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    router.reload({ only: ['post'] });
+                },
             },
-        });
+        );
     };
 
     const handleRepost = async () => {
         if (post.is_private || post.user.is_private) {
-            alert(translations["You cannot repost private posts."]);
+            alert(translations['You cannot repost private posts.']);
             return;
         }
         setIsReposted(!isReposted);
@@ -121,11 +144,11 @@ export default function Show() {
                     setIsReposted(!isReposted);
                 },
                 onError: (error) => {
-                    console.error("Repost error:", error);
+                    console.error('Repost error:', error);
                     setIsReposted(post.is_reposted);
                     setRepostsCount(post.reposts_count);
                 },
-            }
+            },
         );
     };
 
@@ -143,7 +166,10 @@ export default function Show() {
                             </AvatarFallback>
                         </Avatar>
                         <div>
-                            <Link href={`/user/${post.user.username}`} className="text-lg font-semibold text-gray-900 dark:text-white hover:underline">
+                            <Link
+                                href={`/user/${post.user.username}`}
+                                className="text-lg font-semibold text-gray-900 hover:underline dark:text-white"
+                            >
                                 {post.user.name}
                             </Link>
                             <p className="text-md text-gray-500 dark:text-gray-400">@{post.user.username}</p>
@@ -152,14 +178,15 @@ export default function Show() {
                     {isOwnPost && (
                         <div className="relative" ref={optionsRef}>
                             <EllipsisVertical
-                                className="h-6 w-6 text-gray-500 hover:text-gray-700 dark:text-white dark:hover:text-gray-300 cursor-pointer"
+                                className="h-6 w-6 cursor-pointer text-gray-500 hover:text-gray-700 dark:text-white dark:hover:text-gray-300"
                                 onClick={toggleOptions}
                             />
                             {showOptions && (
-                                <div className="absolute right-0 mt-2 min-w-[160px] rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-neutral-800 z-50">
+                                <div className="absolute right-0 z-50 mt-2 min-w-[160px] rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-neutral-800">
                                     <button
                                         onClick={() => router.get(`/post/${post.id}/edit`)}
-                                        className="block w-full rounded-t-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600">
+                                        className="block w-full rounded-t-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600"
+                                    >
                                         {translations['Edit']}
                                     </button>
                                     <button
@@ -175,68 +202,70 @@ export default function Show() {
                 </div>
 
                 <div className="mt-4">
-                    <p className="text-gray-800 text-xl dark:text-gray-200">
-                        {post.content}
-                    </p>
+                    <p className="text-xl text-gray-800 dark:text-gray-200">{post.content}</p>
                     {post.media.length > 0 && (
-                        <div className="mt-2 py-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="mt-2 grid grid-cols-1 gap-3 py-1 sm:grid-cols-2">
                             {post.media.map((file, index) => {
                                 const uniqueKey = file.id ? `${post.id}-${file.id}` : `${post.id}-${file.file_path}-${index}`;
                                 return file.file_type === 'image' ? (
-                                    <div key={uniqueKey} className="relative w-full overflow-hidden rounded-lg border dark:border-gray-700 flex items-center justify-center">
+                                    <div
+                                        key={uniqueKey}
+                                        className="relative flex w-full items-center justify-center overflow-hidden rounded-lg border dark:border-gray-700"
+                                    >
                                         <img
                                             src={`/storage/${file.file_path}`}
                                             alt="Post Media"
-                                            className=" object-contain transition-transform duration-300 hover:scale-102"
+                                            className="object-contain transition-transform duration-300 hover:scale-102"
                                         />
                                     </div>
                                 ) : (
-                                    <div key={uniqueKey} className="relative w-full rounded-lg overflow-hidden border dark:border-gray-700">
-                                        <video controls className="w-full h-auto rounded-lg object-contain">
+                                    <div key={uniqueKey} className="relative w-full overflow-hidden rounded-lg border dark:border-gray-700">
+                                        <video controls className="h-auto w-full rounded-lg object-contain">
                                             <source src={`/storage/${file.file_path}`} type="video/mp4" />
                                         </video>
                                     </div>
                                 );
                             })}
-
                         </div>
                     )}
 
                     {post.hashtags?.length > 0 && (
-                        <div className="mt-2 lg:text-[16px] text-sm flex flex-wrap gap-x-1 break-all">
+                        <div className="mt-2 flex flex-wrap gap-x-1 text-sm break-all lg:text-[16px]">
                             {post.hashtags.map((hashtag) => (
-                                <Link
-                                    key={hashtag.id}
-                                    href={`/posts-by-hashtag/${hashtag.hashtag}`}
-                                    className="text-blue-500 hover:underline"
-                                >
+                                <Link key={hashtag.id} href={`/posts-by-hashtag/${hashtag.hashtag}`} className="text-blue-500 hover:underline">
                                     #{hashtag.hashtag}
                                 </Link>
                             ))}
                         </div>
                     )}
 
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{post.created_at}</p>
+                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{post.created_at}</p>
                 </div>
 
-                <div className="mt-3 flex items-center space-x-6 text-md text-gray-600 dark:text-gray-400">
+                <div className="text-md mt-3 flex items-center space-x-6 text-gray-600 dark:text-gray-400">
                     <div className="flex items-center space-x-1">
                         <Heart
                             className={`h-6 w-6 cursor-pointer ${isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}`}
                             onClick={handleLike}
                         />
-                        <p><strong>{likesCount}</strong></p>
+                        <p>
+                            <strong>{likesCount}</strong>
+                        </p>
                     </div>
                     <div className="flex items-center space-x-1">
-                        <MessageCircle className="h-6 w-6 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-500" />
-                        <p><strong>{post.comments_count}</strong></p>
+                        <MessageCircle className="h-6 w-6 text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-500" />
+                        <p>
+                            <strong>{post.comments_count}</strong>
+                        </p>
                     </div>
                     <div className="flex items-center space-x-1">
                         <Bookmark
-                            className={`h-6 w-6 cursor-pointer ${isFavorited ? 'text-yellow-500' : 'text-gray-500 hover:yellow-red-500'}`}
+                            className={`h-6 w-6 cursor-pointer ${isFavorited ? 'text-yellow-500' : 'hover:yellow-red-500 text-gray-500'}`}
                             onClick={handleFavorite}
                         />
-                        <p><strong>{favoritesCount}</strong></p>
+                        <p>
+                            <strong>{favoritesCount}</strong>
+                        </p>
                     </div>
                     {post.user.id !== auth.user.id && !post.is_private && !post.user.is_private && (
                         <button
@@ -251,23 +280,71 @@ export default function Show() {
 
                     {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
                 </div>
+                {post.reposted_by_recent.length > 0 && (
+                    <div className="mt-7 px-2">
+                        {(post.reposted_by_you || post.reposted_by_recent?.length > 0) && (
+                            <div className="mb-2 flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                                <Repeat className="h-4 w-4" />
+                                <span>Reposted by</span>
+
+                                {post.reposted_by_you && (
+                                    <span className="flex items-center">
+                                    <Link href={`/user/${post.current_user.username}`}>
+                                        <Avatar className="h-6 w-6 border">
+                                            <AvatarImage src={post.current_user.profile_image_url} alt={post.current_user.name} />
+                                            <AvatarFallback>{getInitials(post.current_user.name)}</AvatarFallback>
+                                        </Avatar>
+                                    </Link>
+                                    <Link href={`/user/${post.current_user.username}`} className="ml-1 text-blue-500 hover:underline">
+                                        {post.current_user.name}
+                                    </Link>
+                                    <span className="ml-1">(you)</span>
+                                        {post.reposted_by_you && post.reposted_by_recent?.length > 1 && <span>,</span>}
+                                </span>
+                                )}
+
+                                {post.reposted_by_recent?.map((user, index) => {
+                                    if (user.id !== post.current_user.id) {
+                                        return (
+                                            <span key={user.id} className="flex items-center">
+                                            <Link href={`/user/${user.username}`}>
+                                                <Avatar className="h-6 w-6 border">
+                                                    <AvatarImage src={user.profile_image_url} alt={user.name} />
+                                                    <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                                                </Avatar>
+                                            </Link>
+                                            <Link href={`/user/${user.username}`} className="ml-1 text-blue-500 hover:underline">
+                                                {user.name}
+                                            </Link>
+                                                {index < post.reposted_by_recent.length - 1 && <span>,</span>}
+                                        </span>
+                                        );
+                                    }
+                                    return null;
+                                })}
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
-            <div className="p-4 bg-white dark:bg-neutral-950 border-y dark:border-gray-800">
+            <div className="border-y bg-white p-4 dark:border-gray-800 dark:bg-neutral-950">
                 <form onSubmit={handleCommentSubmit} className="flex flex-col space-y-4">
                     <textarea
                         value={data.content}
                         onChange={(e) => setData('content', e.target.value)}
                         rows={3}
                         placeholder={translations["What's on your mind?"]}
-                        className="resize-none p-3 bg-gray-100 dark:bg-neutral-900 rounded-md text-neutral-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600"
+                        className="resize-none rounded-md bg-gray-100 p-3 text-neutral-950 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-neutral-900 dark:text-white dark:focus:ring-blue-600"
                     />
-                    {errors.content && <p className="text-red-500 text-sm">{errors.content}</p>}
+                    {errors.content && <p className="text-sm text-red-500">{errors.content}</p>}
                     <button
                         type="submit"
                         disabled={!data.content || processing}
-                        className={`self-end py-2 mr-0.5 px-4 rounded-lg text-white ${
-                            data.content ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700 cursor-not-allowed'
+                        className={`mr-0.5 self-end rounded-lg px-4 py-2 text-white ${
+                            data.content
+                                ? 'bg-blue-600 hover:bg-blue-700'
+                                : 'cursor-not-allowed bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-700'
                         }`}
                     >
                         {translations['Publish']}
@@ -275,12 +352,12 @@ export default function Show() {
                 </form>
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-white dark:bg-neutral-950 border-b dark:border-gray-800">
+            <div className="flex items-center justify-between border-b bg-white p-4 dark:border-gray-800 dark:bg-neutral-950">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{translations['Comments']}</h2>
                 <select
                     value={sortOption}
                     onChange={handleSortChange}
-                    className="p-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
+                    className="rounded-md border bg-gray-100 p-2 text-neutral-950 dark:bg-neutral-900 dark:text-white"
                 >
                     <option value="latest">{translations['Latest']}</option>
                     <option value="oldest">{translations['Oldest']}</option>
@@ -290,7 +367,7 @@ export default function Show() {
                 <div className="divide-y divide-gray-200 dark:divide-neutral-800">
                     {post.comments.length > 0 ? (
                         post.comments.map((comment) => (
-                            <div key={comment.id } className="py-4 flex items-center space-x-3">
+                            <div key={comment.id} className="flex items-center space-x-3 py-4">
                                 <Avatar className="h-12 w-12 border border-gray-300 dark:border-gray-700">
                                     <AvatarImage src={comment.user.profile_image_url} alt={comment.user.name} />
                                     <AvatarFallback className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white">
@@ -298,28 +375,29 @@ export default function Show() {
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="flex-1">
-                                    <div className="flex justify-between items-center">
-                                        <div className="flex gap-1.5 items-center">
-                                            <Link href={`/user/${comment.user.username}`} className="font-semibold text-gray-900 dark:text-white hover:underline">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-1.5">
+                                            <Link
+                                                href={`/user/${comment.user.username}`}
+                                                className="font-semibold text-gray-900 hover:underline dark:text-white"
+                                            >
                                                 {comment.user.name}
                                             </Link>
                                             <p className="text-sm text-gray-500 dark:text-gray-400">{comment.created_at}</p>
                                         </div>
                                     </div>
-                                    <p className={`text-gray-800 dark:text-gray-200 mt-1`}>
-                                        {comment.content}
-                                    </p>
+                                    <p className={`mt-1 text-gray-800 dark:text-gray-200`}>{comment.content}</p>
                                 </div>
                                 {auth.user?.id === comment.user.id && (
                                     <Trash2
-                                        className="h-5 w-5 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500 cursor-pointer"
+                                        className="h-5 w-5 cursor-pointer text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-500"
                                         onClick={() => handleDeleteComment(comment.id)}
                                     />
                                 )}
                             </div>
                         ))
                     ) : (
-                        <p className="text-gray-500 dark:text-gray-400 py-4">{translations['No comments yet.']}</p>
+                        <p className="py-4 text-gray-500 dark:text-gray-400">{translations['No comments yet.']}</p>
                     )}
                 </div>
             </div>

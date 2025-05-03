@@ -1,5 +1,5 @@
 import { Link, router, useForm, usePage } from '@inertiajs/react';
-import { Bookmark, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat } from 'lucide-react';
+import { Bookmark, Check, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
@@ -101,14 +101,13 @@ export default function PostComponent({ post, compact = false }) {
                     setRepostsCount(isReposted ? repostsCount - 1 : repostsCount + 1);
                     setIsReposted(!isReposted);
                 },
-                onError: (error) => {
+                onError: () => {
                     setIsReposted(post.is_reposted);
                     setRepostsCount(post.reposts_count);
                 },
             },
         );
     };
-
     return (
         <div className={`relative ${compact ? 'bg-muted/30 rounded-lg border p-3' : 'border-b p-4'} border-gray-200 dark:border-gray-800`}>
             <div className="flex items-start space-x-3">
@@ -120,25 +119,66 @@ export default function PostComponent({ post, compact = false }) {
                 </Avatar>
 
                 <div className="flex-1">
-                    {post.reposted_by_you && (
-                        <div className="mb-2 flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                    {(post.reposted_by_you || post.reposted_by_recent?.length > 0) && (
+                        <div className="mb-2 flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                             <Repeat className="h-4 w-4" />
-                            Reposted by you
-                        </div>
-                    )}
+                            <span>Reposted by</span>
 
-                    {!post.reposted_by_you && post.reposted_by_recent?.length > 0 && (
-                        <div className="mb-2 flex flex-wrap items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-                            <Repeat className="h-4 w-4" />
-                            Reposted by
-                            {post.reposted_by_recent.map((user, index) => (
-                                <span key={user.id} className="ml-1 flex items-center">
-                                    <Link href={`/user/${user.username}`} className="text-blue-500 hover:underline">
-                                        {user.name}
+                            {post.reposted_by_you && (
+                                <span className="flex items-center">
+                                    <Link href={`/user/${post.current_user.username}`}>
+                                        <Avatar className="h-6 w-6 border">
+                                            <AvatarImage src={post.current_user.profile_image_url} alt={post.current_user.name} />
+                                            <AvatarFallback className="text-xs">{getInitials(post.current_user.name)}</AvatarFallback>
+                                        </Avatar>
                                     </Link>
-                                    {index < post.reposted_by_recent.length - 1 && <span>,&nbsp;</span>}
+                                    <Link href={`/user/${post.current_user.username}`} className="ml-1 text-blue-500 hover:underline">
+                                        {post.current_user.name}
+                                    </Link>
+                                    <span className="ml-1">(you)</span>
+                                    {post.current_user.is_verified && (
+                                        <div className="group relative">
+                                            <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                                Verified
+                                            </span>
+                                            <span className="ml-1 flex items-center rounded-md bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                <Check className="h-3 w-3" />
+                                            </span>
+                                        </div>
+                                    )}
+                                    {post.reposted_by_you && post.reposted_by_recent?.length > 1 && <span>,</span>}
                                 </span>
-                            ))}
+                            )}
+
+                            {post.reposted_by_recent?.map((user, index) => {
+                                if (user.id !== post.current_user.id) {
+                                    return (
+                                        <span key={user.id} className="flex items-center">
+                                            <Link href={`/user/${user.username}`}>
+                                                <Avatar className="h-6 w-6 border">
+                                                    <AvatarImage src={user.profile_image_url} alt={user.name} />
+                                                    <AvatarFallback className="text-xs">{getInitials(user.name)}</AvatarFallback>
+                                                </Avatar>
+                                            </Link>
+                                            <Link href={`/user/${user.username}`} className="ml-1 text-blue-500 hover:underline">
+                                                {user.name}
+                                            </Link>
+                                            {user.is_verified && (
+                                                <div className="group relative">
+                                                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                                        Verified
+                                                    </span>
+                                                    <span className="ml-1 flex items-center rounded-md bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                        <Check className="h-3 w-3" />
+                                                    </span>
+                                                </div>
+                                            )}
+                                            {index < post.reposted_by_recent.length - 1 && <span>,</span>}
+                                        </span>
+                                    );
+                                }
+                                return null;
+                            })}
                         </div>
                     )}
 
@@ -147,6 +187,16 @@ export default function PostComponent({ post, compact = false }) {
                             <Link href={`/user/${post.user.username}`} className="font-semibold text-gray-900 hover:underline dark:text-white">
                                 {post.user.name}
                             </Link>
+                            {post.user.is_verified && (
+                                <div className="group relative">
+                                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                        Verified
+                                    </span>
+                                    <span className="flex items-center rounded-md bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                        <Check className="h-4 w-4" />
+                                    </span>
+                                </div>
+                            )}
                             <span className="text-sm text-gray-500">{post.created_at}</span>
                         </div>
 
@@ -156,7 +206,6 @@ export default function PostComponent({ post, compact = false }) {
                                     className="h-6 w-6 cursor-pointer text-gray-500 hover:text-gray-700 dark:text-white dark:hover:text-gray-300"
                                     onClick={toggleOptions}
                                 />
-
                                 {showOptions && (
                                     <div className="absolute right-0 z-50 mt-1 min-w-[160px] rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-neutral-800">
                                         <button

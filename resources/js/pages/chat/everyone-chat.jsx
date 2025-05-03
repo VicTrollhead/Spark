@@ -9,7 +9,7 @@ export default function EveryoneChat () {
     const [messages, setMessages] = useState(init_messages || []);
     const scroll = useRef();
     const scrollToBottom = () => {
-        if (scroll)
+        if (scroll && scroll.current)
             scroll.current.scrollIntoView({ behavior: "smooth" });
     };
 
@@ -73,7 +73,7 @@ export default function EveryoneChat () {
                                 </>
                             ) : (
                                 <div className="flex-1 flex items-center justify-center text-center">
-                                    Нет сообщений
+                                    {translations['No messages anyone yet.']}
                                 </div>
                             )}
                         </div>

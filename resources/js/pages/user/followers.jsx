@@ -2,16 +2,39 @@ import { usePage, Link, Head, router } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
+import { useState } from 'react';
 
 export default function Followers() {
-    const { title, users, user, auth, translations } = usePage().props;
+    const { title, users: initialUsers, user, auth, translations } = usePage().props;
     const getInitials = useInitials();
+    const [users, setUsers] = useState(initialUsers);
+    const [hasSentRequest, setHasSentRequest] = useState(user.has_sent_follow_request);
 
     const handleFollowToggle = (targetUser, isFollowed) => {
-        const action = isFollowed ? 'unfollow' : 'follow';
+        let action;
+        if (isFollowed) {
+            action = 'unfollow';
+        } else if (targetUser.is_private && !isFollowed) {
+            action = 'follow-request';
+        } else {
+            action = 'follow';
+        }
+
         router.post(`/user/${targetUser.username}/${action}`, {}, {
             preserveScroll: true,
-            onSuccess: () => router.reload({ only: ['users'] }),
+            onSuccess: () => {
+                setUsers(prevUsers =>
+                    prevUsers.map(u =>
+                        u.id === targetUser.id
+                            ? {
+                                ...u,
+                                is_followed: action === 'follow',
+                                has_sent_follow_request: action === 'follow-request',
+                            }
+                            : u
+                    )
+                );
+            },
         });
     };
 
@@ -25,32 +48,52 @@ export default function Followers() {
                 ) : (
                     <ul>
                         {users.map((follower) => (
-                            <li key={follower.id} className="flex items-center gap-3 py-2 border-b dark:border-gray-700">
+                            <li key={follower.id} className="flex items-center gap-3 py-4 border-b dark:border-gray-700">
                                 <Avatar className="h-24 w-24 border-4 border-white sm:h-28 sm:w-28 dark:border-gray-900">
                                     <AvatarImage src={follower.profile_image_url} alt={follower.name} />
                                     <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
                                         {getInitials(follower.name)}
                                     </AvatarFallback>
                                 </Avatar>
-                                <div className="flex w-full items-center">
-                                    <div>
-                                        <Link href={`/user/${follower.username}`} className="font-medium text-blue-500 hover:underline">
-                                            {follower.name}
-                                        </Link>
-                                        <p className="text-gray-500 dark:text-gray-400">@{follower.username}</p>
+                                <div className="flex flex-col w-full">
+                                    <div className="flex items-center gap-2">
+                                        <div>
+                                            <Link href={`/user/${follower.username}`} className="font-medium text-blue-500 hover:underline">
+                                                {follower.name}
+                                            </Link>
+                                            <p className="text-gray-500 dark:text-gray-400">@{follower.username}</p>
+                                            <p className="text-sm text-gray-400 dark:text-gray-500">
+                                                {follower.followers_count} {translations['Subscribers']}
+                                            </p>
+                                            {follower.is_friend && (
+                                                <p className="text-green-500 text-sm font-medium mt-1">
+                                                    {translations['You follow each other']}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        {auth.user.id !== follower.id && (
+                                            <button
+                                                onClick={() => handleFollowToggle(follower, follower.is_followed || follower.has_sent_follow_request)}
+                                                className={`ml-auto px-4 py-2 rounded-md text-white ${
+                                                    follower.has_sent_follow_request
+                                                        ? 'bg-gray-600 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700'
+                                                        : (follower.is_followed
+                                                            ? 'bg-gray-600 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700'
+                                                            : 'bg-blue-600 hover:bg-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600')
+                                                }`}
+                                            >
+                                                {follower.is_private && !follower.is_followed && !follower.has_sent_follow_request
+                                                    ? translations['Send Follow Request']
+                                                    : (follower.has_sent_follow_request && !follower.is_followed
+                                                        ? translations['Request Sent']
+                                                        : (follower.is_followed
+                                                            ? translations['Unfollow']
+                                                            : translations['Follow']))
+                                                }
+                                            </button>
+                                        )}
                                     </div>
-                                    {auth.user.id !== follower.id && (
-                                        <button
-                                            onClick={() => handleFollowToggle(follower, follower.is_followed)}
-                                            className={`ml-auto px-4 py-2 rounded-md text-white ${
-                                                follower.is_followed
-                                                    ? 'bg-gray-600 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700'
-                                                    : 'bg-blue-600 hover:bg-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600'
-                                            }`}
-                                        >
-                                            {follower.is_followed ? translations['Unfollow'] : translations['Follow']}
-                                        </button>
-                                    )}
                                 </div>
                             </li>
                         ))}
@@ -60,3 +103,4 @@ export default function Followers() {
         </AppLayout>
     );
 }
+

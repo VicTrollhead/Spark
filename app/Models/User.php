@@ -63,27 +63,35 @@ class User extends Authenticatable
 
     public function followers(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'follows', 'followee_id', 'follower_id');
+        return $this->belongsToMany(User::class, 'follows', 'followee_id', 'follower_id')
+            ->wherePivot('is_accepted', true);
     }
 
     public function following(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'followee_id');
+        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'followee_id')
+            ->wherePivot('is_accepted', true);
     }
 
     public function friends(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'follows', 'follower_id', 'followee_id')
-            ->join('follows as f2', function ($join) {
-                $join->on('follows.followee_id', '=', 'f2.follower_id')
-                    ->where('f2.followee_id', '=', $this->id);
-            })
-            ->select('users.*');
+            ->wherePivot('is_accepted', true)
+            ->whereIn('followee_id', function ($query) {
+                $query->select('follower_id')
+                    ->from('follows')
+                    ->where('is_accepted', true)
+                    ->where('followee_id', $this->id);
+            });
     }
+
 
     public function isFollowing(User $user): bool
     {
-        return $this->following()->where('followee_id', $user->id)->exists();
+        return $this->following()
+            ->where('followee_id', $user->id)
+            ->wherePivot('is_accepted', true)
+            ->exists();
     }
 
     public function posts(): HasMany
@@ -101,16 +109,15 @@ class User extends Authenticatable
         return $this->belongsToMany(Post::class, 'likes', 'user_id', 'post_id');
     }
 
-    public function reposts() : HasMany
+    public function reposts(): HasMany
     {
         return $this->hasMany(Repost::class);
     }
 
-    public function repostedPosts() : BelongsToMany
+    public function repostedPosts(): BelongsToMany
     {
         return $this->belongsToMany(Post::class, 'reposts');
     }
-
 
     public function followingPosts(): HasManyThrough
     {
@@ -121,22 +128,23 @@ class User extends Authenticatable
             'user_id',
             'id',
             'followee_id'
-        );
+        )->where('follows.is_accepted', true);
     }
 
-    public function notifications() : HasMany
+    public function notifications(): HasMany
     {
         return $this->hasMany(Notification::class);
     }
 
-    public function sentNotifications() : HasMany
+    public function sentNotifications(): HasMany
     {
         return $this->hasMany(Notification::class, 'source_user_id');
     }
 
     public function pendingFollowRequests(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'follows', 'followee_id', 'follower_id')
+        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'followee_id')
             ->wherePivot('is_accepted', false);
     }
+
 }
