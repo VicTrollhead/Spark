@@ -260,7 +260,10 @@ class ChatController extends Controller
 
         $chat = $message->chat;
 
-        $recipientId = $chat->user1_id === $user->id ? $chat->user2_id : $chat->user1_id;
+        $recipientId = null;
+        if (!is_null($chat)){
+            $recipientId = $chat->user1_id === $user->id ? $chat->user2_id : $chat->user1_id;
+        }
 
         $message->delete();
 
@@ -272,8 +275,9 @@ class ChatController extends Controller
             $chat->last_message_id = $previousMessage?->id;
             $chat->save();
         }
-
-        event(new UserMessageIsReadChange($recipientId, "delete"));
+        if (!is_null($recipientId)){
+            event(new UserMessageIsReadChange($recipientId, "delete"));
+        }
 
         return redirect()->back()->with('success', 'The message has been deleted.');
     }

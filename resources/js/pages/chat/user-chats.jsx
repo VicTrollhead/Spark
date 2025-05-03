@@ -17,7 +17,9 @@ export default function UserChats() {
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        window.Echo.private(`user-chats.${user.id}`).listen('UserMessageCreated', handleReload).listen('UserMessageIsReadChange', handleReload);
+        window.Echo.private(`user-chats.${user.id}`)
+            .listen('UserMessageCreated', handleReload)
+            .listen('UserMessageIsReadChange', handleReload);
 
         setTimeout(handleReload, 0);
         return () => {
@@ -43,7 +45,9 @@ export default function UserChats() {
         const shiftedNow = new Date();
         shiftedNow.setHours(shiftedNow.getHours() + 3);
         const isToday =
-            date.getFullYear() === shiftedNow.getFullYear() && date.getMonth() === shiftedNow.getMonth() && date.getDate() === shiftedNow.getDate();
+            date.getFullYear() === shiftedNow.getFullYear()
+            && date.getMonth() === shiftedNow.getMonth()
+            && date.getDate() === shiftedNow.getDate();
         return isToday
             ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             : date.toLocaleString([], {
@@ -96,10 +100,10 @@ export default function UserChats() {
                                             usersSearch
                                                 .filter((group) => group.users.length > 0)
                                                 .map((group, idx) => (
-                                                    <div key={idx} className="flex flex-col gap-2">
-                                                        <h4 className="text-md font-semibold text-neutral-700 dark:text-white">
+                                                    <span key={idx} className="flex flex-col gap-2">
+                                                        <span className="text-md font-semibold text-neutral-700 dark:text-white">
                                                             {translations[group.label] || group.label}
-                                                        </h4>
+                                                        </span>
                                                         {group.users.map((user) => (
                                                             <DialogClose
                                                                 key={user.id}
@@ -122,7 +126,7 @@ export default function UserChats() {
                                                                 </div>
                                                             </DialogClose>
                                                         ))}
-                                                    </div>
+                                                    </span>
                                                 ))
                                         )}
                                     </DialogDescription>
