@@ -86,6 +86,15 @@ class UserController extends Controller
             $combinedPosts = $combinedPosts->sortByDesc('created_at')->values();
         }
 
+        $repostedPostIds = $user->repostedPosts()->pluck('posts.id');
+
+        $totalLikes = $user->posts()
+            ->whereNotIn('id', $repostedPostIds)
+            ->withCount('likes')
+            ->get()
+            ->sum('likes_count');
+
+
         $posts = $combinedPosts->map(function ($post) use ($user, $currentUser) {
             return [
                 'id' => $post->id,
@@ -112,7 +121,7 @@ class UserController extends Controller
                 'favorites_count' => $post->favorites->count(),
                 'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
                 'comments_count' => $post->comments->count(),
-                'is_reposted' => $user->repostedPosts->contains($post->id),
+                'is_reposted' => $post->repostedByUsers->contains('id', $currentUser->id),
                 'reposts_count' => $post->repostedByUsers->count(),
                 'reposted_by_you' => $currentUser && $post->repostedByUsers->contains('id', $currentUser->id),
                 'reposted_by_user' => $post->repostedByUsers
@@ -141,6 +150,7 @@ class UserController extends Controller
             ];
         });
 
+
         return Inertia::render('user/show', [
             'user' => [
                 'id' => $user->id,
@@ -164,6 +174,7 @@ class UserController extends Controller
                 'has_sent_follow_request' => Auth::check() && auth()->user()->pendingFollowRequests()
                         ->where('followee_id', $user->id)
                         ->exists(),
+                'total_likes' => $totalLikes,
             ],
             'posts' => $posts,
             'filters' => [
@@ -192,6 +203,7 @@ class UserController extends Controller
                 'is_verified' => $user->is_verified,
                 'is_private' => $user->is_private,
                 'status' => $user->status,
+
             ],
         ]);
     }
@@ -372,16 +384,26 @@ class UserController extends Controller
 
     public function usersList(Request $request)
     {
-        $usersQuery = User::with('profileImage')->withCount('followers');
+        $authUser = $request->user();
 
-        $users = $usersQuery->oldest()->take(3)->get();
+        $excludedUserIds = collect([
+            $authUser->following()->pluck('users.id'),
+            [$authUser->id]
+        ])->flatten();
+
+        $users = User::with('profileImage')
+            ->withCount('followers')
+            ->whereNotIn('id', $excludedUserIds)
+            ->orderByDesc('followers_count')
+            ->take(5)
+            ->get();
 
         return $users->map(function ($user) {
             return [
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
-                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'profile_image_url' => $user->profileImage?->url,
                 'followers_count' => $user->followers_count,
                 'is_verified' => $user->is_verified,
             ];
@@ -535,7 +557,7 @@ class UserController extends Controller
                 break;
 
             case 'following':
-                $likedQuery->whereIn('posts.user_id', $followingIds); // Only liked posts by followed users
+                $likedQuery->whereIn('posts.user_id', $followingIds);
                 break;
 
             case 'latest':

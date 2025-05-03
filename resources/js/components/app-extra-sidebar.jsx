@@ -62,7 +62,7 @@ export function AppExtraSidebar() {
                 <SidebarMenu className="py-1 px-2.5">
                     <h2 className="m-2 font-bold">{translations['Let\'s get acquainted']}</h2>
                     {users.length === 0 ? (
-                        <p className="text-gray-500">{translations['Not users anyone yet.']}</p>
+                        <p className="text-gray-500">{translations['No users yet.']}</p>
                     ) : (
                         <ul className="flex flex-col gap-2">
                             {users.map((user) => (
@@ -78,7 +78,7 @@ export function AppExtraSidebar() {
                     <SidebarSeparator/>
                     <h2 className="m-2 font-bold"><Link href="/show-popular-hashtags">{translations['Popular hashtags']}</Link></h2>
                     {hashtags.length === 0 ? (
-                        <p className="text-gray-500">{translations['Not hashtags anyone yet.']}</p>
+                        <p className="text-gray-500">{translations['No hashtags yet.']}</p>
                     ) : (
                         <div className="flex flex-col gap-1 mb-1">
                             {hashtags.map((hashtag) => (

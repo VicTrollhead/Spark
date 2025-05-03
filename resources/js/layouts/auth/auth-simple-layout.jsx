@@ -22,7 +22,7 @@ export default function AuthSimpleLayout({ children, title, description, imageSr
 
                             <div className="space-y-2 text-start">
                                 <h1 className="text-xl font-medium">{title}</h1>
-                                <p className="text-muted-foreground text-center text-sm">{description}</p>
+                                <p className="text-muted-foreground text-sm">{description}</p>
                             </div>
                         </div>
                         {children}

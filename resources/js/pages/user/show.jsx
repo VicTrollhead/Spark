@@ -81,6 +81,8 @@ export default function Show() {
         );
     }
 
+    console.log(user.total_likes);
+
     return (
         <AppLayout>
             <Head title={`${user.name} (@${user.username})`} />
@@ -207,6 +209,9 @@ export default function Show() {
                     <Link href={`/user/${user.username}/following`} className="hover:underline">
                         <strong>{user.following_count}</strong> {following_string}
                     </Link>
+                    <div>
+                        <strong>{user.total_likes}</strong> {translations['Likes']}
+                    </div>
                 </div>
             </div>
 
