@@ -109,11 +109,20 @@ export default function PostComponent({ post, compact = false }) {
         );
     };
 
+    console.log(post.user.profile_image);
+    const profileImageUrl =
+        post.user?.profile_image?.disk === 's3'
+            ? post.user?.profile_image?.url
+            : post.user?.profile_image
+                ? `/storage/${post.user.profile_image.file_path}`
+                : null;
+
+
     return (
         <div className={`relative ${compact ? 'bg-muted/30 rounded-lg border p-3' : 'border-b p-4'} border-gray-200 dark:border-gray-800`}>
             <div className="flex items-start space-x-3">
                 <Avatar className="h-16 w-16">
-                    <AvatarImage src={post.user.profile_image_url} alt={post.user.name} />
+                    <AvatarImage src={profileImageUrl} alt={post.user.name} />
                     <AvatarFallback className="rounded-full bg-gray-300 text-black dark:bg-gray-700 dark:text-white">
                         {getInitials(post.user.name)}
                     </AvatarFallback>

@@ -96,6 +96,7 @@ class UserController extends Controller
 
 
         $posts = $combinedPosts->map(function ($post) use ($user, $currentUser) {
+
             return [
                 'id' => $post->id,
                 'content' => $post->content,
@@ -104,7 +105,14 @@ class UserController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage?->url,
+                    'profile_image' => $post->user->profileImage
+                        ? [
+                            'file_path' => $post->user->profileImage->file_path,
+                            'disk' => $post->user->profileImage->disk,
+                            'url' => $post->user->profileImage->url,
+                        ]
+                        : null,
+
                     'is_verified' => $post->user->is_verified,
                 ],
 
@@ -139,14 +147,26 @@ class UserController extends Controller
                             'id' => $user->id,
                             'name' => $user->name,
                             'username' => $user->username,
-                            'profile_image_url' => $user->profileImage?->url,
+                            'profile_image' => $user->profileImage
+                                ? [
+                                    'file_path' => $user->profileImage->file_path,
+                                    'disk' => $user->profileImage->disk,
+                                    'url' => $user->profileImage->url,
+                                ]
+                                : null,
                             'is_verified' => $user->is_verified,
                         ];
                     }),
                 'current_user' => [
                     'id' => $currentUser->id,
                     'username' => $currentUser->username,
-                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'profile_image' => $currentUser->profileImage
+                        ? [
+                            'file_path' => $currentUser->profileImage->file_path,
+                            'disk' => $currentUser->profileImage->disk,
+                            'url' => $currentUser->profileImage->url,
+                        ]
+                        : null,
                     'name' => $currentUser->name,
                     'is_verified' => $currentUser->is_verified,
                 ],
@@ -162,8 +182,8 @@ class UserController extends Controller
                 'bio' => $canViewFullProfile ? $user->bio : null,
 //                'profile_image_url' => $user->profileImage?->url,
 //                'cover_image_url' => $canViewFullProfile && $user->coverImage ? $user->coverImage->url : null,
-                'profile_image_url' => $user->profileImage,
-                'cover_image_url' => $canViewFullProfile && $user->coverImage ? $user->coverImage : null,
+                'profile_image' => $user->profileImage,
+                'cover_image' => $canViewFullProfile && $user->coverImage ? $user->coverImage : null,
                 'location' => $canViewFullProfile ? $user->location : null,
                 'website' => $canViewFullProfile ? $user->website : null,
                 'date_of_birth' => $canViewFullProfile ? optional($user->date_of_birth)->format('F j, Y') : null,
