@@ -9,6 +9,7 @@ use App\Models\Media;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -54,6 +55,23 @@ class PostController extends Controller
                 $postsQuery->withCount('likes')->orderByDesc('likes_count');
                 break;
 
+            case 'comments':
+                $postsQuery->withCount('comments')->orderByDesc('comments_count');
+                break;
+
+            case 'reposts':
+                $postsQuery->withCount('repostedByUsers')->orderByDesc('reposted_by_users_count');
+                break;
+
+            case 'favorites':
+                $postsQuery->withCount('favorites')->orderByDesc('favorites_count');
+                break;
+
+            case 'most_activity':
+                $postsQuery->withCount(['likes', 'comments', 'favorites', 'repostedByUsers'])
+                    ->orderByDesc(DB::raw('(likes_count + comments_count + favorites_count + reposted_by_users_count)'));
+                break;
+
             case 'oldest':
                 $postsQuery->oldest();
                 break;
@@ -88,6 +106,7 @@ class PostController extends Controller
                 $postsQuery->latest();
                 break;
         }
+
 
         $posts = $postsQuery->get()->map(function ($post) use ($currentUser) {
             return [

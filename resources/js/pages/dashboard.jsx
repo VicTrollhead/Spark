@@ -188,11 +188,15 @@ export default function Dashboard() {
                     <select
                         value={sortOption}
                         onChange={handleSortChange}
-                        className="ml-auto w-1/2 rounded-md border bg-gray-100 p-2 text-neutral-950 dark:bg-neutral-900 dark:text-white"
+                        className="ml-auto w-fit rounded-md border bg-gray-100 p-2 text-neutral-950 dark:bg-neutral-900 dark:text-white"
                     >
                         <option value="latest">{translations['Latest']}</option>
                         <option value="oldest">{translations['Oldest']}</option>
                         <option value="likes">{translations['Most Liked']}</option>
+                        <option value="comments">{translations['Most Commented']}</option>
+                        <option value="reposts">{translations['Most Reposted']}</option>
+                        <option value="favorites">{translations['Most Favorited']}</option>
+                        <option value="most_activity">{translations['Most Activity']}</option>
                         <option value="followees">{translations['People I Follow']}</option>
                         <option value="followers">{translations['People Who Follow Me']}</option>
                         <option value="mutuals">{translations['Mutual Friends']}</option>

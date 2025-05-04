@@ -14,7 +14,7 @@ export function UserInfo({ user, showEmail = false }) {
             </Avatar>
             <div className="grid flex-1 text-left leading-tight">
                 <div className="flex items-center gap-1">
-                    <span className="truncate text-sm">@{user.username}</span>
+                    <span className="truncate text-[14.5px] text-gray-700 dark:text-neutral-300">@{user.username}</span>
                     {user.is_verified && (
                         <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
                             <Check className="h-3 w-3" />

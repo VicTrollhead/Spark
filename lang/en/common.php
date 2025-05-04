@@ -136,5 +136,10 @@ return [
     "Write" => "Write",
     "Mutuals" => "Mutuals",
     "Others" => "Others",
+    "Most Commented" => "Most Commented",
+    "Most Reposted" => "Most Reposted",
+    "Most Favorited" => "Most Favorited",
+    "Most Activity" => "Most Activity",
+
 ];
 
