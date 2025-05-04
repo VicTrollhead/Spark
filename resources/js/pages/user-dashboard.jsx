@@ -73,21 +73,17 @@ export default function Dashboard() {
                                     </Avatar>
 
                                     <div className="flex flex-col">
-                                        <div className="flex items-center gap-1.5">
-                                            <h2 className="truncate text-lg font-semibold">{user.name}</h2>
-                                            {user.is_verified && (
-                                                <div className="group relative">
-                                                    <span className="absolute -top-7 left-1/2 top -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
-                                                        Verified
-                                                    </span>
+                                        <div className="grid flex-1 text-left leading-tight">
+                                            <div className="flex items-center gap-1">
+                                                <span className="truncate text-[14.5px] text-gray-700 dark:text-neutral-300">@{user.username}</span>
+                                                {user.is_verified && (
                                                     <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
                                                         <Check className="h-3 w-3" />
                                                     </span>
-                                                </div>
-                                            )}
+                                                )}
+                                            </div>
+                                            <span className="truncate text-lg font-extrabold break-all">{user.name}</span>
                                         </div>
-
-                                        <p className="truncate text-sm text-gray-500 dark:text-gray-400">@{user.username}</p>
                                     </div>
                                 </div>
                             </Link>
