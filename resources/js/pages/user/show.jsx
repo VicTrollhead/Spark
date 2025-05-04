@@ -65,6 +65,19 @@ export default function Show() {
                     </Avatar>
 
                     <h2 className="text-lg font-semibold mt-2">@{user.username}</h2>
+                    <div className="flex items-center mt-2">
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user.name}</h1>
+                        {user.is_verified && (
+                            <div className="group relative ml-2">
+                                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-lg bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                        Verified
+                                    </span>
+                                <span className="flex items-center rounded-xl bg-blue-500 p-1 text-xs font-medium text-white">
+                                        <Check className="h-4 w-4" />
+                                    </span>
+                            </div>
+                        )}
+                    </div>
                     <p className="text-gray-500 dark:text-gray-400">{translations['This account is private.']}</p>
 
                     {auth.user && !user.is_following && (
