@@ -64,8 +64,12 @@ class HandleInertiaRequests extends Middleware
 //                    'profile_image_url' => $user->profileImage
 //                        ? asset('storage/' . $user->profileImage->file_path)
 //                        : null,
+//                    'profile_image_url' => $user->profileImage
+//                        ? Storage::disk($this->disk ?? 's3')->url($user->profileImage->file_path)
+//                        : null,
                     'profile_image_url' => $user->profileImage
-                        ?Storage::disk($this->disk ?? 'public')->url($user->profileImage->file_path)
+                        ? Storage::disk($user->profileImage->disk ?? config('filesystems.default'))
+                            ->url($user->profileImage->file_path)
                         : null,
                     'is_verified' => $user->is_verified,
                 ] : null,

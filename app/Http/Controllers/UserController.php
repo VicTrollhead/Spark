@@ -208,34 +208,84 @@ class UserController extends Controller
         ]);
     }
 
+//    public function update(UpdateUserRequest $request, User $user)
+//    {
+//        $this->authorize('update', $user);
+//
+//        if ($request->hasFile('profile_image')) {
+//            if ($user->profileImage) {
+//                Storage::disk('public')->delete($user->profileImage->file_path);
+//                $user->profileImage()->delete();
+//            }
+//
+//            $media = new Media([
+//                'file_path' => $request->file('profile_image')->store('profile_images', 'public'),
+//                'file_type' => 'profile',
+//                'mediable_id' => $user->id,
+//                'mediable_type' => User::class,
+//            ]);
+//
+//            $media->save();
+//        }
+//        if ($request->hasFile('cover_image')) {
+//            if ($user->coverImage) {
+//                Storage::disk('public')->delete($user->coverImage->file_path);
+//                $user->coverImage()->delete();
+//            }
+//
+//            $media = new Media([
+//                'file_path' => $request->file('cover_image')->store('cover_images', 'public'),
+//                'file_type' => 'cover',
+//                'mediable_id' => $user->id,
+//                'mediable_type' => User::class,
+//            ]);
+//
+//            $media->save();
+//        }
+//
+//        $user->update($request->validated());
+//
+//        return redirect()->route('user.show', $user->username)
+//            ->with('success', 'Profile updated successfully.');
+//    }
+
     public function update(UpdateUserRequest $request, User $user)
     {
         $this->authorize('update', $user);
 
+        $disk = config('filesystems.default');
+
         if ($request->hasFile('profile_image')) {
             if ($user->profileImage) {
-                Storage::disk('public')->delete($user->profileImage->file_path);
+                Storage::disk($disk)->delete($user->profileImage->file_path);
                 $user->profileImage()->delete();
             }
 
+            $path = $request->file('profile_image')->store('profile_images', $disk);
+
             $media = new Media([
-                'file_path' => $request->file('profile_image')->store('profile_images', 'public'),
+                'file_path' => $path,
                 'file_type' => 'profile',
+                'disk' => $disk,
                 'mediable_id' => $user->id,
                 'mediable_type' => User::class,
             ]);
 
             $media->save();
         }
+
         if ($request->hasFile('cover_image')) {
             if ($user->coverImage) {
-                Storage::disk('public')->delete($user->coverImage->file_path);
+                Storage::disk($disk)->delete($user->coverImage->file_path);
                 $user->coverImage()->delete();
             }
 
+            $path = $request->file('cover_image')->store('cover_images', $disk);
+
             $media = new Media([
-                'file_path' => $request->file('cover_image')->store('cover_images', 'public'),
+                'file_path' => $path,
                 'file_type' => 'cover',
+                'disk' => $disk,
                 'mediable_id' => $user->id,
                 'mediable_type' => User::class,
             ]);
@@ -248,6 +298,7 @@ class UserController extends Controller
         return redirect()->route('user.show', $user->username)
             ->with('success', 'Profile updated successfully.');
     }
+
 
     public function users(Request $request): Response
     {

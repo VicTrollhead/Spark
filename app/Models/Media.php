@@ -32,9 +32,15 @@ class Media extends Model
 //    {
 //        return Storage::disk('s3')->url($this->file_path);
 //    }
+//    public function getUrlAttribute(): string
+//    {
+//        return Storage::disk($this->disk ?? 's3')->url($this->file_path);
+//    }
 
     public function getUrlAttribute(): string
     {
-        return Storage::disk($this->disk ?? 's3')->url($this->file_path);
+        $disk = $this->disk ?? config('filesystems.default');
+
+        return Storage::disk($disk)->url($this->file_path);
     }
 }
