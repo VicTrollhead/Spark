@@ -56,7 +56,7 @@ export default function EveryoneChat () {
             <Head title={translations['Everyone chat']} />
             <div className="flex justify-center h-fit">
                 <div className="w-full">
-                    <div className="bg-white dark:border-gray-800 dark:bg-neutral-950 shadow-md rounded-lg flex flex-col h-[90vh] max-h-[90vh]">
+                    <div className="bg-white dark:border-gray-800 dark:bg-neutral-950 shadow-md rounded-lg flex flex-col h-[92vh] max-h-[92vh]">
                         <div className="flex-1 flex flex-col overflow-y-auto px-4 py-3">
                             {messages?.length > 0 ? (
                                 <>
