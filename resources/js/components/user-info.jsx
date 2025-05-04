@@ -4,7 +4,6 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 export function UserInfo({ user, showEmail = false }) {
     const getInitials = useInitials();
-    console.log('User: ' + user['name'] + ' ' + user['is_verified']);
     return (
         <div className="flex items-center gap-2">
             <Avatar className="h-12 w-12 overflow-hidden rounded-full">

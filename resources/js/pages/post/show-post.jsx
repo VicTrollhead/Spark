@@ -1,5 +1,5 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { Bookmark, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat, Trash2 } from 'lucide-react';
+import { Bookmark, Check, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
@@ -166,12 +166,24 @@ export default function Show() {
                             </AvatarFallback>
                         </Avatar>
                         <div>
-                            <Link
-                                href={`/user/${post.user.username}`}
-                                className="text-lg font-semibold text-gray-900 hover:underline dark:text-white"
-                            >
-                                {post.user.name}
-                            </Link>
+                            <div className="flex items-center gap-1">
+                                <Link
+                                    href={`/user/${post.user.username}`}
+                                    className="text-lg font-semibold text-gray-900 hover:underline dark:text-white"
+                                >
+                                    {post.user.name}
+                                </Link>
+                                {post.user.is_verified && (
+                                    <div className="group relative">
+                                            <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                                Verified
+                                            </span>
+                                        <span className="flex items-center rounded-md bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                <Check className="h-3 w-3" />
+                                            </span>
+                                    </div>
+                                )}
+                            </div>
                             <p className="text-md text-gray-500 dark:text-gray-400">@{post.user.username}</p>
                         </div>
                     </div>
