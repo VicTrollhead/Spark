@@ -192,7 +192,12 @@ class PostController extends Controller
 
         if ($request->hasFile('media')) {
             foreach ($request->file('media') as $file) {
-                $path = $file->store('uploads/posts', 'public');
+
+                //$path = $file->store('uploads/posts', 'public');
+
+                $path = $file->store('posts', 's3');
+
+                Storage::disk('s3')->setVisibility($path, 'public');
 
                 $media = new Media([
                     'file_path' => $path,
