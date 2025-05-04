@@ -108,6 +108,7 @@ export default function PostComponent({ post, compact = false }) {
             },
         );
     };
+
     return (
         <div className={`relative ${compact ? 'bg-muted/30 rounded-lg border p-3' : 'border-b p-4'} border-gray-200 dark:border-gray-800`}>
             <div className="flex items-start space-x-3">
@@ -233,13 +234,17 @@ export default function PostComponent({ post, compact = false }) {
                         <div className="mt-2 grid grid-cols-1 gap-3 py-1 sm:grid-cols-2">
                             {post.media.map((file, index) => {
                                 const uniqueKey = `${post.id}-${file.id ?? file.file_path ?? index}`;
+                                const mediaUrl = file.disk === 's3'
+                                    ? file.url
+                                    : `/storage/${file.file_path}`;
+
                                 return file.file_type === 'image' ? (
                                     <div
                                         key={uniqueKey}
                                         className="relative flex w-full items-center justify-center overflow-hidden rounded-lg border dark:border-gray-700"
                                     >
                                         <img
-                                            src={`/storage/${file.file_path}`}
+                                            src={mediaUrl}
                                             alt="Post Media"
                                             className="object-contain transition-transform duration-300 hover:scale-102"
                                         />
@@ -247,13 +252,18 @@ export default function PostComponent({ post, compact = false }) {
                                 ) : (
                                     <div key={uniqueKey} className="relative w-full overflow-hidden rounded-lg border dark:border-gray-700">
                                         <video controls className="h-auto w-full rounded-lg object-contain">
-                                            <source src={`/storage/${file.file_path}`} type="video/mp4" />
+                                            <source src={mediaUrl} type="video/mp4" />
                                         </video>
                                     </div>
                                 );
                             })}
                         </div>
                     )}
+
+
+
+
+
 
                     {post.hashtags?.length > 0 && (
                         <div className="mt-0.5 flex flex-wrap gap-x-1 text-[16px] break-all">

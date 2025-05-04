@@ -107,9 +107,12 @@ class UserController extends Controller
                     'profile_image_url' => $post->user->profileImage?->url,
                     'is_verified' => $post->user->is_verified,
                 ],
+
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
+                    'disk' => $media->disk,
+                    'url' => $media->url,
                 ]),
                 'hashtags' => $post->hashtags->map(fn ($tag) => [
                     'id' => $tag->id,
@@ -157,8 +160,10 @@ class UserController extends Controller
                 'username' => $user->username,
                 'name' => $canViewFullProfile ? $user->name : null,
                 'bio' => $canViewFullProfile ? $user->bio : null,
-                'profile_image_url' => $user->profileImage?->url,
-                'cover_image_url' => $canViewFullProfile && $user->coverImage ? $user->coverImage->url : null,
+//                'profile_image_url' => $user->profileImage?->url,
+//                'cover_image_url' => $canViewFullProfile && $user->coverImage ? $user->coverImage->url : null,
+                'profile_image_url' => $user->profileImage,
+                'cover_image_url' => $canViewFullProfile && $user->coverImage ? $user->coverImage : null,
                 'location' => $canViewFullProfile ? $user->location : null,
                 'website' => $canViewFullProfile ? $user->website : null,
                 'date_of_birth' => $canViewFullProfile ? optional($user->date_of_birth)->format('F j, Y') : null,
@@ -887,6 +892,8 @@ class UserController extends Controller
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
+                    'disk' => $media->disk,
+                    'url' => $media->url,
                 ]),
                 'hashtags' => $post->hashtags->map(fn ($tag) => [
                     'id' => $tag->id,

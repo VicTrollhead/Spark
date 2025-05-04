@@ -81,17 +81,25 @@ export default function Show() {
         );
     }
 
+    const profileImageUrl = user.profile_image_url.disk === 's3'
+        ? user.profile_image_url.url
+        : `/storage/${user.profile_image_url.file_path}`;
+
+    const coverImageUrl = user.cover_image_url.disk === 's3'
+        ? user.cover_image_url.url
+        : `/storage/${user.cover_image_url.file_path}`;
+
     return (
         <AppLayout>
             <Head title={`${user.name} (@${user.username})`} />
 
             <div className="relative w-full bg-gray-200 h-72 dark:bg-gray-800">
                 {user.cover_image_url && (
-                    <img src={user.cover_image_url} alt="Cover Image" className="h-full w-full object-fill object-center" />
+                    <img src={coverImageUrl} alt="Cover Image" className="h-full w-full object-fill object-center" />
                 )}
                 <div className="absolute bottom-[-55px] left-4 sm:left-6">
                     <Avatar className="h-32 w-32 border-4 border-white sm:h-36 sm:w-36 dark:border-gray-900">
-                        <AvatarImage src={user.profile_image_url || ''} alt={user.name} />
+                        <AvatarImage src={profileImageUrl || ''} alt={user.name} />
                         <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
                             {getInitials(user.name)}
                         </AvatarFallback>

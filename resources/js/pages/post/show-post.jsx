@@ -159,7 +159,7 @@ export default function Show() {
             <div className="p-6">
                 <div className="flex justify-between">
                     <div className="flex items-center space-x-3">
-                        <Avatar className="h-20 w-20 border border-gray-300 dark:border-gray-700">
+                        <Avatar className="h-20 w-20 border border-gray-300 dark:border-gray-700 text-2xl">
                             <AvatarImage src={post.user.profile_image_url} alt={post.user.name} />
                             <AvatarFallback className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white">
                                 {getInitials(post.user.name)}
@@ -219,13 +219,16 @@ export default function Show() {
                         <div className="mt-2 grid grid-cols-1 gap-3 py-1 sm:grid-cols-2">
                             {post.media.map((file, index) => {
                                 const uniqueKey = file.id ? `${post.id}-${file.id}` : `${post.id}-${file.file_path}-${index}`;
+                                const mediaUrl = file.disk === 's3'
+                                    ? file.url
+                                    : `/storage/${file.file_path}`;
                                 return file.file_type === 'image' ? (
                                     <div
                                         key={uniqueKey}
                                         className="relative flex w-full items-center justify-center overflow-hidden rounded-lg border dark:border-gray-700"
                                     >
                                         <img
-                                            src={`/storage/${file.file_path}`}
+                                            src={mediaUrl}
                                             alt="Post Media"
                                             className="object-contain transition-transform duration-300 hover:scale-102"
                                         />
@@ -233,7 +236,7 @@ export default function Show() {
                                 ) : (
                                     <div key={uniqueKey} className="relative w-full overflow-hidden rounded-lg border dark:border-gray-700">
                                         <video controls className="h-auto w-full rounded-lg object-contain">
-                                            <source src={`/storage/${file.file_path}`} type="video/mp4" />
+                                            <source src={mediaUrl} type="video/mp4" />
                                         </video>
                                     </div>
                                 );
