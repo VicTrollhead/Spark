@@ -20,6 +20,10 @@ export default function UserChat() {
     const connectWebSocket = () => {
         window.Echo.private(webSocketChannel).listen('GotPersonalMessage', async (e) => {
             await getMessages();
+            const container = document.getElementById('chat-scroll-container');
+            if (container && container.scrollHeight <= container.clientHeight) {
+                router.post(`/chat/user-chat/${chat_id}/mark-messages-as-read`);
+            }
         });
     };
 
@@ -64,6 +68,10 @@ export default function UserChat() {
 
         container.addEventListener('scroll', handleScroll);
 
+        if (container && container.scrollHeight <= container.clientHeight) {
+            router.post(`/chat/user-chat/${chat_id}/mark-messages-as-read`);
+        }
+
         return () => {
             container.removeEventListener('scroll', handleScroll);
             window.Echo.leave(webSocketChannel);
@@ -106,7 +114,7 @@ export default function UserChat() {
                             </span>
                         </Link>
                     </div>
-                    <div className="flex h-[82vh] max-h-[82vh] flex-col rounded-lg bg-white shadow-md dark:border-gray-800 dark:bg-neutral-950">
+                    <div className="flex h-[85vh] max-h-[85vh] flex-col rounded-lg bg-white shadow-md dark:border-gray-800 dark:bg-neutral-950">
                         <div id={'chat-scroll-container'} className="flex flex-1 flex-col overflow-y-auto px-4 py-3">
                             {messages?.length > 0 ? (
                                 <>
