@@ -114,25 +114,26 @@ export default function UserChat() {
                             </span>
                         </Link>
                     </div>
-                    <div className="flex h-[85vh] max-h-[85vh] flex-col rounded-lg bg-white shadow-md dark:border-gray-800 dark:bg-neutral-950">
-                        <div id={'chat-scroll-container'} className="flex flex-1 flex-col overflow-y-auto px-4 py-3">
+                    <div className="flex flex-col max-h-[calc(100vh-8.2rem)] h-[calc(100vh-8.2rem)] rounded-lg bg-white shadow-md dark:border-gray-800 dark:bg-neutral-950">
+                        <div id="chat-scroll-container" className="flex-1 overflow-y-auto px-4 py-3">
                             {messages?.length > 0 ? (
-                                <>
-                                    <div className="mt-auto flex flex-col gap-2">
-                                        {messages.map((message, index) => (
-                                            <Message key={message.id || index} userId={user.id} message={message} />
-                                        ))}
-                                        <span ref={scroll}></span>
-                                    </div>
-                                </>
+                                <div className="flex flex-col gap-2">
+                                    {messages.map((message, index) => (
+                                        <Message key={message.id || index} userId={user.id} message={message} />
+                                    ))}
+                                    <span ref={scroll}></span>
+                                </div>
                             ) : (
-                                <div className="flex flex-1 items-center justify-center text-center">{translations['No messages anyone yet.']}</div>
+                                <div className="flex h-full items-center justify-center text-center">
+                                    {translations['No messages anyone yet.']}
+                                </div>
                             )}
                         </div>
                         <div className="border-t p-4">
                             <MessageInput chatId={chat_id} />
                         </div>
                     </div>
+
                 </div>
             </div>
         </AppLayout>
