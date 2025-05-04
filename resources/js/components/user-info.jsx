@@ -14,7 +14,7 @@ export function UserInfo({ user, showEmail = false }) {
                 </AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-left leading-tight">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                     <span className="truncate text-sm font-normal">@{user.username}</span>
                     {user.is_verified && (
                         <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
