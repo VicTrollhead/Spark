@@ -192,9 +192,9 @@ export function AppHeader({ breadcrumbs = [] }) {
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="Avatar my-4 mr-2.5 -ml-1 h-9 w-9 hover:bg-neutral-300 dark:hover:bg-neutral-800"
+                                    className="Avatar my-4 mr-2.5 -ml-1 h-9 w-9 hover:bg-gray-300 dark:hover:bg-neutral-700"
                                 >
-                                    <Menu className="h-8 w-8" />
+                                    <Menu className="h-9 w-9" />
                                 </Button>
                             </SheetTrigger>
                             <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between gap-0 pl-5">
