@@ -58,7 +58,7 @@ export default function Show() {
 
                 <div className="p-6 text-center">
                     <Avatar className="h-24 w-24 mx-auto border-4 border-white dark:border-gray-900">
-                        <AvatarImage src={user.profile_image_url || ''} alt={user.username} />
+                        <AvatarImage src={profileImageUrl || ''} alt={user.username} />
                         <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
                             {getInitials(user.username)}
                         </AvatarFallback>
@@ -81,17 +81,46 @@ export default function Show() {
         );
     }
 
+    const getProfileImageUrl = (user) => {
+        if (user?.profile_image?.disk === 's3') {
+            return user.profile_image.url;
+        } else if (user?.profile_image?.file_path) {
+            return `/storage/${user.profile_image.file_path}`;
+        }
+        return null;
+    };
+
+    const getCoverImageUrl = (user) => {
+        if (user?.cover_image?.disk === 's3') {
+            return user.cover_image.url;
+        } else if (user?.cover_image?.file_path) {
+            return `/storage/${user.cover_image.file_path}`;
+        }
+        return null;
+    };
+
+    const profileImageUrl = getProfileImageUrl(user);
+    const coverImageUrl = getCoverImageUrl(user);
+
+    // const profileImageUrl = user.profile_image.disk === 's3'
+    //     ? user.profile_image.url
+    //     : `/storage/${user.profile_image.file_path}`;
+    //
+    // const coverImageUrl = user.cover_image.disk === 's3'
+    //     ? user.cover_image.url
+    //     : `/storage/${user.cover_image.file_path}`;
+
     return (
         <AppLayout>
             <Head title={`${user.name} (@${user.username})`} />
 
             <div className="relative w-full bg-gray-200 h-72 dark:bg-gray-800">
-                {user.cover_image_url && (
-                    <img src={user.cover_image_url} alt="Cover Image" className="h-full w-full object-fill object-center" />
+                {coverImageUrl && (
+                    <img src={coverImageUrl} alt="Cover Image" className="h-full w-full object-fill object-center" />
                 )}
                 <div className="absolute bottom-[-55px] left-4 sm:left-6">
                     <Avatar className="h-32 w-32 border-4 border-white sm:h-36 sm:w-36 dark:border-gray-900">
-                        <AvatarImage src={user.profile_image_url || ''} alt={user.name} />
+                        <AvatarImage src={profileImageUrl} alt={user.name} />
                         <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
                             {getInitials(user.name)}
                         </AvatarFallback>

@@ -123,10 +123,11 @@ export default function Dashboard() {
                     <hr />
 
                     <div className="flex flex-row flex-wrap gap-4 xl:flex-nowrap">
-                        <div>
+                        <div className="w-fit max-w-sm">
                             <label className="block text-sm text-gray-700 dark:text-gray-200">
                                 {translations['Upload Media (Images or Videos)']}
                             </label>
+
                             <div className="relative mt-3">
                                 <Input
                                     ref={fileInputRef}
@@ -135,6 +136,7 @@ export default function Dashboard() {
                                     onChange={handleMediaChange}
                                     className="pr-10"
                                 />
+
                                 {data.media && data.media.length > 0 && (
                                     <button
                                         type="button"
@@ -143,22 +145,32 @@ export default function Dashboard() {
                                             setSelectedFiles([]);
                                             if (fileInputRef.current) fileInputRef.current.value = null;
                                         }}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-600 rounded-full p-1 bg-gray-200 dark:bg-gray-700"
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 rounded-full p-1 bg-gray-200 dark:text-gray-200 dark:hover:text-red-500 dark:bg-neutral-700"
                                     >
                                         <X size={16} />
                                     </button>
                                 )}
                             </div>
+
                             {selectedFiles.length > 0 && (
-                                <ul className="mt-2 list-disc pl-4 text-sm text-gray-500">
+                                <ul className="mt-2 list-disc pl-4 text-sm text-gray-500 space-y-1">
                                     {selectedFiles.map((name, index) => (
-                                        <li key={index}>{name}</li>
+                                        <li
+                                            key={index}
+                                            className="max-w-full overflow-hidden text-ellipsis whitespace-nowrap"
+                                            title={name}
+                                        >
+                                            {name}
+                                        </li>
                                     ))}
                                 </ul>
                             )}
-                            {errors['media.0'] && <p className="text-sm text-red-500">{errors['media.0']}</p>}
 
+                            {errors['media.0'] && (
+                                <p className="text-sm text-red-500 mt-1">{errors['media.0']}</p>
+                            )}
                         </div>
+
                         <div className="flex w-full flex-col items-start gap-y-2">
                             <label className="block text-sm text-gray-700 dark:text-gray-200">{translations['Hashtags']}</label>
                             <HashtagInput

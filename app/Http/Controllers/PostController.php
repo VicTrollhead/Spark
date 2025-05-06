@@ -127,6 +127,8 @@ class PostController extends Controller
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
+                    'disk' => $media->disk,
+                    'url' => $media->url,
                 ]),
                 'is_private' => $post->is_private,
                 'likes_count' => $post->likes->count(),
@@ -190,20 +192,27 @@ class PostController extends Controller
             'is_private' => $validated['is_private'] ?? false,
         ]);
 
+        $mediaUrls = [];
+
         if ($request->hasFile('media')) {
+            $disk = config('filesystems.default');
+
             foreach ($request->file('media') as $file) {
-                $path = $file->store('uploads/posts', 'public');
+                $path = $file->store('uploads/posts', $disk);
 
                 $media = new Media([
                     'file_path' => $path,
                     'file_type' => str_starts_with($file->getMimeType(), 'video') ? 'video' : 'image',
+                    'disk' => $disk,
                     'mediable_id' => $post->id,
                     'mediable_type' => Post::class,
                 ]);
 
                 $media->save();
+                $mediaUrls[] = $media->url;
             }
         }
+
         $hashtags = $validated['hashtags'] ?? [];
         $hashtagIds = [];
 
@@ -218,8 +227,9 @@ class PostController extends Controller
 
         $post->hashtags()->sync($hashtagIds);
 
-        return redirect()->route('dashboard')->with('success', 'Post created successfully!');
+        return redirect()->route('dashboard')->with('success', 'Post created successfully!')->with('mediaUrls', $mediaUrls);;
     }
+
 
 
     public function show(Post $post, Request $request)
@@ -270,7 +280,7 @@ class PostController extends Controller
                     'id' => $comment->user->id,
                     'name' => $comment->user->name,
                     'username' => $comment->user->username,
-                    'profile_image_url' => $comment->user->profileImage ? asset('storage/' . $comment->user->profileImage->file_path) : null,
+                    'profile_image' => $comment->user->profileImage,
                     'is_verified' => $comment->user->is_verified,
                 ],
             ];
@@ -283,13 +293,15 @@ class PostController extends Controller
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
+                    'disk' => $media->disk,
+                    'url' => $media->url,
                 ]),
                 'created_at' => $post->created_at->format('n/j/Y'),
                 'user' => [
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage ? asset('storage/' . $post->user->profileImage->file_path) : null,
+                    'profile_image' => $post->user->profileImage,
                     'is_verified' => $post->user->is_verified,
                 ],
                 'is_private' => $post->is_private,
@@ -322,7 +334,7 @@ class PostController extends Controller
                             'id' => $user->id,
                             'name' => $user->name,
                             'username' => $user->username,
-                            'profile_image_url' => $user->profileImage?->url,
+                            'profile_image' => $user->profileImage,
                             'is_verified' => $user->is_verified,
                         ];
                     })
@@ -331,7 +343,7 @@ class PostController extends Controller
                 'current_user' => [
                     'id' => $currentUser->id,
                     'username' => $currentUser->username,
-                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'profile_image' => $currentUser->profileImage,
                     'name' => $currentUser->name,
                     'is_verified' => $currentUser->is_verified,
                 ],
@@ -413,6 +425,7 @@ class PostController extends Controller
                     'media' => $post->media->map(fn ($media) => [
                         'file_path' => $media->file_path,
                         'file_type' => $media->file_type,
+                        'url' => $media->url,
                     ]),
                     'hashtags' => $post->hashtags->map(fn ($tag) => [
                         'id' => $tag->id,
@@ -519,6 +532,7 @@ class PostController extends Controller
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
+                    'url' => $media->url,
                 ]),
                 'hashtags' => $post->hashtags->map(fn ($tag) => [
                     'id' => $tag->id,
