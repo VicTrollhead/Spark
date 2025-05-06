@@ -96,6 +96,7 @@ class UserController extends Controller
 
 
         $posts = $combinedPosts->map(function ($post) use ($user, $currentUser) {
+
             return [
                 'id' => $post->id,
                 'content' => $post->content,
@@ -104,12 +105,22 @@ class UserController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage?->url,
+                    'profile_image' => $post->user->profileImage
+                        ? [
+                            'file_path' => $post->user->profileImage->file_path,
+                            'disk' => $post->user->profileImage->disk,
+                            'url' => $post->user->profileImage->url,
+                        ]
+                        : null,
+
                     'is_verified' => $post->user->is_verified,
                 ],
+
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
+                    'disk' => $media->disk,
+                    'url' => $media->url,
                 ]),
                 'hashtags' => $post->hashtags->map(fn ($tag) => [
                     'id' => $tag->id,
@@ -136,14 +147,26 @@ class UserController extends Controller
                             'id' => $user->id,
                             'name' => $user->name,
                             'username' => $user->username,
-                            'profile_image_url' => $user->profileImage?->url,
+                            'profile_image' => $user->profileImage
+                                ? [
+                                    'file_path' => $user->profileImage->file_path,
+                                    'disk' => $user->profileImage->disk,
+                                    'url' => $user->profileImage->url,
+                                ]
+                                : null,
                             'is_verified' => $user->is_verified,
                         ];
                     }),
                 'current_user' => [
                     'id' => $currentUser->id,
                     'username' => $currentUser->username,
-                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'profile_image' => $currentUser->profileImage
+                        ? [
+                            'file_path' => $currentUser->profileImage->file_path,
+                            'disk' => $currentUser->profileImage->disk,
+                            'url' => $currentUser->profileImage->url,
+                        ]
+                        : null,
                     'name' => $currentUser->name,
                     'is_verified' => $currentUser->is_verified,
                 ],
@@ -157,8 +180,10 @@ class UserController extends Controller
                 'username' => $user->username,
                 'name' => $canViewFullProfile ? $user->name : null,
                 'bio' => $canViewFullProfile ? $user->bio : null,
-                'profile_image_url' => $user->profileImage?->url,
-                'cover_image_url' => $canViewFullProfile && $user->coverImage ? $user->coverImage->url : null,
+//                'profile_image_url' => $user->profileImage?->url,
+//                'cover_image_url' => $canViewFullProfile && $user->coverImage ? $user->coverImage->url : null,
+                'profile_image' => $user->profileImage,
+                'cover_image' => $canViewFullProfile && $user->coverImage ? $user->coverImage : null,
                 'location' => $canViewFullProfile ? $user->location : null,
                 'website' => $canViewFullProfile ? $user->website : null,
                 'date_of_birth' => $canViewFullProfile ? optional($user->date_of_birth)->format('F j, Y') : null,
@@ -208,34 +233,84 @@ class UserController extends Controller
         ]);
     }
 
+//    public function update(UpdateUserRequest $request, User $user)
+//    {
+//        $this->authorize('update', $user);
+//
+//        if ($request->hasFile('profile_image')) {
+//            if ($user->profileImage) {
+//                Storage::disk('public')->delete($user->profileImage->file_path);
+//                $user->profileImage()->delete();
+//            }
+//
+//            $media = new Media([
+//                'file_path' => $request->file('profile_image')->store('profile_images', 'public'),
+//                'file_type' => 'profile',
+//                'mediable_id' => $user->id,
+//                'mediable_type' => User::class,
+//            ]);
+//
+//            $media->save();
+//        }
+//        if ($request->hasFile('cover_image')) {
+//            if ($user->coverImage) {
+//                Storage::disk('public')->delete($user->coverImage->file_path);
+//                $user->coverImage()->delete();
+//            }
+//
+//            $media = new Media([
+//                'file_path' => $request->file('cover_image')->store('cover_images', 'public'),
+//                'file_type' => 'cover',
+//                'mediable_id' => $user->id,
+//                'mediable_type' => User::class,
+//            ]);
+//
+//            $media->save();
+//        }
+//
+//        $user->update($request->validated());
+//
+//        return redirect()->route('user.show', $user->username)
+//            ->with('success', 'Profile updated successfully.');
+//    }
+
     public function update(UpdateUserRequest $request, User $user)
     {
         $this->authorize('update', $user);
 
+        $disk = config('filesystems.default');
+
         if ($request->hasFile('profile_image')) {
             if ($user->profileImage) {
-                Storage::disk('public')->delete($user->profileImage->file_path);
+                Storage::disk($disk)->delete($user->profileImage->file_path);
                 $user->profileImage()->delete();
             }
 
+            $path = $request->file('profile_image')->store('profile_images', $disk);
+
             $media = new Media([
-                'file_path' => $request->file('profile_image')->store('profile_images', 'public'),
+                'file_path' => $path,
                 'file_type' => 'profile',
+                'disk' => $disk,
                 'mediable_id' => $user->id,
                 'mediable_type' => User::class,
             ]);
 
             $media->save();
         }
+
         if ($request->hasFile('cover_image')) {
             if ($user->coverImage) {
-                Storage::disk('public')->delete($user->coverImage->file_path);
+                Storage::disk($disk)->delete($user->coverImage->file_path);
                 $user->coverImage()->delete();
             }
 
+            $path = $request->file('cover_image')->store('cover_images', $disk);
+
             $media = new Media([
-                'file_path' => $request->file('cover_image')->store('cover_images', 'public'),
+                'file_path' => $path,
                 'file_type' => 'cover',
+                'disk' => $disk,
                 'mediable_id' => $user->id,
                 'mediable_type' => User::class,
             ]);
@@ -248,6 +323,7 @@ class UserController extends Controller
         return redirect()->route('user.show', $user->username)
             ->with('success', 'Profile updated successfully.');
     }
+
 
     public function users(Request $request): Response
     {
@@ -836,6 +912,8 @@ class UserController extends Controller
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
+                    'disk' => $media->disk,
+                    'url' => $media->url,
                 ]),
                 'hashtags' => $post->hashtags->map(fn ($tag) => [
                     'id' => $tag->id,

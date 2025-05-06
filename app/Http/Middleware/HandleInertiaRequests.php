@@ -6,6 +6,7 @@ use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Middleware;
 
@@ -60,8 +61,15 @@ class HandleInertiaRequests extends Middleware
                     'name' => $user->name,
                     'username' => $user->username,
                     'email' => $user->email,
+//                    'profile_image_url' => $user->profileImage
+//                        ? asset('storage/' . $user->profileImage->file_path)
+//                        : null,
+//                    'profile_image_url' => $user->profileImage
+//                        ? Storage::disk($this->disk ?? 's3')->url($user->profileImage->file_path)
+//                        : null,
                     'profile_image_url' => $user->profileImage
-                        ? asset('storage/' . $user->profileImage->file_path)
+                        ? Storage::disk($user->profileImage->disk ?? config('filesystems.default'))
+                            ->url($user->profileImage->file_path)
                         : null,
                     'is_verified' => $user->is_verified,
                 ] : null,

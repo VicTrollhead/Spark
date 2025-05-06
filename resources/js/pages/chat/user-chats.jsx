@@ -145,7 +145,7 @@ export default function UserChats() {
                                 className="mt-2 rounded-md border px-4 py-2 hover:bg-gray-200 dark:border-gray-600 dark:hover:bg-gray-700"
                             >
                                 <Link href={`/chat/user-chat/${chat.user.username}`} className="flex flex-row gap-3">
-                                    <Avatar className="my-auto h-12 w-12 border-2 border-neutral-800 md:h-15 md:w-15 dark:border-gray-400">
+                                    <Avatar className="my-auto h-12 w-12  md:h-15 md:w-15 ">
                                         <AvatarImage src={chat.user.profile_image_url} alt={chat.user.name} />
                                         <AvatarFallback className="rounded-full bg-gray-300 text-2xl text-black dark:bg-gray-700 dark:text-white">
                                             {getInitials(chat.user.name)}
