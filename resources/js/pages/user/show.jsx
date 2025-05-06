@@ -81,13 +81,34 @@ export default function Show() {
         );
     }
 
-    const profileImageUrl = user.profile_image.disk === 's3'
-        ? user.profile_image.url
-        : `/storage/${user.profile_image.file_path}`;
+    const getProfileImageUrl = (user) => {
+        if (user?.profile_image?.disk === 's3') {
+            return user.profile_image.url;
+        } else if (user?.profile_image?.file_path) {
+            return `/storage/${user.profile_image.file_path}`;
+        }
+        return null;
+    };
 
-    const coverImageUrl = user.cover_image.disk === 's3'
-        ? user.cover_image.url
-        : `/storage/${user.cover_image.file_path}`;
+    const getCoverImageUrl = (user) => {
+        if (user?.cover_image?.disk === 's3') {
+            return user.cover_image.url;
+        } else if (user?.cover_image?.file_path) {
+            return `/storage/${user.cover_image.file_path}`;
+        }
+        return null;
+    };
+
+    const profileImageUrl = getProfileImageUrl(user);
+    const coverImageUrl = getCoverImageUrl(user);
+
+    // const profileImageUrl = user.profile_image.disk === 's3'
+    //     ? user.profile_image.url
+    //     : `/storage/${user.profile_image.file_path}`;
+    //
+    // const coverImageUrl = user.cover_image.disk === 's3'
+    //     ? user.cover_image.url
+    //     : `/storage/${user.cover_image.file_path}`;
 
     return (
         <AppLayout>

@@ -152,6 +152,26 @@ export default function Show() {
         );
     };
 
+    const getMediaUrl = (file) => {
+        if (file?.disk === 's3') {
+            return file.url;
+        } else if (file?.file_path) {
+            return `/storage/${file.file_path}`;
+        }
+        return null;
+    };
+
+    const getProfileImageUrl = (user) => {
+        if (user?.profile_image?.disk === 's3') {
+            return user.profile_image.url;
+        } else if (user?.profile_image?.file_path) {
+            return `/storage/${user.profile_image.file_path}`;
+        }
+        return null;
+    };
+
+    const profileImageUrl = getProfileImageUrl(post.user);
+
     return (
         <AppLayout>
             <Head title={`${translations['Post by']} @${post.user.username}`} />
@@ -160,7 +180,7 @@ export default function Show() {
                 <div className="flex justify-between">
                     <div className="flex items-center space-x-3">
                         <Avatar className="h-20 w-20 border border-gray-300 dark:border-gray-700 text-2xl">
-                            <AvatarImage src={post.user.profile_image_url} alt={post.user.name} />
+                            <AvatarImage src={profileImageUrl} alt={post.user.name} />
                             <AvatarFallback className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white">
                                 {getInitials(post.user.name)}
                             </AvatarFallback>

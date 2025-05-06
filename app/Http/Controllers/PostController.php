@@ -280,7 +280,7 @@ class PostController extends Controller
                     'id' => $comment->user->id,
                     'name' => $comment->user->name,
                     'username' => $comment->user->username,
-                    'profile_image_url' => $comment->user->profileImage ? asset('storage/' . $comment->user->profileImage->file_path) : null,
+                    'profile_image' => $comment->user->profileImage,
                     'is_verified' => $comment->user->is_verified,
                 ],
             ];
@@ -301,7 +301,7 @@ class PostController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage ? asset('storage/' . $post->user->profileImage->file_path) : null,
+                    'profile_image' => $post->user->profileImage,
                     'is_verified' => $post->user->is_verified,
                 ],
                 'is_private' => $post->is_private,
@@ -334,7 +334,7 @@ class PostController extends Controller
                             'id' => $user->id,
                             'name' => $user->name,
                             'username' => $user->username,
-                            'profile_image_url' => $user->profileImage?->url,
+                            'profile_image' => $user->profileImage,
                             'is_verified' => $user->is_verified,
                         ];
                     })
@@ -343,7 +343,7 @@ class PostController extends Controller
                 'current_user' => [
                     'id' => $currentUser->id,
                     'username' => $currentUser->username,
-                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'profile_image' => $currentUser->profileImage,
                     'name' => $currentUser->name,
                     'is_verified' => $currentUser->is_verified,
                 ],
