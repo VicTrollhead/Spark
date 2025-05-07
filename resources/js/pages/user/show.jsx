@@ -49,6 +49,27 @@ export default function Show() {
         router.get(`/user/${user.username}/edit`);
     };
 
+    const getProfileImageUrl = (user) => {
+        if (user?.profile_image?.disk === 's3') {
+            return user.profile_image.url;
+        } else if (user?.profile_image?.file_path) {
+            return `/storage/${user.profile_image.file_path}`;
+        }
+        return null;
+    };
+
+    const getCoverImageUrl = (user) => {
+        if (user?.cover_image?.disk === 's3') {
+            return user.cover_image.url;
+        } else if (user?.cover_image?.file_path) {
+            return `/storage/${user.cover_image.file_path}`;
+        }
+        return null;
+    };
+
+    const profileImageUrl = getProfileImageUrl(user);
+    const coverImageUrl = getCoverImageUrl(user);
+
     const isOwnProfile = auth.user && auth.user.id === user.id;
 
     if (!user.canViewFullProfile) {
@@ -56,7 +77,7 @@ export default function Show() {
             <AppLayout>
                 <Head title={`@${user.username} (${translations['Private Account']})`} />
 
-                <div className="p-6 text-center">
+                <div className="p-6 text-center flex flex-col items-center justify-center">
                     <Avatar className="h-24 w-24 mx-auto border-4 border-white dark:border-gray-900">
                         <AvatarImage src={profileImageUrl || ''} alt={user.username} />
                         <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
@@ -64,9 +85,9 @@ export default function Show() {
                         </AvatarFallback>
                     </Avatar>
 
-                    <h2 className="text-lg font-semibold mt-2">@{user.username}</h2>
-                    <div className="flex items-center mt-2">
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user.name}</h1>
+                    <h2 className="text-lg font-semibold mt-2 text-gray-600 dark:text-gray-400">@{user.username}</h2>
+                    <div className="flex items-center p-2 ml-2">
+                        <h1 className="text-[22px] font-bold text-gray-900 dark:text-white">{user.name}</h1>
                         {user.is_verified && (
                             <div className="group relative ml-2">
                                     <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-lg bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
@@ -93,35 +114,6 @@ export default function Show() {
             </AppLayout>
         );
     }
-
-    const getProfileImageUrl = (user) => {
-        if (user?.profile_image?.disk === 's3') {
-            return user.profile_image.url;
-        } else if (user?.profile_image?.file_path) {
-            return `/storage/${user.profile_image.file_path}`;
-        }
-        return null;
-    };
-
-    const getCoverImageUrl = (user) => {
-        if (user?.cover_image?.disk === 's3') {
-            return user.cover_image.url;
-        } else if (user?.cover_image?.file_path) {
-            return `/storage/${user.cover_image.file_path}`;
-        }
-        return null;
-    };
-
-    const profileImageUrl = getProfileImageUrl(user);
-    const coverImageUrl = getCoverImageUrl(user);
-
-    // const profileImageUrl = user.profile_image.disk === 's3'
-    //     ? user.profile_image.url
-    //     : `/storage/${user.profile_image.file_path}`;
-    //
-    // const coverImageUrl = user.cover_image.disk === 's3'
-    //     ? user.cover_image.url
-    //     : `/storage/${user.cover_image.file_path}`;
 
     return (
         <AppLayout>

@@ -2,12 +2,22 @@ import { Check } from 'lucide-react';
 import { useInitials } from '../hooks/use-initials';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
+
+const getProfileImageUrl = (user) => {
+    const url = user?.profile_image;
+
+    if (!url) return null;
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+    }
+    return `/storage/${url}`;
+};
 export function UserInfo({ user, showEmail = false }) {
     const getInitials = useInitials();
     return (
         <div className="flex items-center gap-2">
             <Avatar className="h-12 w-12 overflow-hidden rounded-full">
-                <AvatarImage src={user.profile_image_url} alt={user.name} />
+                <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
                 <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-gray-700 dark:text-white">
                     {getInitials(user.name)}
                 </AvatarFallback>

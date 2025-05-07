@@ -108,7 +108,7 @@ class FollowController extends Controller
                     'id' => $follower->id,
                     'name' => $follower->name,
                     'username' => $follower->username,
-                    'profile_image_url' => $follower->profileImage ? $follower->profileImage->url : null,
+                    'profile_image' => $follower->profileImage,
                     'followers_count' => $follower->followers_count,
                     'is_followed' => $authUser->following->contains('id', $follower->id),
                     'has_sent_follow_request' => $hasSentFollowRequest,
@@ -125,7 +125,7 @@ class FollowController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
-                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'profile_image' => $user->profileImage,
                 'is_verified' => $user->is_verified
             ],
         ]);
@@ -145,7 +145,7 @@ class FollowController extends Controller
                     'id' => $followingUser->id,
                     'name' => $followingUser->name,
                     'username' => $followingUser->username,
-                    'profile_image_url' => $followingUser->profileImage ? $followingUser->profileImage->url : null,
+                    'profile_image' => $followingUser->profileImage,
                     'followers_count' => $followingUser->followers_count,
                     'is_followed' => $authUser->following->contains($followingUser->id),
                     'is_private' => $followingUser->is_private,
@@ -161,7 +161,7 @@ class FollowController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
-                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'profile_image' => $user->profileImage,
                 'is_verified' => $user->is_verified
             ],
         ]);

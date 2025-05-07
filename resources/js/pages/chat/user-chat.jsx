@@ -86,6 +86,16 @@ export default function UserChat() {
         }
     }, [init_messages]);
 
+    const getProfileImageUrl = (user) => {
+        if (user?.profile_image?.disk === 's3') {
+            return user.profile_image.url;
+        } else if (user?.profile_image?.file_path) {
+            return `/storage/${user.profile_image.file_path}`;
+        }
+        return null;
+    };
+
+    console.log(other_user);
     return (
         <AppLayout>
             <Head title={`${translations['Chat with']} ${other_user.name}`} />
@@ -94,7 +104,7 @@ export default function UserChat() {
                     <div className="flex h-16 w-full flex-row items-center bg-gray-200 dark:bg-neutral-700">
                         <Link href={`/user/${other_user.username}`} className="flex cursor-pointer flex-row items-center">
                             <Avatar className="mx-5 h-10 w-10 overflow-hidden rounded-full md:h-12 md:w-12">
-                                <AvatarImage src={other_user.profile_image_url} alt={other_user.name} />
+                                <AvatarImage src={getProfileImageUrl(other_user)} alt={other_user.name} />
                                 <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                                     {getInitials(other_user.name)}
                                 </AvatarFallback>

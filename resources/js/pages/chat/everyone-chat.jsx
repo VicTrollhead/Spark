@@ -17,7 +17,7 @@ export default function EveryoneChat () {
     const connectWebSocket = () => {
         window.Echo.private(webSocketChannel)
             .listen('GotMessage', async (e) => {
-                // console.log(e.message)
+                console.log(e.message)
                 await getMessages();
             });
     }

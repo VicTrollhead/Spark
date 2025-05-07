@@ -36,6 +36,15 @@ export default function Friends() {
         });
     };
 
+    const getProfileImageUrl = (user) => {
+        if (user?.profile_image?.disk === 's3') {
+            return user.profile_image.url;
+        } else if (user?.profile_image?.file_path) {
+            return `/storage/${user.profile_image.file_path}`;
+        }
+        return null;
+    };
+
     return (
         <AppLayout>
             <Head title={translations['Friends']} />
@@ -59,14 +68,14 @@ export default function Friends() {
                         {users.map((friend) => (
                             <li key={friend.id} className="flex items-center gap-3 border-b py-2 mt-2 dark:border-gray-700">
                                 <Avatar className="h-24 w-24 border-4 border-white sm:h-28 sm:w-28 dark:border-gray-900">
-                                    <AvatarImage src={friend.profile_image_url} alt={friend.name} />
+                                    <AvatarImage src={getProfileImageUrl(friend)} alt={friend.name} />
                                     <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
                                         {getInitials(friend.name)}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="flex flex-row justify-between w-full gap-2 items-center">
                                     <div className="flex flex-col">
-                                        <div className="flex items-center gap-1.5">
+                                        <div className="flex items-center gap-1">
                                             <Link href={`/user/${friend.username}`} className="font-medium text-blue-500 hover:underline">
                                                 {friend.name}
                                             </Link>
@@ -83,8 +92,14 @@ export default function Friends() {
                                         </div>
 
                                         <p className="text-gray-500 dark:text-gray-400">@{friend.username}</p>
+                                        <p className="text-sm text-gray-400 dark:text-gray-500">
+                                            {friend.followers_count} {translations['Subscribers']}
+                                        </p>
+                                        <p className="text-green-500 text-sm font-medium mt-1">
+                                            {translations['You follow each other']}
+                                        </p>
                                     </div>
-                                    <div className="flex lg:flex-row flex-col gap-2">
+                                    <div className="flex lg:flex-row flex-col gap-1">
                                         {friend.is_friend ? (
                                             <button
                                                 onClick={() => router.post(`/chat/user-chat/new/${friend.id}`)}

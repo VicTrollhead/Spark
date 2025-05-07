@@ -26,6 +26,15 @@ export default function Dashboard() {
         }, 1000);
     };
 
+    const getProfileImageUrl = (user) => {
+        if (user?.profile_image?.disk === 's3') {
+            return user.profile_image.url;
+        } else if (user?.profile_image?.file_path) {
+            return `/storage/${user.profile_image.file_path}`;
+        }
+        return null;
+    };
+
     return (
         <AppLayout>
             <Head title={translations['All users']} />
@@ -66,7 +75,7 @@ export default function Dashboard() {
                             >
                                 <div className="flex min-w-0 items-center space-x-3">
                                     <Avatar className="h-10 w-10 flex-shrink-0">
-                                        <AvatarImage src={user.profile_image_url} alt={user.name} />
+                                        <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
                                         <AvatarFallback className="rounded-full bg-gray-300 text-lg text-black dark:bg-gray-700 dark:text-white">
                                             {getInitials(user.name)}
                                         </AvatarFallback>

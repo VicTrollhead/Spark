@@ -8,7 +8,6 @@ export default function LikeButton({ postId, isLiked, likesCount }) {
     const { post, processing } = useForm();
 
     const toggleLike = () => {
-        console.log(`Attempting to ${liked ? "unlike" : "like"} post ${postId}`);
         router.post(`/post/${postId}/${liked ? "unlike" : "like"}`, {post_id: postId},{
             preserveScroll: true,
             onSuccess: (page) => {

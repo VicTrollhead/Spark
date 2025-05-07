@@ -117,7 +117,7 @@ class PostController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage?->url,
+                    'profile_image' => $post->user->profileImage,
                     'is_verified' => $post->user->is_verified,
                 ],
                 'hashtags' => $post->hashtags->map(fn ($tag) => [
@@ -158,7 +158,7 @@ class PostController extends Controller
                             'id' => $user->id,
                             'name' => $user->name,
                             'username' => $user->username,
-                            'profile_image_url' => $user->profileImage?->url,
+                            'profile_image' => $user->profileImage,
                             'is_verified' => $user->is_verified,
                         ];
                     })
@@ -167,7 +167,7 @@ class PostController extends Controller
                 'current_user' => [
                     'id' => $currentUser->id,
                     'username' => $currentUser->username,
-                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'profile_image' => $currentUser->profileImage,
                     'name' => $currentUser->name,
                     'is_verified' => $currentUser->is_verified,
                 ],
@@ -419,12 +419,13 @@ class PostController extends Controller
                         'id' => $post->user->id,
                         'name' => $post->user->name,
                         'username' => $post->user->username,
-                        'profile_image_url' => $post->user->profileImage?->url,
+                        'profile_image' => $post->user->profileImage,
                         'is_verified' => $post->user->is_verified,
                     ],
                     'media' => $post->media->map(fn ($media) => [
                         'file_path' => $media->file_path,
                         'file_type' => $media->file_type,
+                        'disk' => $media->disk,
                         'url' => $media->url,
                     ]),
                     'hashtags' => $post->hashtags->map(fn ($tag) => [
@@ -460,7 +461,7 @@ class PostController extends Controller
                                 'id' => $user->id,
                                 'name' => $user->name,
                                 'username' => $user->username,
-                                'profile_image_url' => $user->profileImage?->url,
+                                'profile_image' => $user->profileImage,
                                 'is_verified' => $user->is_verified,
                             ];
                         })
@@ -469,7 +470,7 @@ class PostController extends Controller
                     'current_user' => [
                         'id' => $currentUser->id,
                         'username' => $currentUser->username,
-                        'profile_image_url' => $currentUser->profileImage?->url,
+                        'profile_image' => $currentUser->profileImage,
                         'name' => $currentUser->name,
                         'is_verified' => $currentUser->is_verified,
                     ],
@@ -532,6 +533,7 @@ class PostController extends Controller
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
+                    'disk' => $media->disk,
                     'url' => $media->url,
                 ]),
                 'hashtags' => $post->hashtags->map(fn ($tag) => [

@@ -41,6 +41,15 @@ export function Notification({ notification }) {
         </Link>
     );
 
+    const getProfileImageUrl = (user) => {
+        if (user?.profile_image?.disk === 's3') {
+            return user.profile_image.url;
+        } else if (user?.profile_image?.file_path) {
+            return `/storage/${user.profile_image.file_path}`;
+        }
+        return null;
+    };
+
     const handleFollowRequest = (action) => {
         router.post(
             `/user/${sourceUser.id}/${notification.id}/${action}`,
@@ -186,7 +195,7 @@ export function Notification({ notification }) {
         >
             <div className="hidden items-center gap-4 md:flex">
                 <Avatar className="h-14 w-14">
-                    <AvatarImage src={sourceUser.profile_image_url} alt={sourceUser.name} />
+                    <AvatarImage src={getProfileImageUrl(sourceUser)} alt={sourceUser.name} />
                     <AvatarFallback className="rounded-full bg-gray-300 text-black dark:bg-gray-700 dark:text-white">
                         {getInitials(sourceUser.name)}
                     </AvatarFallback>

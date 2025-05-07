@@ -49,6 +49,15 @@ export default function Message({ userId, message }) {
 
     const toggleOptions = () => setShowOptions((prev) => !prev);
 
+    const getProfileImageUrl = (user) => {
+        if (user?.profile_image?.disk === 's3') {
+            return user.profile_image.url;
+        } else if (user?.profile_image?.file_path) {
+            return `/storage/${user.profile_image.file_path}`;
+        }
+        return null;
+    };
+
     return (
         <>
             {userId === message.user.id ? (
@@ -107,7 +116,7 @@ export default function Message({ userId, message }) {
                         <div className="flex flex-row gap-2">
                             <Link href={`/user/${message.user.username}`} className="hidden md:flex">
                                 <Avatar className="h-10 w-10 overflow-hidden rounded-full">
-                                    <AvatarImage src={message.user.profile_image_url} alt={message.user.name} />
+                                    <AvatarImage src={getProfileImageUrl(message.user)} alt={message.user.name} />
                                     <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                                         {getInitials(message.user.name)}
                                     </AvatarFallback>

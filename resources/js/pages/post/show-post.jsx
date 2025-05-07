@@ -239,9 +239,7 @@ export default function Show() {
                         <div className="mt-2 grid grid-cols-1 gap-3 py-1 sm:grid-cols-2">
                             {post.media.map((file, index) => {
                                 const uniqueKey = file.id ? `${post.id}-${file.id}` : `${post.id}-${file.file_path}-${index}`;
-                                const mediaUrl = file.disk === 's3'
-                                    ? file.url
-                                    : `/storage/${file.file_path}`;
+                                const mediaUrl = getMediaUrl(file);
                                 return file.file_type === 'image' ? (
                                     <div
                                         key={uniqueKey}
@@ -315,7 +313,7 @@ export default function Show() {
 
                     {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
                 </div>
-                {post.reposted_by_recent.length > 0 && (
+                {(post.reposted_by_recent.length > 0 || post.reposted_by_you) && (
                     <div className="mt-7 px-2">
                         {(post.reposted_by_you || post.reposted_by_recent?.length > 0) && (
                             <div className="mb-2 flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
@@ -326,7 +324,7 @@ export default function Show() {
                                     <span className="flex items-center">
                                     <Link href={`/user/${post.current_user.username}`}>
                                         <Avatar className="h-6 w-6 border">
-                                            <AvatarImage src={post.current_user.profile_image_url} alt={post.current_user.name} />
+                                            <AvatarImage src={getProfileImageUrl(post.current_user)} alt={post.current_user.name} />
                                             <AvatarFallback>{getInitials(post.current_user.name)}</AvatarFallback>
                                         </Avatar>
                                     </Link>
@@ -344,7 +342,7 @@ export default function Show() {
                                             <span key={user.id} className="flex items-center">
                                             <Link href={`/user/${user.username}`}>
                                                 <Avatar className="h-6 w-6 border">
-                                                    <AvatarImage src={user.profile_image_url} alt={user.name} />
+                                                    <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
                                                     <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                                                 </Avatar>
                                             </Link>
@@ -404,7 +402,7 @@ export default function Show() {
                         post.comments.map((comment) => (
                             <div key={comment.id} className="flex items-center space-x-3 py-4">
                                 <Avatar className="h-12 w-12 border border-gray-300 dark:border-gray-700">
-                                    <AvatarImage src={comment.user.profile_image_url} alt={comment.user.name} />
+                                    <AvatarImage src={getProfileImageUrl(comment.user)} alt={comment.user.name} />
                                     <AvatarFallback className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white">
                                         {getInitials(comment.user.name)}
                                     </AvatarFallback>

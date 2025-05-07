@@ -178,7 +178,7 @@ class UserController extends Controller
             'user' => [
                 'id' => $user->id,
                 'username' => $user->username,
-                'name' => $canViewFullProfile ? $user->name : null,
+                'name' => $user->name,
                 'bio' => $canViewFullProfile ? $user->bio : null,
 //                'profile_image_url' => $user->profileImage?->url,
 //                'cover_image_url' => $canViewFullProfile && $user->coverImage ? $user->coverImage->url : null,
@@ -371,7 +371,7 @@ class UserController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
-                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'profile_image' => $user->profileImage,
                 'followers_count' => $user->followers_count,
                 'is_verified' => $user->is_verified,
             ];
@@ -436,7 +436,7 @@ class UserController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
-                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'profile_image' => $user->profileImage,
                 'followers_count' => $user->followers_count,
                 'is_verified' => $user->is_verified,
             ];
@@ -479,7 +479,7 @@ class UserController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
-                'profile_image_url' => $user->profileImage?->url,
+                'profile_image' => $user->profileImage,
                 'followers_count' => $user->followers_count,
                 'is_verified' => $user->is_verified,
             ];
@@ -527,12 +527,14 @@ class UserController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage?->url,
+                    'profile_image' => $post->user->profileImage,
                     'is_verified' => $post->user->is_verified,
                 ],
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
+                    'disk' => $media->disk,
+                    'url' => $media->url,
                 ]),
                 'hashtags' => $post->hashtags->map(fn ($tag) => [
                     'id' => $tag->id,
@@ -566,7 +568,7 @@ class UserController extends Controller
                             'id' => $user->id,
                             'name' => $user->name,
                             'username' => $user->username,
-                            'profile_image_url' => $user->profileImage?->url,
+                            'profile_image' => $user->profileImage,
                             'is_verified' => $user->is_verified,
                         ];
                     })
@@ -575,7 +577,7 @@ class UserController extends Controller
                 'current_user' => [
                     'id' => $currentUser->id,
                     'username' => $currentUser->username,
-                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'profile_image' => $currentUser->profileImage,
                     'name' => $currentUser->name,
                     'is_verified' => $currentUser->is_verified,
                 ],
@@ -651,12 +653,14 @@ class UserController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage?->url,
+                    'profile_image' => $post->user->profileImage,
                     'is_verified' => $post->user->is_verified,
                 ],
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
+                    'disk' => $media->disk,
+                    'url' => $media->url,
                 ]),
                 'hashtags' => $post->hashtags->map(fn ($tag) => [
                     'id' => $tag->id,
@@ -691,7 +695,7 @@ class UserController extends Controller
                             'id' => $user->id,
                             'name' => $user->name,
                             'username' => $user->username,
-                            'profile_image_url' => $user->profileImage?->url,
+                            'profile_image' => $user->profileImage,
                             'is_verified' => $user->is_verified,
                         ];
                     })
@@ -700,7 +704,7 @@ class UserController extends Controller
                 'current_user' => [
                     'id' => $currentUser->id,
                     'username' => $currentUser->username,
-                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'profile_image' => $currentUser->profileImage,
                     'name' => $currentUser->name,
                     'is_verified' => $currentUser->is_verified,
                 ],
@@ -754,12 +758,14 @@ class UserController extends Controller
                         'id' => $post->user->id,
                         'name' => $post->user->name,
                         'username' => $post->user->username,
-                        'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
+                        'profile_image' => $post->user->profileImage,
                         'is_verified' => $post->user->is_verified,
                     ],
                     'media' => $post->media->map(fn ($media) => [
                         'file_path' => $media->file_path,
                         'file_type' => $media->file_type,
+                        'disk' => $media->disk,
+                        'url' => $media->url,
                     ]),
                     'hashtags' => $post->hashtags->map(fn ($tag) => [
                         'id' => $tag->id,
@@ -793,7 +799,7 @@ class UserController extends Controller
                                 'id' => $user->id,
                                 'name' => $user->name,
                                 'username' => $user->username,
-                                'profile_image_url' => $user->profileImage?->url,
+                                'profile_image' => $user->profileImage,
                                 'is_verified' => $user->is_verified,
                             ];
                         })
@@ -802,7 +808,7 @@ class UserController extends Controller
                     'current_user' => [
                         'id' => $currentUser->id,
                         'username' => $currentUser->username,
-                        'profile_image_url' => $currentUser->profileImage?->url,
+                        'profile_image' => $currentUser->profileImage,
                         'name' => $currentUser->name,
                         'is_verified' => $currentUser->is_verified,
                     ],
@@ -834,14 +840,16 @@ class UserController extends Controller
                 $hasSentFollowRequest = $currentUser ? $currentUser->pendingFollowRequests()->where('followee_id', $friend->id)->exists() : false;
                 $isPrivate = $friend->is_private;
                 $isFriend = in_array($friend->id, $currentUser->friends()->pluck('id')->toArray());
+                $followersCount = $friend->followers()->count();
                 return [
                     'id' => $friend->id,
                     'name' => $friend->name,
                     'username' => $friend->username,
-                    'profile_image_url' => $friend->profileImage ? $friend->profileImage->url : null,
+                    'profile_image' => $friend->profileImage,
                     'is_private' => $isPrivate,
                     'is_followed' => $isFollowed,
                     'has_sent_follow_request' => $hasSentFollowRequest,
+                    'followers_count' => $followersCount,
                     'is_friend' => $isFriend,
                     'is_verified' => $friend->is_verified,
                 ];
@@ -855,6 +863,7 @@ class UserController extends Controller
                 'name' => $user->name,
                 'username' => $user->username,
                 'is_verified' => $user->is_verified,
+                'profile_image' => $user->profileImage,
                 'is_following' => $currentUser ? $user->followers()->where('follower_id', $currentUser->id)->exists() : false,
                 'has_sent_follow_request' => $currentUser ? $currentUser->pendingFollowRequests()->where('followee_id', $user->id)->exists() : false,
             ],
@@ -906,7 +915,7 @@ class UserController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage?->url,
+                    'profile_image' => $post->user->profileImage,
                     'is_verified' => $post->user->is_verified,
                 ],
                 'media' => $post->media->map(fn ($media) => [
@@ -947,7 +956,7 @@ class UserController extends Controller
                             'id' => $user->id,
                             'name' => $user->name,
                             'username' => $user->username,
-                            'profile_image_url' => $user->profileImage?->url,
+                            'profile_image' => $user->profileImage,
                             'is_verified' => $user->is_verified,
                         ];
                     })
@@ -957,7 +966,7 @@ class UserController extends Controller
                 'current_user' => [
                     'id' => $currentUser->id,
                     'username' => $currentUser->username,
-                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'profile_image' => $currentUser->profileImage,
                     'name' => $currentUser->name,
                     'is_verified' => $currentUser->is_verified,
                 ],
@@ -969,7 +978,7 @@ class UserController extends Controller
                 'id' => $user->id,
                 'username' => $user->username,
                 'name' => $user->name,
-                'profile_image_url' => $user->profileImage?->url,
+                'profile_image' => $user->profileImage,
                 'is_verified' => $user->is_verified,
             ],
             'posts' => $posts,
