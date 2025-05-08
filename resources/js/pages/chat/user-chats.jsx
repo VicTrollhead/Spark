@@ -7,6 +7,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, Di
 import { Input } from '../../components/ui/input.jsx';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
+import { getProfileImageUrl } from '../../lib/utils';
 
 export default function UserChats() {
     const { auth, chats, users, translations } = usePage().props;
@@ -67,14 +68,14 @@ export default function UserChats() {
         setUsersSearch(filtered);
     };
 
-    const getProfileImageUrl = (user) => {
-        if (user?.profile_image?.disk === 's3') {
-            return user.profile_image.url;
-        } else if (user?.profile_image?.file_path) {
-            return `/storage/${user.profile_image.file_path}`;
-        }
-        return null;
-    };
+    // const getProfileImageUrl = (user) => {
+    //     if (user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image?.file_path}`;
+    //     }
+    //     return null;
+    // };
 
     return (
         <AppLayout>

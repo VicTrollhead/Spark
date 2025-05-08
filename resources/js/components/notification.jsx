@@ -2,6 +2,7 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { ArrowRight, Bookmark, Check, Eye, EyeOff, Heart, MessageSquare, Repeat, Users } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar.jsx';
 import { useInitials } from '../hooks/use-initials.jsx';
+import { getProfileImageUrl } from '../lib/utils';
 
 export function Notification({ notification }) {
     const { translations } = usePage().props;
@@ -41,14 +42,14 @@ export function Notification({ notification }) {
         </Link>
     );
 
-    const getProfileImageUrl = (user) => {
-        if (user?.profile_image?.disk === 's3') {
-            return user.profile_image.url;
-        } else if (user?.profile_image?.file_path) {
-            return `/storage/${user.profile_image.file_path}`;
-        }
-        return null;
-    };
+    // const getProfileImageUrl = (user) => {
+    //     if (user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image?.file_path}`;
+    //     }
+    //     return null;
+    // };
 
     const handleFollowRequest = (action) => {
         router.post(

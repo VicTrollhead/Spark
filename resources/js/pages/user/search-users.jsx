@@ -5,6 +5,7 @@ import { RefreshCw, Search } from 'lucide-react';
 import { useInitials } from '../../hooks/use-initials.jsx';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar.jsx';
 import { Input } from '../../components/ui/input.jsx';
+import { getProfileImageUrl } from '../../lib/utils';
 
 export default function SearchUsers() {
     const { users, sort, searchText, translations } = usePage().props;
@@ -48,14 +49,14 @@ export default function SearchUsers() {
         }, 1000);
     };
 
-    const getProfileImageUrl = (user) => {
-        if (user?.profile_image?.disk === 's3') {
-            return user.profile_image.url;
-        } else if (user?.profile_image?.file_path) {
-            return `/storage/${user.profile_image.file_path}`;
-        }
-        return null;
-    };
+    // const getProfileImageUrl = (user) => {
+    //     if (user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image?.file_path}`;
+    //     }
+    //     return null;
+    // };
 
 
     return (

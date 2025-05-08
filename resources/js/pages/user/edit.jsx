@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Switch } from '../../components/ui/switch';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
+import { getProfileImageUrl, getCoverImageUrl } from '../../lib/utils';
 
 export default function Edit() {
     const { user, translations } = usePage().props;
@@ -30,6 +31,24 @@ export default function Edit() {
         post(route('user.update', user));
     };
 
+    // const getProfileImageUrl = (user) => {
+    //     if (user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image?.file_path}`;
+    //     }
+    //     return null;
+    // };
+    //
+    // const getCoverImageUrl = (user) => {
+    //     if (user?.cover_image?.disk === 's3') {
+    //         return user.cover_image.url;
+    //     } else if (user?.cover_image?.file_path) {
+    //         return `/storage/${user.cover_image.file_path}`;
+    //     }
+    //     return null;
+    // };
+
     return (
         <AppLayout>
             <Head title={translations['Edit My Profile']} />
@@ -38,32 +57,35 @@ export default function Edit() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="flex items-center gap-4">
                         <Avatar className="h-24 w-24 border-4 border-white dark:border-gray-900">
-                            <AvatarImage src={user.profile_image_url} alt={user.name} />
+                            <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
                             <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                         </Avatar>
                         <div>
                             <label className="mb-2 block text-gray-700 dark:text-gray-200">
                                 {translations['Profile Image']}
-                                <span className="text-gray-500 break-all"> ({user.profile_image_url  || translations['Not Set']})</span>
+                                <span className="text-gray-500 break-all"> ({user.profile_image?.url  || translations['Not Set']})</span>
                             </label>
                             <input
                                 type="file"
                                 onChange={(e) => setData('profile_image', e.target.files[0])}
-                                className="text-sm text-gray-500"
+                                className="text-sm text-gray-500 truncate"
                             />
                         </div>
                     </div>
 
-                    <div>
-                        <label className="mb-2 block text-gray-700 dark:text-gray-200">
-                            {translations['Cover Image']}
-                            <span className="text-gray-500 break-all"> ({user.cover_image_url || translations['Not Set']})</span>
-                        </label>
-                        <input
-                            type="file"
-                            onChange={(e) => setData('cover_image', e.target.files[0])}
-                            className="text-sm text-gray-500"
-                        />
+                    <div className="flex items-center gap-4">
+                        <img src={getCoverImageUrl(user)} className="h-16 w-fit"/>
+                        <div>
+                            <label className="mb-2 block text-gray-700 dark:text-gray-200">
+                                {translations['Cover Image']}
+                                <span className="text-gray-500 break-all"> ({user.cover_image?.url  || translations['Not Set']})</span>
+                            </label>
+                            <input
+                                type="file"
+                                onChange={(e) => setData('cover_image', e.target.files[0])}
+                                className="text-sm text-gray-500 truncate"
+                            />
+                        </div>
                     </div>
 
                     <div>

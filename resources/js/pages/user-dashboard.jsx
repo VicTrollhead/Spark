@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { useInitials } from '../hooks/use-initials';
 import AppLayout from '../layouts/app-layout';
+import { getProfileImageUrl } from '../lib/utils';
 
 export default function Dashboard() {
     const { users, sort, translations } = usePage().props;
@@ -26,14 +27,15 @@ export default function Dashboard() {
         }, 1000);
     };
 
-    const getProfileImageUrl = (user) => {
-        if (user?.profile_image?.disk === 's3') {
-            return user.profile_image.url;
-        } else if (user?.profile_image?.file_path) {
-            return `/storage/${user.profile_image.file_path}`;
-        }
-        return null;
-    };
+    // const getProfileImageUrl = (user) => {
+    //     if (user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image.file_path}`;
+    //     }
+    //     return null;
+    // };
+
 
     return (
         <AppLayout>

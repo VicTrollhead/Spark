@@ -6,6 +6,7 @@ import Message from '../../components/message.jsx';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar.jsx';
 import { useInitials } from '../../hooks/use-initials.jsx';
 import AppLayout from '../../layouts/app-layout.jsx';
+import { getProfileImageUrl } from '../../lib/utils';
 
 export default function UserChat() {
     const { user, chat_id, init_messages, other_user, translations } = usePage().props;
@@ -86,16 +87,15 @@ export default function UserChat() {
         }
     }, [init_messages]);
 
-    const getProfileImageUrl = (user) => {
-        if (user?.profile_image?.disk === 's3') {
-            return user.profile_image.url;
-        } else if (user?.profile_image?.file_path) {
-            return `/storage/${user.profile_image.file_path}`;
-        }
-        return null;
-    };
+    // const getProfileImageUrl = (user) => {
+    //     if (user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image?.file_path}`;
+    //     }
+    //     return null;
+    // };
 
-    console.log(other_user);
     return (
         <AppLayout>
             <Head title={`${translations['Chat with']} ${other_user.name}`} />

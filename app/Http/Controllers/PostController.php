@@ -378,6 +378,7 @@ class PostController extends Controller
         $post->likes()->delete();
         $post->comments()->delete();
         $post->hashtags()->detach();
+        $post->media()->delete();
         $post->delete();
 
         return redirect()->route('dashboard')->with('success', 'Post updated successfully.');
@@ -558,51 +559,59 @@ class PostController extends Controller
     {
         $this->authorize('update', $post);
 
+        $validated = $request->validated();
 
         $post->update([
-            'content' => $request->input('content', ''),
-            'is_private' => $request->boolean('is_private'),
+            'content' => $validated['content'] ?? '',
+            'is_private' => $validated['is_private'] ?? false,
         ]);
 
-        $removePaths = $request->input('remove_media', []);
+        $removePaths = $validated['remove_media'] ?? [];
+
         if (!empty($removePaths)) {
             $mediaToRemove = $post->media()->whereIn('file_path', (array) $removePaths)->get();
 
             foreach ($mediaToRemove as $media) {
-                if (Storage::disk('public')->exists($media->file_path)) {
-                    Storage::disk('public')->delete($media->file_path);
+                $disk = $media->disk ?? config('filesystems.default');
+
+                if (Storage::disk($disk)->exists($media->file_path)) {
+                    Storage::disk($disk)->delete($media->file_path);
                 }
+
                 $media->delete();
             }
         }
 
         if ($request->hasFile('media')) {
+            $disk = config('filesystems.default');
             $files = $request->file('media');
-            $files = is_array($files) ? $files : [$files];
 
             foreach ($files as $file) {
-                $path = $file->store('uploads/posts', 'public');
+                $path = $file->store('uploads/posts', $disk);
 
                 $post->media()->create([
                     'file_path' => $path,
-                    'file_type' => str_contains($file->getMimeType(), 'video') ? 'video' : 'image',
+                    'file_type' => str_starts_with($file->getMimeType(), 'video') ? 'video' : 'image',
+                    'disk' => $disk,
                 ]);
             }
         }
 
-        if ($request->filled('hashtags')) {
-            $hashtagIds = collect($request->hashtags)->map(function ($tag) {
-                return \App\Models\Hashtag::firstOrCreate(['hashtag' => $tag])->id;
-            });
-            $post->hashtags()->sync($hashtagIds);
-        } else {
-            $post->hashtags()->sync([]);
+        $hashtags = $validated['hashtags'] ?? [];
+        $hashtagIds = [];
+
+        foreach ($hashtags as $tag) {
+            $cleanTag = ltrim($tag, '#');
+            $hashtag = \App\Models\Hashtag::firstOrCreate([
+                'hashtag' => strtolower($cleanTag)
+            ]);
+            $hashtagIds[] = $hashtag->id;
         }
+
+        $post->hashtags()->sync($hashtagIds);
 
         return to_route('post.show', $post->id)->with('success', 'Post updated successfully.');
     }
-
-
 
 
 }
