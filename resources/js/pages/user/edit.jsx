@@ -32,15 +32,15 @@ export default function Edit() {
 
     const getProfileImageUrl = (user) => {
         if ((user?.profile_image?.url.startsWith('https://') || user?.profile_image?.url.startsWith('http://')) && user?.profile_image?.disk === 's3') {
-            return user.profile_image.url;
+            return user.profile_image?.url;
         } else if (user?.profile_image?.file_path) {
-            return `/storage/${user.profile_image.file_path}`;
+            return `/storage/${user.profile_image?.file_path}`;
         }
         return null;
     };
 
     const getCoverImageUrl = (user) => {
-        if (user?.cover_image?.url.startsWith('https://') || user?.cover_image?.url.startsWith('http://') || user?.cover_image?.disk === 's3') {
+        if ((user?.cover_image?.url.startsWith('https://') || user?.cover_image?.url.startsWith('http://')) && user?.cover_image?.disk === 's3') {
             return user.cover_image.url;
         } else if (user?.cover_image?.file_path) {
             return `/storage/${user.cover_image.file_path}`;

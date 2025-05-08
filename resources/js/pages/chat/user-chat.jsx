@@ -87,15 +87,14 @@ export default function UserChat() {
     }, [init_messages]);
 
     const getProfileImageUrl = (user) => {
-        if (user?.profile_image?.disk === 's3') {
-            return user.profile_image.url;
+        if ((user?.profile_image?.url.startsWith('https://') || user?.profile_image?.url.startsWith('http://')) && user?.profile_image?.disk === 's3') {
+            return user.profile_image?.url;
         } else if (user?.profile_image?.file_path) {
-            return `/storage/${user.profile_image.file_path}`;
+            return `/storage/${user.profile_image?.file_path}`;
         }
         return null;
     };
 
-    console.log(other_user);
     return (
         <AppLayout>
             <Head title={`${translations['Chat with']} ${other_user.name}`} />
