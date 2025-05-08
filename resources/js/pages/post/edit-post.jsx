@@ -6,6 +6,7 @@ import { Switch } from '../../components/ui/switch';
 import { useState } from 'react';
 import { HashtagInput } from '../../components/hashtag-input.jsx';
 import { X } from 'lucide-react';
+import { getMediaUrl } from '@/lib/utils';
 
 export default function EditPost() {
     const { post, auth, translations } = usePage().props;
@@ -56,14 +57,14 @@ export default function EditPost() {
         }
     };
 
-    const getMediaUrl = (file) => {
-        if (file?.disk === 's3') {
-            return file.url;
-        } else if (file?.file_path) {
-            return `/storage/${file.file_path}`;
-        }
-        return null;
-    };
+    // const getMediaUrl = (file) => {
+    //     if (file?.disk === 's3') {
+    //         return file.url;
+    //     } else if (file?.file_path) {
+    //         return `/storage/${file.file_path}`;
+    //     }
+    //     return null;
+    // };
 
     return (
         <AppLayout

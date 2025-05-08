@@ -3,6 +3,7 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { Check, EllipsisVertical } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useInitials } from '../hooks/use-initials.jsx';
+import { getProfileImageUrl } from '../lib/utils';
 
 export default function Message({ userId, message }) {
     const { translations } = usePage().props;
@@ -49,14 +50,14 @@ export default function Message({ userId, message }) {
 
     const toggleOptions = () => setShowOptions((prev) => !prev);
 
-    const getProfileImageUrl = (user) => {
-        if ((user?.profile_image?.url.startsWith('https://') || user?.profile_image?.url.startsWith('http://')) && user?.profile_image?.disk === 's3') {
-            return user.profile_image?.url;
-        } else if (user?.profile_image?.file_path) {
-            return `/storage/${user.profile_image?.file_path}`;
-        }
-        return null;
-    };
+    // const getProfileImageUrl = (user) => {
+    //     if (user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image?.file_path}`;
+    //     }
+    //     return null;
+    // };
 
     return (
         <>

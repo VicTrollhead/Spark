@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
+import { getProfileImageUrl, getMediaUrl } from '../../lib/utils';
 
 export default function Show() {
     const { post, auth, sort, translations } = usePage().props;
@@ -152,23 +153,23 @@ export default function Show() {
         );
     };
 
-    const getMediaUrl = (file) => {
-        if (file?.disk === 's3') {
-            return file.url;
-        } else if (file?.file_path) {
-            return `/storage/${file.file_path}`;
-        }
-        return null;
-    };
+    // const getMediaUrl = (file) => {
+    //     if (file?.disk === 's3') {
+    //         return file.url;
+    //     } else if (file?.file_path) {
+    //         return `/storage/${file.file_path}`;
+    //     }
+    //     return null;
+    // };
 
-    const getProfileImageUrl = (user) => {
-        if ((user?.profile_image?.url.startsWith('https://') || user?.profile_image?.url.startsWith('http://')) && user?.profile_image?.disk === 's3') {
-            return user.profile_image?.url;
-        } else if (user?.profile_image?.file_path) {
-            return `/storage/${user.profile_image.file_path}`;
-        }
-        return null;
-    };
+    // const getProfileImageUrl = (user) => {
+    //     if (user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image.file_path}`;
+    //     }
+    //     return null;
+    // };
 
     const profileImageUrl = getProfileImageUrl(post.user);
 
@@ -241,15 +242,8 @@ export default function Show() {
                                 const uniqueKey = file.id ? `${post.id}-${file.id}` : `${post.id}-${file.file_path}-${index}`;
                                 const mediaUrl = getMediaUrl(file);
                                 return file.file_type === 'image' ? (
-                                    <div
-                                        key={uniqueKey}
-                                        className="relative flex w-full items-center justify-center overflow-hidden rounded-lg border dark:border-gray-700"
-                                    >
-                                        <img
-                                            src={mediaUrl}
-                                            alt="Post Media"
-                                            className="object-contain transition-transform duration-300 hover:scale-102"
-                                        />
+                                    <div key={uniqueKey} className="relative flex w-full items-center justify-center overflow-hidden rounded-lg border dark:border-gray-700">
+                                        <img src={mediaUrl} alt="Post Media" className="object-contain transition-transform duration-300 hover:scale-102" />
                                     </div>
                                 ) : (
                                     <div key={uniqueKey} className="relative w-full overflow-hidden rounded-lg border dark:border-gray-700">

@@ -3,6 +3,7 @@ import { Bookmark, Check, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat
 import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
+import { getProfileImageUrl, getMediaUrl } from '../../lib/utils';
 
 export default function PostComponent({ post, compact = false }) {
     const { post: sendPost, processing } = useForm();
@@ -102,23 +103,23 @@ export default function PostComponent({ post, compact = false }) {
         );
     };
 
-    const getMediaUrl = (file) => {
-        if (file?.disk === 's3') {
-            return file.url;
-        } else if (file?.file_path) {
-            return `/storage/${file.file_path}`;
-        }
-        return null;
-    };
+    // const getMediaUrl = (file) => {
+    //     if (file?.disk === 's3') {
+    //         return file.url;
+    //     } else if (file?.file_path) {
+    //         return `/storage/${file.file_path}`;
+    //     }
+    //     return null;
+    // };
 
-    const getProfileImageUrl = (user) => {
-        if ((user?.profile_image?.url.startsWith('https://') || user?.profile_image?.url.startsWith('http://')) && user?.profile_image?.disk === 's3') {
-            return user.profile_image?.url;
-        } else if (user?.profile_image?.file_path) {
-            return `/storage/${user.profile_image.file_path}`;
-        }
-        return null;
-    };
+    // const getProfileImageUrl = (user) => {
+    //     if(user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image.file_path}`;
+    //     }
+    //     return null;
+    // };
 
     // const getProfileImageUrl = (user) => {
     //     const url = user?.profile_image;

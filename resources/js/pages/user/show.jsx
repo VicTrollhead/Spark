@@ -5,6 +5,7 @@ import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
 import PostComponent from '../post/post-component';
 import { useState } from 'react';
+import { getProfileImageUrl, getCoverImageUrl } from '../../lib/utils';
 
 export default function Show() {
     const { user, auth, posts, translations, filters, followers_string, following_string } = usePage().props;
@@ -49,14 +50,14 @@ export default function Show() {
         router.get(`/user/${user.username}/edit`);
     };
 
-    const getProfileImageUrl = (user) => {
-        if ((user?.profile_image?.url.startsWith('https://') || user?.profile_image?.url.startsWith('http://')) && user?.profile_image?.disk === 's3') {
-            return user.profile_image?.url;
-        } else if (user?.profile_image?.file_path) {
-            return `/storage/${user.profile_image.file_path}`;
-        }
-        return null;
-    };
+    // const getProfileImageUrl = (user) => {
+    //     if (user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image.file_path}`;
+    //     }
+    //     return null;
+    // };
 
     // const getProfileImageUrl = (user) => {
     //     const url = user?.profile_image;
@@ -67,17 +68,19 @@ export default function Show() {
     //     return `/storage/${url}`;
     // };
 
-    const getCoverImageUrl = (user) => {
-        if ((user?.cover_image?.url.startsWith('https://') || user?.cover_image?.url.startsWith('http://')) && user?.cover_image?.disk === 's3') {
-            return user.cover_image.url;
-        } else if (user?.cover_image?.file_path) {
-            return `/storage/${user.cover_image.file_path}`;
-        }
-        return null;
-    };
+    // const getCoverImageUrl = (user) => {
+    //     if (user?.cover_image?.disk === 's3') {
+    //         return user.cover_image.url;
+    //     } else if (user?.cover_image?.file_path) {
+    //         return `/storage/${user.cover_image.file_path}`;
+    //     }
+    //     return null;
+    // };
 
     const profileImageUrl = getProfileImageUrl(user);
     const coverImageUrl = getCoverImageUrl(user);
+
+    console.log(getProfileImageUrl(user));
 
     const isOwnProfile = auth.user && auth.user.id === user.id;
 

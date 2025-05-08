@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Switch } from '../../components/ui/switch';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
+import { getProfileImageUrl, getCoverImageUrl } from '../../lib/utils';
 
 export default function Edit() {
     const { user, translations } = usePage().props;
@@ -30,23 +31,23 @@ export default function Edit() {
         post(route('user.update', user));
     };
 
-    const getProfileImageUrl = (user) => {
-        if ((user?.profile_image?.url.startsWith('https://') || user?.profile_image?.url.startsWith('http://')) && user?.profile_image?.disk === 's3') {
-            return user.profile_image?.url;
-        } else if (user?.profile_image?.file_path) {
-            return `/storage/${user.profile_image?.file_path}`;
-        }
-        return null;
-    };
-
-    const getCoverImageUrl = (user) => {
-        if ((user?.cover_image?.url.startsWith('https://') || user?.cover_image?.url.startsWith('http://')) && user?.cover_image?.disk === 's3') {
-            return user.cover_image.url;
-        } else if (user?.cover_image?.file_path) {
-            return `/storage/${user.cover_image.file_path}`;
-        }
-        return null;
-    };
+    // const getProfileImageUrl = (user) => {
+    //     if (user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image?.file_path}`;
+    //     }
+    //     return null;
+    // };
+    //
+    // const getCoverImageUrl = (user) => {
+    //     if (user?.cover_image?.disk === 's3') {
+    //         return user.cover_image.url;
+    //     } else if (user?.cover_image?.file_path) {
+    //         return `/storage/${user.cover_image.file_path}`;
+    //     }
+    //     return null;
+    // };
 
     return (
         <AppLayout>

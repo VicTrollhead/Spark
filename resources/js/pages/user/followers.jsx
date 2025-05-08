@@ -4,6 +4,7 @@ import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
 import { useState } from 'react';
 import { Check, SendIcon } from 'lucide-react';
+import { getProfileImageUrl } from '../../lib/utils';
 
 export default function Followers() {
     const { title, users: initialUsers, user, auth, translations } = usePage().props;
@@ -39,14 +40,14 @@ export default function Followers() {
         });
     };
 
-    const getProfileImageUrl = (user) => {
-        if ((user?.profile_image?.url.startsWith('https://') || user?.profile_image?.url.startsWith('http://')) && user?.profile_image?.disk === 's3') {
-            return user.profile_image?.url;
-        } else if (user?.profile_image?.file_path) {
-            return `/storage/${user.profile_image?.file_path}`;
-        }
-        return null;
-    };
+    // const getProfileImageUrl = (user) => {
+    //     if (user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image?.file_path}`;
+    //     }
+    //     return null;
+    // };
 
     return (
         <AppLayout>
