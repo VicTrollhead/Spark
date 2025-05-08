@@ -62,7 +62,7 @@ export default function Edit() {
                         <div>
                             <label className="mb-2 block text-gray-700 dark:text-gray-200">
                                 {translations['Profile Image']}
-                                <span className="text-gray-500 break-all"> ({user.profile_image.url  || translations['Not Set']})</span>
+                                <span className="text-gray-500 break-all"> ({user.profile_image?.url  || translations['Not Set']})</span>
                             </label>
                             <input
                                 type="file"
@@ -77,7 +77,7 @@ export default function Edit() {
                         <div>
                             <label className="mb-2 block text-gray-700 dark:text-gray-200">
                                 {translations['Cover Image']}
-                                <span className="text-gray-500 break-all"> ({user.cover_image.url  || translations['Not Set']})</span>
+                                <span className="text-gray-500 break-all"> ({user.cover_image?.url  || translations['Not Set']})</span>
                             </label>
                             <input
                                 type="file"
