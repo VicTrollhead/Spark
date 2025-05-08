@@ -6,7 +6,7 @@ import { useInitials } from '../../hooks/use-initials';
 import { getProfileImageUrl, getMediaUrl } from '../../lib/utils';
 
 export default function PostComponent({ post, compact = false }) {
-    const { post: sendPost, processing } = useForm();
+    const {processing } = useForm();
     const { auth, translations } = usePage().props;
     const getInitials = useInitials();
 
@@ -28,9 +28,11 @@ export default function PostComponent({ post, compact = false }) {
                 setShowOptions(false);
             }
         }
+
         if (showOptions) {
             document.addEventListener('mousedown', handleClickOutside);
         }
+
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
@@ -50,9 +52,14 @@ export default function PostComponent({ post, compact = false }) {
     const handleLike = async () => {
         setIsLiked(!isLiked);
         setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
+        const action = isLiked ? `/unlike` : `/like`;
+
         await router.post(
-            isLiked ? `/post/${post.id}/unlike` : `/post/${post.id}/like`,
-            {},
+            action,
+            {
+                type: 'post',
+                id: post.id,
+            },
             {
                 preserveScroll: true,
                 onError: () => {

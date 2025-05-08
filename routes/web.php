@@ -56,9 +56,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/popular-hashtags', [PostController::class, 'popularHashtags'])->name('popularHashtags');
     Route::get('/posts-by-hashtag/{hashtag}', [PostController::class, 'postsByHashtag'])->name('postsByHashtag');
 
-    Route::post('/post/{post}/like', [LikeController::class, 'like'])->name('post.like');
-    Route::post('/post/{post}/unlike', [LikeController::class, 'unlike'])->name('post.unlike');
-    Route::get('/post/{post}/is-liked', [LikeController::class, 'isLiked'])->name('post.isLiked');
+    Route::post('/like', [LikeController::class, 'like'])->name('like');
+    Route::post('/unlike', [LikeController::class, 'unlike'])->name('unlike');
+    Route::get('/{type}/{id}/is-liked', [LikeController::class, 'isLiked'])->name('like.isLiked');
 
     Route::post('/post/{post}/add-favorite', [FavoriteController::class, 'addFavorite'])->name('post.addFavorite');
     Route::post('/post/{post}/remove-favorite', [FavoriteController::class, 'removeFavorite'])->name('post.removeFavorite');
