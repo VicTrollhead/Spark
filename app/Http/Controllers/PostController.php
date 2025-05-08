@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use App\Models\Comment;
 use App\Models\Hashtag;
 use App\Models\Media;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -283,6 +284,13 @@ class PostController extends Controller
                     'profile_image' => $comment->user->profileImage,
                     'is_verified' => $comment->user->is_verified,
                 ],
+                'is_liked' => $comment->likes()
+                    ->where('user_id', auth()->id())
+                    ->where('likeable_type', Comment::class)
+                    ->exists(),
+                'likes_count' => $comment->likes()
+                    ->where('likeable_type', Comment::class)
+                    ->count(),
             ];
         });
 

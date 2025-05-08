@@ -1,9 +1,10 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { Bookmark, Check, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat, Trash2 } from 'lucide-react';
+import { Bookmark, Check, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
+import {Comment} from "@/components/comment.jsx";
 
 export default function Show() {
     const { post, auth, sort, translations } = usePage().props;
@@ -11,7 +12,6 @@ export default function Show() {
     const {
         data,
         setData,
-        post: sendPost,
         processing,
         reset,
         errors,
@@ -23,7 +23,6 @@ export default function Show() {
 
     const [sortOption, setSortOption] = useState(sort || 'latest');
     const isOwnPost = auth.user && auth.user.id === post.user.id;
-
     const [isLiked, setIsLiked] = useState(post.is_liked);
     const [likesCount, setLikesCount] = useState(post.likes_count);
     const [isFavorited, setIsFavorited] = useState(post.is_favorited);
@@ -43,7 +42,7 @@ export default function Show() {
 
         document.addEventListener('mousedown', handleClickOutside);
 
-        window.Echo.private(`post.${post.id}`).listen('CommentCreated', (e) => {
+        window.Echo.private(`post.${post.id}`).listen('CommentCreated', () => {
             router.reload();
         });
         return () => {
@@ -63,9 +62,13 @@ export default function Show() {
     const handleLike = async () => {
         setIsLiked(!isLiked);
         setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
+        const action = isLiked ? `/unlike` : `/like`;
         await router.post(
-            isLiked ? `/post/${post.id}/unlike` : `/post/${post.id}/like`,
-            {},
+            action,
+            {
+                type: 'post',
+                id: post.id,
+            },
             {
                 preserveScroll: true,
                 onError: () => {
@@ -110,20 +113,6 @@ export default function Show() {
             },
         );
         setData({ content: '', post_id: post.id, parent_comment_id: null });
-    };
-
-    const handleDeleteComment = async (commentId) => {
-        if (!window.confirm(translations['Are you sure you want to delete this comment?'])) return;
-        await router.post(
-            `/comment/${commentId}/delete`,
-            {},
-            {
-                preserveScroll: true,
-                onSuccess: () => {
-                    router.reload({ only: ['post'] });
-                },
-            },
-        );
     };
 
     const handleRepost = async () => {
@@ -400,34 +389,7 @@ export default function Show() {
                 <div className="divide-y divide-gray-200 dark:divide-neutral-800">
                     {post.comments.length > 0 ? (
                         post.comments.map((comment) => (
-                            <div key={comment.id} className="flex items-center space-x-3 py-4">
-                                <Avatar className="h-12 w-12 border border-gray-300 dark:border-gray-700">
-                                    <AvatarImage src={getProfileImageUrl(comment.user)} alt={comment.user.name} />
-                                    <AvatarFallback className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white">
-                                        {getInitials(comment.user.name)}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-1.5">
-                                            <Link
-                                                href={`/user/${comment.user.username}`}
-                                                className="font-semibold text-gray-900 hover:underline dark:text-white"
-                                            >
-                                                {comment.user.name}
-                                            </Link>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">{comment.created_at}</p>
-                                        </div>
-                                    </div>
-                                    <p className={`mt-1 text-gray-800 dark:text-gray-200`}>{comment.content}</p>
-                                </div>
-                                {auth.user?.id === comment.user.id && (
-                                    <Trash2
-                                        className="h-5 w-5 cursor-pointer text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-500"
-                                        onClick={() => handleDeleteComment(comment.id)}
-                                    />
-                                )}
-                            </div>
+                            <Comment key={comment.id} comment={comment} auth_user={auth.user}/>
                         ))
                     ) : (
                         <p className="py-4 text-gray-500 dark:text-gray-400">{translations['No comments yet.']}</p>

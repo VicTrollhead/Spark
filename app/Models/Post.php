@@ -38,9 +38,9 @@ class Post extends Model
         return $this->hasMany(Post::class, 'parent_post_id');
     }
 
-    public function likes(): HasMany
+    public function likes()
     {
-        return $this->hasMany(Like::class);
+        return $this->morphMany(Like::class, 'likeable');
     }
 
     public function comments(): HasMany
