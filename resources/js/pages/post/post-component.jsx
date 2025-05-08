@@ -112,13 +112,22 @@ export default function PostComponent({ post, compact = false }) {
     };
 
     const getProfileImageUrl = (user) => {
-        if (user?.profile_image?.disk === 's3') {
+        if ((user?.profile_image?.url.startsWith('https://') || user?.profile_image?.url.startsWith('http://')) && user?.profile_image?.disk === 's3') {
             return user.profile_image.url;
         } else if (user?.profile_image?.file_path) {
             return `/storage/${user.profile_image.file_path}`;
         }
         return null;
     };
+
+    // const getProfileImageUrl = (user) => {
+    //     const url = user?.profile_image;
+    //     if (!url) return null;
+    //     if (url.startsWith('http://') || url.startsWith('https://')) {
+    //         return url;
+    //     }
+    //     return `/storage/${url}`;
+    // };
 
     const profileImageUrl = getProfileImageUrl(post.user);
 

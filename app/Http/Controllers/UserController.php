@@ -105,14 +105,7 @@ class UserController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image' => $post->user->profileImage
-                        ? [
-                            'file_path' => $post->user->profileImage->file_path,
-                            'disk' => $post->user->profileImage->disk,
-                            'url' => $post->user->profileImage->url,
-                        ]
-                        : null,
-
+                    'profile_image' => $post->user->profileImage,
                     'is_verified' => $post->user->is_verified,
                 ],
 
@@ -147,26 +140,14 @@ class UserController extends Controller
                             'id' => $user->id,
                             'name' => $user->name,
                             'username' => $user->username,
-                            'profile_image' => $user->profileImage
-                                ? [
-                                    'file_path' => $user->profileImage->file_path,
-                                    'disk' => $user->profileImage->disk,
-                                    'url' => $user->profileImage->url,
-                                ]
-                                : null,
+                            'profile_image' => $user->profileImage,
                             'is_verified' => $user->is_verified,
                         ];
                     }),
                 'current_user' => [
                     'id' => $currentUser->id,
                     'username' => $currentUser->username,
-                    'profile_image' => $currentUser->profileImage
-                        ? [
-                            'file_path' => $currentUser->profileImage->file_path,
-                            'disk' => $currentUser->profileImage->disk,
-                            'url' => $currentUser->profileImage->url,
-                        ]
-                        : null,
+                    'profile_image' => $currentUser->profileImage,
                     'name' => $currentUser->name,
                     'is_verified' => $currentUser->is_verified,
                 ],
@@ -180,8 +161,6 @@ class UserController extends Controller
                 'username' => $user->username,
                 'name' => $user->name,
                 'bio' => $canViewFullProfile ? $user->bio : null,
-//                'profile_image_url' => $user->profileImage?->url,
-//                'cover_image_url' => $canViewFullProfile && $user->coverImage ? $user->coverImage->url : null,
                 'profile_image' => $user->profileImage,
                 'cover_image' => $canViewFullProfile && $user->coverImage ? $user->coverImage : null,
                 'location' => $canViewFullProfile ? $user->location : null,
@@ -220,8 +199,8 @@ class UserController extends Controller
                 'username' => $user->username,
                 'name' => $user->name,
                 'bio' => $user->bio,
-                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
-                'cover_image_url' => $user->coverImage ? $user->coverImage->url : null,
+                'profile_image' => $user->profileImage,
+                'cover_image' => $user->coverImage,
                 'location' => $user->location,
                 'website' => $user->website,
                 'date_of_birth' => optional($user->date_of_birth)->format('F j, Y'),

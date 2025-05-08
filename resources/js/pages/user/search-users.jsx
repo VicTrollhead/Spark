@@ -49,7 +49,7 @@ export default function SearchUsers() {
     };
 
     const getProfileImageUrl = (user) => {
-        if (user?.profile_image?.disk === 's3') {
+        if ((user?.profile_image?.url.startsWith('https://') || user?.profile_image?.url.startsWith('http://')) && user?.profile_image?.disk === 's3') {
             return user.profile_image.url;
         } else if (user?.profile_image?.file_path) {
             return `/storage/${user.profile_image.file_path}`;
