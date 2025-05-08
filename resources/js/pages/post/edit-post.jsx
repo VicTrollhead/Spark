@@ -56,6 +56,15 @@ export default function EditPost() {
         }
     };
 
+    const getMediaUrl = (file) => {
+        if (file?.disk === 's3') {
+            return file.url;
+        } else if (file?.file_path) {
+            return `/storage/${file.file_path}`;
+        }
+        return null;
+    };
+
     return (
         <AppLayout
             breadcrumbs={[
@@ -99,13 +108,13 @@ export default function EditPost() {
                                         <div key={m.file_path} className="relative rounded-md overflow-hidden border dark:border-gray-700 group">
                                             {m.file_type.includes('image') ? (
                                                 <img
-                                                    src={`/storage/${m.file_path}`}
+                                                    src={getMediaUrl(m)}
                                                     alt=""
                                                     className="h-40 w-full object-contain bg-gray-100 dark:bg-neutral-800"
                                                 />
                                             ) : (
                                                 <video
-                                                    src={`/storage/${m.file_path}`}
+                                                    src={getMediaUrl(m)}
                                                     controls
                                                     className="h-40 w-full object-contain bg-gray-100 dark:bg-neutral-800"
                                                 />
