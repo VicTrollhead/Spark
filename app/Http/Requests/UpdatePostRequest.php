@@ -29,7 +29,7 @@ class UpdatePostRequest extends FormRequest
             'remove_media' => ['nullable', 'array'],
             'remove_media.*' => ['string'],
             'hashtags' => ['nullable', 'array'],
-            'hashtags.*' => ['string', 'max:50'],
+            'hashtags.*' => ['string', 'max:30'],
         ];
     }
 }

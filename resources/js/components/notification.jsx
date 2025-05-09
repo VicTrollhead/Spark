@@ -24,10 +24,10 @@ export function Notification({ notification }) {
     const renderUserLink = (username, name) => (
         <Link
             href={`/user/${username}`}
-            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
+            className="flex  items-center gap-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
         >
-            <span>
-                {name} <span className="text-sm break-all"><br/>(@{username})</span>
+            <span className="break-all">
+                {name} <span className="text-sm">(@{username})</span>
             </span>
             {sourceUser.is_verified && (
                 <div className="group relative">
@@ -192,7 +192,7 @@ export function Notification({ notification }) {
 
     return (
         <div
-            className={`border-l-4 ${getColor(notification.type)} flex items-start gap-4 border-t-0 border-r-0 border-b-gray-400 bg-gray-100 p-5 transition-all hover:bg-gray-200 dark:bg-neutral-900 dark:hover:bg-neutral-950`}
+            className={`border-l-4 ${getColor(notification.type)} flex items-start gap-3 border-t-0 border-r-0 border-b-gray-400 bg-gray-100 p-5 transition-all hover:bg-gray-200 dark:bg-neutral-900 dark:hover:bg-neutral-950`}
         >
             <div className="hidden items-center gap-4 md:flex">
                 <Avatar className="h-14 w-14">
@@ -208,9 +208,9 @@ export function Notification({ notification }) {
             </div>
             <div className="my-auto">
                 {notification.is_read ? (
-                    <EyeOff size={28} onClick={toggleReadStatus} className="cursor-pointer" />
+                    <EyeOff size={26} onClick={toggleReadStatus} className="cursor-pointer" />
                 ) : (
-                    <Eye size={28} onClick={toggleReadStatus} className="cursor-pointer" />
+                    <Eye size={26} onClick={toggleReadStatus} className="cursor-pointer" />
                 )}
             </div>
             {post && post.user && (
