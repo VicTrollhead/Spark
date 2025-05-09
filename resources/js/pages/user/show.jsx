@@ -80,8 +80,6 @@ export default function Show() {
     const profileImageUrl = getProfileImageUrl(user);
     const coverImageUrl = getCoverImageUrl(user);
 
-    console.log(getProfileImageUrl(user));
-
     const isOwnProfile = auth.user && auth.user.id === user.id;
 
     if (!user.canViewFullProfile) {
