@@ -224,7 +224,7 @@ export default function Show() {
                 </div>
 
                 <div className="mt-4">
-                    <p className="text-xl text-gray-800 dark:text-gray-200">{post.content}</p>
+                    <p className="text-xl text-gray-800 dark:text-gray-200 max-w-7xl break-all">{post.content}</p>
                     {post.media.length > 0 && (
                         <div className="mt-2 grid grid-cols-1 gap-3 py-1 sm:grid-cols-2">
                             {post.media.map((file, index) => {
