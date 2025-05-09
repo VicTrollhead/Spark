@@ -70,7 +70,7 @@ export default function Followers() {
                                     <div className="flex items-center gap-2 justify-between">
                                         <div>
                                             <div className="flex items-center gap-1">
-                                                <Link href={`/user/${follower.username}`} className="font-medium text-blue-500 hover:underline">
+                                                <Link href={`/user/${follower.username}`} className="font-medium text-blue-500 hover:underline break-all">
                                                     {follower.name}
                                                 </Link>
                                                 {follower.is_verified && (
@@ -84,7 +84,7 @@ export default function Followers() {
                                                     </div>
                                                 )}
                                             </div>
-                                            <p className="text-gray-500 dark:text-gray-400">@{follower.username}</p>
+                                            <p className="text-gray-500 dark:text-gray-400 text-[15px]">@{follower.username}</p>
                                             <p className="text-sm text-gray-400 dark:text-gray-500">
                                                 {follower.followers_count} {translations['Subscribers']}
                                             </p>

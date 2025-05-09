@@ -93,7 +93,7 @@ export default function Friends() {
                                             )}
                                         </div>
 
-                                        <p className="text-gray-500 dark:text-gray-400">@{friend.username}</p>
+                                        <p className="text-gray-500 text-[15px] dark:text-gray-400">@{friend.username}</p>
                                         <p className="text-sm text-gray-400 dark:text-gray-500">
                                             {friend.followers_count} {translations['Subscribers']}
                                         </p>

@@ -58,7 +58,7 @@ export default function Following() {
                                     <div className="flex items-center gap-2 justify-between">
                                         <div>
                                             <div className="flex items-center gap-1">
-                                                <Link href={`/user/${followee.username}`} className="font-medium text-blue-500 hover:underline">
+                                                <Link href={`/user/${followee.username}`} className="font-medium text-blue-500 hover:underline break-all">
                                                     {followee.name}
                                                 </Link>
                                                 {followee.is_verified && (
@@ -72,7 +72,7 @@ export default function Following() {
                                                     </div>
                                                 )}
                                             </div>
-                                            <p className="text-gray-500 dark:text-gray-400">@{followee.username}</p>
+                                            <p className="text-gray-500 dark:text-gray-400 text-[15px]">@{followee.username}</p>
                                             <p className="text-sm text-gray-400 dark:text-gray-500">
                                                 {followee.followers_count} {translations['Subscribers']}
                                             </p>
