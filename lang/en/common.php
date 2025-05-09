@@ -140,6 +140,6 @@ return [
     "Most Reposted" => "Most Reposted",
     "Most Favorited" => "Most Favorited",
     "Most Activity" => "Most Activity",
-
+    "Set" => "Already Set",
 ];
 
