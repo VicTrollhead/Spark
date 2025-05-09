@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateUserRequest;
+use App\Models\Like;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\User;
@@ -585,23 +586,27 @@ class UserController extends Controller
 
         $followingIds = $currentUser->following->pluck('id');
 
-        $likedQuery = $currentUser->likes()
-            ->with([
-                'user.profileImage',
-                'comments',
-                'likes',
-                'media',
-                'user.followers',
-                'favorites',
-                'hashtags',
-                'repostedByUsers',
-            ])
+        $likedPostIds = Like::where('user_id', $currentUser->id)
+            ->where('likeable_type', Post::class)
+            ->pluck('likeable_id');
+
+        $likedQuery = Post::with([
+            'user.profileImage',
+            'comments',
+            'likes',
+            'media',
+            'user.followers',
+            'favorites',
+            'hashtags',
+            'repostedByUsers',
+        ])
+            ->whereIn('id', $likedPostIds)
             ->where(function ($query) use ($currentUser, $followingIds) {
-                $query->where('posts.is_private', 0)
-                ->orWhere(function ($subQuery) use ($currentUser, $followingIds) {
-                    $subQuery->where('posts.user_id', $currentUser->id)
-                    ->orWhereIn('posts.user_id', $followingIds);
-                });
+                $query->where('is_private', 0)
+                    ->orWhere(function ($subQuery) use ($currentUser, $followingIds) {
+                        $subQuery->where('user_id', $currentUser->id)
+                            ->orWhereIn('user_id', $followingIds);
+                    });
             });
 
         switch ($sort) {

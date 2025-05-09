@@ -163,7 +163,7 @@ export default function PostComponent({ post, compact = false }) {
                                             <AvatarFallback className="text-xs">{getInitials(post.current_user.name)}</AvatarFallback>
                                         </Avatar>
                                     </Link>
-                                    <Link href={`/user/${post.current_user.username}`} className="ml-1 text-blue-500 hover:underline">
+                                    <Link href={`/user/${post.current_user.username}`} className="ml-1 text-blue-500 hover:underline break">
                                         {post.current_user.name}
                                     </Link>
                                     <span className="ml-1">(you)</span>
@@ -191,7 +191,7 @@ export default function PostComponent({ post, compact = false }) {
                                                     <AvatarFallback className="text-xs">{getInitials(user.name)}</AvatarFallback>
                                                 </Avatar>
                                             </Link>
-                                            <Link href={`/user/${user.username}`} className="ml-1 text-blue-500 hover:underline">
+                                            <Link href={`/user/${user.username}`} className="ml-1 text-blue-500 hover:underline break-all">
                                                 {user.name}
                                             </Link>
                                             {user.is_verified && (
@@ -215,7 +215,7 @@ export default function PostComponent({ post, compact = false }) {
 
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <Link href={`/user/${post.user.username}`} className="font-semibold text-gray-900 hover:underline dark:text-white">
+                            <Link href={`/user/${post.user.username}`} className="font-semibold text-gray-900 hover:underline dark:text-white break-all">
                                 {post.user.name}
                             </Link>
                             {post.user.is_verified && (
@@ -252,7 +252,7 @@ export default function PostComponent({ post, compact = false }) {
                     </div>
 
                     <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username}</p>
-                    <p className={`mt-1 ${compact ? 'text-sm' : 'text-lg'} text-gray-700 dark:text-gray-300`}>{post.content}</p>
+                    <p className={`mt-1 text-sm lg:text-lg text-gray-700 dark:text-gray-300 break-all`}>{post.content}</p>
 
                     {post.media.length > 0 && (
                         <div className="mt-2 grid grid-cols-1 gap-3 py-1 sm:grid-cols-2">

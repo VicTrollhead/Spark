@@ -23,11 +23,11 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($this->route('user')->id)],
-            'bio' => ['nullable', 'string', 'max:500'],
-            'location' => ['nullable', 'string', 'max:255'],
-            'website' => ['nullable', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:24'],
+            'username' => ['required', 'string', 'max:20', Rule::unique('users')->ignore($this->route('user')->id)],
+            'bio' => ['nullable', 'string', 'max:300'],
+            'location' => ['nullable', 'string', 'max:100'],
+            'website' => ['nullable', 'string', 'max:120'],
             'date_of_birth' => ['nullable', 'date'],
 //            'profile_image' => ['nullable', 'image', 'mimes:jpg,png,jpeg,gif', 'max:2048'],
 //            'cover_image' => ['nullable', 'image', 'mimes:jpg,png,jpeg,gif', 'max:4096'],

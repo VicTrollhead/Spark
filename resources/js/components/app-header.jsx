@@ -22,6 +22,7 @@ import { useInitials } from '@/hooks/use-initials.jsx';
 import AppearanceToggle from '@/components/appearance-toggle.jsx';
 import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge.jsx';
+import { getProfileImageUrl } from '../lib/utils.js';
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
@@ -203,7 +204,7 @@ export function AppHeader({ breadcrumbs = [] }) {
                                     <div className="flex items-center gap-1">
                                         <Link href={user.username ? `/user/${user.username}` : '/user'} prefetch>
                                             <Avatar className="my-3 size-10">
-                                                <AvatarImage src={user.profile_image_url} alt={user.name} />
+                                                <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
                                                 <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-gray-700 dark:text-white">
                                                     {getInitials(user.name)}
                                                 </AvatarFallback>

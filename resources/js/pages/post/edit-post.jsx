@@ -140,29 +140,10 @@ export default function EditPost() {
                     )}
 
                     <div className="flex flex-row flex-wrap gap-4 xl:flex-nowrap">
-                        <div>
-                            <label className="mb-2 text-sm block text-gray-700 dark:text-gray-200">{translations['Upload Media (Images or Videos)']}</label>
-                            <div className="relative mt-4">
-                                <Input
-                                    type="file"
-                                    multiple
-                                    onChange={(e) => setData('media', e.target.files)}
-                                    className="pr-10"
-                                />
-                                {data.media && (
-                                    <button
-                                        type="button"
-                                        onClick={clearMediaInput}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-600 rounded-full p-1 bg-gray-200 dark:bg-gray-700"
-                                    >
-                                        <X size={16} />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="w-full flex flex-col items-start gap-y-1">
-                            <label className="block text-sm mb-2 text-gray-700 dark:text-gray-200">{translations['Hashtags']}</label>
+                        <div className="flex w-full flex-col items-start gap-y-2">
+                            <label className="block text-sm text-gray-700 dark:text-gray-200">
+                                {translations['Hashtags']}
+                            </label>
                             <HashtagInput
                                 placeholder={translations['Add hashtag...']}
                                 initialHashtags={(post.hashtags || []).map((h) => h.hashtag)}
@@ -170,7 +151,47 @@ export default function EditPost() {
                                 onChange={(hashtags) => setData('hashtags', hashtags)}
                             />
                         </div>
+
+                        <div className="flex-1/2">
+                            <label className="block text-sm text-gray-700 dark:text-gray-200">
+                                {translations['Upload Media (Images or Videos)']}
+                            </label>
+
+                            <div className="mt-3 w-full max-w-full flex items-center gap-2">
+                                <Input
+                                    type="file"
+                                    multiple
+                                    onChange={(e) => setData('media', e.target.files)}
+                                    className="w-full break-all"
+                                />
+                                {data.media && (
+                                    <button
+                                        type="button"
+                                        onClick={clearMediaInput}
+                                        className="shrink-0 rounded-full p-2 bg-gray-200 hover:bg-red-100 dark:bg-neutral-700 dark:hover:bg-red-900 text-gray-600 hover:text-red-600 dark:text-gray-200 dark:hover:text-red-400"
+                                        title="Clear media"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                )}
+                            </div>
+
+                            {data.media && data.media.length > 0 && (
+                                <ul className="mt-2 list-disc pl-4 text-sm text-gray-500 space-y-1 overflow-hidden break-all">
+                                    {Array.from(data.media).map((file, index) => (
+                                        <li key={index} className="max-w-6xl" title={file.name}>
+                                            {file.name}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+
+                            {errors['media.0'] && (
+                                <p className="text-sm text-red-500 mt-1">{errors['media.0']}</p>
+                            )}
+                        </div>
                     </div>
+
 
                     <div className="flex justify-end gap-2">
                         <Link

@@ -165,13 +165,13 @@ export default function Show() {
                         <p className="text-gray-500 dark:text-gray-400 mt-1">@{user.username}</p>
                     </div>
                     {!isOwnProfile && (
-                        <div className="flex flex-row gap-2">
+                        <div className="flex lg:flex-row flex-col gap-1">
                             {user.is_friend ? (
                                 <button
                                     onClick={() => router.post(`/chat/user-chat/new/${user.id}`)}
                                     className={`px-4 py-2 flex gap-2 items-center rounded-md bg-gray-600 hover:bg-gray-500 text-white dark:bg-gray-800 dark:hover:bg-gray-700`}
                                 >
-                                    {translations['Write']}<SendIcon className="w-5 h-5" />
+                                    {translations['Write']}<SendIcon className="w-4 h-4" />
                                 </button>
                             ) : ''}
                             <button

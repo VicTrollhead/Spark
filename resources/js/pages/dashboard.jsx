@@ -123,20 +123,28 @@ export default function Dashboard() {
                     <hr />
 
                     <div className="flex flex-row flex-wrap gap-4 xl:flex-nowrap">
-                        <div className="w-fit max-w-sm">
+                        <div className="flex w-full flex-col items-start gap-y-2">
+                            <label className="block text-sm text-gray-700 dark:text-gray-200">{translations['Hashtags']}</label>
+                            <HashtagInput
+                                placeholder={translations['Add hashtag...']}
+                                ref={hashtagRef}
+                                value={data.hashtags}
+                                onChange={(hashtags) => setData((prev) => ({ ...prev, hashtags }))}
+                            />
+                        </div>
+                        <div className="flex-1/2">
                             <label className="block text-sm text-gray-700 dark:text-gray-200">
                                 {translations['Upload Media (Images or Videos)']}
                             </label>
 
-                            <div className="relative mt-3">
+                            <div className="mt-3 w-full max-w-full flex items-center gap-2">
                                 <Input
                                     ref={fileInputRef}
                                     type="file"
                                     multiple
                                     onChange={handleMediaChange}
-                                    className="pr-10"
+                                    className="w-full break-all"
                                 />
-
                                 {data.media && data.media.length > 0 && (
                                     <button
                                         type="button"
@@ -145,19 +153,21 @@ export default function Dashboard() {
                                             setSelectedFiles([]);
                                             if (fileInputRef.current) fileInputRef.current.value = null;
                                         }}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 rounded-full p-1 bg-gray-200 dark:text-gray-200 dark:hover:text-red-500 dark:bg-neutral-700"
+                                        className="shrink-0 rounded-full p-2 bg-gray-200 hover:bg-red-100 dark:bg-neutral-700 dark:hover:bg-red-900 text-gray-600 hover:text-red-600 dark:text-gray-200 dark:hover:text-red-400"
+                                        title="Clear media"
                                     >
                                         <X size={16} />
                                     </button>
                                 )}
                             </div>
 
+
                             {selectedFiles.length > 0 && (
-                                <ul className="mt-2 list-disc pl-4 text-sm text-gray-500 space-y-1">
+                                <ul className="mt-2 list-disc pl-4 text-sm text-gray-500 space-y-1 overflow-hidden break-all">
                                     {selectedFiles.map((name, index) => (
                                         <li
                                             key={index}
-                                            className="max-w-full overflow-hidden text-ellipsis whitespace-nowrap"
+                                            className="` max-w-6xl"
                                             title={name}
                                         >
                                             {name}
@@ -170,18 +180,24 @@ export default function Dashboard() {
                                 <p className="text-sm text-red-500 mt-1">{errors['media.0']}</p>
                             )}
                         </div>
-
-                        <div className="flex w-full flex-col items-start gap-y-2">
-                            <label className="block text-sm text-gray-700 dark:text-gray-200">{translations['Hashtags']}</label>
-                            <HashtagInput
-                                placeholder={translations['Add hashtag...']}
-                                ref={hashtagRef}
-                                value={data.hashtags}
-                                onChange={(hashtags) => setData((prev) => ({ ...prev, hashtags }))}
-                            />
-                        </div>
                     </div>
+                    {selectedFiles.length > 0 && (
+                        <ul className="mt-2 list-disc pl-4 text-sm text-gray-500 space-y-1 overflow-hidden break-all">
+                            {selectedFiles.map((name, index) => (
+                                <li
+                                    key={index}
+                                    className="` max-w-6xl"
+                                    title={name}
+                                >
+                                    {name}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
 
+                    {errors['media.0'] && (
+                        <p className="text-sm text-red-500 mt-1">{errors['media.0']}</p>
+                    )}
                     <button
                         type="submit"
                         disabled={!data.content}
@@ -191,12 +207,15 @@ export default function Dashboard() {
                     >
                         {translations['Publish']}
                     </button>
+
+
+
                 </form>
             </div>
 
-            <div className="flex items-center justify-between border-b bg-white p-4 dark:border-neutral-800 dark:bg-neutral-950">
+            <div className="flex items-center mx-1 gap-1 justify-between border-b bg-white p-4 dark:border-neutral-800 dark:bg-neutral-950">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{translations['Posts']}</h2>
-                <div className="flex items-center gap-2">
+                <div className="flex gap-2">
                     <select
                         value={sortOption}
                         onChange={handleSortChange}

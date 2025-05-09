@@ -27,7 +27,7 @@ export function Notification({ notification }) {
             className="flex items-center gap-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
         >
             <span>
-                {name} <span className="text-sm">(@{username})</span>
+                {name} <span className="text-sm break-all"><br/>(@{username})</span>
             </span>
             {sourceUser.is_verified && (
                 <div className="group relative">
