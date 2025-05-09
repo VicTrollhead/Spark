@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
-import {Comment} from "@/components/comment.jsx";
+import {Comment} from "../../components/comment.jsx";
 import { getProfileImageUrl, getMediaUrl } from '../../lib/utils';
 
 export default function Show() {

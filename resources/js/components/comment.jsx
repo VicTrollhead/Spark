@@ -3,22 +3,13 @@ import { useInitials } from '../hooks/use-initials';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import {Link, router, usePage} from "@inertiajs/react";
 import {useState} from "react";
-
+import { getProfileImageUrl } from '../lib/utils';
 
 export function Comment({ comment, auth_user }) {
     const { translations } = usePage().props;
     const [isLiked, setIsLiked] = useState(comment.is_liked);
     const [likesCount, setLikesCount] = useState(comment.likes_count);
     const getInitials = useInitials();
-
-    const getProfileImageUrl = (user) => {
-        if (user?.profile_image?.disk === 's3') {
-            return user.profile_image.url;
-        } else if (user?.profile_image?.file_path) {
-            return `/storage/${user.profile_image.file_path}`;
-        }
-        return null;
-    };
 
     const handleLike = async () => {
         setIsLiked(!isLiked);
