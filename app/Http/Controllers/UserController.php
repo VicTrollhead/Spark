@@ -265,7 +265,6 @@ class UserController extends Controller
                 Storage::disk($disk)->delete($user->profileImage->file_path);
                 $user->profileImage()->delete();
             }
-
             $path = $request->file('profile_image')->store('profile_images', $disk);
 
             $media = new Media([
@@ -277,6 +276,10 @@ class UserController extends Controller
             ]);
 
             $media->save();
+        }
+        elseif ($request->boolean('remove_profile_image') && $user->profileImage) {
+            Storage::disk($disk)->delete($user->profileImage->file_path);
+            $user->profileImage()->delete();
         }
 
         if ($request->hasFile('cover_image')) {
@@ -296,6 +299,10 @@ class UserController extends Controller
             ]);
 
             $media->save();
+        }
+        elseif ($request->boolean('remove_cover_image') && $user->coverImage) {
+            Storage::disk($disk)->delete($user->coverImage->file_path);
+            $user->coverImage()->delete();
         }
 
         $user->update($request->validated());

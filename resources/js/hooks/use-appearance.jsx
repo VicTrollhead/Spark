@@ -25,7 +25,7 @@ export function initializeTheme() {
 }
 
 export function useAppearance() {
-    const [appearance, setAppearance] = useState('system');
+    const [appearance, setAppearance] = useState('light');
 
     const updateAppearance = (mode) => {
         setAppearance(mode);
@@ -35,7 +35,7 @@ export function useAppearance() {
 
     useEffect(() => {
         const savedAppearance = localStorage.getItem('appearance');
-        updateAppearance(savedAppearance || 'system');
+        updateAppearance(savedAppearance || 'light');
 
         return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
     }, []);

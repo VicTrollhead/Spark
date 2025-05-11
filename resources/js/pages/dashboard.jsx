@@ -200,13 +200,16 @@ export default function Dashboard() {
                     )}
                     <button
                         type="submit"
-                        disabled={!data.content}
+                        disabled={!data.content && (!data.media || data.media.length === 0)}
                         className={`self-end rounded-lg px-4 py-2 text-white transition ${
-                            data.content ? 'bg-blue-600 hover:bg-blue-700' : 'cursor-not-allowed bg-gray-400 dark:bg-gray-600'
+                            !data.content && (!data.media || data.media.length === 0)
+                                ? 'cursor-not-allowed bg-gray-400 dark:bg-gray-600'
+                                : 'bg-blue-600 hover:bg-blue-700'
                         }`}
                     >
                         {translations['Publish']}
                     </button>
+
 
 
 

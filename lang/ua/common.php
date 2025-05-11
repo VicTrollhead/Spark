@@ -139,5 +139,11 @@ return [
     "Most Reposted" => "Найбільш репостнуті",
     "Most Favorited" => "Найбільш збережені",
     "Most Activity" => "Найбільше активності",
-    "Set" => "Задано"
+    "Set" => "Задано",
+    "Unset Profile Image" => "Видалити зображення профілю",
+    "Unset Cover Image" => "Видалити обкладинку профілю",
+    "Undo" => "Відмінити",
+    "Will be removed" => "Буде видалено",
+
+
 ];

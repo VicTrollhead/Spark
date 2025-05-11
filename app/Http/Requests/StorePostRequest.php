@@ -22,7 +22,7 @@ class StorePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => ['required', 'string', 'max:1000'],
+            'content' => ['nullable','string', 'max:1000'],
             'parent_post_id' => ['nullable', 'exists:posts,id'],
             'is_private' => ['required', 'boolean'],
             'media' => ['nullable', 'array'],

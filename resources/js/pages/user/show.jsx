@@ -148,7 +148,7 @@ export default function Show() {
                 <div className="flex items-center justify-between gap-x-5">
                     <div>
                         <div className="flex items-center mt-2">
-                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user.name}</h1>
+                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white break-all">{user.name}</h1>
                             {user.is_verified && (
                                 <div className="group relative ml-2">
                                     <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-lg bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">

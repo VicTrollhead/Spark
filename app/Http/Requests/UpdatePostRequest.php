@@ -22,7 +22,7 @@ class UpdatePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => ['required', 'string', 'max:1000'],
+            'content' => ['nullable','string', 'max:1000'],
             'is_private' => ['required', 'boolean'],
             'media' => ['nullable', 'array'],
             'media.*' => ['file', 'mimes:jpeg,jpg,png,gif,mp4,mov,webm', 'max:10240'],

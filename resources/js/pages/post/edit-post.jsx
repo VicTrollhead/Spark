@@ -57,6 +57,11 @@ export default function EditPost() {
         }
     };
 
+    const canUpdate =
+        (data.content && data.content.trim() !== '') ||
+        (data.media && data.media.length > 0) ||
+        (post.media?.some(m => !removedMediaPaths.includes(m.file_path)));
+
     // const getMediaUrl = (file) => {
     //     if (file?.disk === 's3') {
     //         return file.url;
@@ -200,7 +205,11 @@ export default function EditPost() {
                         >
                             {translations['Cancel']}
                         </Link>
-                        <Button type="submit" disabled={processing} className="bg-blue-600 px-4 py-5 hover:bg-blue-700 text-white">
+                        <Button
+                            type="submit"
+                            disabled={processing || !canUpdate}
+                            className={`px-4 py-5 self-end text-white transition ${!canUpdate ? 'cursor-not-allowed bg-gray-400 dark:bg-gray-600' : 'bg-blue-600 hover:bg-blue-700'}`}
+                        >
                             {translations['Update']}
                         </Button>
                     </div>

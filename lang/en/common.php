@@ -141,5 +141,11 @@ return [
     "Most Favorited" => "Most Favorited",
     "Most Activity" => "Most Activity",
     "Set" => "Already Set",
+    "Unset Profile Image" => "Unset Profile Image",
+    "Unset Cover Image" => "Unset Cover Image",
+    "Undo" => "Undo",
+    "Will be removed" => "Will be removed",
+    "Removed" => "Removed",
+
 ];
 

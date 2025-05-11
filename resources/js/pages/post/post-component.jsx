@@ -163,7 +163,7 @@ export default function PostComponent({ post, compact = false }) {
                                             <AvatarFallback className="text-xs">{getInitials(post.current_user.name)}</AvatarFallback>
                                         </Avatar>
                                     </Link>
-                                    <Link href={`/user/${post.current_user.username}`} className="ml-1 text-blue-500 hover:underline break">
+                                    <Link href={`/user/${post.current_user.username}`} className="ml-1 text-blue-500 hover:underline break-all">
                                         {post.current_user.name}
                                     </Link>
                                     <span className="ml-1">(you)</span>
