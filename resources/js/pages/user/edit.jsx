@@ -92,7 +92,7 @@ export default function Edit() {
     return (
         <AppLayout>
             <Head title={translations['Edit My Profile']} />
-            <div className="mx-auto w-11/12 max-w-7xl py-6">
+            <div className="mx-auto w-full max-w-7xl p-6">
                 <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">{translations['Edit Profile']}</h1>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
