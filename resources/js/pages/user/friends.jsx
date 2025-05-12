@@ -3,11 +3,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar'
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
 import { useState } from 'react';
-import {RefreshCw, SendIcon, Check} from 'lucide-react';
+import { RefreshCw, SendIcon, Check } from 'lucide-react';
 import { getProfileImageUrl } from '../../lib/utils';
 
 export default function Friends() {
-    const { users, user, auth, translations } = usePage().props;
+    const { users, user, auth, translations, filters } = usePage().props;
     const getInitials = useInitials();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -29,7 +29,7 @@ export default function Friends() {
             action = 'follow';
         }
 
-        router.post(`/user/${targetUser.username}/${action}`, {}, {
+        router.post(`/user/friends/${action}`, { user_id: targetUser.id }, {
             preserveScroll: true,
             onSuccess: () => {
                 router.reload({ only: ['users'] });
@@ -37,30 +37,37 @@ export default function Friends() {
         });
     };
 
-    // const getProfileImageUrl = (user) => {
-    //     if (user?.profile_image?.disk === 's3') {
-    //         return user.profile_image?.url;
-    //     } else if (user?.profile_image?.file_path) {
-    //         return `/storage/${user.profile_image.file_path}`;
-    //     }
-    //     return null;
-    // };
-
-
     return (
         <AppLayout>
             <Head title={translations['Friends']} />
             <div className="p-6">
                 <div className="flex justify-between items-center">
                     <h1 className="text-2xl font-bold">{translations['Friends']}</h1>
-                    <button
-                        onClick={handleReload}
-                        className="p-2 text-sm font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition flex items-center"
-                    >
-                        <RefreshCw
-                            className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`}
-                        />
-                    </button>
+                    <div className="flex gap-2">
+                        <select
+                            className="px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
+                            value={filters?.sort || 'latest'}
+                            onChange={(e) => {
+                                router.get(route('user.friends'), {
+                                    sort: e.target.value,
+                                }, {
+                                    preserveScroll: true,
+                                    preserveState: true,
+                                });
+                            }}
+                        >
+                            <option value="latest">{translations['Latest']}</option>
+                            <option value="oldest">{translations['Oldest']}</option>
+                            <option value="popular">{translations['Most Followed']}</option>
+                            <option value="least_followers">{translations['Least Followed']}</option>
+                        </select>
+                        <button
+                            onClick={handleReload}
+                            className="p-2 text-sm font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition flex items-center"
+                        >
+                            <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
+                        </button>
+                    </div>
                 </div>
 
                 {users.length === 0 ? (
@@ -95,7 +102,7 @@ export default function Friends() {
 
                                         <p className="text-gray-500 text-[15px] dark:text-gray-400">@{friend.username}</p>
                                         <p className="text-sm text-gray-400 dark:text-gray-500">
-                                            {friend.followers_count} {translations['Subscribers']}
+                                            {friend.followers_count} {translations['Followers']}
                                         </p>
                                         <p className="text-green-500 text-sm font-medium mt-1">
                                             {translations['You follow each other']}

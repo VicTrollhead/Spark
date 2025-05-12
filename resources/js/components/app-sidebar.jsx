@@ -101,7 +101,7 @@ export function AppSidebar() {
         },
         {
             title: translations['Friends'],
-            url: `/user/${user.username}/friends`,
+            url: `/user/friends`,
             icon: Users,
         },
         {

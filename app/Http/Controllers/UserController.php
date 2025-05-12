@@ -817,49 +817,71 @@ class UserController extends Controller
 
 
 
-    public function friends(User $user): Response
+    public function friends(Request $request): Response
     {
         $currentUser = Auth::user();
 
+        $sort = $request->input('sort', 'latest');
 
-        $friends = $user->friends()
-            ->with('profileImage')
-            ->select('id', 'name', 'username', 'is_private', 'is_verified')
-            ->get()
-            ->map(function ($friend) use ($currentUser) {
-                $isFollowed = $currentUser ? $currentUser->following->contains('id', $friend->id) : false;
-                $hasSentFollowRequest = $currentUser ? $currentUser->pendingFollowRequests()->where('followee_id', $friend->id)->exists() : false;
-                $isPrivate = $friend->is_private;
-                $isFriend = in_array($friend->id, $currentUser->friends()->pluck('id')->toArray());
-                $followersCount = $friend->followers()->count();
-                return [
-                    'id' => $friend->id,
-                    'name' => $friend->name,
-                    'username' => $friend->username,
-                    'profile_image' => $friend->profileImage,
-                    'is_private' => $isPrivate,
-                    'is_followed' => $isFollowed,
-                    'has_sent_follow_request' => $hasSentFollowRequest,
-                    'followers_count' => $followersCount,
-                    'is_friend' => $isFriend,
-                    'is_verified' => $friend->is_verified,
-                ];
-            });
+        $friendsQuery = $currentUser->friends()
+            ->with(['profileImage', 'followers'])
+            ->withCount('followers');
+
+        switch ($sort) {
+            case 'latest':
+                $friendsQuery->orderBy('pivot_created_at', 'desc');
+                break;
+
+            case 'oldest':
+                $friendsQuery->orderBy('pivot_created_at', 'asc');
+                break;
+
+            case 'popular':
+                $friendsQuery->orderByDesc('followers_count');
+                break;
+            case 'least_followers':
+                $friendsQuery->orderBy('followers_count');
+                break;
+        }
+
+        $friends = $friendsQuery->get();
+
+        $mappedFriends = $friends->map(function ($friend) use ($currentUser) {
+            return [
+                'id' => $friend->id,
+                'name' => $friend->name,
+                'username' => $friend->username,
+                'profile_image' => $friend->profileImage,
+                'is_private' => $friend->is_private,
+                'is_followed' => $currentUser?->following->contains('id', $friend->id) ?? false,
+                'has_sent_follow_request' => $currentUser?->pendingFollowRequests()->where('followee_id', $friend->id)->exists() ?? false,
+                'followers_count' => $friend->followers->count(),
+                'is_friend' => $currentUser?->friends()->pluck('id')->contains($friend->id) ?? false,
+                'is_verified' => $friend->is_verified,
+            ];
+        });
 
         return Inertia::render('user/friends', [
             'title' => 'Friends',
-            'users' => $friends,
+            'users' => $mappedFriends,
+            'filters' => ['sort' => $sort],
             'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'username' => $user->username,
-                'is_verified' => $user->is_verified,
-                'profile_image' => $user->profileImage,
-                'is_following' => $currentUser ? $user->followers()->where('follower_id', $currentUser->id)->exists() : false,
-                'has_sent_follow_request' => $currentUser ? $currentUser->pendingFollowRequests()->where('followee_id', $user->id)->exists() : false,
+                'id' => $currentUser->id,
+                'name' => $currentUser->name,
+                'username' => $currentUser->username,
+                'is_verified' => $currentUser->is_verified,
+                'profile_image' => $currentUser->profileImage,
+                'is_following' => $currentUser?->followers()->where('follower_id', $currentUser->id)->exists() ?? false,
+                'has_sent_follow_request' => $currentUser?->pendingFollowRequests()->where('followee_id', $currentUser->id)->exists() ?? false,
             ],
         ]);
     }
+
+
+
+
+
+
 
 
 
