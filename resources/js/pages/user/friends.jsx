@@ -71,7 +71,7 @@ export default function Friends() {
                             <li key={friend.id} className="flex items-center gap-3 border-b py-2 mt-2 dark:border-gray-700">
                                 <Avatar className="h-24 w-24 border-4 border-white sm:h-28 sm:w-28 dark:border-gray-900">
                                     <AvatarImage src={getProfileImageUrl(friend)} alt={friend.name} />
-                                    <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
+                                    <AvatarFallback className="rounded-full bg-gray-200 text-4xl text-black dark:bg-gray-700 dark:text-white">
                                         {getInitials(friend.name)}
                                     </AvatarFallback>
                                 </Avatar>

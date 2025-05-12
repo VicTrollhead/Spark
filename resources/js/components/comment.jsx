@@ -48,9 +48,9 @@ export function Comment({ comment, auth_user }) {
     return (
         <div className="flex flex-col">
             <div className="flex items-center space-x-3 py-2">
-                <Avatar className="h-12 w-12 border border-gray-300 dark:border-gray-700">
+                <Avatar className="h-12 w-12 border border-gray-200 dark:border-gray-700">
                     <AvatarImage src={getProfileImageUrl(comment.user)} alt={comment.user.name} />
-                    <AvatarFallback className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white">
+                    <AvatarFallback className="bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white">
                         {getInitials(comment.user.name)}
                     </AvatarFallback>
                 </Avatar>

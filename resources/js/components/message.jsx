@@ -118,7 +118,7 @@ export default function Message({ userId, message }) {
                             <Link href={`/user/${message.user.username}`} className="hidden md:flex">
                                 <Avatar className="h-10 w-10 overflow-hidden rounded-full">
                                     <AvatarImage src={getProfileImageUrl(message.user)} alt={message.user.name} />
-                                    <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                    <AvatarFallback className="rounded-lg bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
                                         {getInitials(message.user.name)}
                                     </AvatarFallback>
                                 </Avatar>

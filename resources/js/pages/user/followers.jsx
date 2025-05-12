@@ -62,7 +62,7 @@ export default function Followers() {
                             <li key={follower.id} className="flex items-center gap-3 py-4 border-b dark:border-gray-700">
                                 <Avatar className="h-24 w-24 border-4 border-white sm:h-28 sm:w-28 dark:border-gray-900">
                                     <AvatarImage src={getProfileImageUrl(follower)} alt={follower.name} />
-                                    <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
+                                    <AvatarFallback className="rounded-full bg-gray-200 text-4xl text-black dark:bg-gray-700 dark:text-white">
                                         {getInitials(follower.name)}
                                     </AvatarFallback>
                                 </Avatar>

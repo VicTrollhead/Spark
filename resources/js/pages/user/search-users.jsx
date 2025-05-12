@@ -116,7 +116,7 @@ export default function SearchUsers() {
                                 <div className="flex items-center space-x-3 min-w-0">
                                     <Avatar className="h-10 w-10 flex-shrink-0">
                                         <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
-                                        <AvatarFallback className="rounded-full bg-gray-300 text-lg text-black dark:bg-gray-700 dark:text-white">
+                                        <AvatarFallback className="rounded-full bg-gray-200 text-lg text-black dark:bg-gray-700 dark:text-white">
                                             {getInitials(user.name)}
                                         </AvatarFallback>
                                     </Avatar>

@@ -197,7 +197,7 @@ export function Notification({ notification }) {
             <div className="hidden items-center gap-4 md:flex">
                 <Avatar className="h-14 w-14">
                     <AvatarImage src={getProfileImageUrl(sourceUser)} alt={sourceUser.name} />
-                    <AvatarFallback className="rounded-full bg-gray-300 text-black dark:bg-gray-700 dark:text-white">
+                    <AvatarFallback className="rounded-full bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
                         {getInitials(sourceUser.name)}
                     </AvatarFallback>
                 </Avatar>

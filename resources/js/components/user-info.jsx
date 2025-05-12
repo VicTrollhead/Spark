@@ -25,7 +25,7 @@ export function UserInfo({ user, showEmail = false }) {
         <div className="flex items-center gap-2">
             <Avatar className="h-12 w-12 overflow-hidden rounded-full">
                 <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
-                <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-gray-700 dark:text-white">
+                <AvatarFallback className="rounded-lg bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
                     {getInitials(user.name)}
                 </AvatarFallback>
             </Avatar>

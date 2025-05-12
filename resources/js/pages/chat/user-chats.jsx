@@ -118,7 +118,7 @@ export default function UserChats() {
                                                             >
                                                                 <Avatar className="my-auto h-12 w-12 border-2 border-neutral-800 md:h-15 md:w-15 dark:border-gray-400">
                                                                     <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
-                                                                    <AvatarFallback className="rounded-full bg-gray-300 text-2xl text-black dark:bg-gray-700 dark:text-white">
+                                                                    <AvatarFallback className="rounded-full bg-gray-200 text-2xl text-black dark:bg-gray-700 dark:text-white">
                                                                         {getInitials(user.name)}
                                                                     </AvatarFallback>
                                                                 </Avatar>
@@ -157,7 +157,7 @@ export default function UserChats() {
                                 <Link href={`/chat/user-chat/${chat.user.username}`} className="flex flex-row gap-3">
                                     <Avatar className="my-auto h-12 w-12  md:h-15 md:w-15 ">
                                         <AvatarImage src={getProfileImageUrl(chat.user)} alt={chat.user.name} />
-                                        <AvatarFallback className="rounded-full bg-gray-300 text-2xl text-black dark:bg-gray-700 dark:text-white">
+                                        <AvatarFallback className="rounded-full bg-gray-200 text-2xl text-black dark:bg-gray-700 dark:text-white">
                                             {getInitials(chat.user.name)}
                                         </AvatarFallback>
                                     </Avatar>

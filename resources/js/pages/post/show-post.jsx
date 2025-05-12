@@ -169,9 +169,9 @@ export default function Show() {
             <div className="p-6">
                 <div className="flex justify-between">
                     <div className="flex items-center space-x-3">
-                        <Avatar className="h-20 w-20 border border-gray-300 dark:border-gray-700 text-2xl">
+                        <Avatar className="h-20 w-20 border border-gray-200 dark:border-gray-700 text-2xl">
                             <AvatarImage src={profileImageUrl} alt={post.user.name} />
-                            <AvatarFallback className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white">
+                            <AvatarFallback className="bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white">
                                 {getInitials(post.user.name)}
                             </AvatarFallback>
                         </Avatar>

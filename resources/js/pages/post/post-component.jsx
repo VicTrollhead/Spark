@@ -144,7 +144,7 @@ export default function PostComponent({ post, compact = false }) {
             <div className="flex items-start space-x-3">
                 <Avatar className="h-16 w-16">
                     <AvatarImage src={profileImageUrl} alt={post.user.name} />
-                    <AvatarFallback className="rounded-full bg-gray-300 text-black dark:bg-gray-700 dark:text-white">
+                    <AvatarFallback className="rounded-full bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
                         {getInitials(post.user.name)}
                     </AvatarFallback>
                 </Avatar>

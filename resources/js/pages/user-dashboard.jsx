@@ -78,7 +78,7 @@ export default function Dashboard() {
                                 <div className="flex min-w-0 items-center space-x-3">
                                     <Avatar className="h-10 w-10 flex-shrink-0">
                                         <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
-                                        <AvatarFallback className="rounded-full bg-gray-300 text-lg text-black dark:bg-gray-700 dark:text-white">
+                                        <AvatarFallback className="rounded-full bg-gray-200 text-lg text-black dark:bg-gray-700 dark:text-white">
                                             {getInitials(user.name)}
                                         </AvatarFallback>
                                     </Avatar>

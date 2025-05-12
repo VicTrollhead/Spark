@@ -205,7 +205,7 @@ export function AppHeader({ breadcrumbs = [] }) {
                                         <Link href={user.username ? `/user/${user.username}` : '/user'} prefetch>
                                             <Avatar className="my-3 size-10">
                                                 <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
-                                                <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-gray-700 dark:text-white">
+                                                <AvatarFallback className="rounded-lg bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
                                                     {getInitials(user.name)}
                                                 </AvatarFallback>
                                             </Avatar>

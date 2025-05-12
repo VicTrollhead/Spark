@@ -90,7 +90,7 @@ export default function Show() {
                 <div className="p-6 text-center flex flex-col items-center justify-center">
                     <Avatar className="h-24 w-24 mx-auto border-4 border-white dark:border-gray-900">
                         <AvatarImage src={profileImageUrl || ''} alt={user.username} />
-                        <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
+                        <AvatarFallback className="rounded-full bg-gray-200 text-4xl text-black dark:bg-gray-700 dark:text-white">
                             {getInitials(user.username)}
                         </AvatarFallback>
                     </Avatar>
@@ -129,14 +129,14 @@ export default function Show() {
         <AppLayout>
             <Head title={`${user.name} (@${user.username})`} />
 
-            <div className="relative w-full bg-gray-200 h-72 dark:bg-gray-800">
+            <div className="relative w-full bg-gray-200 h-72 dark:bg-gray-700">
                 {coverImageUrl && (
                     <img src={coverImageUrl} alt="Cover Image" className="h-full w-full object-fill object-center" />
                 )}
                 <div className="absolute bottom-[-55px] left-4 sm:left-6">
                     <Avatar className="h-32 w-32 border-4 border-white sm:h-36 sm:w-36 dark:border-gray-900">
                         <AvatarImage src={profileImageUrl} alt={user.name} />
-                        <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
+                        <AvatarFallback className="rounded-full bg-gray-200 text-4xl text-black dark:bg-gray-700 dark:text-white">
                             {getInitials(user.name)}
                         </AvatarFallback>
                     </Avatar>
