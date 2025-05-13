@@ -105,7 +105,7 @@ export default function Dashboard() {
 
             <div className="border-y bg-white p-4 dark:border-neutral-800 dark:bg-neutral-950">
                 <form onSubmit={handlePostSubmit} className="flex flex-col space-y-4">
-                    <div className="my-3 flex items-center justify-start">
+                    <div className=" flex items-center justify-start">
                         <label className="text-sm text-gray-700 dark:text-gray-200">
                             {translations['Private (Only for subscribers)']}{' '}
                             <span className="text-gray-500">({data.is_private ? translations['Yes'] : translations['No']})</span>
@@ -115,7 +115,7 @@ export default function Dashboard() {
                     <textarea
                         value={data.content}
                         onChange={(e) => setData((prev) => ({ ...prev, content: e.target.value }))}
-                        rows={5}
+                        rows={3}
                         placeholder={translations["What's on your mind?"]}
                         className="resize-none rounded-md bg-gray-100 p-3 text-neutral-950 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-neutral-900 dark:text-white dark:focus:ring-blue-600"
                     />

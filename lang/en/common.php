@@ -146,6 +146,6 @@ return [
     "Undo" => "Undo",
     "Will be removed" => "Will be removed",
     "Removed" => "Removed",
-
+    "Write your first post here" => "Write your first post here",
 ];
 

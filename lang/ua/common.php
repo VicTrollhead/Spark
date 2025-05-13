@@ -144,6 +144,7 @@ return [
     "Unset Cover Image" => "Видалити обкладинку профілю",
     "Undo" => "Відмінити",
     "Will be removed" => "Буде видалено",
+    "Write your first post here" => "Напишіть свій перший пост",
 
 
 ];

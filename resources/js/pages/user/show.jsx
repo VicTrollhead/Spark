@@ -293,7 +293,7 @@ export default function Show() {
                             <PostComponent key={post.id} post={post} user={user} auth={auth} />
                         ))
                     ) : (
-                        <p className="text-gray-500 dark:text-gray-400 px-6 py-4">{translations['No posts yet.']}</p>
+                        <p className="text-gray-500 dark:text-gray-400 px-6 py-4">{translations['No posts yet.']} <Link href="/dashboard" className="text-blue-500 hover:underline">{translations['Write your first post here']}</Link></p>
                     )}
                 </div>
             </div>
