@@ -7,13 +7,17 @@ import { Switch } from '../../components/ui/switch';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
 import { getProfileImageUrl, getCoverImageUrl } from '../../lib/utils';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { X } from 'lucide-react';
 
 export default function Edit() {
     const { user, translations } = usePage().props;
     const getInitials = useInitials();
     const [removeProfileImage, setRemoveProfileImage] = useState(false);
     const [removeCoverImage, setRemoveCoverImage] = useState(false);
+    const profileInputRef = useRef();
+    const coverInputRef = useRef(null);
+
 
     const { data, setData, post, processing, errors } = useForm({
         name: user.name,
@@ -114,20 +118,39 @@ export default function Edit() {
                                     </div>
                                 )}
                             </div>
-                            <div className="flex flex-col items-start flex-1">
+                            <div className="flex flex-col items-center flex-1">
                                 <div className="flex items-center mb-2 w-full">
                                     <span className="text-sm text-gray-700 dark:text-gray-300 mr-2">{translations['Status']}:</span>
                                     <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{profileImageStatus}</span>
                                 </div>
-                                <div className="flex flex-wrap items-center gap-2 w-full mt-1">
+                                <div className="flex flex-wrap items-center gap-2 w-full mt-3">
                                     <div className="flex-1">
-                                        <input
-                                            type="file"
-                                            id="profile-image"
-                                            onChange={handleProfileImageChange}
-                                            className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-200  hover:file:bg-gray-300 dark:file:bg-blue-700  dark:hover:file:bg-blue-800"
-                                        />
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                ref={profileInputRef}
+                                                type="file"
+                                                id="profile-image"
+                                                onChange={handleProfileImageChange}
+                                                className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-200 hover:file:bg-gray-300 dark:file:bg-blue-700 dark:hover:file:bg-blue-800"
+                                            />
+                                            {data.profile_image && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setData("profile_image", null);
+                                                        if (profileInputRef.current) {
+                                                            profileInputRef.current.value = "";
+                                                        }
+                                                    }}
+                                                    className="shrink-0 rounded-full p-2 bg-gray-200 hover:bg-red-100 dark:bg-neutral-700 dark:hover:bg-red-900 text-gray-600 hover:text-red-600 dark:text-gray-200 dark:hover:text-red-400"
+                                                    title="Clear file"
+                                                >
+                                                    <X size={16} />
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
+
                                     <div className="flex gap-2">
                                         {user.profile_image && !removeProfileImage && (
                                             <Button
@@ -135,7 +158,7 @@ export default function Edit() {
                                                 variant="destructive"
                                                 size="sm"
                                                 onClick={handleProfileImageUnset}
-                                                className="dark:bg-red-600 dark:hover:bg-red-700"
+                                                className="dark:bg-red-600 dark:hover:bg-red-700 px-5"
                                             >
                                                 {translations['Remove']}
                                             </Button>
@@ -184,13 +207,32 @@ export default function Edit() {
                                 </div>
                                 <div className="flex flex-wrap items-center gap-2 flex-1">
                                     <div className="flex-1">
-                                        <input
-                                            type="file"
-                                            id="cover-image"
-                                            onChange={handleCoverImageChange}
-                                            className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-200  hover:file:bg-gray-300 dark:file:bg-blue-700  dark:hover:file:bg-blue-800"
-                                        />
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                ref={coverInputRef}
+                                                type="file"
+                                                id="cover-image"
+                                                onChange={handleCoverImageChange}
+                                                className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-200 hover:file:bg-gray-300 dark:file:bg-blue-700 dark:hover:file:bg-blue-800"
+                                            />
+                                            {data.cover_image && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setData("cover_image", null);
+                                                        if (coverInputRef.current) {
+                                                            coverInputRef.current.value = "";
+                                                        }
+                                                    }}
+                                                    className="shrink-0 rounded-full p-2 bg-gray-200 hover:bg-red-100 dark:bg-neutral-700 dark:hover:bg-red-900 text-gray-600 hover:text-red-600 dark:text-gray-200 dark:hover:text-red-400"
+                                                    title="Clear file"
+                                                >
+                                                    <X size={16} />
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
+
                                     <div className="flex gap-2">
                                         {user.cover_image && !removeCoverImage && (
                                             <Button
@@ -198,7 +240,7 @@ export default function Edit() {
                                                 variant="destructive"
                                                 size="sm"
                                                 onClick={handleCoverImageUnset}
-                                                className="dark:bg-red-600 dark:hover:bg-red-700"
+                                                className="dark:bg-red-600 dark:hover:bg-red-700 px-5"
                                             >
                                                 {translations['Remove']}
                                             </Button>

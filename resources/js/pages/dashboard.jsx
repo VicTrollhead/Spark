@@ -181,23 +181,6 @@ export default function Dashboard() {
                             )}
                         </div>
                     </div>
-                    {selectedFiles.length > 0 && (
-                        <ul className="mt-2 list-disc pl-4 text-sm text-gray-500 space-y-1 overflow-hidden break-all">
-                            {selectedFiles.map((name, index) => (
-                                <li
-                                    key={index}
-                                    className="` max-w-6xl"
-                                    title={name}
-                                >
-                                    {name}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-
-                    {errors['media.0'] && (
-                        <p className="text-sm text-red-500 mt-1">{errors['media.0']}</p>
-                    )}
                     <button
                         type="submit"
                         disabled={!data.content && (!data.media || data.media.length === 0)}
