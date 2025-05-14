@@ -180,7 +180,6 @@ export function AppHeader({ breadcrumbs = [] }) {
 
     const handleLogout = () => {
         router.post(`/logout`);
-        window.location.href = '/login';
     };
 
     return (
