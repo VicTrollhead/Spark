@@ -109,7 +109,7 @@ export default function UserChat() {
                                     {getInitials(other_user.name)}
                                 </AvatarFallback>
                             </Avatar>
-                            <span className="flex items-center gap-1 text-lg font-bold">
+                            <span className="flex items-center gap-1 lg:text-lg text-sm md:text-lg font-bold mr-2">
                                 {`${translations['Chat with']} ${other_user.name} (@${other_user.username})`}
                                 {other_user.is_verified && (
                                     <div className="group relative">
