@@ -16,13 +16,11 @@ export default function Login({ status, canResetPassword, googleClientId }) {
         password: "",
         remember: false,
     });
-    const { translations } = usePage().props;
 
+    const { translations } = usePage().props;
     const [passwordVisible, setPasswordVisible] = useState(false);
 
-    function togglePasswordVisibility() {
-        setPasswordVisible((prev) => !prev);
-    }
+    const togglePasswordVisibility = () => setPasswordVisible((prev) => !prev);
 
     const navigateToRegister = () => {
         window.location.href = route('register');
@@ -34,20 +32,6 @@ export default function Login({ status, canResetPassword, googleClientId }) {
             onFinish: () => reset("password"),
         });
     };
-
-    useEffect(() => {
-        const script = document.createElement("script");
-        script.src = "https://accounts.google.com/gsi/client";
-        script.async = true;
-        script.defer = true;
-        script.onload = () => {
-            window.google.accounts.id.initialize({
-                client_id: googleClientId,
-                callback: handleCredentialResponse,
-            });
-        };
-        document.body.appendChild(script);
-    }, []);
 
     function handleCredentialResponse(response) {
         fetch("/api/auth/google/callback", {
@@ -67,23 +51,28 @@ export default function Login({ status, canResetPassword, googleClientId }) {
             .catch((error) => console.error("Google Sign-In Error:", error));
     }
 
+    useEffect(() => {
+        window.handleCredentialResponse = handleCredentialResponse;
+
+        const script = document.createElement("script");
+        script.src = "https://accounts.google.com/gsi/client";
+        script.async = true;
+        script.defer = true;
+        document.body.appendChild(script);
+    }, []);
+
     return (
         <AuthLayout title={translations["Log in to Spark"]} description={translations["Use google authentication or email to log in"]}>
             <Head title={translations['Log In']} />
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-5">
-                    <Button
-                        type="button"
-                        onClick={() => window.google?.accounts.id.prompt()}
-                        className="w-full bg-white border text-black hover:bg-gray-100"
-                    >
-                        <img
-                            src="https://developers.google.com/identity/images/g-logo.png"
-                            alt="Google"
-                            className="w-5 h-5 mr-2"
-                        />
-                        {translations["Continue with Google"]}
-                    </Button>
+
+                    {/* Google Sign-In block */}
+                    <div id="g_id_onload"
+                         data-client_id={googleClientId || '980020201753-diubrb4qni06ji66kvfpvem23bfcgiur.apps.googleusercontent.com'}
+                         data-callback="handleCredentialResponse">
+                    </div>
+                    <div className="g_id_signin" data-type="standard"></div>
 
                     <div className="my-1 flex items-center">
                         <div className="flex-grow border border-t"></div>
