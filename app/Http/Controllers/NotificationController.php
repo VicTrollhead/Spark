@@ -58,7 +58,7 @@ class NotificationController extends Controller
                     'id' => $sourceUser->id,
                     'name' => $sourceUser->name,
                     'username' => $sourceUser->username,
-                    'profile_image_url' => $sourceUser->profileImage?->url,
+                    'profile_image' => $sourceUser->profileImage,
                     'is_private' => (bool) $sourceUser->is_private,
                     'is_subscribed' => $currentUser->isFollowing($sourceUser),
                     'is_verified' => $sourceUser->is_verified,
@@ -71,12 +71,14 @@ class NotificationController extends Controller
                         'id' => $post->user->id,
                         'name' => $post->user->name,
                         'username' => $post->user->username,
-                        'profile_image_url' => $post->user->profileImage?->url,
+                        'profile_image' => $post->user->profileImage,
                         'is_verified' => $post->user->is_verified,
                     ],
                     'media' => $post->media->map(fn($m) => [
                         'file_path' => $m->file_path,
                         'file_type' => $m->file_type,
+                        'disk' => $m->disk,
+                        'url' => $m->url,
                     ])->values(),
                 ] : null,
 
@@ -91,7 +93,7 @@ class NotificationController extends Controller
                 'id' => $currentUser->id,
                 'name' => $currentUser->name,
                 'username' => $currentUser->username,
-                'profile_image_url' => $currentUser->profileImage?->url,
+                'profile_image' => $currentUser->profileImage,
                 'is_verified' => $currentUser->is_verified
             ],
             'notifications' => $formattedNotifications,

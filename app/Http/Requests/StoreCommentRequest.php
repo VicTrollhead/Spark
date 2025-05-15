@@ -24,7 +24,7 @@ class StoreCommentRequest extends FormRequest
     {
         return [
             'post_id' => ['required', Rule::exists('posts', 'id')],
-            'content' => ['required', 'string'],
+            'content' => ['required', 'string','max:200'],
             'parent_comment_id' => ['nullable', Rule::exists('comments', 'id')],
         ];
     }

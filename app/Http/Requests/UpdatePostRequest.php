@@ -22,14 +22,14 @@ class UpdatePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => ['required', 'string', 'max:1000'],
+            'content' => ['nullable','string', 'max:1000'],
             'is_private' => ['required', 'boolean'],
             'media' => ['nullable', 'array'],
             'media.*' => ['file', 'mimes:jpeg,jpg,png,gif,mp4,mov,webm', 'max:10240'],
             'remove_media' => ['nullable', 'array'],
             'remove_media.*' => ['string'],
             'hashtags' => ['nullable', 'array'],
-            'hashtags.*' => ['string', 'max:50'],
+            'hashtags.*' => ['string', 'max:30'],
         ];
     }
 }

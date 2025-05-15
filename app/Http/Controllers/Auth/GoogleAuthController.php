@@ -32,7 +32,7 @@ class GoogleAuthController extends Controller
                 'username' => strstr($googleUser['email'], '@', true),
                 'email' => $googleUser['email'],
                 'password' => bcrypt(Str::random()),
-                'is_verified' => true,
+//                'is_verified' => true,
                 'email_verified_at' => now(),
                 'profile_image_url' => $googleUser['picture'],
             ]);

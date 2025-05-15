@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { useInitials } from '../hooks/use-initials';
 import AppLayout from '../layouts/app-layout';
+import { getProfileImageUrl } from '../lib/utils';
 
 export default function Dashboard() {
     const { users, sort, translations } = usePage().props;
@@ -25,6 +26,16 @@ export default function Dashboard() {
             setIsLoading(false);
         }, 1000);
     };
+
+    // const getProfileImageUrl = (user) => {
+    //     if (user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image.file_path}`;
+    //     }
+    //     return null;
+    // };
+
 
     return (
         <AppLayout>
@@ -66,28 +77,24 @@ export default function Dashboard() {
                             >
                                 <div className="flex min-w-0 items-center space-x-3">
                                     <Avatar className="h-10 w-10 flex-shrink-0">
-                                        <AvatarImage src={user.profile_image_url} alt={user.name} />
-                                        <AvatarFallback className="rounded-full bg-gray-300 text-lg text-black dark:bg-gray-700 dark:text-white">
+                                        <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
+                                        <AvatarFallback className="rounded-full bg-gray-200 text-lg text-black dark:bg-gray-700 dark:text-white">
                                             {getInitials(user.name)}
                                         </AvatarFallback>
                                     </Avatar>
 
                                     <div className="flex flex-col">
-                                        <div className="flex items-center gap-1.5">
-                                            <h2 className="truncate text-lg font-semibold">{user.name}</h2>
-                                            {user.is_verified && (
-                                                <span className="group relative">
-                                                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
-                                                        Verified
+                                        <div className="grid flex-1 text-left leading-tight">
+                                            <div className="flex items-center gap-1">
+                                                <span className="truncate text-[14.5px] text-gray-700 dark:text-neutral-300">@{user.username}</span>
+                                                {user.is_verified && (
+                                                    <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                        <Check className="h-3 w-3" />
                                                     </span>
-                                                    <span className="flex items-center rounded-md bg-blue-500 p-0.5 text-xs font-medium text-white">
-                                                        <Check className="h-4 w-4" />
-                                                    </span>
-                                                </span>
-                                            )}
+                                                )}
+                                            </div>
+                                            <span className="truncate text-lg font-extrabold break-all">{user.name}</span>
                                         </div>
-
-                                        <p className="truncate text-sm text-gray-500 dark:text-gray-400">@{user.username}</p>
                                     </div>
                                 </div>
                             </Link>

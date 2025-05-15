@@ -9,7 +9,7 @@ export default function PostsByHashtag() {
         <AppLayout>
             <Head title={`${translations['Posts by hashtag']} #${hashtag.hashtag}`} />
 
-            <div className="p-6 text-2xl font-extrabold">{`${translations['Posts by hashtag']}  `}<span className="text-blue-500">{`#${hashtag.hashtag}`}</span></div>
+            <div className="p-6 text-2xl font-extrabold break-all">{`${translations['Posts by hashtag']}  `}<span className="text-blue-500">{`#${hashtag.hashtag}`}</span></div>
 
             <div className="divide-y divide-gray-200 dark:divide-neutral-800">
                 {posts.length > 0 ? (

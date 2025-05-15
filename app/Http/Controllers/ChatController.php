@@ -38,7 +38,7 @@ class ChatController extends Controller
                         'id' => $message->user->id,
                         'name' => $message->user->name,
                         'username' => $message->user->username,
-                        'profile_image_url' => $message->user->profileImage?->url,
+                        'profile_image' => $message->user->profileImage,
                         'is_verified' => $message->user->is_verified,
                     ],
                 ];
@@ -94,7 +94,7 @@ class ChatController extends Controller
                     'id' => $otherUser->id,
                     'name' => $otherUser->name,
                     'username' => $otherUser->username,
-                    'profile_image_url' => $otherUser->profileImage?->url,
+                    'profile_image' => $otherUser->profileImage,
                     'is_verified' => $otherUser->is_verified,
                 ],
                 'last_message' => $chat->lastMessage ? [
@@ -143,7 +143,7 @@ class ChatController extends Controller
                         'id' => $user->id,
                         'name' => $user->name,
                         'username' => $user->username,
-                        'profile_image_url' => $user->profileImage?->url,
+                        'profile_image' => $user->profileImage,
                     ];
                 }),
             ];
@@ -182,7 +182,7 @@ class ChatController extends Controller
                         'id' => $message->user->id,
                         'name' => $message->user->name,
                         'username' => $message->user->username,
-                        'profile_image_url' => $message->user->profileImage?->url,
+                        'profile_image' => $message->user->profileImage,
                         'is_verified' => $message->user->is_verified,
                     ],
                     'read_at' => $message->read_at,
@@ -201,7 +201,7 @@ class ChatController extends Controller
                 'id' => $otherUser->id,
                 'name' => $otherUser->name,
                 'username' => $otherUser->username,
-                'profile_image_url' => $otherUser->profileImage?->url,
+                'profile_image' => $otherUser->profileImage,
                 'is_verified' => $otherUser->is_verified,
             ],
             'init_messages' => $messages,

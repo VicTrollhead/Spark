@@ -16,6 +16,7 @@
         "laravel/reverb": "^1.0",
         "laravel/socialite": "^5.20",
         "laravel/tinker": "^2.10.1",
+        "league/flysystem-aws-s3-v3": "^3.29",
         "pusher/pusher-php-server": "^7.2",
         "tightenco/ziggy": "^2.4",
         "workos/workos-php-laravel": "^4.1"
@@ -34,7 +35,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Helpers/StorageHelper.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

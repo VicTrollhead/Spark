@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use App\Models\Comment;
 use App\Models\Hashtag;
 use App\Models\Media;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -54,6 +56,23 @@ class PostController extends Controller
                 $postsQuery->withCount('likes')->orderByDesc('likes_count');
                 break;
 
+            case 'comments':
+                $postsQuery->withCount('comments')->orderByDesc('comments_count');
+                break;
+
+            case 'reposts':
+                $postsQuery->withCount('repostedByUsers')->orderByDesc('reposted_by_users_count');
+                break;
+
+            case 'favorites':
+                $postsQuery->withCount('favorites')->orderByDesc('favorites_count');
+                break;
+
+            case 'most_activity':
+                $postsQuery->withCount(['likes', 'comments', 'favorites', 'repostedByUsers'])
+                    ->orderByDesc(DB::raw('(likes_count + comments_count + favorites_count + reposted_by_users_count)'));
+                break;
+
             case 'oldest':
                 $postsQuery->oldest();
                 break;
@@ -89,6 +108,7 @@ class PostController extends Controller
                 break;
         }
 
+
         $posts = $postsQuery->get()->map(function ($post) use ($currentUser) {
             return [
                 'id' => $post->id,
@@ -98,7 +118,7 @@ class PostController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage?->url,
+                    'profile_image' => $post->user->profileImage,
                     'is_verified' => $post->user->is_verified,
                 ],
                 'hashtags' => $post->hashtags->map(fn ($tag) => [
@@ -108,6 +128,8 @@ class PostController extends Controller
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
+                    'disk' => $media->disk,
+                    'url' => $media->url,
                 ]),
                 'is_private' => $post->is_private,
                 'likes_count' => $post->likes->count(),
@@ -137,7 +159,7 @@ class PostController extends Controller
                             'id' => $user->id,
                             'name' => $user->name,
                             'username' => $user->username,
-                            'profile_image_url' => $user->profileImage?->url,
+                            'profile_image' => $user->profileImage,
                             'is_verified' => $user->is_verified,
                         ];
                     })
@@ -146,7 +168,7 @@ class PostController extends Controller
                 'current_user' => [
                     'id' => $currentUser->id,
                     'username' => $currentUser->username,
-                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'profile_image' => $currentUser->profileImage,
                     'name' => $currentUser->name,
                     'is_verified' => $currentUser->is_verified,
                 ],
@@ -171,20 +193,27 @@ class PostController extends Controller
             'is_private' => $validated['is_private'] ?? false,
         ]);
 
+        $mediaUrls = [];
+
         if ($request->hasFile('media')) {
+            $disk = config('filesystems.default');
+
             foreach ($request->file('media') as $file) {
-                $path = $file->store('uploads/posts', 'public');
+                $path = $file->store('uploads/posts', $disk);
 
                 $media = new Media([
                     'file_path' => $path,
                     'file_type' => str_starts_with($file->getMimeType(), 'video') ? 'video' : 'image',
+                    'disk' => $disk,
                     'mediable_id' => $post->id,
                     'mediable_type' => Post::class,
                 ]);
 
                 $media->save();
+                $mediaUrls[] = $media->url;
             }
         }
+
         $hashtags = $validated['hashtags'] ?? [];
         $hashtagIds = [];
 
@@ -199,8 +228,9 @@ class PostController extends Controller
 
         $post->hashtags()->sync($hashtagIds);
 
-        return redirect()->route('dashboard')->with('success', 'Post created successfully!');
+        return redirect()->route('dashboard')->with('success', 'Post created successfully!')->with('mediaUrls', $mediaUrls);;
     }
+
 
 
     public function show(Post $post, Request $request)
@@ -251,9 +281,16 @@ class PostController extends Controller
                     'id' => $comment->user->id,
                     'name' => $comment->user->name,
                     'username' => $comment->user->username,
-                    'profile_image_url' => $comment->user->profileImage ? asset('storage/' . $comment->user->profileImage->file_path) : null,
+                    'profile_image' => $comment->user->profileImage,
                     'is_verified' => $comment->user->is_verified,
                 ],
+                'is_liked' => $comment->likes()
+                    ->where('user_id', auth()->id())
+                    ->where('likeable_type', Comment::class)
+                    ->exists(),
+                'likes_count' => $comment->likes()
+                    ->where('likeable_type', Comment::class)
+                    ->count(),
             ];
         });
 
@@ -264,13 +301,15 @@ class PostController extends Controller
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
+                    'disk' => $media->disk,
+                    'url' => $media->url,
                 ]),
                 'created_at' => $post->created_at->format('n/j/Y'),
                 'user' => [
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage ? asset('storage/' . $post->user->profileImage->file_path) : null,
+                    'profile_image' => $post->user->profileImage,
                     'is_verified' => $post->user->is_verified,
                 ],
                 'is_private' => $post->is_private,
@@ -303,7 +342,7 @@ class PostController extends Controller
                             'id' => $user->id,
                             'name' => $user->name,
                             'username' => $user->username,
-                            'profile_image_url' => $user->profileImage?->url,
+                            'profile_image' => $user->profileImage,
                             'is_verified' => $user->is_verified,
                         ];
                     })
@@ -312,7 +351,7 @@ class PostController extends Controller
                 'current_user' => [
                     'id' => $currentUser->id,
                     'username' => $currentUser->username,
-                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'profile_image' => $currentUser->profileImage,
                     'name' => $currentUser->name,
                     'is_verified' => $currentUser->is_verified,
                 ],
@@ -339,6 +378,7 @@ class PostController extends Controller
         $post->likes()->delete();
         $post->comments()->delete();
         $post->hashtags()->detach();
+        $post->media()->delete();
         $post->delete();
 
         return redirect()->route('dashboard')->with('success', 'Post updated successfully.');
@@ -388,12 +428,14 @@ class PostController extends Controller
                         'id' => $post->user->id,
                         'name' => $post->user->name,
                         'username' => $post->user->username,
-                        'profile_image_url' => $post->user->profileImage?->url,
+                        'profile_image' => $post->user->profileImage,
                         'is_verified' => $post->user->is_verified,
                     ],
                     'media' => $post->media->map(fn ($media) => [
                         'file_path' => $media->file_path,
                         'file_type' => $media->file_type,
+                        'disk' => $media->disk,
+                        'url' => $media->url,
                     ]),
                     'hashtags' => $post->hashtags->map(fn ($tag) => [
                         'id' => $tag->id,
@@ -428,7 +470,7 @@ class PostController extends Controller
                                 'id' => $user->id,
                                 'name' => $user->name,
                                 'username' => $user->username,
-                                'profile_image_url' => $user->profileImage?->url,
+                                'profile_image' => $user->profileImage,
                                 'is_verified' => $user->is_verified,
                             ];
                         })
@@ -437,7 +479,7 @@ class PostController extends Controller
                     'current_user' => [
                         'id' => $currentUser->id,
                         'username' => $currentUser->username,
-                        'profile_image_url' => $currentUser->profileImage?->url,
+                        'profile_image' => $currentUser->profileImage,
                         'name' => $currentUser->name,
                         'is_verified' => $currentUser->is_verified,
                     ],
@@ -500,6 +542,8 @@ class PostController extends Controller
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
+                    'disk' => $media->disk,
+                    'url' => $media->url,
                 ]),
                 'hashtags' => $post->hashtags->map(fn ($tag) => [
                     'id' => $tag->id,
@@ -515,51 +559,59 @@ class PostController extends Controller
     {
         $this->authorize('update', $post);
 
+        $validated = $request->validated();
 
         $post->update([
-            'content' => $request->input('content', ''),
-            'is_private' => $request->boolean('is_private'),
+            'content' => $validated['content'] ?? '',
+            'is_private' => $validated['is_private'] ?? false,
         ]);
 
-        $removePaths = $request->input('remove_media', []);
+        $removePaths = $validated['remove_media'] ?? [];
+
         if (!empty($removePaths)) {
             $mediaToRemove = $post->media()->whereIn('file_path', (array) $removePaths)->get();
 
             foreach ($mediaToRemove as $media) {
-                if (Storage::disk('public')->exists($media->file_path)) {
-                    Storage::disk('public')->delete($media->file_path);
+                $disk = $media->disk ?? config('filesystems.default');
+
+                if (Storage::disk($disk)->exists($media->file_path)) {
+                    Storage::disk($disk)->delete($media->file_path);
                 }
+
                 $media->delete();
             }
         }
 
         if ($request->hasFile('media')) {
+            $disk = config('filesystems.default');
             $files = $request->file('media');
-            $files = is_array($files) ? $files : [$files];
 
             foreach ($files as $file) {
-                $path = $file->store('uploads/posts', 'public');
+                $path = $file->store('uploads/posts', $disk);
 
                 $post->media()->create([
                     'file_path' => $path,
-                    'file_type' => str_contains($file->getMimeType(), 'video') ? 'video' : 'image',
+                    'file_type' => str_starts_with($file->getMimeType(), 'video') ? 'video' : 'image',
+                    'disk' => $disk,
                 ]);
             }
         }
 
-        if ($request->filled('hashtags')) {
-            $hashtagIds = collect($request->hashtags)->map(function ($tag) {
-                return \App\Models\Hashtag::firstOrCreate(['hashtag' => $tag])->id;
-            });
-            $post->hashtags()->sync($hashtagIds);
-        } else {
-            $post->hashtags()->sync([]);
+        $hashtags = $validated['hashtags'] ?? [];
+        $hashtagIds = [];
+
+        foreach ($hashtags as $tag) {
+            $cleanTag = ltrim($tag, '#');
+            $hashtag = \App\Models\Hashtag::firstOrCreate([
+                'hashtag' => strtolower($cleanTag)
+            ]);
+            $hashtagIds[] = $hashtag->id;
         }
+
+        $post->hashtags()->sync($hashtagIds);
 
         return to_route('post.show', $post->id)->with('success', 'Post updated successfully.');
     }
-
-
 
 
 }

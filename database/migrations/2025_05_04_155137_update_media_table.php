@@ -9,13 +9,12 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::table('notifications', function (Blueprint $table) {
-            $table->foreignId('comment_id')->nullable()->constrained()->onDelete('cascade');
+        Schema::table('media', function (Blueprint $table) {
+            $table->string('disk')->default('public');
         });
     }
-
 
     /**
      * Reverse the migrations.

@@ -6,6 +6,7 @@ import { Switch } from '../../components/ui/switch';
 import { useState } from 'react';
 import { HashtagInput } from '../../components/hashtag-input.jsx';
 import { X } from 'lucide-react';
+import { getMediaUrl } from '@/lib/utils';
 
 export default function EditPost() {
     const { post, auth, translations } = usePage().props;
@@ -56,6 +57,20 @@ export default function EditPost() {
         }
     };
 
+    const canUpdate =
+        (data.content && data.content.trim() !== '') ||
+        (data.media && data.media.length > 0) ||
+        (post.media?.some(m => !removedMediaPaths.includes(m.file_path)));
+
+    // const getMediaUrl = (file) => {
+    //     if (file?.disk === 's3') {
+    //         return file.url;
+    //     } else if (file?.file_path) {
+    //         return `/storage/${file.file_path}`;
+    //     }
+    //     return null;
+    // };
+
     return (
         <AppLayout
             breadcrumbs={[
@@ -99,13 +114,13 @@ export default function EditPost() {
                                         <div key={m.file_path} className="relative rounded-md overflow-hidden border dark:border-gray-700 group">
                                             {m.file_type.includes('image') ? (
                                                 <img
-                                                    src={`/storage/${m.file_path}`}
+                                                    src={getMediaUrl(m)}
                                                     alt=""
                                                     className="h-40 w-full object-contain bg-gray-100 dark:bg-neutral-800"
                                                 />
                                             ) : (
                                                 <video
-                                                    src={`/storage/${m.file_path}`}
+                                                    src={getMediaUrl(m)}
                                                     controls
                                                     className="h-40 w-full object-contain bg-gray-100 dark:bg-neutral-800"
                                                 />
@@ -130,29 +145,10 @@ export default function EditPost() {
                     )}
 
                     <div className="flex flex-row flex-wrap gap-4 xl:flex-nowrap">
-                        <div>
-                            <label className="mb-2 text-sm block text-gray-700 dark:text-gray-200">{translations['Upload Media (Images or Videos)']}</label>
-                            <div className="relative mt-4">
-                                <Input
-                                    type="file"
-                                    multiple
-                                    onChange={(e) => setData('media', e.target.files)}
-                                    className="pr-10"
-                                />
-                                {data.media && (
-                                    <button
-                                        type="button"
-                                        onClick={clearMediaInput}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-600 rounded-full p-1 bg-gray-200 dark:bg-gray-700"
-                                    >
-                                        <X size={16} />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="w-full flex flex-col items-start gap-y-1">
-                            <label className="block text-sm mb-2 text-gray-700 dark:text-gray-200">{translations['Hashtags']}</label>
+                        <div className="flex w-full flex-col items-start gap-y-2">
+                            <label className="block text-sm text-gray-700 dark:text-gray-200">
+                                {translations['Hashtags']}
+                            </label>
                             <HashtagInput
                                 placeholder={translations['Add hashtag...']}
                                 initialHashtags={(post.hashtags || []).map((h) => h.hashtag)}
@@ -160,7 +156,47 @@ export default function EditPost() {
                                 onChange={(hashtags) => setData('hashtags', hashtags)}
                             />
                         </div>
+
+                        <div className="flex-1/2">
+                            <label className="block text-sm text-gray-700 dark:text-gray-200">
+                                {translations['Upload Media (Images or Videos)']}
+                            </label>
+
+                            <div className="mt-3 w-full max-w-full flex items-center gap-2">
+                                <Input
+                                    type="file"
+                                    multiple
+                                    onChange={(e) => setData('media', e.target.files)}
+                                    className="w-full break-all"
+                                />
+                                {data.media && (
+                                    <button
+                                        type="button"
+                                        onClick={clearMediaInput}
+                                        className="shrink-0 rounded-full p-2 bg-gray-200 hover:bg-red-100 dark:bg-neutral-700 dark:hover:bg-red-900 text-gray-600 hover:text-red-600 dark:text-gray-200 dark:hover:text-red-400"
+                                        title="Clear media"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                )}
+                            </div>
+
+                            {data.media && data.media.length > 0 && (
+                                <ul className="mt-2 list-disc pl-4 text-sm text-gray-500 space-y-1 overflow-hidden break-all">
+                                    {Array.from(data.media).map((file, index) => (
+                                        <li key={index} className="max-w-6xl" title={file.name}>
+                                            {file.name}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+
+                            {errors['media.0'] && (
+                                <p className="text-sm text-red-500 mt-1">{errors['media.0']}</p>
+                            )}
+                        </div>
                     </div>
+
 
                     <div className="flex justify-end gap-2">
                         <Link
@@ -169,7 +205,11 @@ export default function EditPost() {
                         >
                             {translations['Cancel']}
                         </Link>
-                        <Button type="submit" disabled={processing} className="bg-blue-600 px-4 py-5 hover:bg-blue-700 text-white">
+                        <Button
+                            type="submit"
+                            disabled={processing || !canUpdate}
+                            className={`px-4 py-5 self-end text-white transition ${!canUpdate ? 'cursor-not-allowed bg-gray-400 dark:bg-gray-600' : 'bg-blue-600 hover:bg-blue-700'}`}
+                        >
                             {translations['Update']}
                         </Button>
                     </div>

@@ -16,3 +16,5 @@ RUN docker-php-ext-install pdo pdo_mysql pcntl \
     &&  docker-php-ext-enable redis
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+CMD ["entrypoint.sh"]

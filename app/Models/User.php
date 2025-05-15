@@ -77,6 +77,7 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(User::class, 'follows', 'follower_id', 'followee_id')
             ->wherePivot('is_accepted', true)
+            ->withPivot('created_at')
             ->whereIn('followee_id', function ($query) {
                 $query->select('follower_id')
                     ->from('follows')

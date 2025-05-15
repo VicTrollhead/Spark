@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateUserRequest;
+use App\Models\Like;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\User;
@@ -96,6 +97,7 @@ class UserController extends Controller
 
 
         $posts = $combinedPosts->map(function ($post) use ($user, $currentUser) {
+
             return [
                 'id' => $post->id,
                 'content' => $post->content,
@@ -104,12 +106,15 @@ class UserController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage?->url,
+                    'profile_image' => $post->user->profileImage,
                     'is_verified' => $post->user->is_verified,
                 ],
+
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
+                    'disk' => $media->disk,
+                    'url' => $media->url,
                 ]),
                 'hashtags' => $post->hashtags->map(fn ($tag) => [
                     'id' => $tag->id,
@@ -136,14 +141,14 @@ class UserController extends Controller
                             'id' => $user->id,
                             'name' => $user->name,
                             'username' => $user->username,
-                            'profile_image_url' => $user->profileImage?->url,
+                            'profile_image' => $user->profileImage,
                             'is_verified' => $user->is_verified,
                         ];
                     }),
                 'current_user' => [
                     'id' => $currentUser->id,
                     'username' => $currentUser->username,
-                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'profile_image' => $currentUser->profileImage,
                     'name' => $currentUser->name,
                     'is_verified' => $currentUser->is_verified,
                 ],
@@ -155,10 +160,10 @@ class UserController extends Controller
             'user' => [
                 'id' => $user->id,
                 'username' => $user->username,
-                'name' => $canViewFullProfile ? $user->name : null,
+                'name' => $user->name,
                 'bio' => $canViewFullProfile ? $user->bio : null,
-                'profile_image_url' => $user->profileImage?->url,
-                'cover_image_url' => $canViewFullProfile && $user->coverImage ? $user->coverImage->url : null,
+                'profile_image' => $user->profileImage,
+                'cover_image' => $canViewFullProfile && $user->coverImage ? $user->coverImage : null,
                 'location' => $canViewFullProfile ? $user->location : null,
                 'website' => $canViewFullProfile ? $user->website : null,
                 'date_of_birth' => $canViewFullProfile ? optional($user->date_of_birth)->format('F j, Y') : null,
@@ -195,8 +200,8 @@ class UserController extends Controller
                 'username' => $user->username,
                 'name' => $user->name,
                 'bio' => $user->bio,
-                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
-                'cover_image_url' => $user->coverImage ? $user->coverImage->url : null,
+                'profile_image' => $user->profileImage,
+                'cover_image' => $user->coverImage,
                 'location' => $user->location,
                 'website' => $user->website,
                 'date_of_birth' => optional($user->date_of_birth)->format('F j, Y'),
@@ -208,39 +213,96 @@ class UserController extends Controller
         ]);
     }
 
+//    public function update(UpdateUserRequest $request, User $user)
+//    {
+//        $this->authorize('update', $user);
+//
+//        if ($request->hasFile('profile_image')) {
+//            if ($user->profileImage) {
+//                Storage::disk('public')->delete($user->profileImage->file_path);
+//                $user->profileImage()->delete();
+//            }
+//
+//            $media = new Media([
+//                'file_path' => $request->file('profile_image')->store('profile_images', 'public'),
+//                'file_type' => 'profile',
+//                'mediable_id' => $user->id,
+//                'mediable_type' => User::class,
+//            ]);
+//
+//            $media->save();
+//        }
+//        if ($request->hasFile('cover_image')) {
+//            if ($user->coverImage) {
+//                Storage::disk('public')->delete($user->coverImage->file_path);
+//                $user->coverImage()->delete();
+//            }
+//
+//            $media = new Media([
+//                'file_path' => $request->file('cover_image')->store('cover_images', 'public'),
+//                'file_type' => 'cover',
+//                'mediable_id' => $user->id,
+//                'mediable_type' => User::class,
+//            ]);
+//
+//            $media->save();
+//        }
+//
+//        $user->update($request->validated());
+//
+//        return redirect()->route('user.show', $user->username)
+//            ->with('success', 'Profile updated successfully.');
+//    }
+
     public function update(UpdateUserRequest $request, User $user)
     {
         $this->authorize('update', $user);
 
+        $disk = config('filesystems.default');
+
         if ($request->hasFile('profile_image')) {
             if ($user->profileImage) {
-                Storage::disk('public')->delete($user->profileImage->file_path);
+                Storage::disk($disk)->delete($user->profileImage->file_path);
                 $user->profileImage()->delete();
             }
+            $path = $request->file('profile_image')->store('profile_images', $disk);
 
             $media = new Media([
-                'file_path' => $request->file('profile_image')->store('profile_images', 'public'),
+                'file_path' => $path,
                 'file_type' => 'profile',
+                'disk' => $disk,
                 'mediable_id' => $user->id,
                 'mediable_type' => User::class,
             ]);
 
             $media->save();
         }
+        elseif ($request->boolean('remove_profile_image') && $user->profileImage) {
+            Storage::disk($disk)->delete($user->profileImage->file_path);
+            $user->profileImage()->delete();
+        }
+
         if ($request->hasFile('cover_image')) {
             if ($user->coverImage) {
-                Storage::disk('public')->delete($user->coverImage->file_path);
+                Storage::disk($disk)->delete($user->coverImage->file_path);
                 $user->coverImage()->delete();
             }
 
+            $path = $request->file('cover_image')->store('cover_images', $disk);
+
             $media = new Media([
-                'file_path' => $request->file('cover_image')->store('cover_images', 'public'),
+                'file_path' => $path,
                 'file_type' => 'cover',
+                'disk' => $disk,
                 'mediable_id' => $user->id,
                 'mediable_type' => User::class,
             ]);
 
             $media->save();
+        }
+        elseif ($request->boolean('remove_cover_image') && $user->coverImage) {
+            Storage::disk($disk)->delete($user->coverImage->file_path);
+            $user->coverImage()->delete();
         }
 
         $user->update($request->validated());
@@ -248,6 +310,7 @@ class UserController extends Controller
         return redirect()->route('user.show', $user->username)
             ->with('success', 'Profile updated successfully.');
     }
+
 
     public function users(Request $request): Response
     {
@@ -295,7 +358,7 @@ class UserController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
-                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'profile_image' => $user->profileImage,
                 'followers_count' => $user->followers_count,
                 'is_verified' => $user->is_verified,
             ];
@@ -360,7 +423,7 @@ class UserController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
-                'profile_image_url' => $user->profileImage ? $user->profileImage->url : null,
+                'profile_image' => $user->profileImage,
                 'followers_count' => $user->followers_count,
                 'is_verified' => $user->is_verified,
             ];
@@ -403,7 +466,7 @@ class UserController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
-                'profile_image_url' => $user->profileImage?->url,
+                'profile_image' => $user->profileImage,
                 'followers_count' => $user->followers_count,
                 'is_verified' => $user->is_verified,
             ];
@@ -451,12 +514,14 @@ class UserController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage?->url,
+                    'profile_image' => $post->user->profileImage,
                     'is_verified' => $post->user->is_verified,
                 ],
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
+                    'disk' => $media->disk,
+                    'url' => $media->url,
                 ]),
                 'hashtags' => $post->hashtags->map(fn ($tag) => [
                     'id' => $tag->id,
@@ -490,7 +555,7 @@ class UserController extends Controller
                             'id' => $user->id,
                             'name' => $user->name,
                             'username' => $user->username,
-                            'profile_image_url' => $user->profileImage?->url,
+                            'profile_image' => $user->profileImage,
                             'is_verified' => $user->is_verified,
                         ];
                     })
@@ -499,7 +564,7 @@ class UserController extends Controller
                 'current_user' => [
                     'id' => $currentUser->id,
                     'username' => $currentUser->username,
-                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'profile_image' => $currentUser->profileImage,
                     'name' => $currentUser->name,
                     'is_verified' => $currentUser->is_verified,
                 ],
@@ -528,23 +593,27 @@ class UserController extends Controller
 
         $followingIds = $currentUser->following->pluck('id');
 
-        $likedQuery = $currentUser->likes()
-            ->with([
-                'user.profileImage',
-                'comments',
-                'likes',
-                'media',
-                'user.followers',
-                'favorites',
-                'hashtags',
-                'repostedByUsers',
-            ])
+        $likedPostIds = Like::where('user_id', $currentUser->id)
+            ->where('likeable_type', Post::class)
+            ->pluck('likeable_id');
+
+        $likedQuery = Post::with([
+            'user.profileImage',
+            'comments',
+            'likes',
+            'media',
+            'user.followers',
+            'favorites',
+            'hashtags',
+            'repostedByUsers',
+        ])
+            ->whereIn('id', $likedPostIds)
             ->where(function ($query) use ($currentUser, $followingIds) {
-                $query->where('posts.is_private', 0)
-                ->orWhere(function ($subQuery) use ($currentUser, $followingIds) {
-                    $subQuery->where('posts.user_id', $currentUser->id)
-                    ->orWhereIn('posts.user_id', $followingIds);
-                });
+                $query->where('is_private', 0)
+                    ->orWhere(function ($subQuery) use ($currentUser, $followingIds) {
+                        $subQuery->where('user_id', $currentUser->id)
+                            ->orWhereIn('user_id', $followingIds);
+                    });
             });
 
         switch ($sort) {
@@ -575,12 +644,14 @@ class UserController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage?->url,
+                    'profile_image' => $post->user->profileImage,
                     'is_verified' => $post->user->is_verified,
                 ],
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
+                    'disk' => $media->disk,
+                    'url' => $media->url,
                 ]),
                 'hashtags' => $post->hashtags->map(fn ($tag) => [
                     'id' => $tag->id,
@@ -615,7 +686,7 @@ class UserController extends Controller
                             'id' => $user->id,
                             'name' => $user->name,
                             'username' => $user->username,
-                            'profile_image_url' => $user->profileImage?->url,
+                            'profile_image' => $user->profileImage,
                             'is_verified' => $user->is_verified,
                         ];
                     })
@@ -624,7 +695,7 @@ class UserController extends Controller
                 'current_user' => [
                     'id' => $currentUser->id,
                     'username' => $currentUser->username,
-                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'profile_image' => $currentUser->profileImage,
                     'name' => $currentUser->name,
                     'is_verified' => $currentUser->is_verified,
                 ],
@@ -678,12 +749,14 @@ class UserController extends Controller
                         'id' => $post->user->id,
                         'name' => $post->user->name,
                         'username' => $post->user->username,
-                        'profile_image_url' => $post->user->profileImage ? $post->user->profileImage->url : null,
+                        'profile_image' => $post->user->profileImage,
                         'is_verified' => $post->user->is_verified,
                     ],
                     'media' => $post->media->map(fn ($media) => [
                         'file_path' => $media->file_path,
                         'file_type' => $media->file_type,
+                        'disk' => $media->disk,
+                        'url' => $media->url,
                     ]),
                     'hashtags' => $post->hashtags->map(fn ($tag) => [
                         'id' => $tag->id,
@@ -717,7 +790,7 @@ class UserController extends Controller
                                 'id' => $user->id,
                                 'name' => $user->name,
                                 'username' => $user->username,
-                                'profile_image_url' => $user->profileImage?->url,
+                                'profile_image' => $user->profileImage,
                                 'is_verified' => $user->is_verified,
                             ];
                         })
@@ -726,7 +799,7 @@ class UserController extends Controller
                     'current_user' => [
                         'id' => $currentUser->id,
                         'username' => $currentUser->username,
-                        'profile_image_url' => $currentUser->profileImage?->url,
+                        'profile_image' => $currentUser->profileImage,
                         'name' => $currentUser->name,
                         'is_verified' => $currentUser->is_verified,
                     ],
@@ -744,46 +817,71 @@ class UserController extends Controller
 
 
 
-    public function friends(User $user): Response
+    public function friends(Request $request): Response
     {
         $currentUser = Auth::user();
 
+        $sort = $request->input('sort', 'latest');
 
-        $friends = $user->friends()
-            ->with('profileImage')
-            ->select('id', 'name', 'username', 'is_private', 'is_verified')
-            ->get()
-            ->map(function ($friend) use ($currentUser) {
-                $isFollowed = $currentUser ? $currentUser->following->contains('id', $friend->id) : false;
-                $hasSentFollowRequest = $currentUser ? $currentUser->pendingFollowRequests()->where('followee_id', $friend->id)->exists() : false;
-                $isPrivate = $friend->is_private;
-                $isFriend = in_array($friend->id, $currentUser->friends()->pluck('id')->toArray());
-                return [
-                    'id' => $friend->id,
-                    'name' => $friend->name,
-                    'username' => $friend->username,
-                    'profile_image_url' => $friend->profileImage ? $friend->profileImage->url : null,
-                    'is_private' => $isPrivate,
-                    'is_followed' => $isFollowed,
-                    'has_sent_follow_request' => $hasSentFollowRequest,
-                    'is_friend' => $isFriend,
-                    'is_verified' => $friend->is_verified,
-                ];
-            });
+        $friendsQuery = $currentUser->friends()
+            ->with(['profileImage', 'followers'])
+            ->withCount('followers');
+
+        switch ($sort) {
+            case 'latest':
+                $friendsQuery->orderBy('pivot_created_at', 'desc');
+                break;
+
+            case 'oldest':
+                $friendsQuery->orderBy('pivot_created_at', 'asc');
+                break;
+
+            case 'popular':
+                $friendsQuery->orderByDesc('followers_count');
+                break;
+            case 'least_followers':
+                $friendsQuery->orderBy('followers_count');
+                break;
+        }
+
+        $friends = $friendsQuery->get();
+
+        $mappedFriends = $friends->map(function ($friend) use ($currentUser) {
+            return [
+                'id' => $friend->id,
+                'name' => $friend->name,
+                'username' => $friend->username,
+                'profile_image' => $friend->profileImage,
+                'is_private' => $friend->is_private,
+                'is_followed' => $currentUser?->following->contains('id', $friend->id) ?? false,
+                'has_sent_follow_request' => $currentUser?->pendingFollowRequests()->where('followee_id', $friend->id)->exists() ?? false,
+                'followers_count' => $friend->followers->count(),
+                'is_friend' => $currentUser?->friends()->pluck('id')->contains($friend->id) ?? false,
+                'is_verified' => $friend->is_verified,
+            ];
+        });
 
         return Inertia::render('user/friends', [
             'title' => 'Friends',
-            'users' => $friends,
+            'users' => $mappedFriends,
+            'filters' => ['sort' => $sort],
             'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'username' => $user->username,
-                'is_verified' => $user->is_verified,
-                'is_following' => $currentUser ? $user->followers()->where('follower_id', $currentUser->id)->exists() : false,
-                'has_sent_follow_request' => $currentUser ? $currentUser->pendingFollowRequests()->where('followee_id', $user->id)->exists() : false,
+                'id' => $currentUser->id,
+                'name' => $currentUser->name,
+                'username' => $currentUser->username,
+                'is_verified' => $currentUser->is_verified,
+                'profile_image' => $currentUser->profileImage,
+                'is_following' => $currentUser?->followers()->where('follower_id', $currentUser->id)->exists() ?? false,
+                'has_sent_follow_request' => $currentUser?->pendingFollowRequests()->where('followee_id', $currentUser->id)->exists() ?? false,
             ],
         ]);
     }
+
+
+
+
+
+
 
 
 
@@ -830,12 +928,14 @@ class UserController extends Controller
                     'id' => $post->user->id,
                     'name' => $post->user->name,
                     'username' => $post->user->username,
-                    'profile_image_url' => $post->user->profileImage?->url,
+                    'profile_image' => $post->user->profileImage,
                     'is_verified' => $post->user->is_verified,
                 ],
                 'media' => $post->media->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
+                    'disk' => $media->disk,
+                    'url' => $media->url,
                 ]),
                 'hashtags' => $post->hashtags->map(fn ($tag) => [
                     'id' => $tag->id,
@@ -869,7 +969,7 @@ class UserController extends Controller
                             'id' => $user->id,
                             'name' => $user->name,
                             'username' => $user->username,
-                            'profile_image_url' => $user->profileImage?->url,
+                            'profile_image' => $user->profileImage,
                             'is_verified' => $user->is_verified,
                         ];
                     })
@@ -879,7 +979,7 @@ class UserController extends Controller
                 'current_user' => [
                     'id' => $currentUser->id,
                     'username' => $currentUser->username,
-                    'profile_image_url' => $currentUser->profileImage?->url,
+                    'profile_image' => $currentUser->profileImage,
                     'name' => $currentUser->name,
                     'is_verified' => $currentUser->is_verified,
                 ],
@@ -891,7 +991,7 @@ class UserController extends Controller
                 'id' => $user->id,
                 'username' => $user->username,
                 'name' => $user->name,
-                'profile_image_url' => $user->profileImage?->url,
+                'profile_image' => $user->profileImage,
                 'is_verified' => $user->is_verified,
             ],
             'posts' => $posts,

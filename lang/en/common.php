@@ -124,11 +124,11 @@ return [
     "rejected your follow request." => "rejected your follow request.",
     "All:" => "All:",
     "Send Follow Request" => "Send Follow Request",
-    "Start new chat" => "Start new chat",
-    "Not chats anyone yet." => "Not chats anyone yet.",
-    "No messages anyone yet." => "No messages anyone yet.",
+    "Start new chat" => "Start a new chat",
+    "Not chats anyone yet." => "Not chats with anyone yet.",
+    "No messages anyone yet." => "No messages by anyone yet.",
     "Chat with" => "Chat with",
-    "Select user to start new chat" => "Select user to start chat",
+    "Select user to start new chat" => "Select user to start a new chat",
     "Explore trending topics by post engagement." => "Explore trending topics by post engagement.",
     "Likes" => "Likes",
     "Most Posts" => "Most Posts",
@@ -136,6 +136,7 @@ return [
     "Write" => "Write",
     "Mutuals" => "Mutuals",
     "Others" => "Others",
+
 
 
 
@@ -200,5 +201,16 @@ return [
     "Click here to resend the verification email." => "Click here to resend the verification email.",
     "A new verification link has been sent to your email address." => "A new verification link has been sent to your email address.",
     "OR" => "OR",
+    "Most Commented" => "Most Commented",
+    "Most Reposted" => "Most Reposted",
+    "Most Favorited" => "Most Favorited",
+    "Most Activity" => "Most Activity",
+    "Set" => "Already Set",
+    "Unset Profile Image" => "Unset Profile Image",
+    "Unset Cover Image" => "Unset Cover Image",
+    "Undo" => "Undo",
+    "Will be removed" => "Will be removed",
+    "Removed" => "Removed",
+    "Write your first post here" => "Write your first post here",
 ];
 

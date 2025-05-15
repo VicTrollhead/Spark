@@ -2,6 +2,8 @@ import { usePage, Link, Head, router } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
+import { Check, SendIcon } from 'lucide-react';
+import { getProfileImageUrl } from '../../lib/utils';
 
 export default function Following() {
     const { title, users, user, auth, translations } = usePage().props;
@@ -26,6 +28,15 @@ export default function Following() {
         });
     };
 
+    // const getProfileImageUrl = (user) => {
+    //     if ( user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image?.file_path}`;
+    //     }
+    //     return null;
+    // };
+
     return (
         <AppLayout>
             <Head title={translations['Following']} />
@@ -38,18 +49,30 @@ export default function Following() {
                         {users.map((followee) => (
                             <li key={followee.id} className="flex items-center gap-3 py-4 border-b dark:border-gray-700">
                                 <Avatar className="h-24 w-24 border-4 border-white sm:h-28 sm:w-28 dark:border-gray-900">
-                                    <AvatarImage src={followee.profile_image_url} alt={followee.name} />
-                                    <AvatarFallback className="rounded-full bg-gray-300 text-4xl text-black dark:bg-gray-700 dark:text-white">
+                                    <AvatarImage src={getProfileImageUrl(followee)} alt={followee.name} />
+                                    <AvatarFallback className="rounded-full bg-gray-200 text-4xl text-black dark:bg-gray-700 dark:text-white">
                                         {getInitials(followee.name)}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="flex flex-col w-full">
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 justify-between">
                                         <div>
-                                            <Link href={`/user/${followee.username}`} className="font-medium text-blue-500 hover:underline">
-                                                {followee.name}
-                                            </Link>
-                                            <p className="text-gray-500 dark:text-gray-400">@{followee.username}</p>
+                                            <div className="flex items-center gap-1">
+                                                <Link href={`/user/${followee.username}`} className="font-medium text-blue-500 hover:underline break-all">
+                                                    {followee.name}
+                                                </Link>
+                                                {followee.is_verified && (
+                                                    <div className="group relative">
+                                                    <span className="absolute -top-7 left-1/2 top -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                                        Verified
+                                                    </span>
+                                                        <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                        <Check className="h-3 w-3" />
+                                                    </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <p className="text-gray-500 dark:text-gray-400 text-[15px]">@{followee.username}</p>
                                             <p className="text-sm text-gray-400 dark:text-gray-500">
                                                 {followee.followers_count} {translations['Subscribers']}
                                             </p>
@@ -61,25 +84,36 @@ export default function Following() {
                                         </div>
 
                                         {auth.user.id !== followee.id && (
-                                            <button
-                                                onClick={() => handleFollowToggle(followee, followee.is_followed, followee.is_private, followee.has_sent_follow_request)}
-                                                className={`ml-auto px-4 py-2 rounded-md text-white ${
-                                                    followee.has_sent_follow_request
-                                                        ? 'bg-gray-600 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700'
-                                                        : (followee.is_followed
+                                            <div className="flex lg:flex-row flex-col gap-1">
+                                                {followee.is_friend ? (
+                                                    <button
+                                                        onClick={() => router.post(`/chat/user-chat/new/${followee.id}`)}
+                                                        className={`px-4 py-2 flex gap-2 items-center rounded-md bg-gray-600 hover:bg-gray-500 text-white dark:bg-gray-800 dark:hover:bg-gray-700`}
+                                                    >
+                                                        {translations['Write']}<SendIcon className="w-4 h-4" />
+                                                    </button>
+                                                ) : ''}
+                                                <button
+                                                    onClick={() => handleFollowToggle(followee, followee.is_followed || followee.has_sent_follow_request)}
+                                                    className={`ml-auto px-4 py-2 rounded-md text-white ${
+                                                        followee.has_sent_follow_request
                                                             ? 'bg-gray-600 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700'
-                                                            : 'bg-blue-600 hover:bg-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600')
-                                                }`}
-                                            >
-                                                {followee.is_private && !followee.is_followed && !followee.has_sent_follow_request
-                                                    ? translations['Send Follow Request']
-                                                    : (followee.has_sent_follow_request && !followee.is_followed
-                                                        ? translations['Request Sent']
-                                                        : (followee.is_followed
-                                                            ? translations['Unfollow']
-                                                            : translations['Follow']))
-                                                }
-                                            </button>
+                                                            : (followee.is_followed
+                                                                ? 'bg-gray-600 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700'
+                                                                : 'bg-blue-600 hover:bg-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600')
+                                                    }`}
+                                                >
+                                                    {followee.is_private && !followee.is_followed && !followee.has_sent_follow_request
+                                                        ? translations['Send Follow Request']
+                                                        : (followee.has_sent_follow_request && !followee.is_followed
+                                                            ? translations['Request Sent']
+                                                            : (followee.is_followed
+                                                                ? translations['Unfollow']
+                                                                : translations['Follow']))
+                                                    }
+                                                </button>
+                                            </div>
+
                                         )}
                                     </div>
                                 </div>

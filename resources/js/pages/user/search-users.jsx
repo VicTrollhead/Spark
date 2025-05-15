@@ -5,6 +5,7 @@ import { RefreshCw, Search } from 'lucide-react';
 import { useInitials } from '../../hooks/use-initials.jsx';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar.jsx';
 import { Input } from '../../components/ui/input.jsx';
+import { getProfileImageUrl } from '../../lib/utils';
 
 export default function SearchUsers() {
     const { users, sort, searchText, translations } = usePage().props;
@@ -48,6 +49,16 @@ export default function SearchUsers() {
         }, 1000);
     };
 
+    // const getProfileImageUrl = (user) => {
+    //     if (user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image?.file_path}`;
+    //     }
+    //     return null;
+    // };
+
+
     return (
         <AppLayout>
             <Head title={translations['Search users']} />
@@ -67,14 +78,6 @@ export default function SearchUsers() {
                         </div>
 
                         <div className="flex gap-2 w-full">
-                            <button
-                                onClick={handleReload}
-                                className="p-2 text-sm font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition flex items-center"
-                            >
-                                <RefreshCw
-                                    className={`w-6 h-6 ${isLoading ? 'animate-spin' : ''}`}
-                                />
-                            </button>
                             <select
                                 value={sortOption}
                                 onChange={handleSortChange}
@@ -88,6 +91,14 @@ export default function SearchUsers() {
                                 <option value="followers">{translations['Followers']}</option>
                                 <option value="mutual_subscribers">{translations['Friends']}</option>
                             </select>
+                            <button
+                                onClick={handleReload}
+                                className="p-2 text-sm font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition flex items-center"
+                            >
+                                <RefreshCw
+                                    className={`w-6 h-6 ${isLoading ? 'animate-spin' : ''}`}
+                                />
+                            </button>
                         </div>
 
                     </div>
@@ -104,8 +115,8 @@ export default function SearchUsers() {
                             >
                                 <div className="flex items-center space-x-3 min-w-0">
                                     <Avatar className="h-10 w-10 flex-shrink-0">
-                                        <AvatarImage src={user.profile_image_url} alt={user.name} />
-                                        <AvatarFallback className="rounded-full bg-gray-300 text-lg text-black dark:bg-gray-700 dark:text-white">
+                                        <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
+                                        <AvatarFallback className="rounded-full bg-gray-200 text-lg text-black dark:bg-gray-700 dark:text-white">
                                             {getInitials(user.name)}
                                         </AvatarFallback>
                                     </Avatar>

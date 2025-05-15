@@ -1,9 +1,11 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { Bookmark, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat, Trash2 } from 'lucide-react';
+import { Bookmark, Check, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
+import {Comment} from "../../components/comment.jsx";
+import { getProfileImageUrl, getMediaUrl } from '../../lib/utils';
 
 export default function Show() {
     const { post, auth, sort, translations } = usePage().props;
@@ -11,7 +13,6 @@ export default function Show() {
     const {
         data,
         setData,
-        post: sendPost,
         processing,
         reset,
         errors,
@@ -23,7 +24,6 @@ export default function Show() {
 
     const [sortOption, setSortOption] = useState(sort || 'latest');
     const isOwnPost = auth.user && auth.user.id === post.user.id;
-
     const [isLiked, setIsLiked] = useState(post.is_liked);
     const [likesCount, setLikesCount] = useState(post.likes_count);
     const [isFavorited, setIsFavorited] = useState(post.is_favorited);
@@ -43,7 +43,7 @@ export default function Show() {
 
         document.addEventListener('mousedown', handleClickOutside);
 
-        window.Echo.private(`post.${post.id}`).listen('CommentCreated', (e) => {
+        window.Echo.private(`post.${post.id}`).listen('CommentCreated', () => {
             router.reload();
         });
         return () => {
@@ -63,9 +63,13 @@ export default function Show() {
     const handleLike = async () => {
         setIsLiked(!isLiked);
         setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
+        const action = isLiked ? `/unlike` : `/like`;
         await router.post(
-            isLiked ? `/post/${post.id}/unlike` : `/post/${post.id}/like`,
-            {},
+            action,
+            {
+                type: 'post',
+                id: post.id,
+            },
             {
                 preserveScroll: true,
                 onError: () => {
@@ -112,20 +116,6 @@ export default function Show() {
         setData({ content: '', post_id: post.id, parent_comment_id: null });
     };
 
-    const handleDeleteComment = async (commentId) => {
-        if (!window.confirm(translations['Are you sure you want to delete this comment?'])) return;
-        await router.post(
-            `/comment/${commentId}/delete`,
-            {},
-            {
-                preserveScroll: true,
-                onSuccess: () => {
-                    router.reload({ only: ['post'] });
-                },
-            },
-        );
-    };
-
     const handleRepost = async () => {
         if (post.is_private || post.user.is_private) {
             alert(translations['You cannot repost private posts.']);
@@ -152,6 +142,26 @@ export default function Show() {
         );
     };
 
+    // const getMediaUrl = (file) => {
+    //     if (file?.disk === 's3') {
+    //         return file.url;
+    //     } else if (file?.file_path) {
+    //         return `/storage/${file.file_path}`;
+    //     }
+    //     return null;
+    // };
+
+    // const getProfileImageUrl = (user) => {
+    //     if (user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image.file_path}`;
+    //     }
+    //     return null;
+    // };
+
+    const profileImageUrl = getProfileImageUrl(post.user);
+
     return (
         <AppLayout>
             <Head title={`${translations['Post by']} @${post.user.username}`} />
@@ -159,19 +169,31 @@ export default function Show() {
             <div className="p-6">
                 <div className="flex justify-between">
                     <div className="flex items-center space-x-3">
-                        <Avatar className="h-20 w-20 border border-gray-300 dark:border-gray-700">
-                            <AvatarImage src={post.user.profile_image_url} alt={post.user.name} />
-                            <AvatarFallback className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white">
+                        <Avatar className="h-20 w-20 border border-gray-200 dark:border-gray-700 text-2xl">
+                            <AvatarImage src={profileImageUrl} alt={post.user.name} />
+                            <AvatarFallback className="bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white">
                                 {getInitials(post.user.name)}
                             </AvatarFallback>
                         </Avatar>
                         <div>
-                            <Link
-                                href={`/user/${post.user.username}`}
-                                className="text-lg font-semibold text-gray-900 hover:underline dark:text-white"
-                            >
-                                {post.user.name}
-                            </Link>
+                            <div className="flex items-center gap-1">
+                                <Link
+                                    href={`/user/${post.user.username}`}
+                                    className="text-lg font-semibold text-gray-900 hover:underline dark:text-white"
+                                >
+                                    {post.user.name}
+                                </Link>
+                                {post.user.is_verified && (
+                                    <div className="group relative">
+                                            <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                                Verified
+                                            </span>
+                                        <span className="flex items-center rounded-md bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                <Check className="h-3 w-3" />
+                                            </span>
+                                    </div>
+                                )}
+                            </div>
                             <p className="text-md text-gray-500 dark:text-gray-400">@{post.user.username}</p>
                         </div>
                     </div>
@@ -202,26 +224,20 @@ export default function Show() {
                 </div>
 
                 <div className="mt-4">
-                    <p className="text-xl text-gray-800 dark:text-gray-200">{post.content}</p>
+                    <p className="text-xl text-gray-800 dark:text-gray-200 max-w-7xl break-all">{post.content}</p>
                     {post.media.length > 0 && (
                         <div className="mt-2 grid grid-cols-1 gap-3 py-1 sm:grid-cols-2">
                             {post.media.map((file, index) => {
                                 const uniqueKey = file.id ? `${post.id}-${file.id}` : `${post.id}-${file.file_path}-${index}`;
+                                const mediaUrl = getMediaUrl(file);
                                 return file.file_type === 'image' ? (
-                                    <div
-                                        key={uniqueKey}
-                                        className="relative flex w-full items-center justify-center overflow-hidden rounded-lg border dark:border-gray-700"
-                                    >
-                                        <img
-                                            src={`/storage/${file.file_path}`}
-                                            alt="Post Media"
-                                            className="object-contain transition-transform duration-300 hover:scale-102"
-                                        />
+                                    <div key={uniqueKey} className="relative flex w-full items-center justify-center overflow-hidden rounded-lg border dark:border-gray-700">
+                                        <img src={mediaUrl} alt="Post Media" className="object-contain transition-transform duration-300 hover:scale-102" />
                                     </div>
                                 ) : (
                                     <div key={uniqueKey} className="relative w-full overflow-hidden rounded-lg border dark:border-gray-700">
                                         <video controls className="h-auto w-full rounded-lg object-contain">
-                                            <source src={`/storage/${file.file_path}`} type="video/mp4" />
+                                            <source src={mediaUrl} type="video/mp4" />
                                         </video>
                                     </div>
                                 );
@@ -280,7 +296,7 @@ export default function Show() {
 
                     {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
                 </div>
-                {post.reposted_by_recent.length > 0 && (
+                {(post.reposted_by_recent.length > 0 || post.reposted_by_you) && (
                     <div className="mt-7 px-2">
                         {(post.reposted_by_you || post.reposted_by_recent?.length > 0) && (
                             <div className="mb-2 flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
@@ -291,7 +307,7 @@ export default function Show() {
                                     <span className="flex items-center">
                                     <Link href={`/user/${post.current_user.username}`}>
                                         <Avatar className="h-6 w-6 border">
-                                            <AvatarImage src={post.current_user.profile_image_url} alt={post.current_user.name} />
+                                            <AvatarImage src={getProfileImageUrl(post.current_user)} alt={post.current_user.name} />
                                             <AvatarFallback>{getInitials(post.current_user.name)}</AvatarFallback>
                                         </Avatar>
                                     </Link>
@@ -309,7 +325,7 @@ export default function Show() {
                                             <span key={user.id} className="flex items-center">
                                             <Link href={`/user/${user.username}`}>
                                                 <Avatar className="h-6 w-6 border">
-                                                    <AvatarImage src={user.profile_image_url} alt={user.name} />
+                                                    <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
                                                     <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                                                 </Avatar>
                                             </Link>
@@ -367,34 +383,7 @@ export default function Show() {
                 <div className="divide-y divide-gray-200 dark:divide-neutral-800">
                     {post.comments.length > 0 ? (
                         post.comments.map((comment) => (
-                            <div key={comment.id} className="flex items-center space-x-3 py-4">
-                                <Avatar className="h-12 w-12 border border-gray-300 dark:border-gray-700">
-                                    <AvatarImage src={comment.user.profile_image_url} alt={comment.user.name} />
-                                    <AvatarFallback className="bg-gray-300 text-gray-900 dark:bg-gray-700 dark:text-white">
-                                        {getInitials(comment.user.name)}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-1.5">
-                                            <Link
-                                                href={`/user/${comment.user.username}`}
-                                                className="font-semibold text-gray-900 hover:underline dark:text-white"
-                                            >
-                                                {comment.user.name}
-                                            </Link>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">{comment.created_at}</p>
-                                        </div>
-                                    </div>
-                                    <p className={`mt-1 text-gray-800 dark:text-gray-200`}>{comment.content}</p>
-                                </div>
-                                {auth.user?.id === comment.user.id && (
-                                    <Trash2
-                                        className="h-5 w-5 cursor-pointer text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-500"
-                                        onClick={() => handleDeleteComment(comment.id)}
-                                    />
-                                )}
-                            </div>
+                            <Comment key={comment.id} comment={comment} auth_user={auth.user}/>
                         ))
                     ) : (
                         <p className="py-4 text-gray-500 dark:text-gray-400">{translations['No comments yet.']}</p>

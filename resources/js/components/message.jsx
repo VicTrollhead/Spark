@@ -1,8 +1,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx';
 import { Link, router, usePage } from '@inertiajs/react';
-import { EllipsisVertical } from 'lucide-react';
+import { Check, EllipsisVertical } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useInitials } from '../hooks/use-initials.jsx';
+import { getProfileImageUrl } from '../lib/utils';
 
 export default function Message({ userId, message }) {
     const { translations } = usePage().props;
@@ -49,6 +50,15 @@ export default function Message({ userId, message }) {
 
     const toggleOptions = () => setShowOptions((prev) => !prev);
 
+    // const getProfileImageUrl = (user) => {
+    //     if (user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image?.file_path}`;
+    //     }
+    //     return null;
+    // };
+
     return (
         <>
             {userId === message.user.id ? (
@@ -83,22 +93,32 @@ export default function Message({ userId, message }) {
                 <div className="mb-2 flex">
                     <div className="w-full sm:max-w-md">
                         <div className="mb-1 flex justify-between text-xs text-gray-500">
-                            <Link href={`/user/${message.user.username}`} className="flex w-fit items-center">
+                            <Link href={`/user/${message.user.username}`} className="flex  w-fit items-center">
                                 <div className="flex items-center gap-2">
                                     <div className="grid flex-1 text-left leading-tight">
-                                        <div>
-                                            <span className="truncate text-lg text-black hover:underline dark:text-white">{message.user.name}</span>
+                                        <div className="flex items-center gap-1">
+                                            <span className="break-all min-w-24 text-lg text-black hover:underline dark:text-white ">{message.user.name}</span>
+                                            {message.user.is_verified && (
+                                                <div className="group relative">
+                                                    <span className="top absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                                        Verified
+                                                    </span>
+                                                    <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                        <Check className="h-3 w-3" />
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
-                                    <span className="text-xs text-neutral-700 dark:text-white">{formatMessageTime(message.time)}</span>
+                                    <span className="text-xs text-neutral-700 dark:text-white break-all">{formatMessageTime(message.time)}</span>
                                 </div>
                             </Link>
                         </div>
                         <div className="flex flex-row gap-2">
                             <Link href={`/user/${message.user.username}`} className="hidden md:flex">
                                 <Avatar className="h-10 w-10 overflow-hidden rounded-full">
-                                    <AvatarImage src={message.user.profile_image_url} alt={message.user.name} />
-                                    <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                    <AvatarImage src={getProfileImageUrl(message.user)} alt={message.user.name} />
+                                    <AvatarFallback className="rounded-lg bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
                                         {getInitials(message.user.name)}
                                     </AvatarFallback>
                                 </Avatar>

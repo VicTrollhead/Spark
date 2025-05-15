@@ -2,6 +2,7 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { ArrowRight, Bookmark, Check, Eye, EyeOff, Heart, MessageSquare, Repeat, Users } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar.jsx';
 import { useInitials } from '../hooks/use-initials.jsx';
+import { getProfileImageUrl } from '../lib/utils';
 
 export function Notification({ notification }) {
     const { translations } = usePage().props;
@@ -23,25 +24,32 @@ export function Notification({ notification }) {
     const renderUserLink = (username, name) => (
         <Link
             href={`/user/${username}`}
-            className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
+            className="flex  items-center gap-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
         >
-        <span>
-            {name} <span className="text-sm">(@{username})</span>
-        </span>
-            {sourceUser.is_verified && (
-                <span className="group relative inline-block">
-                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
-                    Verified
-                </span>
-                    <span className="flex items-center justify-center rounded-md bg-blue-500 p-0.5 ml-0.5 text-white">
-                    <Check className="h-4 w-4" />
-                </span>
+            <span className="break-all">
+                {name} <span className="text-sm">(@{username})</span>
             </span>
+            {sourceUser.is_verified && (
+                <div className="group relative">
+                    <span className="top absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                        Verified
+                    </span>
+                    <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
+                        <Check className="h-3 w-3" />
+                    </span>
+                </div>
             )}
         </Link>
     );
 
-
+    // const getProfileImageUrl = (user) => {
+    //     if (user?.profile_image?.disk === 's3') {
+    //         return user.profile_image?.url;
+    //     } else if (user?.profile_image?.file_path) {
+    //         return `/storage/${user.profile_image?.file_path}`;
+    //     }
+    //     return null;
+    // };
 
     const handleFollowRequest = (action) => {
         router.post(
@@ -184,12 +192,12 @@ export function Notification({ notification }) {
 
     return (
         <div
-            className={`border-l-4 ${getColor(notification.type)} flex items-start gap-4 border-t-0 border-r-0 border-b-gray-400 bg-gray-100 p-5 transition-all hover:bg-gray-200 dark:bg-neutral-900 dark:hover:bg-neutral-950`}
+            className={`border-l-4 ${getColor(notification.type)} flex items-start gap-3 border-t-0 border-r-0 border-b-gray-400 bg-gray-100 p-5 transition-all hover:bg-gray-200 dark:bg-neutral-900 dark:hover:bg-neutral-950`}
         >
             <div className="hidden items-center gap-4 md:flex">
                 <Avatar className="h-14 w-14">
-                    <AvatarImage src={sourceUser.profile_image_url} alt={sourceUser.name} />
-                    <AvatarFallback className="rounded-full bg-gray-300 text-black dark:bg-gray-700 dark:text-white">
+                    <AvatarImage src={getProfileImageUrl(sourceUser)} alt={sourceUser.name} />
+                    <AvatarFallback className="rounded-full bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
                         {getInitials(sourceUser.name)}
                     </AvatarFallback>
                 </Avatar>
@@ -200,9 +208,9 @@ export function Notification({ notification }) {
             </div>
             <div className="my-auto">
                 {notification.is_read ? (
-                    <EyeOff size={28} onClick={toggleReadStatus} className="cursor-pointer" />
+                    <EyeOff size={26} onClick={toggleReadStatus} className="cursor-pointer" />
                 ) : (
-                    <Eye size={28} onClick={toggleReadStatus} className="cursor-pointer" />
+                    <Eye size={26} onClick={toggleReadStatus} className="cursor-pointer" />
                 )}
             </div>
             {post && post.user && (

@@ -17,7 +17,7 @@ export default function EveryoneChat () {
     const connectWebSocket = () => {
         window.Echo.private(webSocketChannel)
             .listen('GotMessage', async (e) => {
-                // console.log(e.message)
+                console.log(e.message)
                 await getMessages();
             });
     }
@@ -56,7 +56,7 @@ export default function EveryoneChat () {
             <Head title={translations['Everyone chat']} />
             <div className="flex justify-center h-fit">
                 <div className="w-full">
-                    <div className="bg-white dark:border-gray-800 dark:bg-neutral-950 shadow-md rounded-lg flex flex-col h-[90vh] max-h-[90vh]">
+                    <div className="flex flex-col max-h-[calc(100vh-4.2rem)] h-[calc(100vh-4.2rem)] rounded-lg bg-white shadow-md dark:border-gray-800 dark:bg-neutral-950">
                         <div className="flex-1 flex flex-col overflow-y-auto px-4 py-3">
                             {messages?.length > 0 ? (
                                 <>

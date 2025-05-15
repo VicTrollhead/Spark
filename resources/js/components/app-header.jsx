@@ -1,27 +1,36 @@
+import AppearanceToggle from '@/components/appearance-toggle.jsx';
 import { Icon } from '@/components/icon';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx';
+import { Badge } from '@/components/ui/badge.jsx';
 import { Button } from '@/components/ui/button';
+import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu.jsx';
+import { Input } from '@/components/ui/input.jsx';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { useInitials } from '@/hooks/use-initials.jsx';
 import { cn } from '@/lib/utils';
 import { Link, router, usePage } from '@inertiajs/react';
 import {
-    Bookmark, Folder, FolderHeart, Hash,
-    Home, List,
+    Bookmark,
+    Check,
+    Folder,
+    FolderHeart,
+    Hash,
+    Home,
+    List,
     LogOut,
     Mail,
-    Menu, MessagesSquareIcon, Repeat, Search,
+    Menu,
+    MessagesSquareIcon,
+    Repeat,
+    Search,
     Settings,
     User,
-    Users
+    Users,
 } from 'lucide-react';
-import AppLogo from './app-logo';
-import { Input } from '@/components/ui/input.jsx';
-import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu.jsx';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx';
-import { useInitials } from '@/hooks/use-initials.jsx';
-import AppearanceToggle from '@/components/appearance-toggle.jsx';
 import { useEffect, useState } from 'react';
-import { Badge } from '@/components/ui/badge.jsx';
+import { getProfileImageUrl } from '../lib/utils.js';
+import AppLogo from './app-logo';
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
@@ -35,8 +44,8 @@ export function AppHeader({ breadcrumbs = [] }) {
     const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
     useEffect(() => {
-        fetchUnreadNotificationsCount().catch(error => console.error(error));
-        fetchUnreadMessagesCount().catch(error => console.error(error));
+        fetchUnreadNotificationsCount().catch((error) => console.error(error));
+        fetchUnreadMessagesCount().catch((error) => console.error(error));
     }, []);
 
     const fetchUnreadNotificationsCount = async () => {
@@ -61,24 +70,17 @@ export function AppHeader({ breadcrumbs = [] }) {
 
     window.Echo.private(`notifications.${user.id}`)
         .listen('NotificationCreated', (e) => {
-            setUnreadNotificationsCount(unreadNotificationsCount+1);
+            setUnreadNotificationsCount(unreadNotificationsCount + 1);
         })
         .listen('NotificationIsReadChange', (e) => {
-            if(e.operation === 'read')
-            {
-                setUnreadNotificationsCount(unreadNotificationsCount-1);
-            }
-            else if (e.operation === 'unread')
-            {
-                setUnreadNotificationsCount(unreadNotificationsCount+1);
-            }
-            else if (e.operation === 'allRead')
-            {
+            if (e.operation === 'read') {
+                setUnreadNotificationsCount(unreadNotificationsCount - 1);
+            } else if (e.operation === 'unread') {
+                setUnreadNotificationsCount(unreadNotificationsCount + 1);
+            } else if (e.operation === 'allRead') {
                 setUnreadNotificationsCount(0);
-            }
-            else if (e.operation === 'allUnread')
-            {
-                fetchUnreadNotificationsCount().catch(error => console.error(error));
+            } else if (e.operation === 'allUnread') {
+                fetchUnreadNotificationsCount().catch((error) => console.error(error));
             }
         });
 
@@ -128,7 +130,7 @@ export function AppHeader({ breadcrumbs = [] }) {
         },
         {
             title: translations['Friends'],
-            url: `/user/${user.username}/friends`,
+            url: `/user/friends`,
             icon: Users,
         },
         {
@@ -178,7 +180,6 @@ export function AppHeader({ breadcrumbs = [] }) {
 
     const handleLogout = () => {
         router.post(`/logout`);
-        window.location.href = "/login";
     };
 
     return (
@@ -193,9 +194,9 @@ export function AppHeader({ breadcrumbs = [] }) {
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="Avatar my-4 mr-2.5 -ml-1 h-9 w-9 hover:bg-neutral-300 dark:hover:bg-neutral-800"
+                                    className="Avatar my-4 mr-2.5 -ml-1 h-9 w-9 hover:bg-gray-300 dark:hover:bg-neutral-700"
                                 >
-                                    <Menu className="h-8 w-8" />
+                                    <Menu className="h-9 w-9" />
                                 </Button>
                             </SheetTrigger>
                             <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between gap-0 pl-5">
@@ -203,27 +204,42 @@ export function AppHeader({ breadcrumbs = [] }) {
                                 <SheetHeader className="flex justify-start p-0 pt-3 text-left">
                                     <div className="flex items-center gap-1">
                                         <Link href={user.username ? `/user/${user.username}` : '/user'} prefetch>
-                                            <Avatar className="my-3 size-10">
-                                                <AvatarImage src={user.profile_image_url} alt={user.name} />
-                                                <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-gray-700 dark:text-white">
+                                            <Avatar className="h-12 w-12 overflow-hidden rounded-full">
+                                                <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
+                                                <AvatarFallback className="rounded-lg bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
                                                     {getInitials(user.name)}
                                                 </AvatarFallback>
                                             </Avatar>
                                         </Link>
                                         <Link href={user.username ? `/user/${user.username}` : '/user'} prefetch className="ml-2">
-                                            <h1 className="text-1l ml-1 font-bold text-gray-900 dark:text-white">{user.name}</h1>
-                                            <p className="text-gray-500 dark:text-gray-400">@{user.username}</p>
+                                            <div className="grid flex-1 text-left leading-tight">
+                                                <div className="flex items-center gap-1 -ml-1">
+                                                    <span className="truncate text-[14px] text-gray-700 dark:text-neutral-300">
+                                                        @{user.username}
+                                                    </span>
+                                                    {user.is_verified && (
+                                                        <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                            <Check className="h-3 w-3" />
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <span className="truncate text-lg font-extrabold break-all">{user.name}</span>
+                                            </div>
                                         </Link>
                                     </div>
                                 </SheetHeader>
                                 <div className="mt-4 flex h-full flex-1 flex-col">
                                     <div className="flex h-full flex-col justify-between text-sm">
-                                        <div className="flex flex-col space-y-4 gap-0.5">
+                                        <div className="flex flex-col gap-0.5 space-y-4">
                                             {sideBarNavItems.map((item) => (
-                                                <Link key={item.title + item.url} href={item.url} className="flex items-center space-x-2 gap-1">
+                                                <Link key={item.title + item.url} href={item.url} className="flex items-center gap-1 space-x-2">
                                                     {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
                                                     <span>{item.title}</span>
-                                                    {item.count && item.count !== 0 ? (<Badge className="bg-neutral-500 dark:bg-neutral-300">{item.count}</Badge>) : ''}
+                                                    {item.count && item.count !== 0 ? (
+                                                        <Badge className="bg-neutral-500 dark:bg-neutral-300">{item.count}</Badge>
+                                                    ) : (
+                                                        ''
+                                                    )}
                                                 </Link>
                                             ))}
                                             <DropdownMenuSeparator className="mb-5" />
@@ -298,4 +314,3 @@ export function AppHeader({ breadcrumbs = [] }) {
         </>
     );
 }
-

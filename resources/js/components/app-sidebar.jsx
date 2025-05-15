@@ -101,7 +101,7 @@ export function AppSidebar() {
         },
         {
             title: translations['Friends'],
-            url: `/user/${user.username}/friends`,
+            url: `/user/friends`,
             icon: Users,
         },
         {
@@ -146,7 +146,7 @@ export function AppSidebar() {
         <Sidebar
                  variant="inset"
                  collapsible="none"
-                 className="bg-transparent fixed top-16 left-0 w-64 h-[calc(100vh-4rem)] shadow-md hidden lg:flex">
+                 className="bg-transparent fixed top-16 left-0 w-[17rem] h-[calc(100vh-4rem)] shadow-lg hidden lg:flex">
             <SidebarHeader>
                 <NavUser />
             </SidebarHeader>
