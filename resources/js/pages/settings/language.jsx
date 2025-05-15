@@ -17,6 +17,7 @@ const breadcrumbs = [
 
 
 export default function Language() {
+    const { translations } = usePage().props;
     const { locale } = usePage().props;
     const [localeOption, setLocaleOption] = useState(locale || 'en');
 
@@ -38,14 +39,14 @@ export default function Language() {
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Language" description="Update your account's language"/>
+                    <HeadingSmall title= {translations["Language"]} description={translations["Update your account's language"]}/>
                     <select
                         value={localeOption}
                         onChange={handleLanguageChange}
                         className="p-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
                     >
-                        <option value="en">English</option>
-                        <option value="ua">Ukrainian</option>
+                        <option value="en">{translations["English"]}</option>
+                        <option value="ua">{translations["Ukrainian"]}</option>
                     </select>
                 </div>
             </SettingsLayout>
