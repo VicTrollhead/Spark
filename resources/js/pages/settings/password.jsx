@@ -73,7 +73,7 @@ export default function Password() {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">>{translations["Confirm password"]}</Label>
+                            <Label htmlFor="password_confirmation">{translations["Confirm password"]}</Label>
 
                             <Input id="password_confirmation" value={data.password_confirmation} onChange={(e) => setData('password_confirmation', e.target.value)} type="password" className="mt-1 block w-full" autoComplete="new-password" placeholder={translations["Confirm password"]}/>
 

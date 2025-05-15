@@ -9,20 +9,16 @@ export default function LogoIcon({ className = '', ...props }) {
     );
 
     useEffect(() => {
-        // Функція, яка оновлює стан теми
         const updateDarkMode = () => {
             const isDark = document.documentElement.classList.contains('dark');
             setIsDarkMode(isDark);
         };
 
-        // Слухаємо зміни класу 'dark' (через зміни теми)
         const observer = new MutationObserver(updateDarkMode);
         observer.observe(document.documentElement, {
             attributes: true,
             attributeFilter: ['class'],
         });
-
-        // І одразу викликаємо для початкової теми
         updateDarkMode();
 
         return () => observer.disconnect();
@@ -32,7 +28,7 @@ export default function LogoIcon({ className = '', ...props }) {
         <img
             src={isDarkMode ? sparkLight : sparkDark}
             alt="Spark logo"
-            className={cn('h-10', className)}
+            className={cn('h-8', className)}
             {...props}
         />
     );

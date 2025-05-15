@@ -208,6 +208,9 @@ return [
     "Undo" => "Відмінити",
     "Will be removed" => "Буде видалено",
     "Write your first post here" => "Напишіть свій перший пост",
-
-
+    "Don't have an account?" => "Не маєте акаунту?",
+    "Register" => "Зареєструйтесь",
+    "Sign up" => "Зареєструйтесь",
+    "Reposted by" => "Репостнуто",
+    "(you)" => "(вами)",
 ];

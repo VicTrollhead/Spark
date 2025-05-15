@@ -12,7 +12,7 @@ export default function AppearanceToggle({ className = '', ...props }) {
             onClick={() => updateAppearance(isDarkMode ? 'light' : 'dark')}
             className={cn(
                 'flex items-center gap-2 rounded-full bg-neutral ml-1 transition dark:bg-neutral',
-                'hover:bg-neutral-300 dark:hover:bg-neutral-700',
+                'hover:bg-neutral-300 dark:hover:bg-neutral-700 bg-gray-100 dark:bg-neutral-800',
                 className
             )}
             {...props}

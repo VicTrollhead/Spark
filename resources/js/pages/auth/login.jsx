@@ -130,9 +130,15 @@ export default function Login({ status, canResetPassword, googleClientId }) {
                     </div>
                 </div>
 
-                <Button type="button" onClick={navigateToRegister} className="mt-4 w-full" tabIndex={5}>
-                    {translations["Sign Up"]}
-                </Button>
+                {/*<Button type="button" onClick={navigateToRegister} className="mt-4 w-full" tabIndex={5}>*/}
+                {/*    {translations["Sign Up"]}*/}
+                {/*</Button>*/}
+                <div className="text-muted-foreground text-center text-sm">
+                    {translations["Don't have an account?"]}{' '}
+                    <TextLink href={route('register')} tabIndex={6}>
+                        {translations["Sign up"]}
+                    </TextLink>
+                </div>
             </form>
 
             {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}

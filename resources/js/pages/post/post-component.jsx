@@ -153,7 +153,7 @@ export default function PostComponent({ post, compact = false }) {
                     {(post.reposted_by_you || post.reposted_by_recent?.length > 0) && (
                         <div className="mb-2 flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                             <Repeat className="h-4 w-4" />
-                            <span>Reposted by</span>
+                            <span>{translations['Reposted by']}</span>
 
                             {post.reposted_by_you && (
                                 <span className="flex items-center">
@@ -166,7 +166,7 @@ export default function PostComponent({ post, compact = false }) {
                                     <Link href={`/user/${post.current_user.username}`} className="ml-1 text-blue-500 hover:underline break-all">
                                         {post.current_user.name}
                                     </Link>
-                                    <span className="ml-1">(you)</span>
+                                    <span className="ml-1">{translations['(you)']}</span>
                                     {post.current_user.is_verified && (
                                         <div className="group relative">
                                             <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">

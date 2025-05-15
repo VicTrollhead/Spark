@@ -258,11 +258,11 @@ export function AppHeader({ breadcrumbs = [] }) {
                         </Sheet>
                     </div>
 
-                    <div className="flex w-1/6 items-center space-x-2">
+                    <div className="flex w-1/6 items-center space-x-2 lg:space-x-0">
                         <Link href="/dashboard" prefetch>
                             <AppLogo />
                         </Link>
-                        <AppearanceToggle className="ml-4 justify-center p-2.5" />
+                        <AppearanceToggle className="ml-5 lg:ml-2.5 justify-center p-2.5" />
                     </div>
 
                     {/* Desktop Navigation */}

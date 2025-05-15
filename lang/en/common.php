@@ -212,5 +212,10 @@ return [
     "Will be removed" => "Will be removed",
     "Removed" => "Removed",
     "Write your first post here" => "Write your first post here",
+    "Don't have an account?" => "Don't have an account?",
+    "Register" => "Register",
+    "Sign up" => "Sign up",
+    "Reposted by" => "Reposted by",
+    "(you)" => "(you)",
 ];
 

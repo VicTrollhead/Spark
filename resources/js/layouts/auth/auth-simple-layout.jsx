@@ -22,7 +22,7 @@ export default function AuthSimpleLayout({ children, title, description, imageSr
 
             <div className="flex w-full flex-col p-6 md:w-7/12 md:p-10">
                 <div className="mb-6 flex w-full items-center justify-between">
-                    <Icon />
+                    <Icon className="h-10"/>
 
                     <div className="flex items-center gap-2">
                         <AppearanceToggle className="justify-center p-2.5" />

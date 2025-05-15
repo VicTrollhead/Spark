@@ -301,7 +301,7 @@ export default function Show() {
                         {(post.reposted_by_you || post.reposted_by_recent?.length > 0) && (
                             <div className="mb-2 flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                                 <Repeat className="h-4 w-4" />
-                                <span>Reposted by</span>
+                                <span>{translations['Reposted by']}</span>
 
                                 {post.reposted_by_you && (
                                     <span className="flex items-center">
@@ -314,7 +314,7 @@ export default function Show() {
                                     <Link href={`/user/${post.current_user.username}`} className="ml-1 text-blue-500 hover:underline">
                                         {post.current_user.name}
                                     </Link>
-                                    <span className="ml-1">(you)</span>
+                                    <span className="ml-1">{translations['(you)']}</span>
                                         {post.reposted_by_you && post.reposted_by_recent?.length > 1 && <span>,</span>}
                                 </span>
                                 )}
