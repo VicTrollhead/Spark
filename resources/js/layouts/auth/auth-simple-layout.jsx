@@ -1,16 +1,20 @@
-import AppLogoIcon from '../../components/app-logo-icon';
 import { usePage, Link } from '@inertiajs/react';
 import { Globe } from "lucide-react";
 import AppearanceToggle from "../../components/appearance-toggle";
 import Icon from "../../components/ui/logo-icon.jsx";
+import { useState } from 'react';
+
+import AuthLanguageToggle from '../../components/ui/auth-language-toggle';
 
 
 export default function AuthSimpleLayout({ children, title, description, imageSrc, titleSrc }) {
+    const { locale } = usePage().props;
+    const [localeOption, setLocaleOption] = useState(locale || 'en');
     const { translations } = usePage().props;
     return (
         <div className="bg-background flex min-h-svh">
             <div
-                className="relative hidden md:w-5/12 md:flex md:items-start md:justify-center lg:w-1/2 bg-cover bg-center "
+                className="relative hidden bg-cover bg-center md:flex md:w-5/12 md:items-start md:justify-center lg:w-1/2"
                 style={{ backgroundImage: `url(${imageSrc})` }}
             >
                 <img src={titleSrc} alt="Title" className="mt-20 w-3/4 object-fill" />
@@ -22,21 +26,21 @@ export default function AuthSimpleLayout({ children, title, description, imageSr
 
                     <div className="flex items-center gap-2">
                         <AppearanceToggle className="justify-center p-2.5" />
-                        <button className="bg-neutral dark:bg-neutral', 'hover:bg-neutral-300 ml-1 flex items-center gap-2 rounded-full p-2.5 transition dark:hover:bg-neutral-700">
-                            <Globe className="h-4 w-4" />
-                            EN
-                        </button>
+                        <AuthLanguageToggle />
+
                     </div>
                 </div>
 
                 <div className="flex flex-1 flex-col items-center justify-center">
-                    <span className="mb-4 text-6xl font-extrabold sm:text-6xl md:text-5xl lg:text-6xl">
-                        {translations["In the Comfort"]}
-                        <br />
-                        {translations["Zone"]}
-                    </span>
-
                     <div className="w-full max-w-sm">
+                        <div className="mb-8">
+                            <span className="text-6xl font-extrabold sm:text-6xl md:text-5xl lg:text-6xl">
+                                {translations['In the Comfort']}
+                                <br />
+                                {translations['Zone']}
+                            </span>
+                        </div>
+
                         <div className="flex flex-col gap-4">
                             <div className="flex flex-col items-start gap-4">
                                 <Link href={route('home')} className="flex flex-col items-center gap-2 font-medium">
@@ -52,20 +56,39 @@ export default function AuthSimpleLayout({ children, title, description, imageSr
                     </div>
                 </div>
 
-                <footer className="mt-8 flex flex-wrap gap-4 justify-center text-center text-sm text-gray-500">
-                    <a href="#" className="hover:underline">{translations["About us"]}</a>
-                    <a href="#" className="hover:underline">{translations["Terms of service"]}</a>
-                    <a href="#" className="hover:underline">{translations["Privacy Policy"]}</a>
-                    <a href="#" className="hover:underline">{translations["Cookie Policy"]}</a>
-                    <a href="#" className="hover:underline">{translations["Contact and Registration Information"]}</a>
-                    <a href="#" className="hover:underline">{translations["Accessibility"]}</a>
-                    <a href="#" className="hover:underline">{translations["Advertising Information"]}</a>
-                    <a href="#" className="hover:underline">{translations["Blog"]}</a>
-                    <a href="#" className="hover:underline">{translations["Advertising"]}</a>
-                    <a href="#" className="hover:underline">{translations["Settings"]}</a>
-                    © 2025 SparkCorp
-                    .</footer>
-
+                <footer className="mt-8 flex flex-wrap justify-center gap-4 text-center text-sm text-gray-500">
+                    <a href="#" className="hover:underline">
+                        {translations['About us']}
+                    </a>
+                    <a href="#" className="hover:underline">
+                        {translations['Terms of service']}
+                    </a>
+                    <a href="#" className="hover:underline">
+                        {translations['Privacy Policy']}
+                    </a>
+                    <a href="#" className="hover:underline">
+                        {translations['Cookie Policy']}
+                    </a>
+                    <a href="#" className="hover:underline">
+                        {translations['Contact and Registration Information']}
+                    </a>
+                    <a href="#" className="hover:underline">
+                        {translations['Accessibility']}
+                    </a>
+                    <a href="#" className="hover:underline">
+                        {translations['Advertising Information']}
+                    </a>
+                    <a href="#" className="hover:underline">
+                        {translations['Blog']}
+                    </a>
+                    <a href="#" className="hover:underline">
+                        {translations['Advertising']}
+                    </a>
+                    <a href="#" className="hover:underline">
+                        {translations['Settings']}
+                    </a>
+                    © 2025 SparkCorp .
+                </footer>
             </div>
         </div>
     );

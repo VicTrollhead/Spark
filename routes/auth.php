@@ -9,6 +9,10 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LanguageController;
+
+Route::get('settings/language', [LanguageController::class, 'show'])->name('language.show');
+Route::post('settings/language/{newLang}', [LanguageController::class, 'change'])->name('language.newLang');
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])

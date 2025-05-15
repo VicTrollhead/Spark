@@ -1,13 +1,14 @@
 import { useAppearance } from '../hooks/use-appearance';
 import { cn } from '../lib/utils';
 import { Monitor, Moon, Sun } from 'lucide-react';
+import { usePage } from '@inertiajs/react';
 
 export default function AppearanceToggleTab({ className = '', ...props }) {
     const { appearance, updateAppearance } = useAppearance();
-
+    const { translations } = usePage().props;
     const tabs = [
-        { value: 'light', icon: Sun, label: 'Light' },
-        { value: 'dark', icon: Moon, label: 'Dark' },
+        { value: 'light', icon: Sun, label: translations["Light"] },
+        { value: 'dark', icon: Moon, label: translations["Dark"] },
         // { value: 'system', icon: Monitor, label: 'System' },
     ];
 

@@ -1,11 +1,32 @@
+import { useEffect, useState } from 'react';
 import { cn } from '../../lib/utils.js';
-import { useAppearance } from '../../hooks/use-appearance';
 import sparkLight from '../../assets/images/spark-light.png';
 import sparkDark from '../../assets/images/spark-dark.png';
 
 export default function LogoIcon({ className = '', ...props }) {
-    const { appearance } = useAppearance();
-    const isDarkMode = appearance === 'dark';
+    const [isDarkMode, setIsDarkMode] = useState(
+        document.documentElement.classList.contains('dark')
+    );
+
+    useEffect(() => {
+        // Функція, яка оновлює стан теми
+        const updateDarkMode = () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            setIsDarkMode(isDark);
+        };
+
+        // Слухаємо зміни класу 'dark' (через зміни теми)
+        const observer = new MutationObserver(updateDarkMode);
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class'],
+        });
+
+        // І одразу викликаємо для початкової теми
+        updateDarkMode();
+
+        return () => observer.disconnect();
+    }, []);
 
     return (
         <img

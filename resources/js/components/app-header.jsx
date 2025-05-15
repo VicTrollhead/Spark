@@ -183,6 +183,7 @@ export function AppHeader({ breadcrumbs = [] }) {
 
     return (
         <>
+
             <div className="border-sidebar-border/80 fixed top-0 left-0 z-50 w-full border-b bg-white dark:bg-neutral-950">
                 <div className="mx-4 flex h-16">
                     {/* Mobile Menu */}

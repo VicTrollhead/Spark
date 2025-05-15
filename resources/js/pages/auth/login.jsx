@@ -1,5 +1,5 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { LoaderCircle, EyeOff } from 'lucide-react';
+import { LoaderCircle } from 'lucide-react';
 import InputError from '../../components/input-error';
 import TextLink from '../../components/text-link';
 import { Button } from '../../components/ui/button';
@@ -9,7 +9,6 @@ import PasswordVisibilityToggle from '../../components/ui/password-visibility-bu
 import { Label } from '../../components/ui/label';
 import AuthLayout from '../../layouts/auth-layout';
 import { useState, useEffect } from 'react';
-
 
 export default function Login({ status, canResetPassword, googleClientId }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -37,55 +36,63 @@ export default function Login({ status, canResetPassword, googleClientId }) {
     };
 
     useEffect(() => {
-        window.handleCredentialResponse = function (response) {
-            fetch("/api/auth/google/callback", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": document.querySelector("meta[name='csrf-token']").getAttribute("content"),
-                },
-                body: JSON.stringify({ token: response.credential }),
-            })
-                .then((res) => res.json())
-                .then((data) => {
-                    if(data.success)
-                        window.location.href = "/dashboard";
-                })
-                .catch((error) => console.error("Error:", error));
-        };
-
         const script = document.createElement("script");
         script.src = "https://accounts.google.com/gsi/client";
         script.async = true;
         script.defer = true;
+        script.onload = () => {
+            window.google.accounts.id.initialize({
+                client_id: googleClientId,
+                callback: handleCredentialResponse,
+            });
+        };
         document.body.appendChild(script);
     }, []);
 
-    return (
+    function handleCredentialResponse(response) {
+        fetch("/api/auth/google/callback", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector("meta[name='csrf-token']").getAttribute("content"),
+            },
+            body: JSON.stringify({ token: response.credential }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.success) {
+                    window.location.href = "/dashboard";
+                }
+            })
+            .catch((error) => console.error("Google Sign-In Error:", error));
+    }
 
+    return (
         <AuthLayout title={translations["Log in to Spark"]} description={translations["Use google authentication or email to log in"]}>
             <Head title={translations['Log In']} />
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-5">
-
-
-
-                    <div id="g_id_onload"  data-client_id={googleClientId} data-callback="handleCredentialResponse"></div>
-                    <div className="g_id_signin" data-type="standard"></div>
-
-                    <script src="https://accounts.google.com/gsi/client" async defer></script>
-
-
-
+                    <Button
+                        type="button"
+                        onClick={() => window.google?.accounts.id.prompt()}
+                        className="w-full bg-white border text-black hover:bg-gray-100"
+                    >
+                        <img
+                            src="https://developers.google.com/identity/images/g-logo.png"
+                            alt="Google"
+                            className="w-5 h-5 mr-2"
+                        />
+                        {translations["Continue with Google"]}
+                    </Button>
 
                     <div className="my-1 flex items-center">
                         <div className="flex-grow border border-t"></div>
-                        <span className="px-2 font-bold">OR</span>
+                        <span className="px-2 font-bold">{translations["OR"]}</span>
                         <div className="flex-grow border border-t"></div>
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="email">Email address</Label>
+                        <Label htmlFor="email">{translations["Email Address"]}</Label>
                         <Input
                             id="email"
                             type="email"
@@ -95,13 +102,13 @@ export default function Login({ status, canResetPassword, googleClientId }) {
                             autoComplete="email"
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
-                            placeholder="email@example.com"
+                            placeholder={translations["email@example.com"]}
                         />
                         <InputError message={errors.email} />
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password">{translations["Password"]}</Label>
                         <div className="flex gap-1.5">
                             <Input
                                 id="password"
@@ -111,32 +118,31 @@ export default function Login({ status, canResetPassword, googleClientId }) {
                                 autoComplete="current-password"
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
-                                placeholder="Password"
+                                placeholder={translations["Password"]}
                             />
                             <PasswordVisibilityToggle visible={passwordVisible} onToggle={togglePasswordVisibility} />
                         </div>
-
                         <InputError message={errors.password} />
                     </div>
 
                     <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                        Log in
+                        {translations["Log In"]}
                     </Button>
 
                     <div className="flex items-center space-x-3">
                         <Checkbox id="remember" name="remember" tabIndex={3} />
-                        <Label htmlFor="remember">Remember me</Label>
+                        <Label htmlFor="remember">{translations["Remember Me"]}</Label>
                         {canResetPassword && (
                             <TextLink href={route('password.request')} className="ml-auto text-sm" tabIndex={5}>
-                                Forgot password?
+                                {translations["Forgot Password"]}?
                             </TextLink>
                         )}
                     </div>
                 </div>
 
                 <Button type="button" onClick={navigateToRegister} className="mt-4 w-full" tabIndex={5}>
-                    Sign Up
+                    {translations["Sign Up"]}
                 </Button>
             </form>
 

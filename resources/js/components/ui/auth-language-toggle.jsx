@@ -1,16 +1,11 @@
-import { useState } from 'react';
-import { usePage, router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { Globe } from 'lucide-react';
-import { cn } from '../lib/utils';
 
-export default function AuthLanguageToggle({ className = '', ...props }) {
+export default function AuthLanguageToggle() {
     const { locale, translations } = usePage().props;
-    const [currentLocale, setCurrentLocale] = useState(locale || 'en');
 
     const toggleLanguage = () => {
-        const newLocale = currentLocale === 'en' ? 'ua' : 'en';
-
-        setCurrentLocale(newLocale);
+        const newLocale = locale === 'en' ? 'ua' : 'en';
 
         router.post(`/settings/language/${newLocale}`, {}, {
             preserveState: false,
@@ -24,15 +19,10 @@ export default function AuthLanguageToggle({ className = '', ...props }) {
     return (
         <button
             onClick={toggleLanguage}
-            className={cn(
-                'flex items-center gap-2 rounded-full bg-neutral ml-1 p-2.5 transition dark:bg-neutral',
-                'hover:bg-neutral-300 dark:hover:bg-neutral-700',
-                className
-            )}
-            {...props}
+            className="bg-neutral dark:bg-neutral ml-1 flex items-center gap-2 rounded-full p-2.5 transition hover:bg-neutral-300 dark:hover:bg-neutral-700"
         >
             <Globe className="h-4 w-4" />
-            {currentLocale.toUpperCase()}
+            {locale === 'en' ? 'EN' : 'УКР'}
         </button>
     );
 }
