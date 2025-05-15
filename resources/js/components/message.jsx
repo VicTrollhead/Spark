@@ -93,11 +93,11 @@ export default function Message({ userId, message }) {
                 <div className="mb-2 flex">
                     <div className="w-full sm:max-w-md">
                         <div className="mb-1 flex justify-between text-xs text-gray-500">
-                            <Link href={`/user/${message.user.username}`} className="flex w-fit items-center">
+                            <Link href={`/user/${message.user.username}`} className="flex  w-fit items-center">
                                 <div className="flex items-center gap-2">
                                     <div className="grid flex-1 text-left leading-tight">
                                         <div className="flex items-center gap-1">
-                                            <span className="truncate text-lg text-black hover:underline dark:text-white">{message.user.name}</span>
+                                            <span className="break-all min-w-24 text-lg text-black hover:underline dark:text-white ">{message.user.name}</span>
                                             {message.user.is_verified && (
                                                 <div className="group relative">
                                                     <span className="top absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
@@ -110,7 +110,7 @@ export default function Message({ userId, message }) {
                                             )}
                                         </div>
                                     </div>
-                                    <span className="text-xs text-neutral-700 dark:text-white">{formatMessageTime(message.time)}</span>
+                                    <span className="text-xs text-neutral-700 dark:text-white break-all">{formatMessageTime(message.time)}</span>
                                 </div>
                             </Link>
                         </div>
