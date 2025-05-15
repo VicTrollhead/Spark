@@ -90,56 +90,89 @@ class FollowController extends Controller
         return response()->json(['following' => $isFollowing]);
     }
 
-    public function followers(User $user)
+    public function followers(Request $request, User $user)
     {
         $authUser = Auth::user();
+        $sort = $request->input('sort', 'latest');
 
-        $authUserFriends = $authUser->friends->pluck('id')->toArray();
-        $pendingFollowRequests = $authUser->pendingFollowRequests()->pluck('followee_id')->toArray();
+        $followersQuery = $authUser->followers()
+            ->with(['profileImage', 'followers'])
+            ->withCount('followers');
 
-        $followers = $user->followers()
-            ->with('profileImage')
-            ->withCount('followers')
-            ->get()
-            ->map(function ($follower) use ($authUser, $authUserFriends, $pendingFollowRequests) {
-                $hasSentFollowRequest = in_array($follower->id, $pendingFollowRequests);
+        switch ($sort) {
+            case 'latest':
+                $followersQuery->orderBy('pivot_created_at', 'desc');
+                break;
+            case 'oldest':
+                $followersQuery->orderBy('pivot_created_at', 'asc');
+                break;
+            case 'popular':
+                $followersQuery->orderByDesc('followers_count');
+                break;
+            case 'least_followers':
+                $followersQuery->orderBy('followers_count');
+                break;
+        }
 
-                return [
-                    'id' => $follower->id,
-                    'name' => $follower->name,
-                    'username' => $follower->username,
-                    'profile_image' => $follower->profileImage,
-                    'followers_count' => $follower->followers_count,
-                    'is_followed' => $authUser->following->contains('id', $follower->id),
-                    'has_sent_follow_request' => $hasSentFollowRequest,
-                    'is_private' => $follower->is_private,
-                    'is_friend' => in_array($follower->id, $authUserFriends),
-                    'is_verified' => $follower->is_verified
-                ];
-            });
+        $followers = $followersQuery->get();
+
+        $mappedFollowers = $followers->map(function ($follower) use ($authUser) {
+            return [
+                'id' => $follower->id,
+                'name' => $follower->name,
+                'username' => $follower->username,
+                'profile_image' => $follower->profileImage,
+                'is_private' => $follower->is_private,
+                'is_followed' => $authUser?->following->contains('id', $follower->id) ?? false,
+                'has_sent_follow_request' => $authUser?->pendingFollowRequests()->where('followee_id', $follower->id)->exists() ?? false,
+                'followers_count' => $follower->followers->count(),
+                'is_friend' => $authUser?->friends()->pluck('id')->contains($follower->id) ?? false,
+                'is_verified' => $follower->is_verified,
+            ];
+        });
 
         return inertia('user/followers', [
             'title' => 'Followers',
-            'users' => $followers,
+            'users' => $mappedFollowers,
+            'filters' => ['sort' => $sort],
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
                 'profile_image' => $user->profileImage,
-                'is_verified' => $user->is_verified
+                'is_verified' => $user->is_verified,
             ],
         ]);
     }
 
-    public function following(User $user)
+
+
+    public function following(Request $request, User $user)
     {
         $authUser = Auth::user();
+        $sort = $request->input('sort', 'latest');
         $authUserFriends = $authUser->friends->pluck('id')->toArray();
 
-        $following = $user->following()
-            ->with('profileImage')
-            ->withCount('followers')
-            ->get()
+        $followingQuery = $authUser->following()
+            ->with(['profileImage', 'followers'])
+            ->withCount('followers');
+
+        switch ($sort) {
+            case 'latest':
+                $followingQuery->orderBy('pivot_created_at', 'desc');
+                break;
+            case 'oldest':
+                $followingQuery->orderBy('pivot_created_at', 'asc');
+                break;
+            case 'popular':
+                $followingQuery->orderByDesc('followers_count');
+                break;
+            case 'least_followers':
+                $followingQuery->orderBy('followers_count');
+                break;
+        }
+
+        $following = $followingQuery->get()
             ->map(function ($followingUser) use ($authUser, $authUserFriends) {
                 return [
                     'id' => $followingUser->id,
@@ -157,6 +190,7 @@ class FollowController extends Controller
         return inertia('user/following', [
             'title' => 'Following',
             'users' => $following,
+            'filters' => ['sort' => $sort],
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -166,6 +200,8 @@ class FollowController extends Controller
             ],
         ]);
     }
+
+
 
     public function acceptRequest(User $sourceUser, Notification $notification): RedirectResponse
     {

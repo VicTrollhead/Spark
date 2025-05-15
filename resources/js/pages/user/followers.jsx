@@ -3,14 +3,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar'
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
 import { useState } from 'react';
-import { Check, SendIcon } from 'lucide-react';
+import { Check, SendIcon, RefreshCw } from 'lucide-react';
 import { getProfileImageUrl } from '../../lib/utils';
 
 export default function Followers() {
-    const { title, users: initialUsers, user, auth, translations } = usePage().props;
+    const { title, users: initialUsers, user, auth, translations, filters } = usePage().props;
     const getInitials = useInitials();
     const [users, setUsers] = useState(initialUsers);
     const [hasSentRequest, setHasSentRequest] = useState(user.has_sent_follow_request);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleFollowToggle = (targetUser, isFollowed) => {
         let action;
@@ -40,6 +41,14 @@ export default function Followers() {
         });
     };
 
+    const handleReload = () => {
+        setIsLoading(true);
+        router.reload();
+        setTimeout(() => {
+            setIsLoading(false);
+        }, 1000);
+    };
+
     // const getProfileImageUrl = (user) => {
     //     if (user?.profile_image?.disk === 's3') {
     //         return user.profile_image?.url;
@@ -53,7 +62,35 @@ export default function Followers() {
         <AppLayout>
             <Head title={translations['Followers']} />
             <div className="px-6">
-                <h1 className="text-2xl font-bold my-6">{translations['Followers']}</h1>
+                <div className="flex justify-between items-center my-6">
+                    <h1 className="text-2xl font-bold">{translations['Followers']}</h1>
+                    <div className="flex gap-2">
+                        <select
+                            className="px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
+                            value={filters?.sort || 'latest'}
+                            onChange={(e) => {
+                                router.get(route('user.followers', user.username), {
+                                    sort: e.target.value,
+                                }, {
+                                    preserveScroll: true,
+                                    preserveState: true,
+                                });
+                            }}
+                        >
+                            <option value="latest">{translations['Latest']}</option>
+                            <option value="oldest">{translations['Oldest']}</option>
+                            <option value="popular">{translations['Most Followed']}</option>
+                            <option value="least_followers">{translations['Least Followed']}</option>
+                        </select>
+                        <button
+                            onClick={handleReload}
+                            className="p-2 text-sm font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition flex items-center"
+                        >
+                            <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
+                        </button>
+                    </div>
+                </div>
+
                 {users.length === 0 ? (
                     <p className="text-gray-500">{translations['No followers yet.']}</p>
                 ) : (

@@ -827,6 +827,7 @@ class UserController extends Controller
             ->with(['profileImage', 'followers'])
             ->withCount('followers');
 
+
         switch ($sort) {
             case 'latest':
                 $friendsQuery->orderBy('pivot_created_at', 'desc');
