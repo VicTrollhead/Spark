@@ -141,8 +141,7 @@ return [
 
 
 
-    "In the Comfort" => "In the Comfort",
-    "Zone" => "Zone",
+    "In the Comfort Zone" => "In the Comfort Zone",
     "Log in to Spark" => "Log in to Spark",
     "Use google authentication or email to log in" => "Use google authentication or email to log in",
     "Log In" => "Log In",
@@ -217,5 +216,15 @@ return [
     "Sign up" => "Sign up",
     "Reposted by" => "Reposted by",
     "(you)" => "(you)",
+
+    "Reset password" => "Reset password",
+    "Please enter your new password below" => "Please enter your new password below.",
+    "Verify email" => "Verify email",
+    "Please verify your email address by clicking on the link we just emailed to you." => "Please verify your email address by clicking on the link we just emailed to you.",
+    "Email verification" => "Email verification",
+    "A new verification link has been sent to the email address you provided during registration." => "A new verification link has been sent to the email address you provided during registration.",
+    "Please make sure to check your spam inbox!" => "Please make sure to check your spam inbox!",
+    "Resend verification email" => "Resend verification email",
+
 ];
 
