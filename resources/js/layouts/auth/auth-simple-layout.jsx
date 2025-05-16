@@ -56,43 +56,48 @@ export default function AuthSimpleLayout({ children, title, description, imageSr
                     </div>
                 </div>
 
-                <footer className="mt-8 flex flex-wrap justify-center gap-4 text-center text-sm text-gray-500">
-                    <a href="#" className="hover:underline">
-                        {translations['About us']}
-                    </a>
-                    <a href="#" className="hover:underline">
-                        {translations['Terms of service']}
-                    </a>
-                    <a href="#" className="hover:underline">
-                        {translations['Privacy Policy']}
-                    </a>
-                    <a href="#" className="hover:underline">
-                        {translations['Cookie Policy']}
-                    </a>
-                    <a href="#" className="hover:underline">
-                        {translations['Contact and Registration Information']}
-                    </a>
-                    <a href="#" className="hover:underline">
-                        {translations['Accessibility']}
-                    </a>
-                    <a href="#" className="hover:underline">
-                        {translations['Advertising Information']}
-                    </a>
-                    <a href="#" className="hover:underline">
-                        {translations['Blog']}
-                    </a>
-                    <a href="#" className="hover:underline">
-                        {translations['Advertising']}
-                    </a>
-                    <a href="#" className="hover:underline">
-                        {translations['Settings']}
-                    </a>
-                    © 2025 SparkCorp .
+                <footer className="mt-16 mx-auto flex flex-col flex-wrap justify-center items-center gap-4 text-center text-sm text-gray-500">
+                    <div className="flex mx-auto flex-wrap gap-4 self-center items-center justify-center">
+                        <a href="#" className="hover:underline">
+                            {translations['About us']}
+                        </a>
+                        <a href="#" className="hover:underline">
+                            {translations['Terms of service']}
+                        </a>
+                        <a href="#" className="hover:underline">
+                            {translations['Privacy Policy']}
+                        </a>
+                        <a href="#" className="hover:underline">
+                            {translations['Cookie Policy']}
+                        </a>
+                        <a href="#" className="hover:underline">
+                            {translations['Contact and Registration Information']}
+                        </a>
+                        <a href="#" className="hover:underline">
+                            {translations['Accessibility']}
+                        </a>
+                        <a href="#" className="hover:underline">
+                            {translations['Advertising Information']}
+                        </a>
+                        <a href="#" className="hover:underline">
+                            {translations['Blog']}
+                        </a>
+                        <a href="#" className="hover:underline">
+                            {translations['Advertising']}
+                        </a>
+                        <a href="#" className="hover:underline">
+                            {translations['Settings']}
+                        </a>
+                    </div>
+
+                    <b>© 2025 SparkCorp</b>
                 </footer>
             </div>
         </div>
     );
 }
+
+
 
 
 
