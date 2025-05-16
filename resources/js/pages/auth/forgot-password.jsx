@@ -33,7 +33,7 @@ export default function ForgotPassword({ status }) {
 
             <div className="space-y-6">
                 <form onSubmit={submit}>
-                    <div className="grid gap-4">
+                    <div className="grid gap-4 mt-4">
                         <Label htmlFor="email">{translations["Email Address"]}</Label>
                         <Input
                             id="email"
@@ -48,7 +48,7 @@ export default function ForgotPassword({ status }) {
                         <InputError message={errors.email} />
                     </div>
 
-                    <div className="my-6 flex items-center justify-start">
+                    <div className="my-10 flex items-center justify-start">
                         <Button className="w-full" disabled={processing}>
                             {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                             {translations["Email password reset link"]}
