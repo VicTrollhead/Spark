@@ -137,9 +137,7 @@ return [
     "Others" => "Others",
 
 
-
-    "In the Comfort" => "У зоні",
-    "Zone" => "Комфорту",
+    "In the Comfort Zone" => "У зоні Комфорту",
     "Log in to Spark" => "Увійти у Spark",
     "Use google authentication or email to log in" => "Увійдіть через Google або використовуйте електронну пошту",
     "Log In" => "Увійти",
@@ -213,4 +211,13 @@ return [
     "Sign up" => "Зареєструйтесь",
     "Reposted by" => "Репостнуто",
     "(you)" => "(вами)",
+
+    "Reset password" => "Скинути пароль",
+    "Please enter your new password below" => "Будь ласка, введіть новий пароль нижче.",
+    "Verify email" => "Підтвердити електронну пошту",
+    "Please verify your email address by clicking on the link we just emailed to you." => "Будь ласка, підтвердіть свою електронну адресу, натиснувши на посилання, яке ми щойно надіслали вам на пошту.",
+    "Email verification" => "Підтвердження електронної пошти",
+    "A new verification link has been sent to the email address you provided during registration." => "Нове посилання для підтвердження було надіслано на електронну адресу, яку ви вказали під час реєстрації.",
+    "Please make sure to check your spam inbox!" => "Обов’язково перевірте папку зі спамом!",
+    "Resend verification email" => "Надіслати лист для підтвердження повторно",
 ];

@@ -22,22 +22,19 @@ export default function AuthSimpleLayout({ children, title, description, imageSr
 
             <div className="flex w-full flex-col p-6 md:w-7/12 md:p-10">
                 <div className="mb-6 flex w-full items-center justify-between">
-                    <Icon className="h-10"/>
+                    <Icon className="h-10" />
 
                     <div className="flex items-center gap-2">
                         <AppearanceToggle className="justify-center p-2.5" />
-                        <AuthLanguageToggle />
-
+                        <AuthLanguageToggle className="justify-center p-2.5" />
                     </div>
                 </div>
 
                 <div className="flex flex-1 flex-col items-center justify-center">
                     <div className="w-full max-w-sm">
                         <div className="mb-8">
-                            <span className="text-6xl font-extrabold sm:text-6xl md:text-5xl lg:text-6xl">
-                                {translations['In the Comfort']}
-                                <br />
-                                {translations['Zone']}
+                            <span className="text-5xl font-extrabold sm:text-5xl md:text-4xl lg:text-5xl">
+                                {translations['In the Comfort Zone']}
                             </span>
                         </div>
 
@@ -56,8 +53,8 @@ export default function AuthSimpleLayout({ children, title, description, imageSr
                     </div>
                 </div>
 
-                <footer className="mt-16 mx-auto flex flex-col flex-wrap justify-center items-center gap-4 text-center text-sm text-gray-500">
-                    <div className="flex mx-auto flex-wrap gap-4 self-center items-center justify-center">
+                <footer className="mx-auto mt-16 flex flex-col flex-wrap items-center justify-center gap-4 text-center text-sm text-gray-500">
+                    <div className="mx-auto flex flex-wrap items-center justify-center gap-4 self-center">
                         <a href="#" className="hover:underline">
                             {translations['About us']}
                         </a>
