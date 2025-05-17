@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Chat extends Model
 {
@@ -25,9 +26,10 @@ class Chat extends Model
         return $this->hasMany(Message::class);
     }
 
-    public function lastMessage()
+    public function lastMessage() : HasOne
     {
-        return $this->belongsTo(Message::class, 'last_message_id');
+        //return $this->belongsTo(Message::class, 'last_message_id');
+        return $this->hasOne(Message::class, 'chat_id')->latestOfMany();
     }
 
     public static function firstOrCreateChat($userId1, $userId2)

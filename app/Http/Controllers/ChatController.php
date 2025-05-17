@@ -71,9 +71,11 @@ class ChatController extends Controller
     {
         $user = Auth::user();
 
-        $chats = Chat::with(['user1.profileImage', 'user2.profileImage'])
-            ->where('user1_id', $user->id)
-            ->orWhere('user2_id', $user->id)
+        $chats = Chat::with(['user1.profileImage', 'user2.profileImage', 'lastMessage'])
+            ->where(function ($query) use ($user) {
+                $query->where('user1_id', $user->id)
+                    ->orWhere('user2_id', $user->id);
+            })
             ->get();
 
         $chatUserIds = $chats->map(function ($chat) use ($user) {
@@ -101,10 +103,11 @@ class ChatController extends Controller
                     'user_id' => $chat->lastMessage->user_id,
                     'text' => $chat->lastMessage->text,
                     'time' => $chat->lastMessage->created_at->format('d M Y, H:i:s'),
+                    'created_at' => $chat->lastMessage->created_at,
                 ] : null,
                 'unread_count' => $unreadCount,
             ];
-        });
+        })->sortByDesc(fn ($chat) => $chat['last_message']['created_at'] ?? now()->subYears(10))->values();
 
         $allUsers = User::with('profileImage')
             ->where('id', '!=', $user->id)
@@ -154,6 +157,7 @@ class ChatController extends Controller
             'users' => $users,
         ]);
     }
+
 
 
     public function getUserChat(User $otherUser): Response
