@@ -252,7 +252,7 @@ export default function PostComponent({ post, compact = false }) {
                     </div>
 
                     <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username}</p>
-                    <p className={`mt-1 text-sm lg:text-lg text-gray-700 dark:text-gray-300 break-all`}>{post.content}</p>
+                    <p className={`mt-1 text-[16px] lg:text-lg text-gray-700 dark:text-gray-300 break-all`}>{post.content}</p>
 
                     {post.media.length > 0 && (
                         <div className="mt-2 grid grid-cols-1 gap-3 py-1 sm:grid-cols-2">
