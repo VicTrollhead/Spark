@@ -94,6 +94,7 @@ class FollowController extends Controller
     {
         $authUser = Auth::user();
         $sort = $request->input('sort', 'latest');
+        $authUserFriends = $authUser->friends->pluck('id')->toArray();
 
         $followersQuery = $authUser->followers()
             ->with(['profileImage', 'followers'])
@@ -114,26 +115,25 @@ class FollowController extends Controller
                 break;
         }
 
-        $followers = $followersQuery->get();
-
-        $mappedFollowers = $followers->map(function ($follower) use ($authUser) {
-            return [
-                'id' => $follower->id,
-                'name' => $follower->name,
-                'username' => $follower->username,
-                'profile_image' => $follower->profileImage,
-                'is_private' => $follower->is_private,
-                'is_followed' => $authUser?->following->contains('id', $follower->id) ?? false,
-                'has_sent_follow_request' => $authUser?->pendingFollowRequests()->where('followee_id', $follower->id)->exists() ?? false,
-                'followers_count' => $follower->followers->count(),
-                'is_friend' => $authUser?->friends()->pluck('id')->contains($follower->id) ?? false,
-                'is_verified' => $follower->is_verified,
-            ];
-        });
+        $followers = $followersQuery->get()
+            ->map(function ($follower) use ($authUser, $authUserFriends) {
+                return [
+                    'id' => $follower->id,
+                    'name' => $follower->name,
+                    'username' => $follower->username,
+                    'profile_image' => $follower->profileImage,
+                    'followers_count' => $follower->followers_count,
+                    'is_followed' => $authUser->following->contains($follower->id),
+                    'is_private' => $follower->is_private,
+                    'is_friend' => in_array($follower->id, $authUserFriends),
+                    'has_sent_follow_request' => $authUser->pendingFollowRequests()->where('followee_id', $follower->id)->exists(),
+                    'is_verified' => $follower->is_verified,
+                ];
+            });
 
         return inertia('user/followers', [
             'title' => 'Followers',
-            'users' => $mappedFollowers,
+            'users' => $followers,
             'filters' => ['sort' => $sort],
             'user' => [
                 'id' => $user->id,
@@ -144,6 +144,7 @@ class FollowController extends Controller
             ],
         ]);
     }
+
 
 
 

@@ -2,7 +2,7 @@ import { usePage, Link, Head, router } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Check, SendIcon, RefreshCw } from 'lucide-react';
 import { getProfileImageUrl } from '../../lib/utils';
 
@@ -12,6 +12,10 @@ export default function Followers() {
     const [users, setUsers] = useState(initialUsers);
     const [hasSentRequest, setHasSentRequest] = useState(user.has_sent_follow_request);
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        setUsers(initialUsers);
+    }, [initialUsers]);
 
     const handleFollowToggle = (targetUser, isFollowed) => {
         let action;

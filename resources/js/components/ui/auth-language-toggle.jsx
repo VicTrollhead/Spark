@@ -24,6 +24,7 @@ export default function AuthLanguageToggle({ className = '', ...props }) {
                 'hover:bg-neutral-300 dark:hover:bg-neutral-700 bg-gray-100 dark:bg-neutral-800',
                 className
             )}
+            onClick={toggleLanguage}
             {...props}
         >
             <Globe className="h-5 w-5 " />
