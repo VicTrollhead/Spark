@@ -29,25 +29,32 @@ export default function PopularHashtags() {
         <AppLayout>
             <Head title={translations['Popular hashtags']} />
 
-            <div className="flex justify-between items-start p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between p-6">
                 <div className="flex flex-col gap-2">
                     <h1 className="text-2xl font-extrabold">{translations['Popular hashtags']}</h1>
-                    <p className="text-gray-600 dark:text-gray-300">{translations['Explore trending topics by post engagement.']}</p>
+                    <p className="text-gray-600 dark:text-gray-300">
+                        {translations['Explore trending topics by post engagement.']}
+                    </p>
                 </div>
 
-                <div className="flex gap-2">
-                    <select value={sort} onChange={handleSortChange} className="max-w-36 rounded-md border px-3 py-1 dark:bg-neutral-900 dark:text-white">
+                <div className="flex flex-wrap gap-2 sm:flex-nowrap">
+                    <select
+                        value={sort}
+                        onChange={handleSortChange}
+                        className="w-fit rounded-md border px-3 py-1 dark:bg-neutral-900 dark:text-white"
+                    >
                         <option value="likes">{translations['Most Liked']}</option>
                         <option value="posts">{translations['Most Posts']}</option>
                     </select>
                     <button
                         onClick={handleReload}
-                        className="flex items-center rounded-md border p-2 text-sm font-semibold text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800"
+                        className="flex items-center justify-center rounded-md border p-2 text-sm font-semibold text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800"
                     >
                         <RefreshCw className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
                     </button>
                 </div>
             </div>
+
 
             <div className="space-y-2.5 px-6">
                 {hashtags.length > 0 ? (
@@ -71,7 +78,7 @@ export default function PopularHashtags() {
                         </Link>
                     ))
                 ) : (
-                    <div className="py-12 text-center text-gray-500 dark:text-gray-400">{translations['No popular hashtags found.']}</div>
+                    <div className="pt-10 text-center text-gray-500 dark:text-gray-400">{translations['No popular hashtags found.']}</div>
                 )}
             </div>
         </AppLayout>

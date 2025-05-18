@@ -81,7 +81,7 @@ export default function UserChats() {
         <AppLayout>
             <Head title={translations['User chats']} />
             <div className="p-6">
-                <div className="flex items-center justify-between">
+                <div className="flex  gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <h1 className="text-2xl font-bold">{translations['User chats']}</h1>
                     <div className="flex flex-row items-center gap-2">
                         <Dialog>
@@ -146,7 +146,7 @@ export default function UserChats() {
                     </div>
                 </div>
                 {chats.length === 0 ? (
-                    <p className="mt-1 text-gray-500">{translations['Not chats anyone yet.']}</p>
+                    <p className="mt-10 text-gray-500">{translations['Not chats anyone yet.']}</p>
                 ) : (
                     <ul className="overflow-y-auto">
                         {chats.map((chat) => (
@@ -165,7 +165,7 @@ export default function UserChats() {
                                         <div className="flexflex-wrap gap-1">
                                             <div className="flex items-center gap-1">
                                                 <span className="ml-1 font-bold">{chat.user.name}</span>
-                                                <span className="hidden text-gray-500 sm:flex dark:text-gray-400">@{chat.user.username}</span>
+                                                <span className="hidden text-gray-500 sm:flex dark:text-gray-400 text-[15px]">@{chat.user.username}</span>
                                                 {chat.user.is_verified && (
                                                     <div className="group relative">
                                                         <span className="top absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">

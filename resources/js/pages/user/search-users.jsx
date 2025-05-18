@@ -64,8 +64,8 @@ export default function SearchUsers() {
             <Head title={translations['Search users']} />
 
             <div className="p-6">
-                <div className="flex justify-between items-center mb-4">
-                    <div className="flex items-center gap-1.5 w-full flex-wrap md:flex-nowrap">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex items-center gap-1.5 w-full flex-wrap">
                         <div className="flex items-center space-x-3 w-full">
                             <Search className="size-10 opacity-80 group-hover:opacity-100"/>
                             <Input
@@ -81,7 +81,7 @@ export default function SearchUsers() {
                             <select
                                 value={sortOption}
                                 onChange={handleSortChange}
-                                className="px-1 max-w-36 py-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
+                                className="px-1 w-fit py-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
                             >
                                 <option value="latest">{translations['Latest']}</option>
                                 <option value="oldest">{translations['Oldest']}</option>
@@ -96,7 +96,7 @@ export default function SearchUsers() {
                                 className="p-2 text-sm font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition flex items-center"
                             >
                                 <RefreshCw
-                                    className={`w-6 h-6 ${isLoading ? 'animate-spin' : ''}`}
+                                    className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`}
                                 />
                             </button>
                         </div>

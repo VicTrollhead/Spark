@@ -212,6 +212,9 @@ return [
     "Sign up" => "Зареєструйтесь",
     "Reposted by" => "Репостнуто",
     "(you)" => "(вами)",
+    "No popular hashtags found." => "No popular hashtags found.",
+    "sent you a message:" => "відправив вам повідомлення:",
+    "liked your comment." => "лайкнув ваш коментар.",
 
     "Reset password" => "Скинути пароль",
     "Please enter your new password below" => "Будь ласка, введіть новий пароль нижче.",

@@ -251,7 +251,7 @@ export default function PostComponent({ post, compact = false }) {
                         )}
                     </div>
 
-                    <p className="text-sm text-gray-500 dark:text-gray-400">@{post.user.username}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 break-all">@{post.user.username}</p>
                     <p className={`mt-1 text-[16px] lg:text-lg text-gray-700 dark:text-gray-300 break-all`}>{post.content}</p>
 
                     {post.media.length > 0 && (

@@ -33,17 +33,21 @@ class LikeController extends Controller
             'likeable_type' => $modelClass,
         ]);
 
-        if ($likeable->user_id !== Auth::id() && $likeable instanceof Post) {
+        if ($likeable->user_id !== Auth::id()) {
             NotificationService::create([
                 'user_id' => $likeable->user_id,
                 'source_user_id' => Auth::id(),
                 'type' => 'like',
-                'post_id' => $likeable->id,
+                'post_id' => $type === 'post' ? $likeable->id : ($likeable->post_id ?? null),
+                'extra_data' => $type === 'comment' ? $likeable->content : null,
+
+                'comment_id' => $type === 'comment' ? $likeable->id : null,
             ]);
         }
 
         return back()->with('success', class_basename($modelClass) . ' liked successfully.');
     }
+
 
     public function unlike(Request $request): RedirectResponse
     {
@@ -59,7 +63,7 @@ class LikeController extends Controller
         $likeableClass = match ($type) {
             'post' => Post::class,
             'comment' => Comment::class,
-            default => abort(400, 'Invalid likeable type.'),
+            default => abort(404, 'Invalid likeable type.'),
         };
 
         Like::where([
@@ -68,7 +72,7 @@ class LikeController extends Controller
             'likeable_type' => $likeableClass,
         ])->delete();
 
-        if ($likeableClass === Post::class) {
+        if ($type === 'post') {
             $post = Post::find($id);
             if ($post) {
                 Notification::where('type', 'like')
@@ -77,10 +81,20 @@ class LikeController extends Controller
                     ->where('user_id', $post->user_id)
                     ->delete();
             }
+        } elseif ($type === 'comment') {
+            $comment = Comment::find($id);
+            if ($comment) {
+                Notification::where('type', 'like')
+                    ->where('source_user_id', $userId)
+                    ->where('comment_id', $comment->id)
+                    ->where('user_id', $comment->user_id)
+                    ->delete();
+            }
         }
 
         return back()->with('success', ucfirst($type) . ' unliked successfully.');
     }
+
 
     public function isLiked($type, $id, Request $request)
     {

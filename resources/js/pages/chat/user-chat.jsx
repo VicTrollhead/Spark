@@ -95,7 +95,7 @@ export default function UserChat() {
     //     }
     //     return null;
     // };
-
+console.log(other_user);
     return (
         <AppLayout>
             <Head title={`${translations['Chat with']} ${other_user.name}`} />
@@ -109,7 +109,7 @@ export default function UserChat() {
                                     {getInitials(other_user.name)}
                                 </AvatarFallback>
                             </Avatar>
-                            <span className="flex items-center gap-1 lg:text-lg text-sm md:text-lg font-bold mr-2">
+                            <span className="flex items-center gap-1 lg:text-lg text-sm md:text-lg font-bold mr-2 break-all">
                                 {`${translations['Chat with']} ${other_user.name} (@${other_user.username})`}
                                 {other_user.is_verified && (
                                     <div className="group relative">

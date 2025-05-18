@@ -217,6 +217,9 @@ return [
     "Sign up" => "Sign up",
     "Reposted by" => "Reposted by",
     "(you)" => "(you)",
+    "No popular hashtags found." => "No popular hashtags found.",
+    "sent you a message:" => "sent you a message:",
+    "liked your comment." => "liked your post.",
 
     "Reset password" => "Reset password",
     "Please enter your new password below" => "Please enter your new password below.",
@@ -226,6 +229,7 @@ return [
     "A new verification link has been sent to the email address you provided during registration." => "A new verification link has been sent to the email address you provided during registration.",
     "Please make sure to check your spam inbox!" => "Please make sure to check your spam inbox!",
     "Resend verification email" => "Resend verification email",
+
 
 ];
 

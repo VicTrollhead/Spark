@@ -9,7 +9,9 @@ use App\Jobs\SendMessage;
 use App\Jobs\SendPersonalMessage;
 use App\Models\Chat;
 use App\Models\Message;
+use App\Models\Notification;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -248,6 +250,17 @@ class ChatController extends Controller
         Chat::where('id', $validated['chatId'])
             ->update(['last_message_id' => $message->id]);
 
+        if ($recipientId !== $user->id) {
+            NotificationService::create([
+                'user_id' => $recipientId,
+                'source_user_id' => $user->id,
+                'type' => 'message',
+                'extra_data' => $message->text,
+                'message_id' => $message->id,
+            ]);
+        }
+
+
         event(new GotPersonalMessage($message, $validated['chatId']));
         event(new UserMessageCreated($message, $recipientId));
 
@@ -268,6 +281,11 @@ class ChatController extends Controller
         if (!is_null($chat)){
             $recipientId = $chat->user1_id === $user->id ? $chat->user2_id : $chat->user1_id;
         }
+
+        Notification::where('type', 'message')
+            ->where('source_user_id', $message->user_id)
+            ->where('message_id', $message->id)
+            ->delete();
 
         $message->delete();
 

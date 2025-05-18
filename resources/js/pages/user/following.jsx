@@ -54,12 +54,12 @@ export default function Following() {
     return (
         <AppLayout>
             <Head title={translations['Following']} />
-            <div className="px-6">
-                <div className="flex justify-between items-center my-6">
+            <div className="p-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <h1 className="text-2xl font-bold">{translations['Following']}</h1>
                     <div className="flex gap-2">
                         <select
-                            className="px-3 py-1 max-w-36 border rounded-md dark:bg-neutral-900 dark:text-white"
+                            className="px-3 py-1 w-fit border rounded-md dark:bg-neutral-900 dark:text-white"
                             value={filters?.sort || 'latest'}
                             onChange={handleSortChange}
                         >
@@ -107,7 +107,7 @@ export default function Following() {
                                                     </div>
                                                 )}
                                             </div>
-                                            <p className="text-gray-500 dark:text-gray-400 text-[15px]">@{followee.username}</p>
+                                            <p className="text-gray-500 dark:text-gray-400 text-[15px] break-all">@{followee.username}</p>
                                             <p className="text-sm text-gray-400 dark:text-gray-500">
                                                 {followee.followers_count} {translations['Subscribers']}
                                             </p>
@@ -119,7 +119,7 @@ export default function Following() {
                                         </div>
 
                                         {auth.user.id !== followee.id && (
-                                            <div className="flex lg:flex-row flex-col gap-1">
+                                            <div className="flex flex-col gap-1">
                                                 {followee.is_friend ? (
                                                     <button
                                                         onClick={() => router.post(`/chat/user-chat/new/${followee.id}`)}

@@ -30,12 +30,12 @@ export default function Favorites() {
         <AppLayout>
             <Head title={translations['Favorites']} />
 
-            <div className="flex justify-between items-center p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between p-6">
                 <h1 className="text-2xl font-extrabold">{translations['Favorites']}</h1>
 
                 <div className="flex gap-2">
                     <select
-                        className="ml-4 max-w-36 px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
+                        className="w-fit px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
                         value={filters.sort}
                         onChange={handleSortChange}
                     >

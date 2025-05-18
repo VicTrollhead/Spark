@@ -263,7 +263,7 @@ export default function Show() {
 
                     <div className="flex items-center gap-2">
                         <select
-                            className="ml-4 px-3 max-w-36 py-1.5 border rounded-md dark:bg-neutral-900 dark:text-white"
+                            className="ml-4 px-3 w-fit py-1.5 border rounded-md dark:bg-neutral-900 dark:text-white"
                             value={sort}
                             onChange={(e) => {
                                 setSort(e.target.value);

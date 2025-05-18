@@ -28,12 +28,12 @@ export default function Liked() {
         <AppLayout>
             <Head title={translations['Liked posts']} />
 
-            <div className="flex justify-between items-center p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between p-6">
                 <h1 className="text-2xl font-extrabold">{translations['Liked posts']}</h1>
 
                 <div className="flex gap-2">
                     <select
-                        className="ml-4 max-w-36 px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
+                        className="ml-4 w-fit px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
                         value={filters.sort}
                         onChange={handleSortChange}
                     >

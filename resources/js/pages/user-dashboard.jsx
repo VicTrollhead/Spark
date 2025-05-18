@@ -42,13 +42,14 @@ export default function Dashboard() {
             <Head title={translations['All users']} />
 
             <div className="p-6">
-                <div className="mb-4 flex items-center justify-between">
-                    <h1 className="mr-2 text-2xl font-bold">{translations['All users']}</h1>
-                    <div className="flex items-center gap-2">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <h1 className="text-2xl font-bold">{translations['All users']}</h1>
+
+                    <div className="flex flex-wrap items-center gap-2 self-end">
                         <select
                             value={sortOption}
                             onChange={handleSortChange}
-                            className="ml-4 rounded-md border px-3 py-2 dark:bg-neutral-900 dark:text-white"
+                            className=" sm:w-36 rounded-md border px-3 py-2 dark:bg-neutral-900 dark:text-white"
                         >
                             <option value="latest">{translations['Latest']}</option>
                             <option value="oldest">{translations['Oldest']}</option>
@@ -58,17 +59,19 @@ export default function Dashboard() {
                             <option value="followers">{translations['Followers']}</option>
                             <option value="mutual_subscribers">{translations['Friends']}</option>
                         </select>
+
                         <button
                             onClick={handleReload}
-                            className="flex items-center rounded-md border p-2 text-sm font-semibold text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800"
+                            className="flex items-center justify-center rounded-md border p-2 text-sm font-semibold text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800"
                         >
                             <RefreshCw className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
                         </button>
                     </div>
                 </div>
 
+
                 {users.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 py-4">
                         {users.map((user) => (
                             <Link
                                 key={user.id}
@@ -86,14 +89,14 @@ export default function Dashboard() {
                                     <div className="flex flex-col">
                                         <div className="grid flex-1 text-left leading-tight">
                                             <div className="flex items-center gap-1">
-                                                <span className="truncate text-[14.5px] text-gray-700 dark:text-neutral-300">@{user.username}</span>
+                                                <span className=" text-[14.5px] text-gray-700 dark:text-neutral-300 break-all">@{user.username}</span>
                                                 {user.is_verified && (
                                                     <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
                                                         <Check className="h-3 w-3" />
                                                     </span>
                                                 )}
                                             </div>
-                                            <span className="truncate text-lg font-extrabold break-all">{user.name}</span>
+                                            <span className="text-lg font-extrabold break-all">{user.name}</span>
                                         </div>
                                     </div>
                                 </div>

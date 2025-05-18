@@ -41,11 +41,11 @@ export default function Friends() {
         <AppLayout>
             <Head title={translations['Friends']} />
             <div className="p-6">
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between ">
                     <h1 className="text-2xl font-bold">{translations['Friends']}</h1>
                     <div className="flex gap-2">
                         <select
-                            className="px-3 max-w-36 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
+                            className="px-3 w-fit py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
                             value={filters?.sort || 'latest'}
                             onChange={(e) => {
                                 router.get(route('user.friends'), {
@@ -71,7 +71,7 @@ export default function Friends() {
                 </div>
 
                 {users.length === 0 ? (
-                    <p className="text-gray-500 mt-1">{translations['No friends yet.']}</p>
+                    <p className="text-gray-500 mt-10">{translations['No friends yet.']}</p>
                 ) : (
                     <ul>
                         {users.map((friend) => (
@@ -84,7 +84,7 @@ export default function Friends() {
                                 </Avatar>
                                 <div className="flex flex-row justify-between w-full gap-2 items-center">
                                     <div className="flex flex-col">
-                                        <div className="flex items-center gap-1">
+                                        <div className="flex items-center gap-1 truncate">
                                             <Link href={`/user/${friend.username}`} className="font-medium text-blue-500 hover:underline break-all">
                                                 {friend.name}
                                             </Link>
@@ -100,7 +100,7 @@ export default function Friends() {
                                             )}
                                         </div>
 
-                                        <p className="text-gray-500 text-[15px] dark:text-gray-400">@{friend.username}</p>
+                                        <p className="text-gray-500 text-[15px] dark:text-gray-400 break-all">@{friend.username}</p>
                                         <p className="text-sm text-gray-400 dark:text-gray-500">
                                             {friend.followers_count} {translations['Followers']}
                                         </p>
@@ -108,7 +108,7 @@ export default function Friends() {
                                             {translations['You follow each other']}
                                         </p>
                                     </div>
-                                    <div className="flex lg:flex-row flex-col gap-1">
+                                    <div className="flex flex-col gap-1">
                                         {friend.is_friend ? (
                                             <button
                                                 onClick={() => router.post(`/chat/user-chat/new/${friend.id}`)}

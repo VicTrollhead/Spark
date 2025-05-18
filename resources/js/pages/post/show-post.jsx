@@ -175,8 +175,8 @@ export default function Show() {
             <Head title={`${translations['Post by']} @${post.user.username}`} />
 
             <div className="p-6">
-                <div className="flex justify-between">
-                    <div className="flex items-center space-x-3">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex items-center space-x-3 -ml-2">
                         <Avatar className="h-20 w-20 border border-gray-200 dark:border-gray-700 text-2xl">
                             <AvatarImage src={profileImageUrl} alt={post.user.name} />
                             <AvatarFallback className="bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white">
@@ -184,7 +184,7 @@ export default function Show() {
                             </AvatarFallback>
                         </Avatar>
                         <div>
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1 break-all">
                                 <Link
                                     href={`/user/${post.user.username}`}
                                     className="text-lg font-semibold text-gray-900 hover:underline dark:text-white"
@@ -202,7 +202,7 @@ export default function Show() {
                                     </div>
                                 )}
                             </div>
-                            <p className="text-md text-gray-500 dark:text-gray-400">@{post.user.username}</p>
+                            <p className="text-md text-gray-500 dark:text-gray-400 break-all">@{post.user.username}</p>
                         </div>
                     </div>
                     {isOwnPost && (
@@ -305,7 +305,7 @@ export default function Show() {
                     {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
                 </div>
                 {(post.reposted_by_recent.length > 0 || post.reposted_by_you) && (
-                    <div className="mt-7 px-2">
+                    <div className="mt-6 -mb-2 px-2">
                         {(post.reposted_by_you || post.reposted_by_recent?.length > 0) && (
                             <div className="mb-2 flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                                 <Repeat className="h-4 w-4" />
@@ -376,27 +376,32 @@ export default function Show() {
                 </form>
             </div>
 
-            <div className="flex items-center justify-between border-b bg-white p-4 dark:border-gray-800 dark:bg-neutral-950">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{translations['Comments']}</h2>
-                <div className="flex gap-2">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b bg-white p-4 dark:border-gray-800 dark:bg-neutral-950">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    {translations['Comments']}
+                </h2>
+
+                <div className="flex flex-wrap gap-2 sm:flex-nowrap">
                     <select
                         value={sortOption}
                         onChange={handleSortChange}
-                        className="rounded-md max-w-36 border bg-gray-100 p-2 text-neutral-950 dark:bg-neutral-900 dark:text-white"
+                        className="w-fitf rounded-md border bg-gray-100 p-2 text-neutral-950 dark:bg-neutral-900 dark:text-white"
                     >
                         <option value="latest">{translations['Latest']}</option>
                         <option value="oldest">{translations['Oldest']}</option>
                         <option value="likes">{translations['Most Liked']}</option>
                         <option value="less_likes">{translations['Least Liked']}</option>
                     </select>
+
                     <button
                         onClick={handleReload}
-                        className="p-2 text-sm font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition flex items-center"
+                        className="flex items-center justify-center rounded-md border p-2 text-sm font-semibold text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800"
                     >
                         <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
                     </button>
                 </div>
             </div>
+
             <div className="mt-2 px-6">
                 <div className="divide-y divide-gray-200 dark:divide-neutral-800">
                     {post.comments.length > 0 ? (

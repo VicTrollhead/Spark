@@ -36,12 +36,12 @@ export default function Notifications() {
         <AppLayout>
             <Head title={translations['Notifications']} />
 
-            <div className="flex flex-wrap justify-between items-center p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between p-6">
                 <h1 className="text-2xl font-extrabold ">
                     {translations['Notifications']}
                 </h1>
                 <div className="flex items-center gap-2">
-                    <div className="flex flex-row gap-2 ml-2">
+                    <div className="flex flex-row gap-1.5 text-[15px] lg:text-lg">
                         <h4 className="py-1">{translations['All:']}</h4>
                         <button
                             onClick={() => router.patch(route('notifications.markAllAsRead'), {}, { preserveScroll: true })}
@@ -59,7 +59,7 @@ export default function Notifications() {
                         <select
                             value={sort}
                             onChange={(e) => handleSortChange(e.target.value)}
-                            className="px-3 py-2 border rounded-md max-w-36 dark:bg-neutral-900 dark:text-white"
+                            className="px-3 py-2 border rounded-md w-fit dark:bg-neutral-900 dark:text-white"
                         >
                             <option value="latest">{translations['Latest']} ({read_count + unread_count})</option>
                             <option value="oldest">{translations['Oldest']} ({read_count + unread_count})</option>
@@ -70,7 +70,7 @@ export default function Notifications() {
 
                     <button
                         onClick={handleReload}
-                        className="flex items-center rounded-md border p-2 text-sm font-semibold text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800"
+                        className="flex -ml-0.5 items-center rounded-md border p-2 text-sm font-semibold text-gray-800 transition hover:bg-gray-200 dark:text-white dark:hover:bg-neutral-800"
                     >
                         <RefreshCw className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
                     </button>
@@ -78,7 +78,7 @@ export default function Notifications() {
 
             </div>
 
-            <div className="divide-y divide-gray-200 dark:divide-neutral-800 -mt-2">
+            <div className="divide-y divide-gray-200 dark:divide-neutral-800 ">
                 {notifications.length > 0 ? (
                     notifications.map((notification) => <Notification key={notification.id + notification.created_at} notification={notification}/>)
                 ) : (

@@ -201,7 +201,7 @@ export function AppHeader({ breadcrumbs = [] }) {
                             <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between gap-0 pl-5">
                                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                                 <SheetHeader className="flex justify-start p-0 pt-3 pr-10 text-left">
-                                    <div className="-ml-3 flex min-w-0 items-center gap-1">
+                                    <div className="-ml-2.5 flex min-w-0 items-center gap-1">
                                         {' '}
                                         {/* min-w-0 to allow flex child truncation */}
                                         <Link href={user.username ? `/user/${user.username}` : '/user'} prefetch>

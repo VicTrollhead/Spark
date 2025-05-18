@@ -28,12 +28,12 @@ export default function FollowingPosts() {
         <AppLayout>
             <Head title={translations['Following posts']} />
 
-            <div className="flex justify-between items-center p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between p-6">
                 <h1 className="text-2xl font-extrabold">{translations['Following posts']}</h1>
 
                 <div className="flex gap-2">
                     <select
-                        className="ml-4 px-3 py-1 max-w-36 border rounded-md dark:bg-neutral-900 dark:text-white"
+                        className=" px-3 py-1 w-fit border rounded-md dark:bg-neutral-900 dark:text-white"
                         value={filters.sort}
                         onChange={handleSortChange}
                     >

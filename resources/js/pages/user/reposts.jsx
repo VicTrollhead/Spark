@@ -29,12 +29,12 @@ export default function Reposts() {
         <AppLayout>
             <Head title={translations['Reposts']} />
 
-            <div className="flex justify-between items-center p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between p-6">
                 <h1 className="text-2xl font-extrabold">{translations['Reposts']}</h1>
 
                 <div className="flex gap-2">
                     <select
-                        className="ml-4 px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white max-w-36"
+                        className=" px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white w-fit"
                         value={filters.sort}
                         onChange={handleSortChange}
                     >

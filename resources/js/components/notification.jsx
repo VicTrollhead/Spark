@@ -1,5 +1,5 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { ArrowRight, Bookmark, Check, Eye, EyeOff, Heart, MessageSquare, Repeat, Users } from 'lucide-react';
+import { ArrowRight, Bookmark, Check, Eye, EyeOff, Heart, MessageCircle, Repeat, Users, MessagesSquareIcon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar.jsx';
 import { useInitials } from '../hooks/use-initials.jsx';
 import { getProfileImageUrl } from '../lib/utils';
@@ -73,11 +73,13 @@ export function Notification({ notification }) {
                 return 'border-l-gray-700';
             case 'favorite':
                 return 'border-l-yellow-500';
+            case 'message':
+                return 'border-l-gray-400'
             default:
                 return 'border-l-gray-600';
         }
     };
-
+console.log(notification.extra_data);
     const renderMessage = (notification) => {
         const { type, source_user, post } = notification;
         const name = source_user?.name || translations['Someone'];
@@ -91,10 +93,16 @@ export function Notification({ notification }) {
                         <span className="text-sm text-gray-500 dark:text-gray-400">{notification.created_at}</span>
                         <div className="flex flex-row">
                             <Heart className="my-auto h-5 w-5" />
-                            <span className="ml-2">{translations['liked your post.']}</span>
+                            <span className="ml-2">
+                    {notification.extra_data
+                        ? translations['liked your comment.']
+                        : translations['liked your post.']}
+                </span>
                         </div>
+                        { notification.extra_data && (<div className="text-[16px]">"{notification.extra_data}"</div>) }
                     </div>
                 );
+
             case 'repost':
                 return (
                     <div className="flex flex-col gap-1">
@@ -112,7 +120,7 @@ export function Notification({ notification }) {
                         <span>{renderUserLink(username, name)}</span>
                         <span className="text-sm text-gray-500 dark:text-gray-400">{notification.created_at}</span>
                         <div className="flex flex-row">
-                            <MessageSquare className="my-auto h-5 w-5" />
+                            <MessageCircle className="my-auto h-5 w-5" />
                             <span className="ml-2">{translations['commented on your post:']}</span>
                         </div>
                         <div className="text-[16px]">"{notification.extra_data}"</div>
@@ -177,6 +185,18 @@ export function Notification({ notification }) {
                         </div>
                     </div>
                 );
+            case 'message':
+                return (
+                    <div className="flex flex-col gap-1">
+                        <span>{renderUserLink(username, name)}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">{notification.created_at}</span>
+                        <div className="flex flex-row">
+                            <MessagesSquareIcon className="my-auto h-5 w-5" />
+                            <span className="ml-2">{translations['sent you a message:']}</span>
+                        </div>
+                        <div className="text-[16px]">"{notification.extra_data}"</div>
+                    </div>
+                );
             default:
                 return (
                     <div className="flex flex-col gap-1">
@@ -192,10 +212,10 @@ export function Notification({ notification }) {
 
     return (
         <div
-            className={`border-l-4 ${getColor(notification.type)} flex items-start gap-3 border-t-0 border-r-0 border-b-gray-400 bg-gray-100 p-5 transition-all hover:bg-gray-200 dark:bg-neutral-900 dark:hover:bg-neutral-950`}
+            className={`border-l-4 ${getColor(notification.type)} flex items-start gap-3 border-t-0 border-r-0 border-b-gray-400 bg-gray-100 p-5 transition-all hover:bg-gray-50 dark:bg-neutral-900 dark:hover:bg-neutral-950`}
         >
             <div className="hidden items-center gap-4 md:flex">
-                <Avatar className="h-14 w-14">
+                <Avatar className="h-14 w-14 mt-4">
                     <AvatarImage src={getProfileImageUrl(sourceUser)} alt={sourceUser.name} />
                     <AvatarFallback className="rounded-full bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
                         {getInitials(sourceUser.name)}
@@ -213,7 +233,15 @@ export function Notification({ notification }) {
                     <Eye size={26} onClick={toggleReadStatus} className="cursor-pointer" />
                 )}
             </div>
-            {post && post.user && (
+            {notification.type === 'message' && sourceUser?.id ? (
+                <button
+                    onClick={() => router.post(`/chat/user-chat/new/${sourceUser.id}`)}
+                    className="my-auto rounded-lg p-2 text-gray-700 transition-all hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-200"
+                    title={translations['Send a message']}
+                >
+                    <ArrowRight className="ml-auto" size={28} />
+                </button>
+            ) : post && post.user && (
                 <Link
                     href={`/post/${post.id}`}
                     className="my-auto rounded-lg p-2 text-gray-700 transition-all hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-200"
@@ -221,6 +249,7 @@ export function Notification({ notification }) {
                     <ArrowRight className="ml-auto" size={28} />
                 </Link>
             )}
+
         </div>
     );
 }
