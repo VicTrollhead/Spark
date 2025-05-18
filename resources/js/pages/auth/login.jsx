@@ -10,6 +10,7 @@ import { Label } from '../../components/ui/label';
 import AuthLayout from '../../layouts/auth-layout';
 import { useState, useEffect } from 'react';
 
+
 export default function Login({ status, canResetPassword, googleClientId }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: "",

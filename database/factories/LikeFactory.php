@@ -22,8 +22,9 @@ class LikeFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
-            'post_id' => Post::factory(),
+            'user_id' => null,
+            'likeable_id' => null,
+            'likeable_type' => null,
             'is_deleted' => false,
         ];
     }
