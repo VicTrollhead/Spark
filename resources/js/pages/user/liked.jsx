@@ -33,7 +33,7 @@ export default function Liked() {
 
                 <div className="flex gap-2">
                     <select
-                        className="ml-4 px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
+                        className="ml-4 max-w-36 px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
                         value={filters.sort}
                         onChange={handleSortChange}
                     >

@@ -45,7 +45,7 @@ export default function Friends() {
                     <h1 className="text-2xl font-bold">{translations['Friends']}</h1>
                     <div className="flex gap-2">
                         <select
-                            className="px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
+                            className="px-3 max-w-36 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
                             value={filters?.sort || 'latest'}
                             onChange={(e) => {
                                 router.get(route('user.friends'), {

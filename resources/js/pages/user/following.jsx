@@ -59,7 +59,7 @@ export default function Following() {
                     <h1 className="text-2xl font-bold">{translations['Following']}</h1>
                     <div className="flex gap-2">
                         <select
-                            className="px-3 py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
+                            className="px-3 py-1 max-w-36 border rounded-md dark:bg-neutral-900 dark:text-white"
                             value={filters?.sort || 'latest'}
                             onChange={handleSortChange}
                         >

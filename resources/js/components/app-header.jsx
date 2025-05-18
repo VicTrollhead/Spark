@@ -184,7 +184,6 @@ export function AppHeader({ breadcrumbs = [] }) {
 
     return (
         <>
-
             <div className="border-sidebar-border/80 fixed top-0 left-0 z-50 w-full border-b bg-white dark:bg-neutral-950">
                 <div className="mx-4 flex h-16">
                     {/* Mobile Menu */}
@@ -201,33 +200,36 @@ export function AppHeader({ breadcrumbs = [] }) {
                             </SheetTrigger>
                             <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between gap-0 pl-5">
                                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                                <SheetHeader className="flex justify-start p-0 pt-3 text-left">
-                                    <div className="flex items-center gap-1">
+                                <SheetHeader className="flex justify-start p-0 pt-3 pr-10 text-left">
+                                    <div className="-ml-3 flex min-w-0 items-center gap-1">
+                                        {' '}
+                                        {/* min-w-0 to allow flex child truncation */}
                                         <Link href={user.username ? `/user/${user.username}` : '/user'} prefetch>
-                                            <Avatar className="h-12 w-12 overflow-hidden rounded-full">
+                                            <Avatar className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full">
                                                 <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
                                                 <AvatarFallback className="rounded-lg bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
                                                     {getInitials(user.name)}
                                                 </AvatarFallback>
                                             </Avatar>
                                         </Link>
-                                        <Link href={user.username ? `/user/${user.username}` : '/user'} prefetch className="ml-2">
-                                            <div className="grid flex-1 text-left leading-tight">
-                                                <div className="flex items-center gap-1 -ml-1">
-                                                    <span className="truncate text-[14px] text-gray-700 dark:text-neutral-300">
+                                        <Link href={user.username ? `/user/${user.username}` : '/user'} prefetch className="ml-2 min-w-0 flex-1">
+                                            <div className="grid text-left leading-tight">
+                                                <div className="flex min-w-0 items-center gap-1">
+                                                    <span className="max-w-full truncate text-[14px] text-gray-700 dark:text-neutral-300">
                                                         @{user.username}
                                                     </span>
                                                     {user.is_verified && (
-                                                        <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                        <span className="flex flex-shrink-0 items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
                                                             <Check className="h-3 w-3" />
                                                         </span>
                                                     )}
                                                 </div>
-                                                <span className="truncate text-lg font-extrabold break-all">{user.name}</span>
+                                                <span className="max-w-full truncate text-lg font-extrabold">{user.name}</span>
                                             </div>
                                         </Link>
                                     </div>
                                 </SheetHeader>
+
                                 <div className="mt-4 flex h-full flex-1 flex-col">
                                     <div className="flex h-full flex-col justify-between text-sm">
                                         <div className="flex flex-col gap-0.5 space-y-4">
@@ -262,7 +264,7 @@ export function AppHeader({ breadcrumbs = [] }) {
                         <Link href="/dashboard" prefetch>
                             <AppLogo />
                         </Link>
-                        <AppearanceToggle className="ml-5 lg:ml-2.5 justify-center p-2.5" />
+                        <AppearanceToggle className="ml-5 justify-center p-2.5 lg:ml-2.5" />
                     </div>
 
                     {/* Desktop Navigation */}

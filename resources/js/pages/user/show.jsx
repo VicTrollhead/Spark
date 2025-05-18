@@ -160,7 +160,7 @@ export default function Show() {
                                 </div>
                             )}
                         </div>
-                        <p className="text-gray-500 dark:text-gray-400 mt-1">@{user.username}</p>
+                        <p className="text-gray-500 dark:text-gray-400 mt-1 break-all">@{user.username}</p>
                     </div>
                     {!isOwnProfile && (
                         <div className="flex lg:flex-row flex-col gap-1">
@@ -263,7 +263,7 @@ export default function Show() {
 
                     <div className="flex items-center gap-2">
                         <select
-                            className="ml-4 px-3 py-1.5 border rounded-md dark:bg-neutral-900 dark:text-white"
+                            className="ml-4 px-3 max-w-36 py-1.5 border rounded-md dark:bg-neutral-900 dark:text-white"
                             value={sort}
                             onChange={(e) => {
                                 setSort(e.target.value);

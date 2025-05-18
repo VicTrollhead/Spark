@@ -36,7 +36,7 @@ export default function PopularHashtags() {
                 </div>
 
                 <div className="flex gap-2">
-                    <select value={sort} onChange={handleSortChange} className="rounded-md border px-3 py-1 dark:bg-neutral-900 dark:text-white">
+                    <select value={sort} onChange={handleSortChange} className="max-w-36 rounded-md border px-3 py-1 dark:bg-neutral-900 dark:text-white">
                         <option value="likes">{translations['Most Liked']}</option>
                         <option value="posts">{translations['Most Posts']}</option>
                     </select>

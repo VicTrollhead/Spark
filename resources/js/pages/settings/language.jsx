@@ -43,7 +43,7 @@ export default function Language() {
                     <select
                         value={localeOption}
                         onChange={handleLanguageChange}
-                        className="p-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
+                        className="p-2 border rounded-md max-w-36 bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
                     >
                         <option value="en">{translations["English"]}</option>
                         <option value="ua">{translations["Ukrainian"]}</option>

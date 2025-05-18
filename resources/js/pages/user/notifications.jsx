@@ -59,7 +59,7 @@ export default function Notifications() {
                         <select
                             value={sort}
                             onChange={(e) => handleSortChange(e.target.value)}
-                            className="px-3 py-2 border rounded-md dark:bg-neutral-900 dark:text-white"
+                            className="px-3 py-2 border rounded-md max-w-36 dark:bg-neutral-900 dark:text-white"
                         >
                             <option value="latest">{translations['Latest']} ({read_count + unread_count})</option>
                             <option value="oldest">{translations['Oldest']} ({read_count + unread_count})</option>

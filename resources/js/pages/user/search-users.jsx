@@ -81,7 +81,7 @@ export default function SearchUsers() {
                             <select
                                 value={sortOption}
                                 onChange={handleSortChange}
-                                className="px-1 py-2 w-full border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
+                                className="px-1 max-w-36 py-2 border rounded-md bg-gray-100 dark:bg-neutral-900 text-neutral-950 dark:text-white"
                             >
                                 <option value="latest">{translations['Latest']}</option>
                                 <option value="oldest">{translations['Oldest']}</option>
