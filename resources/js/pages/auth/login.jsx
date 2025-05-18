@@ -9,6 +9,7 @@ import PasswordVisibilityToggle from '../../components/ui/password-visibility-bu
 import { Label } from '../../components/ui/label';
 import AuthLayout from '../../layouts/auth-layout';
 import { useState, useEffect } from 'react';
+import GoogleIcon from '../../assets/images/google_icon.png'
 
 export default function Login({ status, canResetPassword, googleClientId }) {
     const { data, setData, post, processing, errors, reset } = useForm({

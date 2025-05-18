@@ -7,7 +7,6 @@ use App\Models\Follow;
 use App\Models\Like;
 use App\Models\Post;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -31,7 +30,7 @@ class DatabaseSeeder extends Seeder
 
         // Create Follows (Ensure no user follows themselves)
         $users->each(function ($follower) use ($users) {
-            $users->random(rand(1, 5))->each(function ($followee) use ($follower, $users) {
+            $users->random(rand(1, 5))->each(function ($followee) use ($follower) {
                 if ($follower->id !== $followee->id) {
                     Follow::factory()->create([
                         'follower_id' => $follower->id,
@@ -41,34 +40,39 @@ class DatabaseSeeder extends Seeder
             });
         });
 
-        // Create Likes
-        $users->each(function ($user) use ($posts) {
-            $posts->random(rand(1, 10))->each(function ($post) use ($user) {
-                Like::factory()->create([
-                    'user_id' => $user->id,
-                    'post_id' => $post->id,
-                ]);
-            });
-        });
-
         // Create Comments
-        $users->each(function ($user) use ($posts, $users) {
-            $posts->random(rand(1, 5))->each(function ($post) use ($user, $users) {
+        $comments = collect();
+        $users->each(function ($user) use ($posts, $users, $comments) {
+            $posts->random(rand(1, 5))->each(function ($post) use ($user, $users, $comments) {
                 $comment = Comment::factory()->create([
                     'user_id' => $user->id,
                     'post_id' => $post->id,
                 ]);
+                $comments->push($comment);
 
                 // Nested Replies
                 if (rand(0, 1)) {
-                    Comment::factory()->create([
+                    $reply = Comment::factory()->create([
                         'user_id' => $users->random()->id,
                         'post_id' => $post->id,
                         'parent_comment_id' => $comment->id,
                     ]);
+                    $comments->push($reply);
                 }
+            });
+        });
+
+        // Create Likes (polymorphic: Post and Comment)
+        $likeables = $posts->merge($comments);
+
+        $users->each(function ($user) use ($likeables) {
+            $likeables->random(rand(3, 10))->each(function ($likeable) use ($user) {
+                Like::factory()->create([
+                    'user_id' => $user->id,
+                    'likeable_id' => $likeable->id,
+                    'likeable_type' => get_class($likeable),
+                ]);
             });
         });
     }
 }
-
