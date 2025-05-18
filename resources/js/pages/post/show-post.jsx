@@ -149,6 +149,12 @@ export default function Show() {
             setIsLoading(false);
         }, 1000);
     };
+    const handleKeyDown = (e) => {
+        if(e.key === 'Enter')
+        {
+            handleCommentSubmit(e);
+        }
+    };
 
     // const getMediaUrl = (file) => {
     //     if (file?.disk === 's3') {
@@ -175,7 +181,7 @@ export default function Show() {
             <Head title={`${translations['Post by']} @${post.user.username}`} />
 
             <div className="p-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex justify-between">
                     <div className="flex items-center space-x-3 -ml-2">
                         <Avatar className="h-20 w-20 border border-gray-200 dark:border-gray-700 text-2xl">
                             <AvatarImage src={profileImageUrl} alt={post.user.name} />
@@ -365,6 +371,7 @@ export default function Show() {
                     <button
                         type="submit"
                         disabled={!data.content || processing}
+                        onKeyDown={handleKeyDown}
                         className={`mr-0.5 self-end rounded-lg px-4 py-2 text-white ${
                             data.content
                                 ? 'bg-blue-600 hover:bg-blue-700'
