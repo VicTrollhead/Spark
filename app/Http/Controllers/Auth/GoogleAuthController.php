@@ -9,37 +9,41 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
+
 
 class GoogleAuthController extends Controller
 {
-    public function callback(Request $request): JsonResponse
+
+    public function googleLogin()
     {
-        $token = $request->input('token');
+        return Socialite::driver('google')->redirect();
+    }
 
-        $googleResponse = Http::get("https://oauth2.googleapis.com/tokeninfo?id_token={$token}");
+    public function googleAuth()
+    {
 
-        if (!$googleResponse->successful()) {
-            return response()->json(['success' => false, 'message' => "Error auth with token: {$token}"], 401);
+        $googleUser = Socialite::driver('google')->stateless()->user();
+
+
+        $user = User::where('email', $googleUser->getEmail())->first();
+
+        if ($user) {
+            Auth::login($user);
+            return redirect()->route('dashboard');
         }
 
-        $googleUser = $googleResponse->json();
 
-        $user = User::where('email', $googleUser['email'])->first();
-
-        if (!$user) {
-            $user = User::create([
-                'name' => $googleUser['name'],
-                'username' => strstr($googleUser['email'], '@', true),
-                'email' => $googleUser['email'],
-                'password' => bcrypt(Str::random()),
-//                'is_verified' => true,
-                'email_verified_at' => now(),
-                'profile_image_url' => $googleUser['picture'],
-            ]);
-        }
+        $user = User::create([
+            'name' => $googleUser->getName(),
+            'username' => strstr($googleUser->getEmail(), '@', true),
+            'email' => $googleUser->getEmail(),
+            'password' => bcrypt(Str::random()),
+            'email_verified_at' => now(),
+            'profile_image_url' => $googleUser->getAvatar(),
+        ]);
 
         Auth::login($user);
-
-        return response()->json(['success' => true]);
+        return redirect()->route('dashboard');
     }
 }

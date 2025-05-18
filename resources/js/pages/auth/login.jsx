@@ -9,7 +9,7 @@ import PasswordVisibilityToggle from '../../components/ui/password-visibility-bu
 import { Label } from '../../components/ui/label';
 import AuthLayout from '../../layouts/auth-layout';
 import { useState, useEffect } from 'react';
-
+import GoogleIcon from '../../assets/images/google_icon.png'
 
 export default function Login({ status, canResetPassword, googleClientId }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -63,26 +63,29 @@ export default function Login({ status, canResetPassword, googleClientId }) {
     }, []);
 
     return (
-        <AuthLayout title={translations["Log in to Spark"]} description={translations["Use google authentication or email to log in"]}>
+        <AuthLayout title={translations['Log in to Spark']} description={translations['Use google authentication or email to log in']}>
             <Head title={translations['Log In']} />
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-5">
 
-                    {/* Google Sign-In block */}
-                    <div id="g_id_onload"
-                         data-client_id={googleClientId || '980020201753-diubrb4qni06ji66kvfpvem23bfcgiur.apps.googleusercontent.com'}
-                         data-callback="handleCredentialResponse">
-                    </div>
+
+                    <Button asChild variant="default" size="default"  className="mt-4 w-full bg-white dark:bg-black hover:bg-white hover:dark:bg-black border-2 border-grey-700 hover:border-3 hover:border-blue-500 text-black dark:text-white" tabIndex={5}>
+                        <a href={route('api.auth.google')} className="block text-center">
+                            <img src={GoogleIcon} alt="Google" className="mr-2 h-5 w-5" />
+                            {translations['Continue with Google']}
+                        </a>
+                    </Button>
+
                     <div className="g_id_signin" data-type="standard"></div>
 
                     <div className="my-1 flex items-center">
                         <div className="flex-grow border border-t"></div>
-                        <span className="px-2 font-bold">{translations["OR"]}</span>
+                        <span className="px-2 font-bold">{translations['OR']}</span>
                         <div className="flex-grow border border-t"></div>
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="email">{translations["Email Address"]}</Label>
+                        <Label htmlFor="email">{translations['Email Address']}</Label>
                         <Input
                             id="email"
                             type="email"
@@ -92,13 +95,13 @@ export default function Login({ status, canResetPassword, googleClientId }) {
                             autoComplete="email"
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
-                            placeholder={translations["email@example.com"]}
+                            placeholder={translations['email@example.com']}
                         />
                         <InputError message={errors.email} />
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="password">{translations["Password"]}</Label>
+                        <Label htmlFor="password">{translations['Password']}</Label>
                         <div className="flex gap-1.5">
                             <Input
                                 id="password"
@@ -108,7 +111,7 @@ export default function Login({ status, canResetPassword, googleClientId }) {
                                 autoComplete="current-password"
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
-                                placeholder={translations["Password"]}
+                                placeholder={translations['Password']}
                             />
                             <PasswordVisibilityToggle visible={passwordVisible} onToggle={togglePasswordVisibility} />
                         </div>
@@ -117,15 +120,15 @@ export default function Login({ status, canResetPassword, googleClientId }) {
 
                     <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                        {translations["Log In"]}
+                        {translations['Log In']}
                     </Button>
 
                     <div className="flex items-center space-x-3">
                         <Checkbox id="remember" name="remember" tabIndex={3} />
-                        <Label htmlFor="remember">{translations["Remember Me"]}</Label>
+                        <Label htmlFor="remember">{translations['Remember Me']}</Label>
                         {canResetPassword && (
                             <TextLink href={route('password.request')} className="ml-auto text-sm" tabIndex={5}>
-                                {translations["Forgot Password"]}?
+                                {translations['Forgot Password']}?
                             </TextLink>
                         )}
                     </div>
@@ -137,7 +140,7 @@ export default function Login({ status, canResetPassword, googleClientId }) {
                 <div className="text-muted-foreground text-center text-sm">
                     {translations["Don't have an account?"]}{' '}
                     <TextLink href={route('register')} tabIndex={6}>
-                        {translations["Sign up"]}
+                        {translations['Sign up']}
                     </TextLink>
                 </div>
             </form>

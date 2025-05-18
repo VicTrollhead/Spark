@@ -18,7 +18,10 @@ Route::get('/', function () {
     return Inertia::render('auth/login');
 })->name('home');
 
-Route::post('/api/auth/google/callback', [GoogleAuthController::class, 'callback']);
+
+
+Route::get('/api/auth/google/callback', [GoogleAuthController::class, 'googleAuth'])->name('api.auth.google.callback');
+Route::get('/api/auth/google', [GoogleAuthController::class, 'googleLogin']) ->name('api.auth.google');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [PostController::class, 'index'])->name('home');
