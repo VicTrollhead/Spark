@@ -22,9 +22,7 @@ class GoogleAuthController extends Controller
 
     public function googleAuth()
     {
-
         $googleUser = Socialite::driver('google')->stateless()->user();
-
 
         $user = User::where('email', $googleUser->getEmail())->first();
 
@@ -33,10 +31,18 @@ class GoogleAuthController extends Controller
             return redirect()->route('dashboard');
         }
 
+        $baseUsername = strstr($googleUser->getEmail(), '@', true);
+        $username = $baseUsername;
+        $counter = 1;
+
+        while (User::where('username', $username)->exists()) {
+            $username = $baseUsername . $counter;
+            $counter++;
+        }
 
         $user = User::create([
             'name' => $googleUser->getName(),
-            'username' => strstr($googleUser->getEmail(), '@', true),
+            'username' => $username,
             'email' => $googleUser->getEmail(),
             'password' => bcrypt(Str::random()),
             'email_verified_at' => now(),
@@ -46,4 +52,5 @@ class GoogleAuthController extends Controller
         Auth::login($user);
         return redirect()->route('dashboard');
     }
+
 }
