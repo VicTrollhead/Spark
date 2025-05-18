@@ -65,14 +65,18 @@ class DatabaseSeeder extends Seeder
         // Create Likes (polymorphic: Post and Comment)
         $likeables = $posts->merge($comments);
 
-        $users->each(function ($user) use ($likeables) {
-            $likeables->random(rand(3, 10))->each(function ($likeable) use ($user) {
-                Like::factory()->create([
-                    'user_id' => $user->id,
-                    'likeable_id' => $likeable->id,
-                    'likeable_type' => get_class($likeable),
-                ]);
-            });
+        $users->each(function ($user) use ($posts, $comments) {
+            $likeables = collect();
+
+            $likeables = $likeables
+                ->merge($posts->random(rand(1, min(5, $posts->count()))))
+                ->merge($comments->random(rand(1, min(5, $comments->count()))));
+
+            foreach ($likeables as $likeable) {
+                Like::factory()
+                    ->{$likeable instanceof \App\Models\Post ? 'forPost' : 'forComment'}($likeable)
+                    ->create(['user_id' => $user->id]);
+            }
         });
     }
 }

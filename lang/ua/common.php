@@ -42,6 +42,7 @@ return [
     "Latest" => "Останні",
     "Oldest" => "Старіші",
     "Most Liked" => "Найбільш лайкнуті",
+    "Least Liked" => "Найменьш лайкнуті",
     "People I Follow" => "Люди, на яких я підписаний",
     "People Who Follow Me" => "Підписані на мене",
     "Mutual Friends" => "Друзі",

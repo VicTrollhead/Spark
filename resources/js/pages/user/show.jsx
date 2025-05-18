@@ -136,7 +136,7 @@ export default function Show() {
                 <div className="absolute bottom-[-55px] left-4 sm:left-6">
                     <Avatar className="h-32 w-32 border-4 border-white sm:h-36 sm:w-36 dark:border-gray-900">
                         <AvatarImage src={profileImageUrl} alt={user.name} />
-                        <AvatarFallback className="rounded-full bg-gray-200 text-4xl text-black dark:bg-gray-700 dark:text-white">
+                        <AvatarFallback className="rounded-full bg-gray-200 text-5xl text-black dark:bg-gray-700 dark:text-white">
                             {getInitials(user.name)}
                         </AvatarFallback>
                     </Avatar>

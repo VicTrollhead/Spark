@@ -264,6 +264,9 @@ class PostController extends Controller
             case 'likes':
                 $commentsQuery->withCount('likes')->orderByDesc('likes_count');
                 break;
+            case 'less_likes':
+                $commentsQuery->withCount('likes')->orderBy('likes_count');
+                break;
             case 'oldest':
                 $commentsQuery->oldest();
                 break;

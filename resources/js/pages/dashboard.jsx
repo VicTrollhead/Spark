@@ -232,7 +232,7 @@ export default function Dashboard() {
                 {posts.length > 0 ? (
                     posts.map((post) => <PostComponent key={post.id} post={post} />)
                 ) : (
-                    <p className="px-6 py-4 text-gray-500 dark:text-gray-400">No posts yet.</p>
+                    <p className="px-6 py-4 text-gray-500 dark:text-gray-400">{translations['No posts yet.']}</p>
                 )}
             </div>
         </AppLayout>

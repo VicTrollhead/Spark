@@ -18,10 +18,10 @@ export default function VerifyEmail({ status }) {
     return (<AuthLayout title={translations["Verify email"]} description={translations["Please verify your email address by clicking on the link we just emailed to you."]}>
             <Head title={translations["Email verification"]}/>
 
-            {status === 'verification-link-sent' && (<div className="my-[-0.5rem]"><div className=" text-center text-sm font-medium text-green-600">
+            {status === 'verification-link-sent' && (<div className="my-[-0.5rem]"><div className="text-sm font-medium text-green-600">
                 {translations["A new verification link has been sent to the email address you provided during registration."]}
                 </div>
-                <div className="mb-4 text-center text-sm text-green-600 font-extrabold">
+                <div className="mb-4 text-sm text-green-600 font-extrabold">
                     {translations["Please make sure to check your spam inbox!"]}
                 </div></div>)}
 

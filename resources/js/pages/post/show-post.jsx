@@ -1,5 +1,5 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { Bookmark, Check, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat } from 'lucide-react';
+import { Bookmark, Check, EllipsisVertical, EyeOff, Heart, MessageCircle, RefreshCw, Repeat } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
@@ -21,7 +21,7 @@ export default function Show() {
         post_id: post.id,
         parent_comment_id: null,
     });
-
+    const [isLoading, setIsLoading] = useState(false);
     const [sortOption, setSortOption] = useState(sort || 'latest');
     const isOwnPost = auth.user && auth.user.id === post.user.id;
     const [isLiked, setIsLiked] = useState(post.is_liked);
@@ -140,6 +140,14 @@ export default function Show() {
                 },
             },
         );
+    };
+
+    const handleReload = () => {
+        setIsLoading(true);
+        router.reload();
+        setTimeout(() => {
+            setIsLoading(false);
+        }, 1000);
     };
 
     // const getMediaUrl = (file) => {
@@ -370,14 +378,24 @@ export default function Show() {
 
             <div className="flex items-center justify-between border-b bg-white p-4 dark:border-gray-800 dark:bg-neutral-950">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{translations['Comments']}</h2>
-                <select
-                    value={sortOption}
-                    onChange={handleSortChange}
-                    className="rounded-md border bg-gray-100 p-2 text-neutral-950 dark:bg-neutral-900 dark:text-white"
-                >
-                    <option value="latest">{translations['Latest']}</option>
-                    <option value="oldest">{translations['Oldest']}</option>
-                </select>
+                <div className="flex gap-2">
+                    <select
+                        value={sortOption}
+                        onChange={handleSortChange}
+                        className="rounded-md border bg-gray-100 p-2 text-neutral-950 dark:bg-neutral-900 dark:text-white"
+                    >
+                        <option value="latest">{translations['Latest']}</option>
+                        <option value="oldest">{translations['Oldest']}</option>
+                        <option value="likes">{translations['Most Liked']}</option>
+                        <option value="less_likes">{translations['Least Liked']}</option>
+                    </select>
+                    <button
+                        onClick={handleReload}
+                        className="p-2 text-sm font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition flex items-center"
+                    >
+                        <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
+                    </button>
+                </div>
             </div>
             <div className="mt-2 px-6">
                 <div className="divide-y divide-gray-200 dark:divide-neutral-800">

@@ -43,6 +43,7 @@ return [
     "Latest" => "Latest",
     "Oldest" => "Oldest",
     "Most Liked" => "Most Liked",
+    "Least Liked" => "Least Liked",
     "People I Follow" => "People I Follow",
     "People Who Follow Me" => "People Who Follow Me",
     "Mutual Friends" => "Mutual Friends",

@@ -142,9 +142,9 @@ export default function PostComponent({ post, compact = false }) {
     return (
         <div className={`relative ${compact ? 'bg-muted/30 rounded-lg border p-3' : 'border-b p-4'} border-gray-200 dark:border-gray-800`}>
             <div className="flex items-start space-x-3">
-                <Avatar className="h-16 w-16">
+                <Avatar className="h-16 w-16 mt-2.5">
                     <AvatarImage src={profileImageUrl} alt={post.user.name} />
-                    <AvatarFallback className="rounded-full bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
+                    <AvatarFallback className="rounded-full text-lg bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
                         {getInitials(post.user.name)}
                     </AvatarFallback>
                 </Avatar>
