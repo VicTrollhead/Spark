@@ -317,15 +317,16 @@ class ChatController extends Controller
             return redirect()->back()->with('error', 'No unread messages to mark as read.');
         }
 
-        $messages->each(function ($message) {
+        $messages->each(function ($message) use ($user) {
             $message->update(['read_at' => now()]);
+
+            Notification::where('type', 'message')
+                ->where('message_id', $message->id)
+                ->where('user_id', $user->id)
+                ->delete();
         });
 
         $recipientId = $chat->user1_id === $user->id ? $chat->user2_id : $chat->user1_id;
-
-        if (is_null($recipientId)) {
-            return redirect()->back()->with('error', 'Recipient not found.');
-        }
 
         if (!is_null($recipientId)) {
             event(new UserMessageIsReadChange($recipientId, "read"));
@@ -333,6 +334,7 @@ class ChatController extends Controller
 
         return redirect()->back()->with('success', 'The message has been read.');
     }
+
 
     public function getUnreadMessagesCount(Request $request)
     {

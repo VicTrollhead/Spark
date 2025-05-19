@@ -79,7 +79,7 @@ export function Notification({ notification }) {
                 return 'border-l-gray-600';
         }
     };
-console.log(notification.extra_data);
+    console.log(notification.extra_data);
     const renderMessage = (notification) => {
         const { type, source_user, post } = notification;
         const name = source_user?.name || translations['Someone'];
@@ -236,7 +236,7 @@ console.log(notification.extra_data);
             {notification.type === 'message' && sourceUser?.id ? (
                 <button
                     onClick={() => router.post(`/chat/user-chat/new/${sourceUser.id}`)}
-                    className="my-auto rounded-lg p-2 text-gray-700 transition-all hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-200"
+                    className="my-auto rounded-lg p-2 cursor-pointer text-gray-700 transition-all hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-200"
                     title={translations['Send a message']}
                 >
                     <ArrowRight className="ml-auto" size={28} />

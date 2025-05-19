@@ -219,7 +219,7 @@ return [
     "(you)" => "(you)",
     "No popular hashtags found." => "No popular hashtags found.",
     "sent you a message:" => "sent you a message:",
-    "liked your comment." => "liked your post.",
+    "liked your comment." => "liked your comment.",
 
     "Reset password" => "Reset password",
     "Please enter your new password below" => "Please enter your new password below.",

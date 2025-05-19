@@ -75,8 +75,8 @@ export default function Friends() {
                 ) : (
                     <ul>
                         {users.map((friend) => (
-                            <li key={friend.id} className="flex items-center gap-3 border-b py-2 mt-2 dark:border-gray-700">
-                                <Avatar className="h-24 w-24 border-4 border-white sm:h-28 sm:w-28 dark:border-gray-900">
+                            <li key={friend.id} className="flex items-center gap-2 border-b py-2 mt-2 dark:border-gray-700">
+                                <Avatar className="h-20 w-20 border-4 border-white sm:h-28 sm:w-28 dark:border-gray-900">
                                     <AvatarImage src={getProfileImageUrl(friend)} alt={friend.name} />
                                     <AvatarFallback className="rounded-full bg-gray-200 text-4xl text-black dark:bg-gray-700 dark:text-white">
                                         {getInitials(friend.name)}
@@ -112,14 +112,14 @@ export default function Friends() {
                                         {friend.is_friend ? (
                                             <button
                                                 onClick={() => router.post(`/chat/user-chat/new/${friend.id}`)}
-                                                className={`px-4 py-2 flex gap-2 items-center rounded-md bg-gray-600 hover:bg-gray-500 text-white dark:bg-gray-800 dark:hover:bg-gray-700`}
+                                                className={`sm:px-4 sm:py-2 px-3 py-1.5 flex gap-2 items-center rounded-md bg-gray-600 hover:bg-gray-500 text-white dark:bg-gray-800 dark:hover:bg-gray-700`}
                                             >
                                                 {translations['Write']}<SendIcon className="w-4 h-4" />
                                             </button>
                                         ) : ''}
                                         <button
                                             onClick={() => handleFollowToggle(friend, friend.is_followed, friend.is_private, friend.has_sent_follow_request)}
-                                            className={`px-4 py-1 rounded-md ${
+                                            className={`ml-auto sm:px-4 sm:py-2 px-3 py-1.5 rounded-md text-white ${
                                                 friend.has_sent_follow_request
                                                     ? 'bg-gray-600 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700'
                                                     : (friend.is_followed

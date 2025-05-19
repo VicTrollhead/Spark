@@ -16,6 +16,7 @@ class NotificationService
             'post_id'        => $data['post_id'] ?? null,
             'extra_data'     => $data['extra_data'] ?? null,
             'comment_id'     => $data['comment_id'] ?? null,
+            'message_id'     => $data['message_id'] ?? null,
         ]);
         event(new NotificationCreated($notification));
         return $notification;
