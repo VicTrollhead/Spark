@@ -323,7 +323,7 @@ class ChatController extends Controller
             Notification::where('type', 'message')
                 ->where('message_id', $message->id)
                 ->where('user_id', $user->id)
-                ->delete();
+                ->update(['is_read' => true]);
         });
 
         $recipientId = $chat->user1_id === $user->id ? $chat->user2_id : $chat->user1_id;
