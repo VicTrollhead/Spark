@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User; // Додайте цей рядок для імпорту моделі User
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -46,34 +47,6 @@ class HandleInertiaRequests extends Middleware
 
         $user = $request->user();
 
-//        $defaultDisk = config('filesystems.default');
-//        $fallbackDisk = 'public';
-//
-//        $profileImage = null;
-//
-//        if ($user && $user->profileImage) {
-//            $filePath = $user->profileImage->file_path;
-//
-//            try {
-//                $diskToUse = $user->profileImage->disk ?? $defaultDisk;
-//                if (Storage::disk($diskToUse)->exists($filePath)) {
-//                    $profileImage = Storage::disk($diskToUse)->url($filePath);
-//                } else {
-//                    if (Storage::disk($fallbackDisk)->exists($filePath)) {
-//                        $profileImage = Storage::disk($fallbackDisk)->url($filePath);
-//                    }
-//                }
-//            } catch (\Exception $e) {
-//                try {
-//                    if (Storage::disk($fallbackDisk)->exists($filePath)) {
-//                        $profileImage = Storage::disk($fallbackDisk)->url($filePath);
-//                    }
-//                } catch (\Exception $ex) {
-//                    $profileImage = null;
-//                }
-//            }
-//        }
-
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -89,16 +62,12 @@ class HandleInertiaRequests extends Middleware
                     'name' => $user->name,
                     'username' => $user->username,
                     'email' => $user->email,
-//                    'profile_image_url' => $user->profileImage
-//                        ? asset('storage/' . $user->profileImage->file_path)
-//                        : null,
-//                    'profile_image_url' => $user->profileImage
-//                        ? Storage::disk($this->disk ?? 's3')->url($user->profileImage->file_path)
-//                        : null,
                     'profile_image' => $user->profileImage,
                     'is_verified' => $user->is_verified,
                 ] : null,
             ],
+            // Додайте цю секцію для can_view_reports
+            'can_view_reports' => $user ? $user->can('viewReports', User::class) : false,
         ];
     }
 }

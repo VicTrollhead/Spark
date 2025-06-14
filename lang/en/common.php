@@ -230,6 +230,12 @@ return [
     "Please make sure to check your spam inbox!" => "Please make sure to check your spam inbox!",
     "Resend verification email" => "Resend verification email",
 
-
+    "Reports" => "Reports",
+    'Report Post' => 'Report Post',
+    'You are reporting the following post by' => 'You are reporting the following post by',
+    'Reason for reporting' => 'Reason for reporting',
+    'Please describe why you are reporting this post...' => 'Please describe why you are reporting this post...',
+    'Submitting...' => 'Submitting...',
+    'Submit Report' => 'Submit Report',
 ];
 

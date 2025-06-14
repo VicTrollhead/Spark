@@ -1,5 +1,5 @@
 import { Link, router, useForm, usePage } from '@inertiajs/react';
-import { Bookmark, Check, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat } from 'lucide-react';
+import { Bookmark, Check, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat, Flag } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
@@ -302,6 +302,16 @@ export default function PostComponent({ post, compact = false }) {
                                 </button>
                             )}
                             {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
+
+                            {post.user.id !== auth.user.id && ( // Показуємо кнопку, якщо це не ваш власний пост
+                                <Link
+                                    href={`/report-post/${post.id}`} // URL для сторінки скарги, передаємо ID поста
+                                    className="ml-auto flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-200" // `ml-auto` вирівняє її праворуч
+                                    title={translations['Report']} // Текст підказки
+                                >
+                                    <Flag className="h-5 w-5" />
+                                </Link>
+                            )}
                         </div>
                     )}
                 </div>

@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
@@ -28,6 +28,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at',
         'is_private',
         'status',
+        'is_admin'
     ];
 
     protected $hidden = [
@@ -44,6 +45,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'is_private' => 'boolean',
             'date_of_birth' => 'date',
             'status' => 'string',
+            'is_admin' => 'boolean',
         ];
     }
 
@@ -150,4 +152,8 @@ class User extends Authenticatable implements MustVerifyEmail
             ->wherePivot('is_accepted', false);
     }
 
+    public function isAdmin(): bool
+    {
+        return $this->is_admin === true;
+    }
 }

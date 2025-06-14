@@ -9,7 +9,8 @@ import {
     SidebarSeparator
 } from './ui/sidebar';
 import { useForm, usePage } from '@inertiajs/react';
-import { Bookmark, Folder, Home, LogOut, Mail, Settings, User, Users, Repeat, MessagesSquareIcon, Hash  } from 'lucide-react';
+
+import { Bookmark, Folder, Home, LogOut, Mail, Settings, User, Users, Repeat, MessagesSquareIcon, Hash, Flag } from 'lucide-react';
 import {useEffect, useState} from "react";
 
 export function AppSidebar() {
@@ -18,6 +19,9 @@ export function AppSidebar() {
     const { post } = useForm();
     const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
     const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+    const { can_view_reports } = usePage().props;
+
+    console.log('props', usePage().props);
 
     const fetchUnreadNotificationsCount = async () => {
         try {
@@ -63,15 +67,15 @@ export function AppSidebar() {
             .listen('UserMessageCreated',  (e) => {
                 fetchUnreadMessagesCount().catch(error => console.error(error));
             }).listen('UserMessageIsReadChange', (e) => {
-                if(e.operation === 'read')
-                {
-                    fetchUnreadMessagesCount().catch(error => console.error(error));
-                }
-                else if (e.operation === 'delete')
-                {
-                    fetchUnreadMessagesCount().catch(error => console.error(error));
-                }
-            });
+            if(e.operation === 'read')
+            {
+                fetchUnreadMessagesCount().catch(error => console.error(error));
+            }
+            else if (e.operation === 'delete')
+            {
+                fetchUnreadMessagesCount().catch(error => console.error(error));
+            }
+        });
 
         return () => {
             window.Echo.leave(`notifications.${user.id}`);
@@ -140,8 +144,16 @@ export function AppSidebar() {
             url: '/settings/profile',
             icon: Settings,
         },
-    ];
 
+        ...(can_view_reports
+            ? [{
+                title: translations['Reports'],
+                url: '',
+                icon: Flag,
+            }]
+            : [])
+
+    ];
     return (
         <Sidebar
                  variant="inset"

@@ -30,5 +30,8 @@ class UserPolicy
         return false;
     }
 
-
+    public function viewReports(User $user): bool
+    {
+        return $user->isAdmin();
+    }
 }

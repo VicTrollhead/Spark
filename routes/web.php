@@ -12,6 +12,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\RepostController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ReportController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -28,6 +29,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [PostController::class, 'index'])->name('dashboard');
     Route::get('dashboard/users', [UserController::class, 'users'])->name('dashboard.users');
     Route::get('/users-list', [UserController::class, 'usersList'])->name('users.list');
+
+
+    Route::get('/report-post/{post}', [ReportController::class, 'create'])->name('report.create');
+    Route::post('/report-post/{post}', [ReportController::class, 'store'])->name('report.store');
 
     Route::get('/user/favorites', [UserController::class, 'favorites'])->name('user.favorites');
     Route::get('/user/liked', [UserController::class, 'liked'])->name('user.liked');
