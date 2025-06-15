@@ -48,7 +48,7 @@ export default function ReportPost({ post, translations }) {
                             onChange={(e) => setData('reason', e.target.value)}
                             rows={3}
                             placeholder={translations['Please describe why you are reporting this post...']}
-                            className="w-full resize-none rounded-md bg-gray-100 p-3 text-neutral-950 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-neutral-950 dark:text-white dark:focus:ring-blue-600"
+                            className="w-full resize-none rounded-md bg-gray-100 p-3 text-neutral-950 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-neutral-800 dark:text-white dark:focus:ring-blue-600"
                         />
                         {errors.reason && <p className="text-red-500 text-sm mt-1">{errors.reason}</p>}
                     </div>

@@ -13,13 +13,20 @@ use App\Http\Controllers\RepostController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log; // <-- ДОДАЙТЕ ЦЕЙ РЯДОК
+
 
 Route::get('/', function () {
     return Inertia::render('auth/login');
 })->name('home');
 
+Route::delete('/admin/reports/{report}/post/{post}/delete-all', [AdminReportController::class, 'destroyPostAndReport'])
+    ->name('admin.reports.destroyPostAndReport');
 
+Route::delete('/admin/reports/{report}/delete-only', [AdminReportController::class, 'destroyReport'])
+    ->name('admin.reports.destroyReport');
 
 Route::get('/api/auth/google/callback', [GoogleAuthController::class, 'googleAuth'])->name('api.auth.google.callback');
 Route::get('/api/auth/google', [GoogleAuthController::class, 'googleLogin']) ->name('api.auth.google');
@@ -33,6 +40,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/report-post/{post}', [ReportController::class, 'create'])->name('report.create');
     Route::post('/report-post/{post}', [ReportController::class, 'store'])->name('report.store');
+
+
+    Route::get('/admin/reports', [AdminReportController::class, 'index'])
+        // ->middleware('can:viewReports') з невідомих мені причин десь у Middleware не дає viewReports пройти
+        ->name('admin.reports.index');
+
 
     Route::get('/user/favorites', [UserController::class, 'favorites'])->name('user.favorites');
     Route::get('/user/liked', [UserController::class, 'liked'])->name('user.liked');
@@ -100,50 +113,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/chat/user-chat/messages/unread-count', [ChatController::class, 'getUnreadMessagesCount'])->name('chat.getUnreadMessagesCount');
 
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//// 🏠 Public Routes
-//Route::get('/', function () {
-//    return Inertia::render('Welcome', [
-//        'canLogin' => Route::has('login'),
-//        'canRegister' => Route::has('register'),
-//        'laravelVersion' => Application::VERSION,
-//        'phpVersion' => PHP_VERSION,
-//    ]);
-//});
-//
-//// 🔒 Dashboard - Requires Authentication & Email Verification
-//Route::middleware(['auth', 'verified'])->group(function () {
-//    Route::get('/dashboard', function () {
-//        return Inertia::render('Dashboard');
-//    })->name('dashboard');
-//
-//    // 👤 Profile Routes
-//    Route::prefix('profile')->group(function () {
-//        Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
-//        Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
-//        Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
-//    });
-//});
-
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

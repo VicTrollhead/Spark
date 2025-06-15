@@ -11,7 +11,7 @@ class ReportController extends Controller
 {
     public function create(Post $post)
     {
-        return Inertia::render('ReportPost', [
+        return Inertia::render('report-post', [
             'post' => $post->load('user'),
             'translations' => trans('common'),
         ]);
@@ -23,7 +23,6 @@ class ReportController extends Controller
             'reason' => ['required', 'string', 'max:1000'],
         ]);
 
-        // Зберігаємо репорт у базі даних
         Report::create([
             'user_id' => auth()->id(),
             'post_id' => $post->id,

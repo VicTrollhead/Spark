@@ -148,7 +148,7 @@ export function AppSidebar() {
         ...(can_view_reports
             ? [{
                 title: translations['Reports'],
-                url: '',
+                url: '/admin/reports',
                 icon: Flag,
             }]
             : [])
