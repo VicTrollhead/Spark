@@ -229,6 +229,7 @@ return [
     "A new verification link has been sent to the email address you provided during registration." => "A new verification link has been sent to the email address you provided during registration.",
     "Please make sure to check your spam inbox!" => "Please make sure to check your spam inbox!",
     "Resend verification email" => "Resend verification email",
+    "Will be set" => "Will be set",
 
 
 ];

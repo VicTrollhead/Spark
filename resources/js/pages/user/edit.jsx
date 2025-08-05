@@ -7,7 +7,7 @@ import { Switch } from '../../components/ui/switch';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
 import { getProfileImageUrl, getCoverImageUrl } from '../../lib/utils';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 
 export default function Edit() {
@@ -17,6 +17,9 @@ export default function Edit() {
     const [removeCoverImage, setRemoveCoverImage] = useState(false);
     const profileInputRef = useRef();
     const coverInputRef = useRef(null);
+    const [previewProfileImage, setPreviewProfileImage] = useState(null);
+    const [previewCoverImage, setPreviewCoverImage] = useState(null);
+
 
 
     const { data, setData, post, processing, errors } = useForm({
@@ -45,28 +48,34 @@ export default function Edit() {
         setRemoveProfileImage(true);
         setData('profile_image', null);
         setData('remove_profile_image', true);
+        setPreviewProfileImage(null);
     };
 
     const handleCoverImageUnset = () => {
         setRemoveCoverImage(true);
         setData('cover_image', null);
         setData('remove_cover_image', true);
+        setPreviewCoverImage(null);
     };
 
 
     const handleProfileImageChange = (e) => {
         if (e.target.files[0]) {
+            const file = e.target.files[0];
             setRemoveProfileImage(false);
-            setData('profile_image', e.target.files[0]);
+            setData('profile_image', file);
             setData('remove_profile_image', false);
+            setPreviewProfileImage(URL.createObjectURL(file));
         }
     };
 
     const handleCoverImageChange = (e) => {
         if (e.target.files[0]) {
+            const file = e.target.files[0];
             setRemoveCoverImage(false);
-            setData('cover_image', e.target.files[0]);
+            setData('cover_image', file);
             setData('remove_cover_image', false);
+            setPreviewCoverImage(URL.createObjectURL(file));
         }
     };
 
@@ -83,15 +92,27 @@ export default function Edit() {
 
     const profileImageStatus = removeProfileImage
         ? translations['Will be removed']
-        : user.profile_image
-            ? translations['Set']
-            : translations['Not Set'];
+        : previewProfileImage
+            ? translations['Will be set']
+            : user.profile_image
+                ? translations['Set']
+                : translations['Not Set'];
 
     const coverImageStatus = removeCoverImage
         ? translations['Will be removed']
-        : user.cover_image
-            ? translations['Set']
-            : translations['Not Set'];
+        : previewCoverImage
+            ? translations['Will be set']
+            : user.cover_image
+                ? translations['Set']
+                : translations['Not Set'];
+
+
+    useEffect(() => {
+        return () => {
+            if (previewProfileImage) URL.revokeObjectURL(previewProfileImage);
+            if (previewCoverImage) URL.revokeObjectURL(previewCoverImage);
+        };
+    }, [previewProfileImage, previewCoverImage]);
 
     return (
         <AppLayout>
@@ -104,8 +125,11 @@ export default function Edit() {
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                             <div className="relative">
                                 <Avatar className="h-24 w-24">
-                                    {!removeProfileImage && user.profile_image ? (
-                                        <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
+                                    {!removeProfileImage && (previewProfileImage || user.profile_image) ? (
+                                        <AvatarImage
+                                            src={previewProfileImage || getProfileImageUrl(user)}
+                                            alt={user.name}
+                                        />
                                     ) : (
                                         <AvatarFallback className="bg-gray-200 dark:bg-gray-700 text-3xl">
                                             {getInitials(user.name)}
@@ -138,9 +162,8 @@ export default function Edit() {
                                                     type="button"
                                                     onClick={() => {
                                                         setData("profile_image", null);
-                                                        if (profileInputRef.current) {
-                                                            profileInputRef.current.value = "";
-                                                        }
+                                                        setPreviewProfileImage(null);
+                                                        if (profileInputRef.current) profileInputRef.current.value = "";
                                                     }}
                                                     className="shrink-0 rounded-full p-2 bg-gray-200 hover:bg-red-100 dark:bg-neutral-700 dark:hover:bg-red-900 text-gray-600 hover:text-red-600 dark:text-gray-200 dark:hover:text-red-400"
                                                     title="Clear file"
@@ -183,9 +206,9 @@ export default function Edit() {
                         <h2 className="mb-3 text-lg font-medium text-gray-900 dark:text-white">{translations['Cover Image']}</h2>
                         <div className="flex flex-col gap-4">
                             <div className="h-72 w-full object-fill object-center bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden relative">
-                                {!removeCoverImage && user.cover_image ? (
+                                {!removeCoverImage && (previewCoverImage || user.cover_image) ? (
                                     <img
-                                        src={getCoverImageUrl(user)}
+                                        src={previewCoverImage || getCoverImageUrl(user)}
                                         alt="Cover"
                                         className="w-full h-full object-center object-fill"
                                     />
@@ -220,9 +243,8 @@ export default function Edit() {
                                                     type="button"
                                                     onClick={() => {
                                                         setData("cover_image", null);
-                                                        if (coverInputRef.current) {
-                                                            coverInputRef.current.value = "";
-                                                        }
+                                                        setPreviewCoverImage(null);
+                                                        if (coverInputRef.current) coverInputRef.current.value = "";
                                                     }}
                                                     className="shrink-0 rounded-full p-2 bg-gray-200 hover:bg-red-100 dark:bg-neutral-700 dark:hover:bg-red-900 text-gray-600 hover:text-red-600 dark:text-gray-200 dark:hover:text-red-400"
                                                     title="Clear file"

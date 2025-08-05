@@ -224,4 +224,5 @@ return [
     "A new verification link has been sent to the email address you provided during registration." => "Нове посилання для підтвердження було надіслано на електронну адресу, яку ви вказали під час реєстрації.",
     "Please make sure to check your spam inbox!" => "Обов’язково перевірте папку зі спамом!",
     "Resend verification email" => "Надіслати лист для підтвердження повторно",
+    "Will be set" => "Буде задано",
 ];
