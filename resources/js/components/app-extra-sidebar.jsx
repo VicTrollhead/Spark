@@ -61,7 +61,7 @@ export function AppExtraSidebar() {
                 <SidebarMenu className="px-2.5 py-1">
                     <h2 className="m-2 font-bold">{translations["Let's get acquainted"]}</h2>
                     {users.length === 0 ? (
-                        <p className="text-gray-500">{translations['No users yet.']}</p>
+                        <p className="text-gray-500 ml-4">{translations['No users yet.']}</p>
                     ) : (
                         <ul className="flex flex-col gap-2">
                             {users.map((user) => (

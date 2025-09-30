@@ -19,7 +19,7 @@ return [
     "Search users by name or username" => "Пошук користувачів по імені або логіну",
     "Let's get acquainted" => "Будемо знайомі",
     "Popular hashtags" => "Популярні хештеги",
-    "No users yet." => "Немає жодного користувача.",
+    "No users yet." => "Немає незнайомих користувачів.",
     "No hashtags yet." => "Немає жодного хештега.",
     "No following posts yet." => "Немає жодного поста.",
     "No liked posts yet." => "Немає жодного лайкнутого поста.",

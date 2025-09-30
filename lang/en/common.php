@@ -19,7 +19,7 @@ return [
     "Search users by name or username" => "Search users by name or username",
     "Let's get acquainted" => "Let's get acquainted",
     "Popular hashtags" => "Popular hashtags",
-    "No users yet." => "No users yet.",
+    "No users yet." => "No unacquainted users yet.",
     "No hashtags yet." => "No hashtags yet.",
     "No following posts yet." => "No following posts yet.",
     "No liked posts yet." => "No liked posts yet.",
