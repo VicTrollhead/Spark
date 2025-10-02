@@ -78,7 +78,7 @@ export default function Notifications() {
 
             </div>
 
-            <div className="divide-y divide-gray-200 dark:divide-neutral-800 ">
+            <div className="divide-y divide-gray-200 dark:divide-neutral-800 mr-2">
                 {notifications.length > 0 ? (
                     notifications.map((notification) => <Notification key={notification.id + notification.created_at} notification={notification}/>)
                 ) : (

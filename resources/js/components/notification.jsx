@@ -212,7 +212,7 @@ export function Notification({ notification }) {
 
     return (
         <div
-            className={`border-l-4 ${getColor(notification.type)} flex items-start gap-3 border-t-0 border-r-0 border-b-gray-400 bg-gray-100 p-5 transition-all hover:bg-gray-50 dark:bg-neutral-900 dark:hover:bg-neutral-950`}
+            className={`border-l-4 ${getColor(notification.type)} flex items-start gap-3 border-t-0 border-r-0 border-b-gray-400 bg-gray-100 p-5 ml-2 transition-all hover:bg-gray-50 dark:bg-neutral-900 dark:hover:bg-neutral-950`}
         >
             <div className="hidden items-center gap-4 md:flex">
                 <Avatar className="h-14 w-14 mt-4">
