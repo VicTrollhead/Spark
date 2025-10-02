@@ -879,13 +879,6 @@ class UserController extends Controller
     }
 
 
-
-
-
-
-
-
-
     public function reposts(Request $request, User $user = null): Response
     {
         $currentUser = Auth::user();

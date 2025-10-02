@@ -245,7 +245,7 @@ export function AppHeader({ breadcrumbs = [] }) {
                                                 </Link>
                                             ))}
                                             <DropdownMenuSeparator className="mb-5" />
-                                            <a className="flex items-center space-x-2" href="https://github.com/VicTrollhead/Spark">
+                                            <a className="flex items-center space-x-2" href="https://gitlab.com/shapovalovtimur16/Spark">
                                                 <Folder className="h-5 w-5" />
                                                 <span>{translations['Repository']}</span>
                                             </a>
