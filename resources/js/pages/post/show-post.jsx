@@ -322,7 +322,7 @@ export default function Show() {
                                     <Link href={`/user/${post.current_user.username}`}>
                                         <Avatar className="h-6 w-6 border">
                                             <AvatarImage src={getProfileImageUrl(post.current_user)} alt={post.current_user.name} />
-                                            <AvatarFallback>{getInitials(post.current_user.name)}</AvatarFallback>
+                                            <AvatarFallback className="bg-gray-200 text-black dark:bg-gray-700 dark:text-white">{getInitials(post.current_user.name)}</AvatarFallback>
                                         </Avatar>
                                     </Link>
                                     <Link href={`/user/${post.current_user.username}`} className="ml-1 text-blue-500 hover:underline">
@@ -340,7 +340,7 @@ export default function Show() {
                                             <Link href={`/user/${user.username}`}>
                                                 <Avatar className="h-6 w-6 border">
                                                     <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
-                                                    <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                                                    <AvatarFallback className="text-xs bg-gray-200 text-black dark:bg-gray-700 dark:text-white">{getInitials(user.name)}</AvatarFallback>
                                                 </Avatar>
                                             </Link>
                                             <Link href={`/user/${user.username}`} className="ml-1 text-blue-500 hover:underline">

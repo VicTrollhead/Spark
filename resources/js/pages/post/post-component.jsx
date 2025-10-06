@@ -160,7 +160,7 @@ export default function PostComponent({ post, compact = false }) {
                                     <Link href={`/user/${post.current_user.username}`}>
                                         <Avatar className="h-6 w-6 border">
                                             <AvatarImage src={getProfileImageUrl(post.current_user)} alt={post.current_user.name} />
-                                            <AvatarFallback className="text-xs">{getInitials(post.current_user.name)}</AvatarFallback>
+                                            <AvatarFallback className="text-xs bg-gray-200 text-black dark:bg-gray-700 dark:text-white">{getInitials(post.current_user.name)}</AvatarFallback>
                                         </Avatar>
                                     </Link>
                                     <Link href={`/user/${post.current_user.username}`} className="ml-1 text-blue-500 hover:underline break-all">
@@ -188,7 +188,7 @@ export default function PostComponent({ post, compact = false }) {
                                             <Link href={`/user/${user.username}`}>
                                                 <Avatar className="h-6 w-6 border">
                                                     <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
-                                                    <AvatarFallback className="text-xs">{getInitials(user.name)}</AvatarFallback>
+                                                    <AvatarFallback className="text-xs bg-gray-200 text-black dark:bg-gray-700 dark:text-white">{getInitials(user.name)}</AvatarFallback>
                                                 </Avatar>
                                             </Link>
                                             <Link href={`/user/${user.username}`} className="ml-1 text-blue-500 hover:underline break-all">

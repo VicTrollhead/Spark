@@ -101,11 +101,11 @@ console.log(other_user);
             <Head title={`${translations['Chat with']} ${other_user.name}`} />
             <div className="flex h-fit justify-center">
                 <div className="w-full">
-                    <div className="flex h-16 w-full flex-row items-center bg-gray-200 dark:bg-neutral-700">
+                    <div className="flex h-16 w-full flex-row items-center bg-gray-200 dark:bg-neutral-800">
                         <Link href={`/user/${other_user.username}`} className="flex cursor-pointer flex-row items-center">
                             <Avatar className="mx-5 h-10 w-10 overflow-hidden rounded-full md:h-12 md:w-12">
                                 <AvatarImage src={getProfileImageUrl(other_user)} alt={other_user.name} />
-                                <AvatarFallback className="rounded-lg bg-gray-200 text-black dark:bg-neutral-700 dark:text-white">
+                                <AvatarFallback className="rounded-lg bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
                                     {getInitials(other_user.name)}
                                 </AvatarFallback>
                             </Avatar>
