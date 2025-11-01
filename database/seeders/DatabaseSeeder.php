@@ -8,6 +8,7 @@ use App\Models\Like;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,6 +18,20 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Create Users
+        User::create([
+        'username' => 'paragon',
+        'email' => 'test@fake.com',
+        'password' => Hash::make('12345678'),
+        'name' => 'Paragon',
+        'bio' => 'Test account for development.',
+        'location' => 'Nowhere',
+        'website' => 'https://example.com',
+        'date_of_birth' => '2000-01-01',
+        'is_verified' => true,
+        'email_verified_at' => now(),
+        'is_private' => false,
+        'status' => 'active',
+    ]);
         $users = User::factory()->count(20)->create();
 
         // Create Posts
