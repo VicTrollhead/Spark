@@ -84,7 +84,7 @@ export function AppExtraSidebar() {
                         <Link href="/show-popular-hashtags">{translations['Popular hashtags']}</Link>
                     </h2>
                     {hashtags.length === 0 ? (
-                        <p className="text-gray-500">{translations['No hashtags yet.']}</p>
+                        <p className="text-gray-500 ml-3">{translations['No hashtags yet.']}</p>
                     ) : (
                         <div className="mb-1 flex flex-col gap-1">
                             {hashtags.map((hashtag) => (
