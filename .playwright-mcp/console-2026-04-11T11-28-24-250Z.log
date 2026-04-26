@@ -1,2 +1,0 @@
-[    2968ms] [INFO] Download the React DevTools for a better development experience: https://react.dev/link/react-devtools @ http://spark.localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=5ec7c2eb:17803
-[  141644ms] [ERROR] [JavaScript Error: "Error: Error: Element is not an <input>, <textarea>, <select> or [contenteditable] and does not have a role allowing [aria-readonly]" {file: "debugger eval code" line: 7447}] @ debugger eval code:7447
