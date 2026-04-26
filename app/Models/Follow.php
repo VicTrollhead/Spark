@@ -13,8 +13,10 @@ class Follow extends Model
         'follower_id',
         'followee_id',
         'is_accepted',
-//        'created_at',
-//        'updated_at',
+    ];
+
+    protected $casts = [
+        'is_accepted' => 'boolean',
     ];
 
     public $timestamps = false;

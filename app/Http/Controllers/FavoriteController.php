@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
+use App\Events\PostEngagementChanged;
 use App\Models\Favorite;
 use App\Models\Notification;
 use App\Models\Post;
@@ -9,11 +12,16 @@ use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class FavoriteController extends Controller
 {
     public function addFavorite(Post $post): RedirectResponse
     {
+        if (Gate::denies('view', $post)) {
+            abort(403, 'You cannot favorite this post.');
+        }
+
         Favorite::firstOrCreate([
             'user_id' => Auth::id(),
             'post_id' => $post->id,
@@ -27,6 +35,8 @@ class FavoriteController extends Controller
                 'post_id' => $post->id,
             ]);
         }
+
+        $this->broadcastEngagement($post);
 
         return back()->with('success', 'Post liked successfully.');
     }
@@ -43,10 +53,12 @@ class FavoriteController extends Controller
             ->where('post_id', $post->id)
             ->delete();
 
+        $this->broadcastEngagement($post);
+
         return back()->with('success', 'Post unliked successfully.');
     }
 
-    public function isFavorited(Post $post, Request $request)
+    public function isFavorited(Post $post, Request $request): RedirectResponse
     {
         $userId = Auth::id();
         $postId = $post->post_id;
@@ -56,5 +68,15 @@ class FavoriteController extends Controller
             ->exists();
 
         return back()->with(['favorited' => $isFavorited]);
+    }
+
+    private function broadcastEngagement(Post $post): void
+    {
+        broadcast(new PostEngagementChanged(
+            $post->id,
+            $post->likes()->count(),
+            $post->favorites()->count(),
+            $post->repostedByUsers()->count(),
+        ))->toOthers();
     }
 }

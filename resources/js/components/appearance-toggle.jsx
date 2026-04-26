@@ -18,9 +18,6 @@ export default function AppearanceToggle({ className = '', ...props }) {
             {...props}
         >
             {isDarkMode ? <Moon className="h-5 w-5 text-white" /> : <Sun className="h-5 w-5 text-black-500" />}
-            {/*<span className="text-sm font-medium text-gray-900 dark:text-gray-100">*/}
-            {/*    {isDarkMode ? 'Dark' : 'Light'} Mode*/}
-            {/*</span>*/}
         </button>
     );
 }

@@ -37,7 +37,7 @@ export const HashtagInput = forwardRef(function HashtagInput({ onChange, placeho
     };
 
     return (
-        <div className="flex w-full flex-wrap items-center gap-2 rounded-md  bg-gray-100 p-1.5 text-neutral-900 transition-colors focus-within:ring-2 focus-within:ring-blue-500 dark:bg-neutral-900 dark:text-white dark:focus-within:ring-blue-600">
+        <div className="flex w-full flex-wrap items-center gap-2 rounded-md bg-gray-100 p-1.5 text-neutral-900 transition-colors focus-within:ring-2 focus-within:ring-blue-500 dark:bg-neutral-900 dark:text-white dark:focus-within:ring-blue-600">
             {value.map((tag, index) => (
                 <Badge
                     key={index}
@@ -45,7 +45,7 @@ export const HashtagInput = forwardRef(function HashtagInput({ onChange, placeho
                     className="flex items-center gap-1 bg-zinc-200 px-2 py-1 text-sm text-black dark:bg-zinc-800 dark:text-white"
                 >
                     #{tag}
-                    <button type="button" onClick={() => removeTag(index)} className="transition hover:text-red-500">
+                    <button type="button" onClick={() => removeTag(index)} className="cursor-pointer transition hover:text-red-500">
                         <X className="h-3 w-3" />
                     </button>
                 </Badge>
@@ -56,7 +56,7 @@ export const HashtagInput = forwardRef(function HashtagInput({ onChange, placeho
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={placeholder}
-                className="placeholder:text-muted-foreground flex-1 border-none bg-transparent text-sm text-black shadow-none outline-none dark:text-white"
+                className="placeholder:text-muted-foreground min-w-0 flex-1 border-none bg-transparent text-sm text-black shadow-none outline-none dark:text-white"
             />
         </div>
     );

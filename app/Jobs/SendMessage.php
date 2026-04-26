@@ -27,11 +27,25 @@ class SendMessage implements ShouldQueue
      */
     public function handle(): void
     {
+        $this->message->load('user.profileImage');
+        $user = $this->message->user;
+
         GotMessage::dispatch([
             'id' => $this->message->id,
-            'user_id' => $this->message->user_id,
             'text' => $this->message->text,
             'time' => $this->message->time,
+            'media' => [],
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'is_verified' => $user->is_verified,
+                'profile_image' => $user->profileImage ? [
+                    'file_path' => $user->profileImage->file_path,
+                    'disk' => $user->profileImage->disk,
+                    'url' => $user->profileImage->url,
+                ] : null,
+            ],
         ]);
     }
 }

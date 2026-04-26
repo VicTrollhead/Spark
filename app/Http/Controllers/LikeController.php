@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
+use App\Events\PostEngagementChanged;
 use App\Models\Comment;
 use App\Models\Notification;
 use App\Models\Post;
@@ -10,22 +13,39 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Models\Like;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 
 class LikeController extends Controller
 {
     public function like(Request $request): RedirectResponse
     {
+        $request->validate([
+            'type' => 'required|in:post,comment',
+            'id' => 'required|integer',
+        ]);
+
         $type = $request->input('type');
         $id = $request->input('id');
 
         $modelClass = match ($type) {
             'post' => Post::class,
             'comment' => Comment::class,
-            default => abort(404, 'Invalid likeable type')
+            default => abort(400, 'Invalid likeable type.')
         };
 
         $likeable = $modelClass::findOrFail($id);
+
+        if ($type === 'post' && Gate::denies('view', $likeable)) {
+            abort(403, 'You cannot like this post.');
+        }
+
+        if ($type === 'comment') {
+            $commentPost = Post::find($likeable->post_id);
+            if ($commentPost && Gate::denies('view', $commentPost)) {
+                abort(403, 'You cannot like this comment.');
+            }
+        }
 
         Like::firstOrCreate([
             'user_id' => Auth::id(),
@@ -43,6 +63,10 @@ class LikeController extends Controller
 
                 'comment_id' => $type === 'comment' ? $likeable->id : null,
             ]);
+        }
+
+        if ($type === 'post') {
+            $this->broadcastEngagement($likeable);
         }
 
         return back()->with('success', class_basename($modelClass) . ' liked successfully.');
@@ -63,7 +87,7 @@ class LikeController extends Controller
         $likeableClass = match ($type) {
             'post' => Post::class,
             'comment' => Comment::class,
-            default => abort(404, 'Invalid likeable type.'),
+            default => abort(400, 'Invalid likeable type.'),
         };
 
         Like::where([
@@ -80,6 +104,7 @@ class LikeController extends Controller
                     ->where('post_id', $post->id)
                     ->where('user_id', $post->user_id)
                     ->delete();
+                $this->broadcastEngagement($post);
             }
         } elseif ($type === 'comment') {
             $comment = Comment::find($id);
@@ -96,7 +121,7 @@ class LikeController extends Controller
     }
 
 
-    public function isLiked($type, $id, Request $request)
+    public function isLiked($type, $id, Request $request): RedirectResponse
     {
         $userId = Auth::id();
 
@@ -114,4 +139,13 @@ class LikeController extends Controller
         return back()->with(['liked' => $isLiked]);
     }
 
+    private function broadcastEngagement(Post $post): void
+    {
+        broadcast(new PostEngagementChanged(
+            $post->id,
+            $post->likes()->count(),
+            $post->favorites()->count(),
+            $post->repostedByUsers()->count(),
+        ))->toOthers();
+    }
 }

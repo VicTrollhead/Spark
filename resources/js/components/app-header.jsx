@@ -3,7 +3,6 @@ import { Icon } from '@/components/icon';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx';
 import { Badge } from '@/components/ui/badge.jsx';
 import { Button } from '@/components/ui/button';
-import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu.jsx';
 import { Input } from '@/components/ui/input.jsx';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -28,9 +27,10 @@ import {
     User,
     Users,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getProfileImageUrl } from '../lib/utils.js';
 import AppLogo from './app-logo';
+import { useUnreadCounts } from '../contexts/unread-counts-context';
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
@@ -40,49 +40,17 @@ export function AppHeader({ breadcrumbs = [] }) {
     const { auth } = page.props;
     const user = auth?.user;
     const getInitials = useInitials();
-    const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
-    const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+    const { unreadNotifications: unreadNotificationsCount, unreadMessages: unreadMessagesCount } = useUnreadCounts();
 
+    const [sheetOpen, setSheetOpen] = useState(false);
+
+    // Close the mobile sheet on every Inertia navigation so body scroll lock is released
     useEffect(() => {
-        fetchUnreadNotificationsCount().catch((error) => console.error(error));
-        fetchUnreadMessagesCount().catch((error) => console.error(error));
-    }, []);
-
-    const fetchUnreadNotificationsCount = async () => {
-        try {
-            const response = await fetch('/notifications/unread-count');
-            const data = await response.json();
-            setUnreadNotificationsCount(data.unread_count);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const fetchUnreadMessagesCount = async () => {
-        try {
-            const response = await fetch('/chat/user-chat/messages/unread-count');
-            const data = await response.json();
-            setUnreadMessagesCount(data.unread_count);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    window.Echo.private(`notifications.${user.id}`)
-        .listen('NotificationCreated', (e) => {
-            setUnreadNotificationsCount(unreadNotificationsCount + 1);
-        })
-        .listen('NotificationIsReadChange', (e) => {
-            if (e.operation === 'read') {
-                setUnreadNotificationsCount(unreadNotificationsCount - 1);
-            } else if (e.operation === 'unread') {
-                setUnreadNotificationsCount(unreadNotificationsCount + 1);
-            } else if (e.operation === 'allRead') {
-                setUnreadNotificationsCount(0);
-            } else if (e.operation === 'allUnread') {
-                fetchUnreadNotificationsCount().catch((error) => console.error(error));
-            }
+        const removeListener = router.on('navigate', () => {
+            setSheetOpen(false);
         });
+        return removeListener;
+    }, []);
 
     if (!user) return null;
 
@@ -134,11 +102,6 @@ export function AppHeader({ breadcrumbs = [] }) {
             icon: Users,
         },
         {
-            title: translations['All users'],
-            url: '/dashboard/users',
-            icon: Users,
-        },
-        {
             title: translations['Notifications'],
             url: '/user/notifications',
             icon: Mail,
@@ -171,10 +134,32 @@ export function AppHeader({ breadcrumbs = [] }) {
         },
     ];
 
+    const searchInputRef = useRef(null);
+
+    useEffect(() => {
+        const handleGlobalKeyDown = (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                if (searchInputRef.current) {
+                    searchInputRef.current.focus();
+                } else {
+                    router.get('/search');
+                }
+            }
+        };
+        document.addEventListener('keydown', handleGlobalKeyDown);
+        return () => document.removeEventListener('keydown', handleGlobalKeyDown);
+    }, []);
+
     const onKeyDownSearch = async (e) => {
         if (e.code === 'Enter') {
-            const searchText = e.currentTarget.value;
-            router.get(`/user/search/${searchText}`, { sort: 'newest' }, { preserveScroll: true });
+            const searchText = e.currentTarget.value.trim();
+            if (searchText) {
+                router.get('/search', { q: searchText, tab: 'posts' });
+            }
+        }
+        if (e.code === 'Escape') {
+            e.currentTarget.blur();
         }
     };
 
@@ -188,7 +173,7 @@ export function AppHeader({ breadcrumbs = [] }) {
                 <div className="mx-4 flex h-16">
                     {/* Mobile Menu */}
                     <div className="lg:hidden">
-                        <Sheet>
+                        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
                             <SheetTrigger asChild>
                                 <Button
                                     variant="ghost"
@@ -219,12 +204,12 @@ export function AppHeader({ breadcrumbs = [] }) {
                                                         @{user.username}
                                                     </span>
                                                     {user.is_verified && (
-                                                        <span className="flex flex-shrink-0 items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                        <span className="flex flex-shrink-0 items-center rounded-full bg-blue-500 p-0.5 text-xs font-medium text-white">
                                                             <Check className="h-3 w-3" />
                                                         </span>
                                                     )}
                                                 </div>
-                                                <span className="max-w-full truncate text-lg font-extrabold">{user.name}</span>
+                                                <span className="max-w-full truncate text-lg font-bold">{user.name}</span>
                                             </div>
                                         </Link>
                                     </div>
@@ -234,25 +219,25 @@ export function AppHeader({ breadcrumbs = [] }) {
                                     <div className="flex h-full flex-col justify-between text-sm">
                                         <div className="flex flex-col gap-0.5 space-y-4">
                                             {sideBarNavItems.map((item) => (
-                                                <Link key={item.title + item.url} href={item.url} className="flex items-center gap-1 space-x-2">
+                                                <Link key={item.title + item.url} href={item.url} className="flex items-center gap-2">
                                                     {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
                                                     <span>{item.title}</span>
                                                     {item.count && item.count !== 0 ? (
-                                                        <Badge className="bg-neutral-500 dark:bg-neutral-300">{item.count}</Badge>
+                                                        <Badge className="bg-neutral-500 text-white dark:bg-neutral-300 dark:text-neutral-900">{item.count}</Badge>
                                                     ) : (
                                                         ''
                                                     )}
                                                 </Link>
                                             ))}
-                                            <DropdownMenuSeparator className="mb-5" />
+                                            <hr className="mb-5 border-gray-200 dark:border-neutral-700" />
                                             <a className="flex items-center space-x-2" href="https://gitlab.com/shapovalovtimur16/Spark">
                                                 <Folder className="h-5 w-5" />
                                                 <span>{translations['Repository']}</span>
                                             </a>
-                                            <p onClick={handleLogout} className="flex cursor-pointer items-center space-x-2">
+                                            <button type="button" onClick={handleLogout} className="flex w-full cursor-pointer items-center space-x-2">
                                                 <LogOut className="mr-2 h-5 w-5" />
                                                 {translations['Log out']}
-                                            </p>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -293,7 +278,7 @@ export function AppHeader({ breadcrumbs = [] }) {
                     </div>
 
                     <div className="mr-2 ml-auto flex items-center xl:hidden">
-                        <Link href={'/search-empty'}>
+                        <Link href={'/search'}>
                             <Search />
                         </Link>
                     </div>
@@ -301,18 +286,27 @@ export function AppHeader({ breadcrumbs = [] }) {
                     <div className="ml-auto hidden w-1/4 items-center justify-end space-x-2 xl:flex">
                         <div className="relative flex items-center space-x-1">
                             <div className="flex items-center space-x-3">
-                                <Search className="size-1/8 opacity-80 group-hover:opacity-100" />
-                                <Input placeholder={translations['Search users']} className="w-full" onKeyDown={onKeyDownSearch} />
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const text = searchInputRef.current?.value?.trim();
+                                        if (text) {
+                                            router.get('/search', { q: text, tab: 'posts' });
+                                        } else {
+                                            router.get('/search');
+                                        }
+                                    }}
+                                    className="cursor-pointer opacity-80 hover:opacity-100"
+                                    aria-label={translations['Search']}
+                                >
+                                    <Search className="h-5 w-5" />
+                                </button>
+                                <Input ref={searchInputRef} placeholder={`${translations['Search...']}  (Ctrl+K)`} className="w-full" onKeyDown={onKeyDownSearch} />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            {/*{breadcrumbs.length > 1 && (<div className="border-sidebar-border/70 flex w-full border-b">*/}
-            {/*        <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 md:max-w-7xl">*/}
-            {/*            <Breadcrumbs breadcrumbs={breadcrumbs}/>*/}
-            {/*        </div>*/}
-            {/*    </div>)}*/}
         </>
     );
 }

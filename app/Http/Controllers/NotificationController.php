@@ -1,15 +1,21 @@
 <?php
+
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Events\NotificationIsReadChange;
 use App\Models\Notification;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class NotificationController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response|JsonResponse
     {
         $currentUser = Auth::user();
 
@@ -53,7 +59,6 @@ class NotificationController extends Controller
                 'is_read' => $notification->is_read,
                 'created_at' => $notification->created_at->diffForHumans(),
 
-
                 'source_user' => $sourceUser ? [
                     'id' => $sourceUser->id,
                     'name' => $sourceUser->name,
@@ -66,6 +71,7 @@ class NotificationController extends Controller
 
                 'post' => $post ? [
                     'id' => $post->id,
+                    'slug' => $post->slug,
                     'content' => $post->content,
                     'user' => [
                         'id' => $post->user->id,
@@ -86,7 +92,14 @@ class NotificationController extends Controller
             ];
         });
 
-
+        if ($request->wantsJson()) {
+            return response()->json([
+                'notifications' => $formattedNotifications,
+                'sort' => $sort,
+                'read_count' => $readCount,
+                'unread_count' => $unreadCount,
+            ]);
+        }
 
         return Inertia::render('user/notifications', [
             'user' => [
@@ -103,24 +116,57 @@ class NotificationController extends Controller
         ]);
     }
 
-
-    public function markAsRead(Notification $notification)
+    public function markAsRead(Request $request, Notification $notification): JsonResponse|RedirectResponse
     {
+        if ($notification->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $wasUnread = !$notification->is_read;
         $notification->is_read = true;
         $notification->save();
-        event(new NotificationIsReadChange($notification, 'read'));
+
+        if ($wasUnread) {
+            event(new NotificationIsReadChange($notification, 'read'));
+        }
+
+        if ($request->wantsJson()) {
+            $userId = Auth::id();
+            return response()->json([
+                'unread_count' => Notification::where('user_id', $userId)->where('is_read', false)->count(),
+                'read_count' => Notification::where('user_id', $userId)->where('is_read', true)->count(),
+            ]);
+        }
+
         return redirect()->back();
     }
 
-    public function markAsUnread(Notification $notification)
+    public function markAsUnread(Request $request, Notification $notification): JsonResponse|RedirectResponse
     {
+        if ($notification->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $wasRead = $notification->is_read;
         $notification->is_read = false;
         $notification->save();
-        event(new NotificationIsReadChange($notification, 'unread'));
+
+        if ($wasRead) {
+            event(new NotificationIsReadChange($notification, 'unread'));
+        }
+
+        if ($request->wantsJson()) {
+            $userId = Auth::id();
+            return response()->json([
+                'unread_count' => Notification::where('user_id', $userId)->where('is_read', false)->count(),
+                'read_count' => Notification::where('user_id', $userId)->where('is_read', true)->count(),
+            ]);
+        }
+
         return redirect()->back();
     }
 
-    public function getUnreadNotificationsCount(Request $request)
+    public function getUnreadNotificationsCount(Request $request): JsonResponse
     {
         $currentUser = Auth::user();
 
@@ -133,7 +179,7 @@ class NotificationController extends Controller
         ]);
     }
 
-    public function markAllAsRead()
+    public function markAllAsRead(Request $request): JsonResponse|RedirectResponse
     {
         $user = Auth::user();
         Notification::where('user_id', $user->id)
@@ -141,21 +187,38 @@ class NotificationController extends Controller
             ->update(['is_read' => true]);
 
         $notification = Notification::where('user_id', $user->id)->first();
+        if ($notification) {
+            event(new NotificationIsReadChange($notification, 'allRead'));
+        }
 
-        event(new NotificationIsReadChange($notification, 'allRead'));
+        if ($request->wantsJson()) {
+            return response()->json([
+                'unread_count' => 0,
+                'read_count' => Notification::where('user_id', $user->id)->count(),
+            ]);
+        }
+
         return back();
     }
 
-    public function markAllAsUnread()
+    public function markAllAsUnread(Request $request): JsonResponse|RedirectResponse
     {
         $user = Auth::user();
 
         $user->notifications()->update(['is_read' => false]);
 
         $notification = Notification::where('user_id', $user->id)->first();
+        if ($notification) {
+            event(new NotificationIsReadChange($notification, 'allUnread'));
+        }
 
-        event(new NotificationIsReadChange($notification, 'allUnread'));
+        if ($request->wantsJson()) {
+            return response()->json([
+                'unread_count' => Notification::where('user_id', $user->id)->count(),
+                'read_count' => 0,
+            ]);
+        }
+
         return back();
     }
 }
-

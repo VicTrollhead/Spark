@@ -21,7 +21,7 @@ export default function VerifyEmail({ status }) {
             {status === 'verification-link-sent' && (<div className="my-[-0.5rem]"><div className="text-sm font-medium text-green-600">
                 {translations["A new verification link has been sent to the email address you provided during registration."]}
                 </div>
-                <div className="mb-4 text-sm text-green-600 font-extrabold">
+                <div className="mb-4 text-sm text-green-600 font-bold">
                     {translations["Please make sure to check your spam inbox!"]}
                 </div></div>)}
 

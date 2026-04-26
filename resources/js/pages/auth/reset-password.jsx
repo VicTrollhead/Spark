@@ -4,8 +4,10 @@ import { LoaderCircle } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import PasswordVisibilityToggle from '@/components/ui/password-visibility-button';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { useState } from 'react';
 
 export default function ResetPassword({ token, email }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -15,6 +17,8 @@ export default function ResetPassword({ token, email }) {
         password_confirmation: '',
     });
     const { translations } = usePage().props;
+    const [pwVisible, setPwVisible] = useState(false);
+    const [cpwVisible, setCpwVisible] = useState(false);
     const submit = (e) => {
         e.preventDefault();
         post(route('password.store'), {
@@ -35,13 +39,19 @@ export default function ResetPassword({ token, email }) {
 
                     <div className="grid gap-2">
                         <Label htmlFor="password">{translations["Password"]}</Label>
-                        <Input id="password" type="password" name="password" autoComplete="new-password" value={data.password} className="mt-1 block w-full" autoFocus onChange={(e) => setData('password', e.target.value)} placeholder={translations["Password"]}/>
+                        <div className="flex gap-1.5">
+                            <Input id="password" type={pwVisible ? 'text' : 'password'} name="password" autoComplete="new-password" value={data.password} className="mt-1 block w-full" autoFocus onChange={(e) => setData('password', e.target.value)} placeholder={translations["Password"]}/>
+                            <PasswordVisibilityToggle visible={pwVisible} onToggle={() => setPwVisible((v) => !v)} className="mt-1" />
+                        </div>
                         <InputError message={errors.password}/>
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">Confirm password</Label>
-                        <Input id="password_confirmation" type="password" name="password_confirmation" autoComplete="new-password" value={data.password_confirmation} className="mt-1 block w-full" onChange={(e) => setData('password_confirmation', e.target.value)} placeholder={translations["Confirm password"]}/>
+                        <Label htmlFor="password_confirmation">{translations["Confirm password"]}</Label>
+                        <div className="flex gap-1.5">
+                            <Input id="password_confirmation" type={cpwVisible ? 'text' : 'password'} name="password_confirmation" autoComplete="new-password" value={data.password_confirmation} className="mt-1 block w-full" onChange={(e) => setData('password_confirmation', e.target.value)} placeholder={translations["Confirm password"]}/>
+                            <PasswordVisibilityToggle visible={cpwVisible} onToggle={() => setCpwVisible((v) => !v)} className="mt-1" />
+                        </div>
                         <InputError message={errors.password_confirmation} className="mt-2"/>
                     </div>
 

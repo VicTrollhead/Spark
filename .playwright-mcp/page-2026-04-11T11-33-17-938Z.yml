@@ -1,0 +1,786 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - link "Spark logo Spark" [ref=e7] [cursor=pointer]:
+          - /url: /dashboard
+          - generic [ref=e8]:
+            - img "Spark logo" [ref=e9]
+            - generic [ref=e11]: Spark
+        - button [ref=e12] [cursor=pointer]:
+          - img [ref=e13]
+      - navigation "Main" [ref=e24]:
+        - list [ref=e26]:
+          - listitem [ref=e27]:
+            - link "News" [ref=e28] [cursor=pointer]:
+              - /url: /dashboard
+          - listitem [ref=e29]:
+            - link "Following" [ref=e30] [cursor=pointer]:
+              - /url: /user/following-posts
+          - listitem [ref=e31]:
+            - link "Liked" [ref=e32] [cursor=pointer]:
+              - /url: /user/liked
+      - generic [ref=e35]:
+        - button "Search" [ref=e36] [cursor=pointer]:
+          - img [ref=e37]
+        - textbox "Search... (Ctrl+K)" [ref=e40]:
+          - /placeholder: Search...  (Ctrl+K)
+    - generic [ref=e41]:
+      - generic [ref=e42]:
+        - list [ref=e44]:
+          - listitem [ref=e45]:
+            - link "P @paragon Paragon" [ref=e46] [cursor=pointer]:
+              - /url: /user
+              - generic [ref=e47]:
+                - generic [ref=e49]: P
+                - generic [ref=e50]:
+                  - generic [ref=e52]: "@paragon"
+                  - generic [ref=e53]: Paragon
+        - list [ref=e56]:
+          - listitem [ref=e57]:
+            - link "Dashboard" [ref=e58] [cursor=pointer]:
+              - /url: /dashboard
+              - img [ref=e59]
+              - generic [ref=e62]: Dashboard
+          - listitem [ref=e63]:
+            - link "Everyone chat" [ref=e64] [cursor=pointer]:
+              - /url: /chat/everyone
+              - img [ref=e65]
+              - generic [ref=e68]: Everyone chat
+          - listitem [ref=e69]:
+            - link "User chats" [ref=e70] [cursor=pointer]:
+              - /url: /chat/user-chats
+              - img [ref=e71]
+              - generic [ref=e74]: User chats
+          - listitem [ref=e75]:
+            - link "Friends" [ref=e76] [cursor=pointer]:
+              - /url: /user/friends
+              - img [ref=e77]
+              - generic [ref=e82]: Friends
+          - listitem [ref=e83]:
+            - link "Notifications" [ref=e84] [cursor=pointer]:
+              - /url: /user/notifications
+              - img [ref=e85]
+              - generic [ref=e88]: Notifications
+          - listitem [ref=e89]:
+            - link "Favorites" [ref=e90] [cursor=pointer]:
+              - /url: /user/favorites
+              - img [ref=e91]
+              - generic [ref=e93]: Favorites
+          - listitem [ref=e94]:
+            - link "Reposts" [ref=e95] [cursor=pointer]:
+              - /url: /user/reposts
+              - img [ref=e96]
+              - generic [ref=e101]: Reposts
+          - listitem [ref=e102]:
+            - link "Popular hashtags" [ref=e103] [cursor=pointer]:
+              - /url: /show-popular-hashtags
+              - img [ref=e104]
+              - generic [ref=e109]: Popular hashtags
+          - listitem [ref=e110]:
+            - link "Profile" [ref=e112] [cursor=pointer]:
+              - /url: /user/paragon
+              - img [ref=e113]
+              - generic [ref=e116]: Profile
+          - listitem [ref=e117]:
+            - link "Settings" [ref=e118] [cursor=pointer]:
+              - /url: /settings/profile
+              - img [ref=e119]
+              - generic [ref=e122]: Settings
+        - generic [ref=e123]:
+          - link "Repository" [ref=e124] [cursor=pointer]:
+            - /url: https://gitlab.com/shapovalovtimur16/Spark
+            - button "Repository" [ref=e125]:
+              - img [ref=e126]
+              - text: Repository
+          - button "Log out" [ref=e128] [cursor=pointer]:
+            - img [ref=e129]
+            - text: Log out
+      - main [ref=e133]:
+        - generic [ref=e137]: P
+        - generic [ref=e138]:
+          - generic [ref=e139]:
+            - generic [ref=e140]:
+              - heading "Paragon" [level=1] [ref=e142]
+              - paragraph [ref=e143]: "@paragon"
+            - button "Edit Profile" [ref=e145] [cursor=pointer]
+          - paragraph [ref=e146]: Standard test account for development.
+          - generic [ref=e147]:
+            - generic [ref=e148]:
+              - img [ref=e149]
+              - text: Nowhere
+            - generic [ref=e152]:
+              - img [ref=e153]
+              - link "https://example.com" [ref=e157] [cursor=pointer]:
+                - /url: https://example.com
+            - generic [ref=e158]:
+              - img [ref=e159]
+              - text: 01/01/2000
+            - generic [ref=e164]:
+              - img [ref=e165]
+              - text: Joined 20/03/2026
+            - generic [ref=e169]:
+              - img [ref=e170]
+              - text: Active
+          - generic [ref=e174]:
+            - link "32 Followers" [ref=e175] [cursor=pointer]:
+              - /url: /user/paragon/followers
+              - strong [ref=e176]: "32"
+              - text: Followers
+            - link "13 Following" [ref=e177] [cursor=pointer]:
+              - /url: /user/paragon/following
+              - strong [ref=e178]: "13"
+              - text: Following
+            - generic [ref=e179]:
+              - strong [ref=e180]: "117"
+              - text: Likes
+          - generic [ref=e181]:
+            - generic [ref=e182]:
+              - img [ref=e183]
+              - text: First Post
+            - generic [ref=e186]:
+              - img [ref=e187]
+              - text: Active Poster
+            - generic [ref=e189]:
+              - img [ref=e190]
+              - text: Rising Star
+            - generic [ref=e192]:
+              - img [ref=e193]
+              - text: Well Liked
+        - generic [ref=e195]:
+          - generic [ref=e196]:
+            - heading "Posts" [level=2] [ref=e197]
+            - generic [ref=e198]:
+              - combobox [ref=e199] [cursor=pointer]:
+                - option "Latest" [selected]
+                - option "Oldest"
+                - option "Most Liked"
+                - option "Reposts"
+              - button "Refresh posts" [ref=e200] [cursor=pointer]:
+                - img [ref=e201]
+          - generic [ref=e206]:
+            - generic [ref=e207]:
+              - img [ref=e208]
+              - generic [ref=e211]: Pinned
+            - generic [ref=e213] [cursor=pointer]:
+              - generic [ref=e215]: P
+              - generic [ref=e216]:
+                - generic [ref=e217]:
+                  - generic [ref=e218]:
+                    - link "Paragon" [ref=e219]:
+                      - /url: /user/paragon
+                    - link "8 Mar" [ref=e220]:
+                      - /url: /post/eeSTbkVVhy
+                  - button "Options" [ref=e222]:
+                    - img [ref=e223]
+                - paragraph [ref=e227]: "@paragon"
+                - paragraph [ref=e228]: Finally figured out that Docker networking issue. It was DNS. It is always DNS.
+                - generic [ref=e229]:
+                  - button "Like" [ref=e230]:
+                    - img [ref=e231]
+                    - generic [ref=e233]: "14"
+                  - button "Comments" [ref=e234]:
+                    - img [ref=e235]
+                    - generic [ref=e237]: "3"
+                  - button "Add to favorites" [ref=e238]:
+                    - img [ref=e239]
+                    - generic [ref=e241]: "0"
+                  - button "Quote" [ref=e242]:
+                    - img [ref=e243]
+                    - generic [ref=e246]: "0"
+                  - button "Reply" [ref=e247]:
+                    - img [ref=e248]
+                    - generic [ref=e251]: "0"
+                  - button "Copy link" [ref=e252]:
+                    - img [ref=e253]
+          - generic [ref=e257]:
+            - generic [ref=e259] [cursor=pointer]:
+              - generic [ref=e260]:
+                - img [ref=e261]
+                - generic [ref=e266]:
+                  - link "You" [ref=e267]:
+                    - /url: /user/paragon
+                  - text: reposted
+              - generic [ref=e268]:
+                - img "Super User" [ref=e270]
+                - generic [ref=e271]:
+                  - generic [ref=e273]:
+                    - link "Super User" [ref=e274]:
+                      - /url: /user/superuser
+                    - generic [ref=e275]:
+                      - generic: Verified
+                      - img [ref=e277]
+                    - link "14 Mar" [ref=e279]:
+                      - /url: /post/uVFT0s2C36
+                  - paragraph [ref=e280]: "@superuser"
+                  - paragraph [ref=e281]: Sometimes the best optimization is deleting code.
+                  - link "#css" [ref=e283]:
+                    - /url: /posts-by-hashtag/css
+                  - generic [ref=e284]:
+                    - button "Unlike" [ref=e285]:
+                      - img [ref=e286]
+                      - generic [ref=e288]: "13"
+                    - button "Comments" [ref=e289]:
+                      - img [ref=e290]
+                      - generic [ref=e292]: "6"
+                    - button "Remove from favorites" [ref=e293]:
+                      - img [ref=e294]
+                      - generic [ref=e296]: "2"
+                    - button "Undo repost" [ref=e297]:
+                      - img [ref=e298]
+                      - generic [ref=e303]: "1"
+                    - button "Quote" [ref=e304]:
+                      - img [ref=e305]
+                      - generic [ref=e308]: "0"
+                    - button "Reply" [ref=e309]:
+                      - img [ref=e310]
+                      - generic [ref=e313]: "0"
+                    - button "Copy link" [ref=e314]:
+                      - img [ref=e315]
+            - generic [ref=e320] [cursor=pointer]:
+              - generic [ref=e321]:
+                - img [ref=e322]
+                - generic [ref=e327]:
+                  - link "You" [ref=e328]:
+                    - /url: /user/paragon
+                  - text: ","
+                  - generic [ref=e329]:
+                    - link "Ruthie O'Conner" [ref=e330]:
+                      - /url: /user/ward.elmira
+                    - text: ","
+                  - link "Mylene Greenholt" [ref=e332]:
+                    - /url: /user/deontae62
+                  - text: reposted
+              - generic [ref=e333]:
+                - img "Super User" [ref=e335]
+                - generic [ref=e336]:
+                  - generic [ref=e338]:
+                    - link "Super User" [ref=e339]:
+                      - /url: /user/superuser
+                    - generic [ref=e340]:
+                      - generic: Verified
+                      - img [ref=e342]
+                    - link "16 Mar" [ref=e344]:
+                      - /url: /post/Ua4rnmyMzG
+                  - paragraph [ref=e345]: "@superuser"
+                  - paragraph [ref=e346]: My terminal history is my autobiography.
+                  - generic [ref=e347]:
+                    - link "#design" [ref=e348]:
+                      - /url: /posts-by-hashtag/design
+                    - link "#css" [ref=e349]:
+                      - /url: /posts-by-hashtag/css
+                  - generic [ref=e350]:
+                    - button "Unlike" [ref=e351]:
+                      - img [ref=e352]
+                      - generic [ref=e354]: "10"
+                    - button "Comments" [ref=e355]:
+                      - img [ref=e356]
+                      - generic [ref=e358]: "0"
+                    - button "Remove from favorites" [ref=e359]:
+                      - img [ref=e360]
+                      - generic [ref=e362]: "2"
+                    - button "Undo repost" [ref=e363]:
+                      - img [ref=e364]
+                      - generic [ref=e369]: "3"
+                    - button "Quote" [ref=e370]:
+                      - img [ref=e371]
+                      - generic [ref=e374]: "0"
+                    - button "Reply" [ref=e375]:
+                      - img [ref=e376]
+                      - generic [ref=e379]: "0"
+                    - button "Copy link" [ref=e380]:
+                      - img [ref=e381]
+            - generic [ref=e386] [cursor=pointer]:
+              - generic [ref=e387]:
+                - img [ref=e388]
+                - generic [ref=e393]:
+                  - link "You" [ref=e394]:
+                    - /url: /user/paragon
+                  - text: ","
+                  - link "Jimmie Gislason" [ref=e396]:
+                    - /url: /user/lorena02
+                  - text: reposted
+              - generic [ref=e397]:
+                - img "Super User" [ref=e399]
+                - generic [ref=e400]:
+                  - generic [ref=e402]:
+                    - link "Super User" [ref=e403]:
+                      - /url: /user/superuser
+                    - generic [ref=e404]:
+                      - generic: Verified
+                      - img [ref=e406]
+                    - link "16 Mar" [ref=e408]:
+                      - /url: /post/yyLY6RUtOK
+                  - paragraph [ref=e409]: "@superuser"
+                  - paragraph [ref=e410]: "Remember: a PR with 1000 lines changed will get 'LGTM' in 5 minutes."
+                  - generic [ref=e411]:
+                    - button "Unlike" [ref=e412]:
+                      - img [ref=e413]
+                      - generic [ref=e415]: "13"
+                    - button "Comments" [ref=e416]:
+                      - img [ref=e417]
+                      - generic [ref=e419]: "0"
+                    - button "Remove from favorites" [ref=e420]:
+                      - img [ref=e421]
+                      - generic [ref=e423]: "1"
+                    - button "Undo repost" [ref=e424]:
+                      - img [ref=e425]
+                      - generic [ref=e430]: "2"
+                    - button "Quote" [ref=e431]:
+                      - img [ref=e432]
+                      - generic [ref=e435]: "0"
+                    - button "Reply" [ref=e436]:
+                      - img [ref=e437]
+                      - generic [ref=e440]: "0"
+                    - button "Copy link" [ref=e441]:
+                      - img [ref=e442]
+            - generic [ref=e448] [cursor=pointer]:
+              - generic [ref=e450]: P
+              - generic [ref=e451]:
+                - generic [ref=e452]:
+                  - generic [ref=e453]:
+                    - link "Paragon" [ref=e454]:
+                      - /url: /user/paragon
+                    - link "22 Mar" [ref=e455]:
+                      - /url: /post/Z7v4ktz1fv
+                  - button "Options" [ref=e457]:
+                    - img [ref=e458]
+                - paragraph [ref=e462]: "@paragon"
+                - paragraph [ref=e463]: smegma
+                - link "Super User Super User @superuser 19 Mar Following for the replies." [ref=e464]:
+                  - /url: /post/LLDhp0YqqZ
+                  - generic [ref=e465]:
+                    - img "Super User" [ref=e467]
+                    - generic [ref=e468]: Super User
+                    - img [ref=e470]
+                    - generic [ref=e472]: "@superuser"
+                    - generic "Thursday, 19 March 2026 at 00:00" [ref=e473]: 19 Mar
+                  - paragraph [ref=e474]: Following for the replies.
+                - generic [ref=e475]:
+                  - button "Like" [ref=e476]:
+                    - img [ref=e477]
+                    - generic [ref=e479]: "0"
+                  - button "Comments" [ref=e480]:
+                    - img [ref=e481]
+                    - generic [ref=e483]: "1"
+                  - button "Add to favorites" [ref=e484]:
+                    - img [ref=e485]
+                    - generic [ref=e487]: "0"
+                  - button "Quote" [ref=e488]:
+                    - img [ref=e489]
+                    - generic [ref=e492]: "0"
+                  - button "Reply" [ref=e493]:
+                    - img [ref=e494]
+                    - generic [ref=e497]: "1"
+                  - button "Copy link" [ref=e498]:
+                    - img [ref=e499]
+            - generic [ref=e504] [cursor=pointer]:
+              - generic [ref=e505]:
+                - img [ref=e506]
+                - generic [ref=e511]:
+                  - link "You" [ref=e512]:
+                    - /url: /user/paragon
+                  - text: reposted
+              - generic [ref=e513]:
+                - img "Super User" [ref=e515]
+                - generic [ref=e516]:
+                  - generic [ref=e518]:
+                    - link "Super User" [ref=e519]:
+                      - /url: /user/superuser
+                    - generic [ref=e520]:
+                      - generic: Verified
+                      - img [ref=e522]
+                    - link "19 Mar" [ref=e524]:
+                      - /url: /post/LLDhp0YqqZ
+                  - paragraph [ref=e525]: "@superuser"
+                  - link "Replying to @deontae62 Started learning Rust this weekend. The borrow checker is... something." [ref=e526]:
+                    - /url: /post/vNWicRyyL7
+                    - generic [ref=e527]: Replying to @deontae62
+                    - paragraph [ref=e528]: Started learning Rust this weekend. The borrow checker is... something.
+                  - paragraph [ref=e529]: Following for the replies.
+                  - generic [ref=e530]:
+                    - button "Unlike" [ref=e531]:
+                      - img [ref=e532]
+                      - generic [ref=e534]: "16"
+                    - button "Comments" [ref=e535]:
+                      - img [ref=e536]
+                      - generic [ref=e538]: "0"
+                    - button "Remove from favorites" [ref=e539]:
+                      - img [ref=e540]
+                      - generic [ref=e542]: "3"
+                    - button "Undo repost" [ref=e543]:
+                      - img [ref=e544]
+                      - generic [ref=e549]: "1"
+                    - button "Quote" [ref=e550]:
+                      - img [ref=e551]
+                      - generic [ref=e554]: "1"
+                    - button "Reply" [ref=e555]:
+                      - img [ref=e556]
+                      - generic [ref=e559]: "0"
+                    - button "Copy link" [ref=e560]:
+                      - img [ref=e561]
+            - generic [ref=e567] [cursor=pointer]:
+              - generic [ref=e569]: P
+              - generic [ref=e570]:
+                - generic [ref=e571]:
+                  - generic [ref=e572]:
+                    - link "Paragon" [ref=e573]:
+                      - /url: /user/paragon
+                    - link "22 Mar" [ref=e574]:
+                      - /url: /post/Q7ZdLca9CS
+                  - button "Options" [ref=e576]:
+                    - img [ref=e577]
+                - paragraph [ref=e581]: "@paragon"
+                - paragraph [ref=e582]:
+                  - generic [ref=e583]:
+                    - link "@superuser" [ref=e585]:
+                      - /url: /user/superuser
+                    - text: ligma
+                - generic [ref=e586]:
+                  - button "Like" [ref=e587]:
+                    - img [ref=e588]
+                    - generic [ref=e590]: "0"
+                  - button "Comments" [ref=e591]:
+                    - img [ref=e592]
+                    - generic [ref=e594]: "0"
+                  - button "Add to favorites" [ref=e595]:
+                    - img [ref=e596]
+                    - generic [ref=e598]: "0"
+                  - button "Quote" [ref=e599]:
+                    - img [ref=e600]
+                    - generic [ref=e603]: "0"
+                  - button "Reply" [ref=e604]:
+                    - img [ref=e605]
+                    - generic [ref=e608]: "0"
+                  - button "Copy link" [ref=e609]:
+                    - img [ref=e610]
+            - generic [ref=e615] [cursor=pointer]:
+              - generic [ref=e616]:
+                - img [ref=e617]
+                - generic [ref=e622]:
+                  - link "Super User" [ref=e624]:
+                    - /url: /user/superuser
+                  - text: reposted
+              - generic [ref=e625]:
+                - generic [ref=e627]: P
+                - generic [ref=e628]:
+                  - generic [ref=e629]:
+                    - generic [ref=e630]:
+                      - link "Paragon" [ref=e631]:
+                        - /url: /user/paragon
+                      - link "22 Mar" [ref=e632]:
+                        - /url: /post/f9wWnS2AsQ
+                    - button "Options" [ref=e634]:
+                      - img [ref=e635]
+                  - paragraph [ref=e639]: "@paragon"
+                  - paragraph [ref=e640]: ligma
+                  - link "Super User Super User @superuser 22 Feb Reading through legacy code is like archeology but less fun." [ref=e641]:
+                    - /url: /post/9D4qEwdOSV
+                    - generic [ref=e642]:
+                      - img "Super User" [ref=e644]
+                      - generic [ref=e645]: Super User
+                      - img [ref=e647]
+                      - generic [ref=e649]: "@superuser"
+                      - generic "Sunday, 22 February 2026 at 00:00" [ref=e650]: 22 Feb
+                    - paragraph [ref=e651]: Reading through legacy code is like archeology but less fun.
+                  - generic [ref=e652]:
+                    - button "Like" [ref=e653]:
+                      - img [ref=e654]
+                      - generic [ref=e656]: "1"
+                    - button "Comments" [ref=e657]:
+                      - img [ref=e658]
+                      - generic [ref=e660]: "0"
+                    - button "Add to favorites" [ref=e661]:
+                      - img [ref=e662]
+                      - generic [ref=e664]: "1"
+                    - button "Quote" [ref=e665]:
+                      - img [ref=e666]
+                      - generic [ref=e669]: "0"
+                    - button "Reply" [ref=e670]:
+                      - img [ref=e671]
+                      - generic [ref=e674]: "0"
+                    - button "Copy link" [ref=e675]:
+                      - img [ref=e676]
+            - generic [ref=e681] [cursor=pointer]:
+              - generic [ref=e682]:
+                - img [ref=e683]
+                - generic [ref=e688]:
+                  - link "You" [ref=e689]:
+                    - /url: /user/paragon
+                  - text: reposted
+              - generic [ref=e690]:
+                - img "Super User" [ref=e692]
+                - generic [ref=e693]:
+                  - generic [ref=e695]:
+                    - link "Super User" [ref=e696]:
+                      - /url: /user/superuser
+                    - generic [ref=e697]:
+                      - generic: Verified
+                      - img [ref=e699]
+                    - link "22 Feb" [ref=e701]:
+                      - /url: /post/9D4qEwdOSV
+                  - paragraph [ref=e702]: "@superuser"
+                  - paragraph [ref=e703]: Reading through legacy code is like archeology but less fun.
+                  - link "#python" [ref=e705]:
+                    - /url: /posts-by-hashtag/python
+                  - generic [ref=e706]:
+                    - button "Unlike" [ref=e707]:
+                      - img [ref=e708]
+                      - generic [ref=e710]: "10"
+                    - button "Comments" [ref=e711]:
+                      - img [ref=e712]
+                      - generic [ref=e714]: "0"
+                    - button "Remove from favorites" [ref=e715]:
+                      - img [ref=e716]
+                      - generic [ref=e718]: "2"
+                    - button "Undo repost" [ref=e719]:
+                      - img [ref=e720]
+                      - generic [ref=e725]: "1"
+                    - button "Quote" [ref=e726]:
+                      - img [ref=e727]
+                      - generic [ref=e730]: "1"
+                    - button "Reply" [ref=e731]:
+                      - img [ref=e732]
+                      - generic [ref=e735]: "1"
+                    - button "Copy link" [ref=e736]:
+                      - img [ref=e737]
+            - generic [ref=e743] [cursor=pointer]:
+              - generic [ref=e745]: P
+              - generic [ref=e746]:
+                - generic [ref=e747]:
+                  - generic [ref=e748]:
+                    - link "Paragon" [ref=e749]:
+                      - /url: /user/paragon
+                    - link "19 Mar" [ref=e750]:
+                      - /url: /post/1pwz7fyA2L
+                  - button "Options" [ref=e752]:
+                    - img [ref=e753]
+                - paragraph [ref=e757]: "@paragon"
+                - paragraph [ref=e758]: My terminal history is my autobiography.
+                - generic [ref=e759]:
+                  - button "Like" [ref=e760]:
+                    - img [ref=e761]
+                    - generic [ref=e763]: "8"
+                  - button "Comments" [ref=e764]:
+                    - img [ref=e765]
+                    - generic [ref=e767]: "0"
+                  - button "Add to favorites" [ref=e768]:
+                    - img [ref=e769]
+                    - generic [ref=e771]: "2"
+                  - button "Quote" [ref=e772]:
+                    - img [ref=e773]
+                    - generic [ref=e776]: "0"
+                  - button "Reply" [ref=e777]:
+                    - img [ref=e778]
+                    - generic [ref=e781]: "3"
+                  - button "Copy link" [ref=e782]:
+                    - img [ref=e783]
+            - generic [ref=e788] [cursor=pointer]:
+              - generic [ref=e789]:
+                - img [ref=e790]
+                - generic [ref=e795]:
+                  - link "Thurman Tillman" [ref=e797]:
+                    - /url: /user/qthiel
+                  - text: reposted
+              - generic [ref=e798]:
+                - generic [ref=e800]: P
+                - generic [ref=e801]:
+                  - generic [ref=e802]:
+                    - generic [ref=e803]:
+                      - link "Paragon" [ref=e804]:
+                        - /url: /user/paragon
+                      - link "18 Mar" [ref=e805]:
+                        - /url: /post/4PZeJafUDY
+                    - button "Options" [ref=e807]:
+                      - img [ref=e808]
+                  - paragraph [ref=e812]: "@paragon"
+                  - paragraph [ref=e813]: Deployed on a Friday. Living dangerously.
+                  - generic [ref=e814]:
+                    - button "Like" [ref=e815]:
+                      - img [ref=e816]
+                      - generic [ref=e818]: "6"
+                    - button "Comments" [ref=e819]:
+                      - img [ref=e820]
+                      - generic [ref=e822]: "0"
+                    - button "Add to favorites" [ref=e823]:
+                      - img [ref=e824]
+                      - generic [ref=e826]: "1"
+                    - button "Quote" [ref=e827]:
+                      - img [ref=e828]
+                      - generic [ref=e831]: "0"
+                    - button "Reply" [ref=e832]:
+                      - img [ref=e833]
+                      - generic [ref=e836]: "0"
+                    - button "Copy link" [ref=e837]:
+                      - img [ref=e838]
+            - generic [ref=e844] [cursor=pointer]:
+              - generic [ref=e846]: P
+              - generic [ref=e847]:
+                - generic [ref=e848]:
+                  - generic [ref=e849]:
+                    - link "Paragon" [ref=e850]:
+                      - /url: /user/paragon
+                    - link "14 Mar" [ref=e851]:
+                      - /url: /post/DvgmrJJtBO
+                  - button "Options" [ref=e853]:
+                    - img [ref=e854]
+                - paragraph [ref=e858]: "@paragon"
+                - link "Replying to @paragon The documentation says it should work. The documentation lies." [ref=e859]:
+                  - /url: /post/84QapvbtLK
+                  - generic [ref=e860]: Replying to @paragon
+                  - paragraph [ref=e861]: The documentation says it should work. The documentation lies.
+                - paragraph [ref=e862]: Been there, done that.
+                - generic [ref=e863]:
+                  - button "Like" [ref=e864]:
+                    - img [ref=e865]
+                    - generic [ref=e867]: "0"
+                  - button "Comments" [ref=e868]:
+                    - img [ref=e869]
+                    - generic [ref=e871]: "4"
+                  - button "Add to favorites" [ref=e872]:
+                    - img [ref=e873]
+                    - generic [ref=e875]: "1"
+                  - button "Quote" [ref=e876]:
+                    - img [ref=e877]
+                    - generic [ref=e880]: "0"
+                  - button "Reply" [ref=e881]:
+                    - img [ref=e882]
+                    - generic [ref=e885]: "0"
+                  - button "Copy link" [ref=e886]:
+                    - img [ref=e887]
+            - generic [ref=e893] [cursor=pointer]:
+              - generic [ref=e895]: P
+              - generic [ref=e896]:
+                - generic [ref=e897]:
+                  - generic [ref=e898]:
+                    - link "Paragon" [ref=e899]:
+                      - /url: /user/paragon
+                    - link "14 Mar" [ref=e900]:
+                      - /url: /post/qEnaw7j6ww
+                  - button "Options" [ref=e902]:
+                    - img [ref=e903]
+                - paragraph [ref=e907]: "@paragon"
+                - paragraph [ref=e908]: Machine learning is just statistics wearing a fancy hat.
+                - link "#laravel" [ref=e910]:
+                  - /url: /posts-by-hashtag/laravel
+                - generic [ref=e911]:
+                  - button "Unlike" [ref=e912]:
+                    - img [ref=e913]
+                    - generic [ref=e915]: "14"
+                  - button "Comments" [ref=e916]:
+                    - img [ref=e917]
+                    - generic [ref=e919]: "4"
+                  - button "Add to favorites" [ref=e920]:
+                    - img [ref=e921]
+                    - generic [ref=e923]: "0"
+                  - button "Quote" [ref=e924]:
+                    - img [ref=e925]
+                    - generic [ref=e928]: "0"
+                  - button "Reply" [ref=e929]:
+                    - img [ref=e930]
+                    - generic [ref=e933]: "2"
+                  - button "Copy link" [ref=e934]:
+                    - img [ref=e935]
+            - generic [ref=e941] [cursor=pointer]:
+              - generic [ref=e943]: P
+              - generic [ref=e944]:
+                - generic [ref=e945]:
+                  - generic [ref=e946]:
+                    - link "Paragon" [ref=e947]:
+                      - /url: /user/paragon
+                    - link "14 Mar" [ref=e948]:
+                      - /url: /post/84QapvbtLK
+                  - button "Options" [ref=e950]:
+                    - img [ref=e951]
+                - paragraph [ref=e955]: "@paragon"
+                - paragraph [ref=e956]: The documentation says it should work. The documentation lies.
+                - generic [ref=e957]:
+                  - link "#php" [ref=e958]:
+                    - /url: /posts-by-hashtag/php
+                  - link "#typescript" [ref=e959]:
+                    - /url: /posts-by-hashtag/typescript
+                - generic [ref=e960]:
+                  - button "Unlike" [ref=e961]:
+                    - img [ref=e962]
+                    - generic [ref=e964]: "12"
+                  - button "Comments" [ref=e965]:
+                    - img [ref=e966]
+                    - generic [ref=e968]: "0"
+                  - button "Add to favorites" [ref=e969]:
+                    - img [ref=e970]
+                    - generic [ref=e972]: "1"
+                  - button "Quote" [ref=e973]:
+                    - img [ref=e974]
+                    - generic [ref=e977]: "0"
+                  - button "Reply" [ref=e978]:
+                    - img [ref=e979]
+                    - generic [ref=e982]: "1"
+                  - button "Copy link" [ref=e983]:
+                    - img [ref=e984]
+            - generic [ref=e990] [cursor=pointer]:
+              - generic [ref=e992]: P
+              - generic [ref=e993]:
+                - generic [ref=e994]:
+                  - generic [ref=e995]:
+                    - link "Paragon" [ref=e996]:
+                      - /url: /user/paragon
+                    - link "12 Mar" [ref=e997]:
+                      - /url: /post/sBJPMCqFaH
+                  - button "Options" [ref=e999]:
+                    - img [ref=e1000]
+                - paragraph [ref=e1004]: "@paragon"
+                - paragraph [ref=e1005]: The amount of YAML I write daily is truly disturbing.
+                - generic [ref=e1006]:
+                  - button "Like" [ref=e1007]:
+                    - img [ref=e1008]
+                    - generic [ref=e1010]: "5"
+                  - button "Comments" [ref=e1011]:
+                    - img [ref=e1012]
+                    - generic [ref=e1014]: "0"
+                  - button "Add to favorites" [ref=e1015]:
+                    - img [ref=e1016]
+                    - generic [ref=e1018]: "1"
+                  - button "Quote" [ref=e1019]:
+                    - img [ref=e1020]
+                    - generic [ref=e1023]: "0"
+                  - button "Reply" [ref=e1024]:
+                    - img [ref=e1025]
+                    - generic [ref=e1028]: "0"
+                  - button "Copy link" [ref=e1029]:
+                    - img [ref=e1030]
+            - generic [ref=e1036] [cursor=pointer]:
+              - generic [ref=e1038]: P
+              - generic [ref=e1039]:
+                - generic [ref=e1040]:
+                  - generic [ref=e1041]:
+                    - link "Paragon" [ref=e1042]:
+                      - /url: /user/paragon
+                    - link "11 Mar" [ref=e1043]:
+                      - /url: /post/ViMstWBJKz
+                  - button "Options" [ref=e1045]:
+                    - img [ref=e1046]
+                - paragraph [ref=e1050]: "@paragon"
+                - paragraph [ref=e1051]: Writing tests after the fact is like putting on a seatbelt after the crash.
+                - link "#devops" [ref=e1053]:
+                  - /url: /posts-by-hashtag/devops
+                - generic [ref=e1054]:
+                  - button "Like" [ref=e1055]:
+                    - img [ref=e1056]
+                    - generic [ref=e1058]: "9"
+                  - button "Comments" [ref=e1059]:
+                    - img [ref=e1060]
+                    - generic [ref=e1062]: "1"
+                  - button "Add to favorites" [ref=e1063]:
+                    - img [ref=e1064]
+                    - generic [ref=e1066]: "1"
+                  - button "Quote" [ref=e1067]:
+                    - img [ref=e1068]
+                    - generic [ref=e1071]: "0"
+                  - button "Reply" [ref=e1072]:
+                    - img [ref=e1073]
+                    - generic [ref=e1076]: "0"
+                  - button "Copy link" [ref=e1077]:
+                    - img [ref=e1078]
+      - complementary [ref=e1083]:
+        - generic [ref=e1086]: Spark © 2026
+  - region "Notifications alt+T"

@@ -28,7 +28,6 @@ class Chat extends Model
 
     public function lastMessage() : HasOne
     {
-        //return $this->belongsTo(Message::class, 'last_message_id');
         return $this->hasOne(Message::class, 'chat_id')->latestOfMany();
     }
 

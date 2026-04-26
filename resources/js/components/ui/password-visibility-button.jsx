@@ -7,8 +7,8 @@ export default function PasswordVisibilityToggle({ visible, onToggle, className 
             type="button"
             onClick={onToggle}
             className={cn(
-                'flex items-center gap-2 rounded-full bg-neutral p-2 ml-1 transition dark:bg-neutral',
-                'hover:bg-neutral-300 dark:hover:bg-neutral-700',
+                'flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-input bg-transparent transition',
+                'hover:bg-accent hover:text-accent-foreground',
                 className
             )}
             {...props}

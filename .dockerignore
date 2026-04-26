@@ -1,0 +1,11 @@
+node_modules
+vendor
+.git
+spark-extras
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+public/build
+public/hot
+.env

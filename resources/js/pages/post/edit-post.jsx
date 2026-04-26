@@ -5,19 +5,21 @@ import { Button } from '../../components/ui/button';
 import { Switch } from '../../components/ui/switch';
 import { useState } from 'react';
 import { HashtagInput } from '../../components/hashtag-input.jsx';
-import { X } from 'lucide-react';
+import { BarChart3, X } from 'lucide-react';
 import { getMediaUrl } from '@/lib/utils';
 
 export default function EditPost() {
     const { post, auth, translations } = usePage().props;
 
     const [removedMediaPaths, setRemovedMediaPaths] = useState([]);
+    const [pollRemoved, setPollRemoved] = useState(false);
 
     const { data, setData, post: submit, processing, errors } = useForm({
         content: post.content || '',
         is_private: post.is_private || false,
         media: null,
         remove_media: [],
+        remove_poll: false,
         hashtags: (post.hashtags || []).map((h) => h.hashtag),
         _method: 'PATCH',
     });
@@ -33,6 +35,10 @@ export default function EditPost() {
             formData.append('remove_media[]', path);
         });
 
+        if (pollRemoved) {
+            formData.append('remove_poll', '1');
+        }
+
         data.hashtags.forEach(tag => {
             formData.append('hashtags[]', tag);
         });
@@ -43,7 +49,7 @@ export default function EditPost() {
             }
         }
 
-        submit(route('post.update', post.id), {
+        submit(route('post.update', post.slug), {
             data: formData,
             forceFormData: true,
         });
@@ -62,30 +68,24 @@ export default function EditPost() {
         (data.media && data.media.length > 0) ||
         (post.media?.some(m => !removedMediaPaths.includes(m.file_path)));
 
-    // const getMediaUrl = (file) => {
-    //     if (file?.disk === 's3') {
-    //         return file.url;
-    //     } else if (file?.file_path) {
-    //         return `/storage/${file.file_path}`;
-    //     }
-    //     return null;
-    // };
-
     return (
         <AppLayout
             breadcrumbs={[
                 { title: 'My Posts', href: `/user/${auth.user.username}` },
-                { title: 'Edit Post', href: `/posts/${post.id}` },
+                { title: 'Edit Post', href: `/post/${post.slug}` },
             ]}
         >
             <Head title={translations['Edit Post']} />
 
+            <div className="border-b border-gray-200 p-6 dark:border-neutral-800">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{translations['Edit Post']}</h1>
+            </div>
+
             <div className="p-6">
-                <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">{translations['Edit Post']}</h1>
 
                 <div className="flex items-center justify-start my-3">
                     <label className="text-sm text-gray-700 dark:text-gray-200">
-                        {translations['Private (Only for subscribers)']} <span className="text-gray-500">({data.is_private ? translations['Yes'] : translations['No']})</span>
+                        {translations['Private (Only for followers)'] || 'Private (Only for followers)'}
                     </label>
                     <Switch checked={data.is_private} onChange={(val) => setData('is_private', val)} />
                 </div>
@@ -101,8 +101,65 @@ export default function EditPost() {
                                 errors.content ? 'border-red-500' : ''
                             }`}
                         />
-                        {errors.content && <div className="mt-1 text-red-500 text-sm">{errors.content}</div>}
+                        <div className="mt-1 flex items-center justify-between">
+                            {errors.content ? <div className="text-red-500 text-sm">{errors.content}</div> : <div />}
+                            <span className={`text-xs ${data.content.length > 500 ? 'text-red-500 font-medium' : 'text-gray-400'}`}>
+                                {data.content.length}/500
+                            </span>
+                        </div>
                     </div>
+
+                    {post.poll && !pollRemoved && (
+                        <div className="rounded-xl border border-gray-100 p-4 dark:border-neutral-800">
+                            <div className="mb-3 flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-400">
+                                <BarChart3 className="h-4 w-4" />
+                                {translations['Poll'] || 'Poll'}
+                                {post.poll.is_expired && (
+                                    <span className="ml-1 text-xs text-red-500">({translations['Expired'] || 'Expired'})</span>
+                                )}
+                                <span className="ml-auto text-xs text-gray-400">
+                                    {post.poll.total_votes} {post.poll.total_votes === 1 ? (translations['vote'] || 'vote') : (translations['votes'] || 'votes')}
+                                </span>
+                            </div>
+                            <div className="space-y-2">
+                                {post.poll.options.map((option) => {
+                                    const percentage = post.poll.total_votes > 0
+                                        ? Math.round((option.votes_count / post.poll.total_votes) * 100)
+                                        : 0;
+                                    return (
+                                        <div key={option.id} className="relative overflow-hidden rounded-md border border-gray-200 px-3 py-2 text-sm dark:border-neutral-700">
+                                            <div
+                                                className="absolute inset-y-0 left-0 bg-blue-100 dark:bg-blue-900/30"
+                                                style={{ width: `${percentage}%` }}
+                                            />
+                                            <div className="relative flex items-center justify-between">
+                                                <span className="text-gray-700 dark:text-gray-300">{option.text}</span>
+                                                <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">{percentage}%</span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            <div className="mt-3 flex items-center justify-between">
+                                {post.poll.expires_at && !post.poll.is_expired && (
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        {translations['Ends'] || 'Ends'} {new Date(post.poll.expires_at).toLocaleDateString()}
+                                    </p>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setPollRemoved(true);
+                                        setData('remove_poll', true);
+                                    }}
+                                    className="ml-auto flex items-center gap-1.5 rounded-md bg-red-50 px-3 py-1.5 text-sm text-red-600 transition hover:bg-red-100 dark:bg-red-950/30 dark:text-red-400 dark:hover:bg-red-950/50"
+                                >
+                                    <X size={14} />
+                                    {translations['Remove poll'] || 'Remove poll'}
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     {post.media?.length > 0 && (
                         <div className="space-y-2">
@@ -166,6 +223,7 @@ export default function EditPost() {
                                 <Input
                                     type="file"
                                     multiple
+                                    accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/quicktime,video/webm"
                                     onChange={(e) => setData('media', e.target.files)}
                                     className="w-full break-all"
                                 />
@@ -200,15 +258,15 @@ export default function EditPost() {
 
                     <div className="flex justify-end gap-2">
                         <Link
-                            href={`/post/${post.id}`}
-                            className="rounded-md bg-gray-300 px-4 py-2 text-gray-900 hover:bg-gray-400 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                            href={`/post/${post.slug}`}
+                            className="rounded-full border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 dark:border-neutral-600 dark:text-gray-300 dark:hover:bg-neutral-800"
                         >
                             {translations['Cancel']}
                         </Link>
                         <Button
                             type="submit"
                             disabled={processing || !canUpdate}
-                            className={`px-4 py-5 self-end text-white transition ${!canUpdate ? 'cursor-not-allowed bg-gray-400 dark:bg-gray-600' : 'bg-blue-600 hover:bg-blue-700'}`}
+                            className={`rounded-full px-5 py-2 text-sm font-medium text-white transition ${!canUpdate ? 'cursor-not-allowed bg-gray-400 dark:bg-neutral-700' : 'bg-blue-600 hover:bg-blue-700'}`}
                         >
                             {translations['Update']}
                         </Button>

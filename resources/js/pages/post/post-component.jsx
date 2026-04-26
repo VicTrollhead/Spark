@@ -1,221 +1,149 @@
 import { Link, router, useForm, usePage } from '@inertiajs/react';
-import { Bookmark, Check, EllipsisVertical, EyeOff, Heart, MessageCircle, Repeat } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import '../../echo';
+import { BarChart3, Bookmark, Check, EllipsisVertical, EyeOff, Heart, Link2, MessageCircle, Pencil, Pin, Quote, Repeat, Reply, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
+import { timeAgo, fullDate } from '../../lib/time';
+
+const dropdownVariants = {
+    hidden: { opacity: 0, scale: 0.95, y: -4 },
+    visible: { opacity: 1, scale: 1, y: 0 },
+    exit: { opacity: 0, scale: 0.95, y: -4 },
+};
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
+import { LinkifiedContent } from '../../components/linkified-content';
 import { useInitials } from '../../hooks/use-initials';
+import { usePostActions } from '../../hooks/use-post-actions';
+import { useDropdown } from '../../hooks/use-dropdown';
 import { getProfileImageUrl, getMediaUrl } from '../../lib/utils';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../components/ui/dialog';
+import { Button } from '../../components/ui/button';
 
 export default function PostComponent({ post, compact = false }) {
     const {processing } = useForm();
     const { auth, translations } = usePage().props;
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const handlePostClick = (e) => {
+        if (compact) return;
+        const target = e.target;
+        if (target.closest('a, button, video, input, textarea, select, [role="button"]')) return;
+        router.visit(`/post/${post.slug}`);
+    };
+
+    const handleCopyLink = () => {
+        const url = `${window.location.origin}/post/${post.slug}`;
+        navigator.clipboard.writeText(url).then(() => {
+            toast.success(translations['Link copied!'] || 'Link copied!');
+        });
+    };
+
+    const handleDelete = () => {
+        router.delete(`/post/${post.slug}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success(translations['Post deleted'] || 'Post deleted');
+                setShowDeleteDialog(false);
+            },
+        });
+    };
+
     const getInitials = useInitials();
+    const { isLiked, likesCount, isFavorited, favoritesCount, isReposted, repostsCount, handleLike, handleFavorite, handleRepost } = usePostActions(post);
+    const { isOpen: showOptions, toggle: toggleOptions, close: closeOptions, ref: optionsRef } = useDropdown();
 
-    const [isLiked, setIsLiked] = useState(post.is_liked);
-    const [likesCount, setLikesCount] = useState(post.likes_count);
-
-    const [isFavorited, setIsFavorited] = useState(post.is_favorited);
-    const [favoritesCount, setFavoritesCount] = useState(post.favorites_count);
-
-    const [isReposted, setIsReposted] = useState(post.is_reposted);
-    const [repostsCount, setRepostsCount] = useState(post.reposts_count);
-
-    const [showOptions, setShowOptions] = useState(false);
-    const optionsRef = useRef(null);
+    const [commentsCount, setCommentsCount] = useState(post.comments_count);
+    const [repliesCount] = useState(post.replies_count || 0);
+    const [quotesCount] = useState(post.quotes_count || 0);
+    const [pollData, setPollData] = useState(post.poll || null);
 
     useEffect(() => {
-        function handleClickOutside(event) {
-            if (optionsRef.current && !optionsRef.current.contains(event.target)) {
-                setShowOptions(false);
-            }
-        }
-
-        if (showOptions) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [showOptions]);
-
-    useEffect(() => {
-        setIsLiked(post.is_liked);
-        setLikesCount(post.likes_count);
-        setIsFavorited(post.is_favorited);
-        setFavoritesCount(post.favorites_count);
-        setIsReposted(post.is_reposted);
-        setRepostsCount(post.reposts_count);
+        setPollData(post.poll || null);
+        setCommentsCount(post.comments_count);
     }, [post]);
 
-    const toggleOptions = () => setShowOptions(prev => !prev);
+    // Listen for new comments to update count in real-time
+    useEffect(() => {
+        if (compact) return;
+        const channel = window.Echo.private(`post.${post.id}`);
+        const handler = () => setCommentsCount((prev) => prev + 1);
+        channel.listen('CommentCreated', handler);
+        return () => {
+            channel.stopListening('CommentCreated', handler);
+        };
+    }, [post.id, compact]);
 
-    const handleLike = async () => {
-        setIsLiked(!isLiked);
-        setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
-        const action = isLiked ? `/unlike` : `/like`;
-
-        await router.post(
-            action,
-            {
-                type: 'post',
-                id: post.id,
-            },
-            {
-                preserveScroll: true,
-                onError: () => {
-                    setIsLiked(post.is_liked);
-                    setLikesCount(post.likes_count);
-                },
-            },
-        );
+    const handleVote = (optionId) => {
+        if (!pollData || pollData.is_expired) return;
+        const prevData = { ...pollData };
+        const oldVoteOptionId = pollData.user_vote_option_id;
+        const newOptions = pollData.options.map(o => ({
+            ...o,
+            votes_count: o.id === optionId
+                ? o.votes_count + (oldVoteOptionId === optionId ? 0 : 1)
+                : o.id === oldVoteOptionId
+                    ? o.votes_count - 1
+                    : o.votes_count,
+        }));
+        setPollData({
+            ...pollData,
+            user_vote_option_id: optionId,
+            total_votes: oldVoteOptionId ? pollData.total_votes : pollData.total_votes + 1,
+            options: newOptions,
+        });
+        router.post(`/poll/${pollData.id}/vote`, { option_id: optionId }, {
+            preserveScroll: true,
+            onError: () => setPollData(prevData),
+        });
     };
-
-    const handleFavorite = async () => {
-        setIsFavorited(!isFavorited);
-        setFavoritesCount(isFavorited ? favoritesCount - 1 : favoritesCount + 1);
-        await router.post(
-            isFavorited ? `/post/${post.id}/remove-favorite` : `/post/${post.id}/add-favorite`,
-            {},
-            {
-                preserveScroll: true,
-                onError: () => {
-                    setIsFavorited(post.is_favorited);
-                    setFavoritesCount(post.favorites_count);
-                },
-            },
-        );
-    };
-
-    const handleRepost = async () => {
-        if (post.is_private || post.user.is_private) {
-            alert(translations['You cannot repost private posts.']);
-            return;
-        }
-        setIsReposted(!isReposted);
-        setRepostsCount(isReposted ? repostsCount - 1 : repostsCount + 1);
-        await router.post(
-            isReposted ? `/post/${post.id}/undo` : `/post/${post.id}/repost`,
-            {},
-            {
-                preserveScroll: true,
-                onSuccess: () => {
-                    setRepostsCount(isReposted ? repostsCount - 1 : repostsCount + 1);
-                    setIsReposted(!isReposted);
-                },
-                onError: () => {
-                    setIsReposted(post.is_reposted);
-                    setRepostsCount(post.reposts_count);
-                },
-            },
-        );
-    };
-
-    // const getMediaUrl = (file) => {
-    //     if (file?.disk === 's3') {
-    //         return file.url;
-    //     } else if (file?.file_path) {
-    //         return `/storage/${file.file_path}`;
-    //     }
-    //     return null;
-    // };
-
-    // const getProfileImageUrl = (user) => {
-    //     if(user?.profile_image?.disk === 's3') {
-    //         return user.profile_image?.url;
-    //     } else if (user?.profile_image?.file_path) {
-    //         return `/storage/${user.profile_image.file_path}`;
-    //     }
-    //     return null;
-    // };
-
-    // const getProfileImageUrl = (user) => {
-    //     const url = user?.profile_image;
-    //     if (!url) return null;
-    //     if (url.startsWith('http://') || url.startsWith('https://')) {
-    //         return url;
-    //     }
-    //     return `/storage/${url}`;
-    // };
 
     const profileImageUrl = getProfileImageUrl(post.user);
+    const displayTime = timeAgo(post.raw_created_at || post.created_at);
+    const tooltipTime = fullDate(post.raw_created_at || post.created_at);
 
     return (
-        <div className={`relative ${compact ? 'bg-muted/30 rounded-lg border p-3' : 'border-b p-4'} border-gray-200 dark:border-gray-800`}>
+        <>
+        <div
+            onClick={handlePostClick}
+            className={`relative ${compact ? 'bg-muted/30 rounded-lg border border-border p-3' : 'rounded-2xl border border-border bg-card px-4 sm:px-6 py-4 cursor-pointer shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all'}`}
+        >
+            {!compact && (post.reposted_by_you || post.reposted_by_recent?.length > 0) && (
+                <div className="mb-2 ml-[3.75rem] flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                    <Repeat className="h-3.5 w-3.5" />
+                    <span>
+                        {post.reposted_by_you && (
+                            <>
+                                <Link href={`/user/${post.current_user.username}`} className="font-medium hover:underline">
+                                    {translations['You'] || 'You'}
+                                </Link>
+                                {post.reposted_by_recent?.length > 0 && ', '}
+                            </>
+                        )}
+                        {post.reposted_by_recent?.map((user, index) => (
+                            <span key={user.id}>
+                                <Link href={`/user/${user.username}`} className="font-medium hover:underline">
+                                    {user.name}
+                                </Link>
+                                {index < post.reposted_by_recent.length - 1 && ', '}
+                            </span>
+                        ))}
+                        {' '}{translations['reposted'] || 'reposted'}
+                    </span>
+                </div>
+            )}
             <div className="flex items-start space-x-3">
-                <Avatar className="h-16 w-16 mt-2.5">
+                <Avatar className="h-12 w-12 mt-0.5">
                     <AvatarImage src={profileImageUrl} alt={post.user.name} />
                     <AvatarFallback className="rounded-full text-lg bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
                         {getInitials(post.user.name)}
                     </AvatarFallback>
                 </Avatar>
 
-                <div className="flex-1">
-                    {(post.reposted_by_you || post.reposted_by_recent?.length > 0) && (
-                        <div className="mb-2 flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                            <Repeat className="h-4 w-4" />
-                            <span>{translations['Reposted by']}</span>
-
-                            {post.reposted_by_you && (
-                                <span className="flex items-center">
-                                    <Link href={`/user/${post.current_user.username}`}>
-                                        <Avatar className="h-6 w-6 border">
-                                            <AvatarImage src={getProfileImageUrl(post.current_user)} alt={post.current_user.name} />
-                                            <AvatarFallback className="text-xs bg-gray-200 text-black dark:bg-gray-700 dark:text-white">{getInitials(post.current_user.name)}</AvatarFallback>
-                                        </Avatar>
-                                    </Link>
-                                    <Link href={`/user/${post.current_user.username}`} className="ml-1 text-blue-500 hover:underline break-all">
-                                        {post.current_user.name}
-                                    </Link>
-                                    <span className="ml-1">{translations['(you)']}</span>
-                                    {post.current_user.is_verified && (
-                                        <div className="group relative">
-                                            <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
-                                                Verified
-                                            </span>
-                                            <span className="ml-1 flex items-center rounded-md bg-blue-500 p-0.5 text-xs font-medium text-white">
-                                                <Check className="h-3 w-3" />
-                                            </span>
-                                        </div>
-                                    )}
-                                    {post.reposted_by_recent?.length > 1 && <span>,</span>}
-                                </span>
-                            )}
-
-                            {post.reposted_by_recent?.map((user, index) => {
-                                if (user.id !== post.current_user.id) {
-                                    return (
-                                        <span key={user.id} className="flex items-center">
-                                            <Link href={`/user/${user.username}`}>
-                                                <Avatar className="h-6 w-6 border">
-                                                    <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
-                                                    <AvatarFallback className="text-xs bg-gray-200 text-black dark:bg-gray-700 dark:text-white">{getInitials(user.name)}</AvatarFallback>
-                                                </Avatar>
-                                            </Link>
-                                            <Link href={`/user/${user.username}`} className="ml-1 text-blue-500 hover:underline break-all">
-                                                {user.name}
-                                            </Link>
-                                            {user.is_verified && (
-                                                <div className="group relative">
-                                                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
-                                                        Verified
-                                                    </span>
-                                                    <span className="ml-1 flex items-center rounded-md bg-blue-500 p-0.5 text-xs font-medium text-white">
-                                                        <Check className="h-3 w-3" />
-                                                    </span>
-                                                </div>
-                                            )}
-                                            {index < post.reposted_by_recent.length - 1 && <span>,</span>}
-                                        </span>
-                                    );
-                                }
-                                return null;
-                            })}
-                        </div>
-                    )}
-
+                <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <Link href={`/user/${post.user.username}`} className="font-semibold text-gray-900 hover:underline dark:text-white break-all">
+                        <div className="flex min-w-0 items-center gap-2">
+                            <Link href={`/user/${post.user.username}`} className="truncate font-semibold text-gray-900 hover:underline dark:text-white">
                                 {post.user.name}
                             </Link>
                             {post.user.is_verified && (
@@ -223,36 +151,90 @@ export default function PostComponent({ post, compact = false }) {
                                     <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
                                         Verified
                                     </span>
-                                    <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                    <span className="flex items-center rounded-full bg-blue-500 p-0.5 text-xs font-medium text-white">
                                         <Check className="h-3 w-3" />
                                     </span>
                                 </div>
                             )}
-                            <span className="text-sm text-gray-500">{post.created_at}</span>
+                            <Link
+                                href={`/post/${post.slug}`}
+                                className="shrink-0 text-sm text-gray-500 hover:underline"
+                                title={tooltipTime}
+                            >
+                                {displayTime}
+                            </Link>
                         </div>
 
                         {post.user.id === auth.user.id && (
                             <div className="relative" ref={optionsRef}>
-                                <EllipsisVertical
-                                    className="h-6 w-6 cursor-pointer text-gray-500 hover:text-gray-700 dark:text-white dark:hover:text-gray-300"
-                                    onClick={toggleOptions}
-                                />
-                                {showOptions && (
-                                    <div className="absolute right-0 z-50 mt-1 min-w-[160px] rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-neutral-800">
-                                        <button onClick={() => router.get(`/post/${post.id}/edit`)} className="block w-full rounded-t-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600">
-                                            {translations['Edit']}
-                                        </button>
-                                        <button onClick={() => router.delete(`/post/${post.id}`)} className="block w-full rounded-b-lg px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-neutral-600">
-                                            {translations['Delete']}
-                                        </button>
-                                    </div>
-                                )}
+                                <button onClick={toggleOptions} aria-label={translations['Options']} className="cursor-pointer text-gray-500 hover:text-gray-700 dark:text-white dark:hover:text-gray-300">
+                                    <EllipsisVertical className="h-6 w-6" />
+                                </button>
+                                <AnimatePresence>
+                                    {showOptions && (
+                                        <motion.div
+                                            variants={dropdownVariants}
+                                            initial="hidden"
+                                            animate="visible"
+                                            exit="exit"
+                                            transition={{ duration: 0.15 }}
+                                            className="absolute right-0 z-50 mt-1 min-w-[160px] origin-top-right rounded-xl border border-gray-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800"
+                                        >
+                                            <button onClick={() => router.get(`/post/${post.slug}/edit`)} className="flex w-full items-center gap-2 rounded-t-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600">
+                                                <Pencil className="h-4 w-4" />
+                                                {translations['Edit']}
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    router.post(`/post/${post.slug}/toggle-pin`, {}, { preserveScroll: true });
+                                                    closeOptions();
+                                                }}
+                                                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600"
+                                            >
+                                                <Pin className="h-4 w-4" />
+                                                {post.is_pinned ? (translations['Unpin from profile'] || 'Unpin from profile') : (translations['Pin to profile'] || 'Pin to profile')}
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    closeOptions();
+                                                    handleCopyLink();
+                                                }}
+                                                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600"
+                                            >
+                                                <Link2 className="h-4 w-4" />
+                                                {translations['Copy link'] || 'Copy link'}
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    closeOptions();
+                                                    setShowDeleteDialog(true);
+                                                }}
+                                                className="flex w-full items-center gap-2 rounded-b-lg px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-neutral-600"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                                {translations['Delete']}
+                                            </button>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         )}
                     </div>
 
-                    <p className="text-sm text-gray-500 dark:text-gray-400 break-all">@{post.user.username}</p>
-                    <p className={`mt-1 text-[16px] lg:text-lg text-gray-700 dark:text-gray-300 break-all`}>{post.content}</p>
+                    <p className="truncate text-sm text-gray-500 dark:text-gray-400">@{post.user.username}</p>
+                    {post.parent_post && (
+                        <Link href={`/post/${post.parent_post.slug}`} className="mt-1 block rounded-md border border-gray-100 px-3 py-2 transition hover:bg-gray-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50">
+                            <span className="flex items-center gap-1 text-xs text-blue-500">
+                                {translations['Replying to'] || 'Replying to'} @{post.parent_post.user.username}
+                            </span>
+                            {post.parent_post.content && (
+                                <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400 line-clamp-2 break-words">
+                                    {post.parent_post.content}
+                                </p>
+                            )}
+                        </Link>
+                    )}
+                    <p className={`mt-1 text-[16px] lg:text-lg text-gray-700 dark:text-gray-300 break-words`}><LinkifiedContent content={post.content} /></p>
 
                     {post.media.length > 0 && (
                         <div className="mt-2 grid grid-cols-1 gap-3 py-1 sm:grid-cols-2">
@@ -262,7 +244,7 @@ export default function PostComponent({ post, compact = false }) {
 
                                 return file.file_type === 'image' ? (
                                     <div key={uniqueKey} className="relative flex w-full items-center justify-center overflow-hidden rounded-lg border dark:border-gray-700">
-                                        <img src={mediaUrl} alt="Post Media" className="object-contain transition-transform duration-300 hover:scale-102" />
+                                        <img src={mediaUrl} alt="Post Media" className="cursor-pointer object-contain transition-transform duration-300 hover:scale-102" />
                                     </div>
                                 ) : (
                                     <div key={uniqueKey} className="relative w-full overflow-hidden rounded-lg border dark:border-gray-700">
@@ -276,7 +258,7 @@ export default function PostComponent({ post, compact = false }) {
                     )}
 
                     {post.hashtags?.length > 0 && (
-                        <div className="mt-0.5 flex flex-wrap gap-x-1 text-[16px] break-all">
+                        <div className="mt-0.5 flex flex-wrap gap-x-1 text-[16px] break-words">
                             {post.hashtags.map((hashtag) => (
                                 <Link key={hashtag.id} href={`/posts-by-hashtag/${hashtag.hashtag}`} className="text-blue-500 hover:underline">
                                     #{hashtag.hashtag}
@@ -285,27 +267,148 @@ export default function PostComponent({ post, compact = false }) {
                         </div>
                     )}
 
-                    {!compact && (
-                        <div className="mt-3 flex items-center gap-3 text-gray-500 dark:text-gray-400">
-                            <button onClick={handleLike} disabled={processing} className={`flex items-center gap-1 ${isLiked ? 'text-red-500' : 'hover:text-red-500'}`}>
-                                <Heart className="h-5 w-5" /><span>{likesCount}</span>
-                            </button>
-                            <Link href={`/post/${post.id}`} className="flex items-center gap-1 hover:text-blue-500">
-                                <MessageCircle className="h-5 w-5" /><span>{post.comments_count}</span>
-                            </Link>
-                            <button onClick={handleFavorite} disabled={processing} className={`flex items-center gap-1 ${isFavorited ? 'text-yellow-500' : 'hover:text-yellow-500'}`}>
-                                <Bookmark className="h-5 w-5" /><span>{favoritesCount}</span>
-                            </button>
-                            {post.user.id !== auth.user.id && !post.is_private && !post.user.is_private && (
-                                <button onClick={handleRepost} disabled={processing} className={`flex items-center gap-1 ${isReposted ? 'text-green-500' : 'hover:text-green-500'}`}>
-                                    <Repeat className="h-5 w-5" /><span>{repostsCount}</span>
-                                </button>
+                    {post.quote_post && (
+                        <Link href={`/post/${post.quote_post.slug}`} className="mt-2 block overflow-hidden rounded-xl border border-gray-100 p-3 transition hover:bg-gray-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50">
+                            <div className="flex min-w-0 items-center gap-2">
+                                <Avatar className="h-5 w-5">
+                                    <AvatarImage src={getProfileImageUrl(post.quote_post.user)} alt={post.quote_post.user.name} />
+                                    <AvatarFallback className="text-[10px] bg-gray-200 text-black dark:bg-gray-700 dark:text-white">{getInitials(post.quote_post.user.name)}</AvatarFallback>
+                                </Avatar>
+                                <span className="truncate text-sm font-semibold text-gray-900 dark:text-white">{post.quote_post.user.name}</span>
+                                {post.quote_post.user.is_verified && (
+                                    <span className="flex items-center rounded-full bg-blue-500 p-0.5 text-xs text-white"><Check className="h-2.5 w-2.5" /></span>
+                                )}
+                                <span className="truncate text-xs text-gray-500">@{post.quote_post.user.username}</span>
+                                <span className="shrink-0 text-xs text-gray-400" title={fullDate(post.quote_post.raw_created_at || post.quote_post.created_at)}>
+                                    {timeAgo(post.quote_post.raw_created_at || post.quote_post.created_at)}
+                                </span>
+                            </div>
+                            <p className="mt-1 text-sm text-gray-700 dark:text-gray-300 line-clamp-3 break-words">{post.quote_post.content}</p>
+                            {post.quote_post.media?.length > 0 && post.quote_post.media[0]?.file_type === 'image' && (
+                                <img src={getMediaUrl(post.quote_post.media[0])} alt="" className="mt-2 h-32 w-full rounded-md object-cover" />
                             )}
-                            {post.is_private === 1 && <EyeOff className="h-5 w-5" />}
+                        </Link>
+                    )}
+
+                    {pollData && (
+                        <div className="mt-3 rounded-xl border border-gray-100 p-3 dark:border-neutral-800">
+                            <div className="mb-2 flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-400">
+                                <BarChart3 className="h-4 w-4" />
+                                {translations['Poll'] || 'Poll'}
+                                {pollData.is_expired && (
+                                    <span className="ml-1 text-xs text-red-500">({translations['Expired'] || 'Expired'})</span>
+                                )}
+                            </div>
+                            <div className="space-y-2">
+                                {pollData.options.map((option) => {
+                                    const hasVoted = pollData.user_vote_option_id != null;
+                                    const isSelected = pollData.user_vote_option_id === option.id;
+                                    const percentage = pollData.total_votes > 0
+                                        ? Math.round((option.votes_count / pollData.total_votes) * 100)
+                                        : 0;
+                                    const showResults = hasVoted || pollData.is_expired;
+
+                                    return (
+                                        <button
+                                            key={option.id}
+                                            onClick={() => !pollData.is_expired && handleVote(option.id)}
+                                            disabled={pollData.is_expired}
+                                            aria-disabled={pollData.is_expired}
+                                            className={`relative w-full overflow-hidden rounded-md border px-3 py-2 text-left text-sm transition ${
+                                                isSelected
+                                                    ? 'border-blue-500 bg-blue-50 dark:border-blue-600 dark:bg-blue-950/30'
+                                                    : 'border-gray-200 hover:bg-gray-50 dark:border-neutral-700 dark:hover:bg-neutral-800'
+                                            } ${pollData.is_expired ? 'cursor-default' : 'cursor-pointer'}`}
+                                        >
+                                            {showResults && (
+                                                <div
+                                                    className="absolute inset-y-0 left-0 bg-blue-100 dark:bg-blue-900/30 transition-all duration-300"
+                                                    style={{ width: `${percentage}%` }}
+                                                />
+                                            )}
+                                            <div className="relative flex items-center justify-between">
+                                                <span className={`${isSelected ? 'font-medium text-blue-700 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                                                    {option.text}
+                                                </span>
+                                                {showResults && (
+                                                    <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">{percentage}%</span>
+                                                )}
+                                            </div>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                {pollData.total_votes} {pollData.total_votes === 1 ? (translations['vote'] || 'vote') : (translations['votes'] || 'votes')}
+                                {pollData.expires_at && !pollData.is_expired && (
+                                    <span className="ml-1">
+                                        &middot; {translations['Ends'] || 'Ends'} {new Date(pollData.expires_at).toLocaleDateString()}
+                                    </span>
+                                )}
+                            </p>
+                        </div>
+                    )}
+
+                    {!compact && (
+                        <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 sm:gap-x-3 text-gray-500 dark:text-gray-400">
+                            <motion.button whileTap={{ scale: 0.9 }} onClick={handleLike} disabled={processing} aria-label={isLiked ? translations['Unlike'] : translations['Like']} className={`flex items-center gap-1 disabled:opacity-50 transition-colors ${isLiked ? 'text-red-500' : 'hover:text-red-500'}`}>
+                                <Heart className="h-4 w-4 sm:h-5 sm:w-5 transition-transform" fill={isLiked ? 'currentColor' : 'none'} />
+                                <span className="text-sm">{likesCount}</span>
+                            </motion.button>
+                            <motion.button whileTap={{ scale: 0.9 }} onClick={() => router.visit(`/post/${post.slug}`)} aria-label={translations['Comments']} className="flex items-center gap-1 transition-colors hover:text-blue-500">
+                                <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" /><span className="text-sm">{commentsCount}</span>
+                            </motion.button>
+                            <motion.button whileTap={{ scale: 0.9 }} onClick={handleFavorite} disabled={processing} aria-label={isFavorited ? translations['Remove from favorites'] : translations['Add to favorites']} className={`flex items-center gap-1 transition-colors ${isFavorited ? 'text-yellow-500' : 'hover:text-yellow-500'}`}>
+                                <Bookmark className="h-4 w-4 sm:h-5 sm:w-5 transition-transform" fill={isFavorited ? 'currentColor' : 'none'} />
+                                <span className="text-sm">{favoritesCount}</span>
+                            </motion.button>
+                            {post.user.id !== auth.user.id && !post.is_private && !post.user.is_private && (
+                                <motion.button whileTap={{ scale: 0.9 }} onClick={handleRepost} disabled={processing} aria-label={isReposted ? translations['Undo repost'] : translations['Repost']} className={`flex items-center gap-1 transition-colors ${isReposted ? 'text-green-500' : 'hover:text-green-500'}`}>
+                                    <Repeat className="h-4 w-4 sm:h-5 sm:w-5" /><span className="text-sm">{repostsCount}</span>
+                                </motion.button>
+                            )}
+                            {!post.is_private && (
+                                <motion.button whileTap={{ scale: 0.9 }} onClick={() => router.visit(`/dashboard?quote=${post.slug}`)} aria-label={translations['Quote']} className="flex items-center gap-1 transition-colors hover:text-purple-500">
+                                    <Quote className="h-4 w-4 sm:h-5 sm:w-5" /><span className="text-sm">{quotesCount}</span>
+                                </motion.button>
+                            )}
+                            <motion.button whileTap={{ scale: 0.9 }} onClick={() => router.visit(`/dashboard?reply=${post.slug}`)} aria-label={translations['Reply'] || 'Reply'} className="flex items-center gap-1 transition-colors hover:text-blue-500">
+                                <Reply className="h-4 w-4 sm:h-5 sm:w-5" /><span className="text-sm">{repliesCount}</span>
+                            </motion.button>
+                            <motion.button
+                                whileTap={{ scale: 0.9 }}
+                                onClick={handleCopyLink}
+                                aria-label={translations['Copy link'] || 'Copy link'}
+                                className="flex items-center gap-1 transition-colors hover:text-blue-500 ml-auto"
+                            >
+                                <Link2 className="h-4 w-4" />
+                            </motion.button>
+                            {post.is_private === 1 && <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" aria-label={translations['Private post']} />}
                         </div>
                     )}
                 </div>
             </div>
         </div>
+
+        {/* Delete confirmation dialog */}
+        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>{translations['Delete post'] || 'Delete post'}</DialogTitle>
+                    <DialogDescription>
+                        {translations['Are you sure you want to delete this post? This action cannot be undone.'] || 'Are you sure you want to delete this post? This action cannot be undone.'}
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+                        {translations['Cancel'] || 'Cancel'}
+                    </Button>
+                    <Button variant="destructive" onClick={handleDelete} className="bg-red-600 hover:bg-red-700 text-white">
+                        {translations['Delete'] || 'Delete'}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+        </>
     );
 }

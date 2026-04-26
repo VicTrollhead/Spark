@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar.jsx';
 import { Link, router, usePage } from '@inertiajs/react';
-import { Check, EllipsisVertical } from 'lucide-react';
+import { Check, CheckCheck, EllipsisVertical } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useInitials } from '../hooks/use-initials.jsx';
 import { getProfileImageUrl } from '../lib/utils';
@@ -12,14 +12,10 @@ export default function Message({ userId, message }) {
     const optionsRef = useRef(null);
     const formatMessageTime = (timestamp) => {
         const date = new Date(timestamp);
-
-        date.setHours(date.getHours() + 3);
-
-        const shiftedNow = new Date();
-        shiftedNow.setHours(shiftedNow.getHours() + 3);
+        const now = new Date();
 
         const isToday =
-            date.getFullYear() === shiftedNow.getFullYear() && date.getMonth() === shiftedNow.getMonth() && date.getDate() === shiftedNow.getDate();
+            date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate();
 
         return isToday
             ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -50,14 +46,24 @@ export default function Message({ userId, message }) {
 
     const toggleOptions = () => setShowOptions((prev) => !prev);
 
-    // const getProfileImageUrl = (user) => {
-    //     if (user?.profile_image?.disk === 's3') {
-    //         return user.profile_image?.url;
-    //     } else if (user?.profile_image?.file_path) {
-    //         return `/storage/${user.profile_image?.file_path}`;
-    //     }
-    //     return null;
-    // };
+    const mediaItems = message.media && message.media.length > 0 ? message.media : [];
+
+    const renderMedia = () => {
+        if (mediaItems.length === 0) return null;
+        return (
+            <div className={`flex flex-wrap gap-1 ${mediaItems.length === 1 ? '' : 'max-w-xs'}`}>
+                {mediaItems.map((media, i) => (
+                    media.file_type === 'video' ? (
+                        <video key={i} src={media.url} controls className="max-h-48 max-w-full rounded-md" />
+                    ) : (
+                        <a key={i} href={media.url} target="_blank" rel="noopener noreferrer">
+                            <img src={media.url} alt="" className="max-h-48 max-w-full rounded-md object-cover" />
+                        </a>
+                    )
+                ))}
+            </div>
+        );
+    };
 
     return (
         <>
@@ -82,9 +88,17 @@ export default function Message({ userId, message }) {
                                 )}
                             </div>
 
-                            <div className="flex w-fit max-w-full flex-col gap-1 rounded-md bg-blue-500 px-4 py-2 text-lg break-words text-white dark:bg-blue-900">
-                                <span className="break-words whitespace-pre-wrap">{message.text}</span>
-                                <span className="text-right text-xs text-blue-100 dark:text-white">{formatMessageTime(message.time)}</span>
+                            <div className="flex w-fit max-w-full flex-col gap-1 rounded-2xl bg-brand-gradient px-4 py-2 text-lg break-words text-white shadow-sm">
+                                {renderMedia()}
+                                {message.text && <span className="break-words whitespace-pre-wrap">{message.text}</span>}
+                                <span className="flex items-center justify-end gap-1 text-xs text-blue-100 dark:text-white">
+                                    {formatMessageTime(message.time)}
+                                    {message.chat_id && (
+                                        message.read_at
+                                            ? <CheckCheck className="h-3.5 w-3.5 text-blue-200" />
+                                            : <Check className="h-3.5 w-3.5 text-blue-200/60" />
+                                    )}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -93,30 +107,29 @@ export default function Message({ userId, message }) {
                 <div className="mb-2 flex">
                     <div className="w-full sm:max-w-md">
                         <div className="mb-1 flex justify-between text-xs text-gray-500">
-                            <Link href={`/user/${message.user.username}`} className="flex  w-fit items-center">
+                            <Link href={`/user/${message.user.username}`} className="flex w-fit items-center">
                                 <div className="flex items-center gap-2">
-                                    <div className="grid flex-1 text-left leading-tight">
+                                    <div className="grid min-w-0 flex-1 text-left leading-tight">
                                         <div className="flex items-center gap-1">
-                                            <span className="break-all text-lg text-black hover:underline dark:text-white ">{message.user.name}</span>
-                                            {/*<span className="break-all text-sm text-gray-600 dark:text-neutral-300 ">(@{message.user.username})</span>*/}
+                                            <span className="truncate text-lg text-black hover:underline dark:text-white">{message.user.name}</span>
                                             {message.user.is_verified && (
                                                 <div className="group relative">
                                                     <span className="top absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
                                                         Verified
                                                     </span>
-                                                    <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
+                                                    <span className="flex items-center rounded-full bg-blue-500 p-0.5 text-xs font-medium text-white">
                                                         <Check className="h-3 w-3" />
                                                     </span>
                                                 </div>
                                             )}
                                         </div>
                                     </div>
-                                    <span className="text-xs text-neutral-700 dark:text-white break-all">{formatMessageTime(message.time)}</span>
+                                    <span className="shrink-0 text-xs text-neutral-700 dark:text-white">{formatMessageTime(message.time)}</span>
                                 </div>
                             </Link>
                         </div>
                         <div className="flex flex-row gap-2">
-                            <Link href={`/user/${message.user.username}`} className="hidden md:flex">
+                            <Link href={`/user/${message.user.username}`} className="hidden sm:flex">
                                 <Avatar className="h-10 w-10 overflow-hidden rounded-full">
                                     <AvatarImage src={getProfileImageUrl(message.user)} alt={message.user.name} />
                                     <AvatarFallback className="rounded-lg bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
@@ -124,8 +137,9 @@ export default function Message({ userId, message }) {
                                     </AvatarFallback>
                                 </Avatar>
                             </Link>
-                            <div className="w-fit max-w-full rounded-md bg-gray-200 px-4 py-2 text-lg break-words text-gray-800 dark:bg-neutral-900 dark:text-white">
-                                <span className="break-words whitespace-pre-wrap">{message.text}</span>
+                            <div className="w-fit max-w-full rounded-2xl bg-muted px-4 py-2 text-lg break-words text-foreground shadow-sm">
+                                {renderMedia()}
+                                {message.text && <span className="break-words whitespace-pre-wrap">{message.text}</span>}
                             </div>
                         </div>
                     </div>

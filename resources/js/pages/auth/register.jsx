@@ -1,13 +1,15 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { EyeOff, LoaderCircle } from 'lucide-react';
+import { LoaderCircle } from 'lucide-react';
 
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import PasswordVisibilityToggle from '@/components/ui/password-visibility-button';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
 import { useState } from 'react';
+import GoogleIcon from '@/assets/images/google_icon.png';
 
 
 export default function Register() {
@@ -40,6 +42,19 @@ export default function Register() {
             <Head title={translations["Sign Up"]} />
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
+                    <Button asChild variant="default" size="default" className="w-full bg-white dark:bg-black hover:bg-white hover:dark:bg-black border-2 border-gray-700 hover:border-blue-500 text-black dark:text-white">
+                        <a href={route('api.auth.google')} className="block text-center">
+                            <img src={GoogleIcon} alt="Google" className="mr-2 h-5 w-5" />
+                            {translations['Continue with Google']}
+                        </a>
+                    </Button>
+
+                    <div className="my-1 flex items-center">
+                        <div className="flex-grow border border-t"></div>
+                        <span className="px-2 font-bold">{translations['OR']}</span>
+                        <div className="flex-grow border border-t"></div>
+                    </div>
+
                     <div className="grid gap-5">
                         <Label htmlFor="name">{translations["Full Name"]}</Label>
                         <Input
@@ -52,7 +67,7 @@ export default function Register() {
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                             disabled={processing}
-                            placeholder={translations["Full Name"]}
+                            placeholder={translations["e.g. Jane Doe"]}
                         />
                         <InputError message={errors.name} className="mt-2" />
                     </div>
@@ -86,9 +101,7 @@ export default function Register() {
                                 onChange={(e) => setData('password', e.target.value)}
                                 placeholder={translations["Password"]}
                             />
-                            <button type="button" className="flex items-center" onClick={togglePasswordVisibility}>
-                                <EyeOff className="h-5 w-5 hover:cursor-pointer" />
-                            </button>
+                            <PasswordVisibilityToggle visible={passwordVisible} onToggle={togglePasswordVisibility} />
                         </div>
                         <InputError message={errors.password} />
                     </div>
@@ -107,9 +120,7 @@ export default function Register() {
                                 disabled={processing}
                                 placeholder={translations["Confirm Password"]}
                             />
-                            <button type="button" className="flex items-center" onClick={toggleCPasswordVisibility}>
-                                <EyeOff className="h-5 w-5 hover:cursor-pointer" />
-                            </button>
+                            <PasswordVisibilityToggle visible={cpasswordVisible} onToggle={toggleCPasswordVisibility} />
                         </div>
                         <InputError message={errors.password_confirmation} />
                     </div>

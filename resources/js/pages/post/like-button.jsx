@@ -10,12 +10,6 @@ export default function LikeButton({ postId, isLiked, likesCount }) {
     const toggleLike = () => {
         router.post(`/post/${postId}/${liked ? "unlike" : "like"}`, {post_id: postId},{
             preserveScroll: true,
-            onSuccess: (page) => {
-                console.log("Updated page props:", page.props);
-            },
-            onError: (errors) => {
-                console.error("Error toggling like:", errors);
-            }
         });
     };
 
@@ -24,7 +18,7 @@ export default function LikeButton({ postId, isLiked, likesCount }) {
             onClick={toggleLike}
             className={`flex items-center gap-1 ${liked ? 'text-red-500' : 'hover:text-red-500'}`}
         >
-            <Heart className="h-5 w-5" />
+            <Heart className="h-5 w-5" fill={liked ? 'currentColor' : 'none'} />
             <span>{count}</span>
         </button>
     );

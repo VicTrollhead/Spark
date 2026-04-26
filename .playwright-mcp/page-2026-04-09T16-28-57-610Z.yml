@@ -1,0 +1,171 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - link "Spark logo Spark" [ref=e7] [cursor=pointer]:
+          - /url: /dashboard
+          - generic [ref=e8]:
+            - img "Spark logo" [ref=e9]
+            - generic [ref=e11]: Spark
+        - button [ref=e12] [cursor=pointer]:
+          - img [ref=e13]
+      - navigation "Main" [ref=e24]:
+        - list [ref=e26]:
+          - listitem [ref=e27]:
+            - link "News" [ref=e28] [cursor=pointer]:
+              - /url: /dashboard
+          - listitem [ref=e29]:
+            - link "Following" [ref=e30] [cursor=pointer]:
+              - /url: /user/following-posts
+          - listitem [ref=e31]:
+            - link "Liked" [ref=e32] [cursor=pointer]:
+              - /url: /user/liked
+      - generic [ref=e35]:
+        - button "Search" [ref=e36] [cursor=pointer]:
+          - img [ref=e37]
+        - textbox "Search... (Ctrl+K)" [ref=e40]:
+          - /placeholder: Search...  (Ctrl+K)
+    - generic [ref=e41]:
+      - generic [ref=e42]:
+        - list [ref=e44]:
+          - listitem [ref=e45]:
+            - link "P @paragon Paragon" [ref=e46] [cursor=pointer]:
+              - /url: /user
+              - generic [ref=e47]:
+                - generic [ref=e49]: P
+                - generic [ref=e50]:
+                  - generic [ref=e52]: "@paragon"
+                  - generic [ref=e53]: Paragon
+        - list [ref=e56]:
+          - listitem [ref=e57]:
+            - link "Dashboard" [ref=e58] [cursor=pointer]:
+              - /url: /dashboard
+              - img [ref=e59]
+              - generic [ref=e62]: Dashboard
+          - listitem [ref=e63]:
+            - link "Everyone chat" [ref=e64] [cursor=pointer]:
+              - /url: /chat/everyone
+              - img [ref=e65]
+              - generic [ref=e68]: Everyone chat
+          - listitem [ref=e69]:
+            - link "User chats" [ref=e70] [cursor=pointer]:
+              - /url: /chat/user-chats
+              - img [ref=e71]
+              - generic [ref=e74]: User chats
+          - listitem [ref=e75]:
+            - link "Friends" [ref=e76] [cursor=pointer]:
+              - /url: /user/friends
+              - img [ref=e77]
+              - generic [ref=e82]: Friends
+          - listitem [ref=e83]:
+            - link "Notifications" [ref=e84] [cursor=pointer]:
+              - /url: /user/notifications
+              - img [ref=e85]
+              - generic [ref=e88]: Notifications
+          - listitem [ref=e89]:
+            - link "Favorites" [ref=e90] [cursor=pointer]:
+              - /url: /user/favorites
+              - img [ref=e91]
+              - generic [ref=e93]: Favorites
+          - listitem [ref=e94]:
+            - link "Reposts" [ref=e95] [cursor=pointer]:
+              - /url: /user/reposts
+              - img [ref=e96]
+              - generic [ref=e101]: Reposts
+          - listitem [ref=e102]:
+            - link "Popular hashtags" [ref=e103] [cursor=pointer]:
+              - /url: /show-popular-hashtags
+              - img [ref=e104]
+              - generic [ref=e109]: Popular hashtags
+          - listitem [ref=e110]:
+            - link "Profile" [ref=e111] [cursor=pointer]:
+              - /url: /user/paragon
+              - img [ref=e112]
+              - generic [ref=e115]: Profile
+          - listitem [ref=e116]:
+            - link "Settings" [ref=e117] [cursor=pointer]:
+              - /url: /settings/profile
+              - img [ref=e118]
+              - generic [ref=e121]: Settings
+        - generic [ref=e122]:
+          - link "Repository" [ref=e123] [cursor=pointer]:
+            - /url: https://gitlab.com/shapovalovtimur16/Spark
+            - button "Repository" [ref=e124]:
+              - img [ref=e125]
+              - text: Repository
+          - button "Log out" [ref=e127] [cursor=pointer]:
+            - img [ref=e128]
+            - text: Log out
+      - main [ref=e132]:
+        - heading "Edit Profile" [level=1] [ref=e134]
+        - generic [ref=e136]:
+          - generic [ref=e137]:
+            - heading "Profile Image" [level=2] [ref=e138]
+            - generic [ref=e139]:
+              - generic [ref=e142]: P
+              - generic [ref=e143]:
+                - generic [ref=e144]:
+                  - generic [ref=e145]: "Status:"
+                  - generic [ref=e146]: Not Set
+                - button "Choose File" [ref=e150]
+          - generic [ref=e151]:
+            - heading "Cover Image" [level=2] [ref=e152]
+            - generic [ref=e153]:
+              - generic [ref=e156]: No Cover Image
+              - generic [ref=e157]:
+                - generic [ref=e158]:
+                  - generic [ref=e159]: "Status:"
+                  - generic [ref=e160]: Not Set
+                - button "Choose File" [ref=e164]
+          - generic [ref=e165]:
+            - heading "User Information" [level=2] [ref=e166]
+            - generic [ref=e167]:
+              - generic [ref=e168]:
+                - generic [ref=e169]: Name
+                - textbox "Name" [ref=e170]:
+                  - /placeholder: Paragon
+                  - text: Paragon
+              - generic [ref=e171]:
+                - generic [ref=e172]: Username
+                - textbox "Username" [ref=e173]:
+                  - /placeholder: paragon
+                  - text: paragon
+              - generic [ref=e174]:
+                - generic [ref=e175]: Bio
+                - textbox "Bio" [ref=e176]:
+                  - /placeholder: Enter your bio
+                  - text: Standard test account for development.
+              - generic [ref=e177]:
+                - generic [ref=e178]: Location
+                - textbox "Location" [ref=e179]:
+                  - /placeholder: Enter your location
+                  - text: Nowhere
+              - generic [ref=e180]:
+                - generic [ref=e181]: Website
+                - textbox "Website" [ref=e182]:
+                  - /placeholder: https://
+                  - text: https://example.com
+              - generic [ref=e183]:
+                - generic [ref=e184]: Date of Birth
+                - textbox "Date of Birth" [ref=e185]: 2000-01-01
+          - generic [ref=e186]:
+            - heading "Account Settings" [level=2] [ref=e187]
+            - generic [ref=e188]:
+              - generic [ref=e189]:
+                - checkbox [ref=e192]
+                - generic [ref=e195]:
+                  - generic [ref=e196]: Private Account
+                  - paragraph [ref=e197]: Only approved followers can see your posts
+              - generic [ref=e198]:
+                - generic [ref=e199]: Account Status
+                - combobox [ref=e200] [cursor=pointer]:
+                  - generic: Active
+                  - img
+                - combobox [ref=e201] [cursor=pointer]
+          - generic [ref=e202]:
+            - link "Cancel" [ref=e203] [cursor=pointer]:
+              - /url: /user/paragon
+            - button "Save Changes" [ref=e204] [cursor=pointer]
+      - complementary [ref=e205]:
+        - generic [ref=e208]: Spark © 2026
+  - region "Notifications alt+T"

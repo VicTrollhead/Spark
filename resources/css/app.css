@@ -56,6 +56,9 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+
+    --color-brand: var(--brand);
+    --color-brand-foreground: var(--brand-foreground);
 }
 
 /*
@@ -110,6 +113,8 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.87 0 0);
+    --brand: oklch(0.62 0.19 255);
+    --brand-foreground: oklch(0.985 0 0);
 }
 
 .dark {
@@ -145,6 +150,19 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(0.269 0 0);
     --sidebar-ring: oklch(0.439 0 0);
+    --brand: oklch(0.68 0.18 255);
+    --brand-foreground: oklch(0.145 0 0);
+}
+
+:root {
+    --header-h: 4rem;
+    --mobile-nav-h: 4rem;
+}
+
+@media (min-width: 1024px) {
+    :root {
+        --mobile-nav-h: 0px;
+    }
 }
 
 @layer base {
@@ -154,5 +172,94 @@
 
     body {
         @apply bg-background text-foreground;
+    }
+
+    button:not(:disabled),
+    select:not(:disabled),
+    [role="button"]:not(:disabled) {
+        cursor: pointer;
+    }
+}
+
+/* Ambient animated background — subtle drifting gradient blobs used across auth + app shell */
+:root {
+    --ambient-blob-a-duration: 18s;
+    --ambient-blob-b-duration: 22s;
+    --ambient-hue-duration: 30s;
+    --ambient-hue-range: 30deg;
+    --ambient-opacity: 0.28;
+}
+.dark {
+    --ambient-opacity: 0.18;
+}
+
+@layer components {
+    .bg-ambient {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+        animation: ambient-hue var(--ambient-hue-duration) ease-in-out infinite;
+    }
+    .bg-ambient::before,
+    .bg-ambient::after {
+        content: '';
+        position: absolute;
+        width: 36rem;
+        height: 36rem;
+        border-radius: 9999px;
+        filter: blur(96px);
+        will-change: transform;
+    }
+    .bg-ambient::before {
+        top: -10rem;
+        left: 15%;
+        background: rgb(59 130 246 / var(--ambient-opacity)); /* blue-500 */
+        animation: ambient-drift-a var(--ambient-blob-a-duration) ease-in-out infinite alternate;
+    }
+    .bg-ambient::after {
+        bottom: -10rem;
+        right: 15%;
+        background: rgb(99 102 241 / var(--ambient-opacity)); /* indigo-500 */
+        animation: ambient-drift-b var(--ambient-blob-b-duration) ease-in-out infinite alternate;
+    }
+
+    .bg-brand-gradient {
+        background-image: linear-gradient(135deg, oklch(0.62 0.19 255) 0%, oklch(0.58 0.2 285) 100%);
+    }
+    .dark .bg-brand-gradient {
+        background-image: linear-gradient(135deg, oklch(0.68 0.18 255) 0%, oklch(0.64 0.19 285) 100%);
+    }
+}
+
+@keyframes ambient-drift-a {
+    0%   { transform: translate(-8%, -6%) scale(1); }
+    100% { transform: translate(12%, 8%) scale(1.25); }
+}
+@keyframes ambient-drift-b {
+    0%   { transform: translate(8%, 6%) scale(1.1); }
+    100% { transform: translate(-14%, -10%) scale(0.9); }
+}
+@keyframes ambient-hue {
+    0%, 100% { filter: hue-rotate(0deg); }
+    50%      { filter: hue-rotate(var(--ambient-hue-range)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bg-ambient,
+    .bg-ambient::before,
+    .bg-ambient::after {
+        animation: none !important;
+    }
+}
+
+/* Filters over blurred elements are expensive on mobile — drop the hue cycle on small screens but keep the drift */
+@media (max-width: 767px) {
+    .bg-ambient {
+        animation: none;
+    }
+    .bg-ambient::before,
+    .bg-ambient::after {
+        animation-duration: 30s;
     }
 }

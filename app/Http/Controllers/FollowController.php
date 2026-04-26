@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
-use App\Events\NotificationCreated;
+use App\Events\FollowChanged;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,7 +17,6 @@ use Inertia\Response;
 use App\Models\Follow;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Validation\Rule;
 
 class FollowController extends Controller
 {
@@ -29,6 +31,11 @@ class FollowController extends Controller
             return back()->with('error', 'You cannot follow yourself.');
         }
 
+        // Private users must use the follow-request route
+        if ($user->is_private) {
+            return $this->sendFollowRequest($user);
+        }
+
         $alreadyFollowing = Follow::where('follower_id', $followerId)
             ->where('followee_id', $followeeId)
             ->exists();
@@ -40,7 +47,7 @@ class FollowController extends Controller
         Follow::create([
             'follower_id' => $followerId,
             'followee_id' => $followeeId,
-            'is_accepted' => !$user->is_private,
+            'is_accepted' => true,
         ]);
 
         Notification::where('type', 'follow')
@@ -53,6 +60,10 @@ class FollowController extends Controller
             'source_user_id' => $followerId,
             'type' => 'follow',
         ]);
+
+        if (!$user->is_private) {
+            $this->broadcastFollowChanged($user, 'followed');
+        }
 
         return back()->with('success', 'Followed successfully.');
     }
@@ -72,13 +83,15 @@ class FollowController extends Controller
                 ->where('user_id', $followeeId)
                 ->delete();
 
+            $this->broadcastFollowChanged($user, 'unfollowed');
+
             return back()->with('success', 'Unfollowed successfully.');
         }
 
         return back()->with('error', 'You are not following this user.');
     }
 
-    public function isFollowing(User $user)
+    public function isFollowing(User $user): JsonResponse
     {
         $followerId = Auth::id();
         $followeeId = $user->id;
@@ -90,13 +103,14 @@ class FollowController extends Controller
         return response()->json(['following' => $isFollowing]);
     }
 
-    public function followers(Request $request, User $user)
+    public function followers(Request $request, User $user): Response
     {
         $authUser = Auth::user();
         $sort = $request->input('sort', 'latest');
         $authUserFriends = $authUser->friends->pluck('id')->toArray();
 
-        $followersQuery = $authUser->followers()
+        $followersQuery = $user->followers()
+            ->where('users.id', '!=', $user->id)
             ->with(['profileImage', 'followers'])
             ->withCount('followers');
 
@@ -148,13 +162,14 @@ class FollowController extends Controller
 
 
 
-    public function following(Request $request, User $user)
+    public function following(Request $request, User $user): Response
     {
         $authUser = Auth::user();
         $sort = $request->input('sort', 'latest');
         $authUserFriends = $authUser->friends->pluck('id')->toArray();
 
-        $followingQuery = $authUser->following()
+        $followingQuery = $user->following()
+            ->where('users.id', '!=', $user->id)
             ->with(['profileImage', 'followers'])
             ->withCount('followers');
 
@@ -240,6 +255,8 @@ class FollowController extends Controller
 
         $notification->delete();
 
+        $this->broadcastFollowChanged($user, 'accepted');
+
         return back()->with('success', 'Follow request accepted.');
     }
 
@@ -275,7 +292,7 @@ class FollowController extends Controller
         return back()->with('success', 'Follow request rejected.');
     }
 
-    public function followRequests()
+    public function followRequests(): Response
     {
         $user = Auth::user();
 
@@ -289,7 +306,7 @@ class FollowController extends Controller
         ]);
     }
 
-    public function sendFollowRequest(User $user)
+    public function sendFollowRequest(User $user): RedirectResponse
     {
         $authUser = auth()->user();
 
@@ -333,5 +350,15 @@ class FollowController extends Controller
 
             return back()->with('success', 'Follow request sent.');
         }
+    }
+
+    private function broadcastFollowChanged(User $user, string $action): void
+    {
+        broadcast(new FollowChanged(
+            $user->id,
+            $action,
+            $user->followers()->count(),
+            $user->following()->count(),
+        ))->toOthers();
     }
 }

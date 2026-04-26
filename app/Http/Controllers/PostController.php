@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
+use App\Events\PostCreated;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Models\Comment;
-use App\Models\Hashtag;
 use App\Models\Media;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
@@ -16,9 +18,8 @@ use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 use App\Models\Post;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Validation\Rule;
 
 class PostController extends Controller
 {
@@ -28,28 +29,7 @@ class PostController extends Controller
         $currentUser = Auth::user();
         $sort = $request->query('sort', 'latest');
 
-        $postsQuery = Post::with([
-            'user.profileImage',
-            'comments',
-            'likes',
-            'media',
-            'hashtags',
-            'favorites',
-            'repostedByUsers',
-
-        ])
-            ->where(function ($query) use ($currentUser) {
-                $query->where('is_private', 0);
-
-                if ($currentUser) {
-                    $query->orWhere(function ($subQuery) use ($currentUser) {
-                        $subQuery->where('user_id', $currentUser->id)
-                            ->orWhereHas('user.followers', function ($followersQuery) use ($currentUser) {
-                                $followersQuery->where('follower_id', $currentUser->id);
-                            });
-                    });
-                }
-            });
+        $postsQuery = postBaseQuery($currentUser);
 
         switch ($sort) {
             case 'likes':
@@ -109,131 +89,184 @@ class PostController extends Controller
         }
 
 
-        $posts = $postsQuery->get()->map(function ($post) use ($currentUser) {
-            return [
-                'id' => $post->id,
-                'content' => $post->content,
-                'created_at' => $post->created_at->format('n/j/Y'),
-                'user' => [
-                    'id' => $post->user->id,
-                    'name' => $post->user->name,
-                    'username' => $post->user->username,
-                    'profile_image' => $post->user->profileImage,
-                    'is_verified' => $post->user->is_verified,
-                ],
-                'hashtags' => $post->hashtags->map(fn ($tag) => [
-                    'id' => $tag->id,
-                    'hashtag' => $tag->hashtag,
-                ]),
-                'media' => $post->media->map(fn ($media) => [
-                    'file_path' => $media->file_path,
-                    'file_type' => $media->file_type,
-                    'disk' => $media->disk,
-                    'url' => $media->url,
-                ]),
-                'is_private' => $post->is_private,
-                'likes_count' => $post->likes->count(),
-                'is_liked' => $currentUser ? $post->likes->contains('user_id', $currentUser->id) : false,
-                'favorites_count' => $post->favorites->count(),
-                'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
-                'comments_count' => $post->comments->count(),
-                'reposts_count' => $post->repostedByUsers->count(),
-                'is_reposted' => $currentUser ? $post->repostedByUsers->contains('id', $currentUser->id) : false,
-                'reposted_by_you' => $currentUser && $post->repostedByUsers->contains('id', $currentUser->id),
-                'reposted_by_user' => $post->repostedByUsers
-                    ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
-                'reposted_by_recent' => $post->repostedByUsers()
-                    ->where('user_id', '!=', $post->user_id)
-                    ->where('user_id', '!=', $currentUser->id)
-                    ->with(['followers', 'following'])
-                    ->get()
-                    ->sortByDesc(function ($user) use ($currentUser) {
-                        $isFollowed = $user->followers->contains('id', $currentUser->id);
-                        $isFollowing = $user->following->contains('id', $currentUser->id);
-                        return $isFollowed || $isFollowing ? 1 : 0;
-                    })
-                    ->values()
-                    ->take(3)
-                    ->map(function ($user) {
-                        return [
-                            'id' => $user->id,
-                            'name' => $user->name,
-                            'username' => $user->username,
-                            'profile_image' => $user->profileImage,
-                            'is_verified' => $user->is_verified,
-                        ];
-                    })
-                    ->values()
-                    ->toArray(),
-                'current_user' => [
-                    'id' => $currentUser->id,
-                    'username' => $currentUser->username,
-                    'profile_image' => $currentUser->profileImage,
-                    'name' => $currentUser->name,
-                    'is_verified' => $currentUser->is_verified,
-                ],
-            ];
-        });
+        $posts = $postsQuery->paginate(15)->through(fn($post) => formatPostForFrontend($post, $currentUser));
+
+        $quotePost = null;
+        if ($quoteSlug = $request->query('quote')) {
+            $quotePostModel = Post::with(['user.profileImage', 'media'])->where('slug', $quoteSlug)->first();
+            if ($quotePostModel) {
+                $quotePost = [
+                    'id' => $quotePostModel->id,
+                    'slug' => $quotePostModel->slug,
+                    'content' => $quotePostModel->content,
+                    'created_at' => $quotePostModel->created_at->format('n/j/Y'),
+                    'user' => [
+                        'id' => $quotePostModel->user->id,
+                        'name' => $quotePostModel->user->name,
+                        'username' => $quotePostModel->user->username,
+                        'profile_image' => $quotePostModel->user->profileImage,
+                        'is_verified' => $quotePostModel->user->is_verified,
+                    ],
+                ];
+            }
+        }
+
+        $replyPost = null;
+        if ($replySlug = $request->query('reply')) {
+            $replyPostModel = Post::with(['user.profileImage', 'media'])->where('slug', $replySlug)->first();
+            if ($replyPostModel) {
+                $replyPost = [
+                    'id' => $replyPostModel->id,
+                    'slug' => $replyPostModel->slug,
+                    'content' => mb_substr($replyPostModel->content, 0, 120),
+                    'created_at' => $replyPostModel->created_at->format('n/j/Y'),
+                    'user' => [
+                        'id' => $replyPostModel->user->id,
+                        'name' => $replyPostModel->user->name,
+                        'username' => $replyPostModel->user->username,
+                        'profile_image' => $replyPostModel->user->profileImage,
+                        'is_verified' => $replyPostModel->user->is_verified,
+                    ],
+                ];
+            }
+        }
 
         return Inertia::render('dashboard', [
             'posts' => $posts,
             'sort' => $sort,
+            'quote_post' => $quotePost,
+            'reply_post' => $replyPost,
         ]);
     }
 
 
-    public function store(StorePostRequest $request)
+    public function store(StorePostRequest $request): RedirectResponse
     {
         $validated = $request->validated();
 
-        $post = Post::create([
-            'user_id' => Auth::id(),
-            'content' => $validated['content'],
-            'parent_post_id' => $validated['parent_post_id'] ?? null,
-            'is_private' => $validated['is_private'] ?? false,
-        ]);
-
-        $mediaUrls = [];
-
-        if ($request->hasFile('media')) {
-            $disk = config('filesystems.default');
-
-            foreach ($request->file('media') as $file) {
-                $path = $file->store('uploads/posts', $disk);
-
-                $media = new Media([
-                    'file_path' => $path,
-                    'file_type' => str_starts_with($file->getMimeType(), 'video') ? 'video' : 'image',
-                    'disk' => $disk,
-                    'mediable_id' => $post->id,
-                    'mediable_type' => Post::class,
-                ]);
-
-                $media->save();
-                $mediaUrls[] = $media->url;
+        // Ensure the user can view the quoted post
+        if (!empty($validated['quote_post_id'])) {
+            $quotedPost = Post::findOrFail($validated['quote_post_id']);
+            if (Gate::denies('view', $quotedPost)) {
+                abort(403, 'You cannot quote this post.');
             }
         }
 
-        $hashtags = $validated['hashtags'] ?? [];
-        $hashtagIds = [];
-
-        foreach ($hashtags as $tag) {
-            $cleanTag = ltrim($tag, '#');
-            $hashtag = \App\Models\Hashtag::firstOrCreate([
-                'hashtag' => strtolower($cleanTag)
+        $mediaUrls = DB::transaction(function () use ($request, $validated) {
+            $post = Post::create([
+                'user_id' => Auth::id(),
+                'content' => $validated['content'],
+                'parent_post_id' => $validated['parent_post_id'] ?? null,
+                'quote_post_id' => $validated['quote_post_id'] ?? null,
+                'is_private' => $validated['is_private'] ?? false,
             ]);
 
-            $hashtagIds[] = $hashtag->id;
+            $mediaUrls = [];
+
+            if ($request->hasFile('media')) {
+                $disk = config('filesystems.default');
+
+                foreach ($request->file('media') as $file) {
+                    $path = $file->store('uploads/posts', $disk);
+
+                    $media = new Media([
+                        'file_path' => $path,
+                        'file_type' => str_starts_with($file->getMimeType(), 'video') ? 'video' : 'image',
+                        'disk' => $disk,
+                        'mediable_id' => $post->id,
+                        'mediable_type' => Post::class,
+                    ]);
+
+                    $media->save();
+                    $mediaUrls[] = $media->url;
+                }
+            }
+
+            $hashtags = $validated['hashtags'] ?? [];
+            $hashtagIds = [];
+
+            foreach ($hashtags as $tag) {
+                $cleanTag = ltrim($tag, '#');
+                $hashtag = \App\Models\Hashtag::firstOrCreate([
+                    'hashtag' => strtolower($cleanTag)
+                ]);
+
+                $hashtagIds[] = $hashtag->id;
+            }
+
+            $post->hashtags()->sync($hashtagIds);
+
+            if (!empty($validated['poll_options'])) {
+                $expiresAt = !empty($validated['poll_expires_in'])
+                    ? now()->addMinutes($validated['poll_expires_in'])
+                    : null;
+
+                $poll = $post->poll()->create(['expires_at' => $expiresAt]);
+
+                foreach ($validated['poll_options'] as $optionText) {
+                    if (trim($optionText) !== '') {
+                        $poll->options()->create(['text' => trim($optionText)]);
+                    }
+                }
+            }
+
+            return ['mediaUrls' => $mediaUrls, 'post' => $post];
+        });
+
+        if (!empty($validated['content'])) {
+            notifyMentionedUsers($validated['content'], Auth::id(), $mediaUrls['post']->id);
         }
 
-        $post->hashtags()->sync($hashtagIds);
+        $createdPost = $mediaUrls['post'];
 
-        return redirect()->route('dashboard')->with('success', 'Post created successfully!')->with('mediaUrls', $mediaUrls);;
+        // Notify parent post author when someone replies
+        if (!empty($validated['parent_post_id'])) {
+            $parentPost = Post::find($validated['parent_post_id']);
+            if ($parentPost && $parentPost->user_id !== Auth::id()) {
+                NotificationService::create([
+                    'user_id' => $parentPost->user_id,
+                    'source_user_id' => Auth::id(),
+                    'type' => 'reply',
+                    'post_id' => $createdPost->id,
+                    'extra_data' => \Illuminate\Support\Str::limit($validated['content'], 120),
+                ]);
+            }
+        }
+
+        // Notify quoted post author when someone quotes their post
+        if (!empty($validated['quote_post_id'])) {
+            $quotedPost = Post::find($validated['quote_post_id']);
+            if ($quotedPost && $quotedPost->user_id !== Auth::id()) {
+                NotificationService::create([
+                    'user_id' => $quotedPost->user_id,
+                    'source_user_id' => Auth::id(),
+                    'type' => 'quote',
+                    'post_id' => $createdPost->id,
+                    'extra_data' => \Illuminate\Support\Str::limit($validated['content'], 120),
+                ]);
+            }
+        }
+
+        // Broadcast new post to followers' feeds
+        $post = $mediaUrls['post'];
+        $post->load(Post::STANDARD_EAGER_LOADS);
+        $currentUser = Auth::user();
+        $formattedPost = formatPostForFrontend($post, null);
+
+        $followerIds = $currentUser->followers()->pluck('users.id')->toArray();
+        // Include the author so their other tabs/devices also see it
+        $followerIds[] = $currentUser->id;
+
+        if (!empty($followerIds)) {
+            broadcast(new PostCreated($formattedPost, $followerIds))->toOthers();
+        }
+
+        return redirect()->route('dashboard')->with('success', 'Post created successfully!')->with('mediaUrls', $mediaUrls['mediaUrls']);
     }
 
 
 
-    public function show(Post $post, Request $request)
+    public function show(Post $post, Request $request): Response
     {
         $currentUser = Auth::user();
 
@@ -243,22 +276,20 @@ class PostController extends Controller
 
         $sort = $request->query('sort', 'latest');
 
-        $post->load([
-            'user.profileImage',
+        $post->load(array_merge(Post::STANDARD_EAGER_LOADS, [
             'comments.user.profileImage',
-            'likes',
-            'media',
-            'hashtags'
-        ]);
+            'parentPost.user.profileImage',
+        ]));
 
-        $hashtags = $post->hashtags->map(function ($hashtag) {
-            return [
-                'id' => $hashtag->id,
-                'hashtag' => $hashtag->hashtag,
-            ];
-        });
+        $threadChain = [];
+        $parent = $post->parentPost;
+        while ($parent) {
+            $parent->load(Post::STANDARD_EAGER_LOADS);
+            array_unshift($threadChain, formatPostForFrontend($parent, $currentUser));
+            $parent = $parent->parentPost;
+        }
 
-        $commentsQuery = $post->comments()->with('user.profileImage');
+        $commentsQuery = $post->comments()->with(['user.profileImage', 'parentComment.user']);
 
         switch ($sort) {
             case 'likes':
@@ -280,6 +311,16 @@ class PostController extends Controller
                 'id' => $comment->id,
                 'content' => $comment->content,
                 'created_at' => $comment->created_at->diffForHumans(),
+                'raw_created_at' => $comment->created_at->toISOString(),
+                'parent_comment_id' => $comment->parent_comment_id,
+                'parent_comment' => $comment->parentComment ? [
+                    'id' => $comment->parentComment->id,
+                    'user' => [
+                        'id' => $comment->parentComment->user->id,
+                        'username' => $comment->parentComment->user->username,
+                    ],
+                ] : null,
+                'reply_to_username' => $comment->parent_comment_id && preg_match('/^@(\S+)/', $comment->content, $m) ? $m[1] : null,
                 'user' => [
                     'id' => $comment->user->id,
                     'name' => $comment->user->name,
@@ -297,238 +338,41 @@ class PostController extends Controller
             ];
         });
 
+        $postData = formatPostForFrontend($post, $currentUser);
+        $postData['comments'] = $comments;
+        $postData['comments_count'] = $comments->count();
+
         return Inertia::render('post/show-post', [
-            'post' => [
-                'id' => $post->id,
-                'content' => $post->content,
-                'media' => $post->media->map(fn ($media) => [
-                    'file_path' => $media->file_path,
-                    'file_type' => $media->file_type,
-                    'disk' => $media->disk,
-                    'url' => $media->url,
-                ]),
-                'created_at' => $post->created_at->format('n/j/Y'),
-                'user' => [
-                    'id' => $post->user->id,
-                    'name' => $post->user->name,
-                    'username' => $post->user->username,
-                    'profile_image' => $post->user->profileImage,
-                    'is_verified' => $post->user->is_verified,
-                ],
-                'is_private' => $post->is_private,
-                'likes_count' => $post->likes->count(),
-                'is_liked' => $currentUser ? $post->likes->contains('user_id', auth()->id()) : false,
-                'favorites_count' => $post->favorites->count(),
-                'is_favorited' => $currentUser ? $post->favorites->contains('user_id', $currentUser->id) : false,
-                'comments_count' => $comments->count(),
-                'comments' => $comments,
-                'hashtags' => $hashtags,
-                'is_reposted' => $currentUser ? $post->repostedByUsers->contains('id', $currentUser->id) : false,
-                'reposts_count' => $post->repostedByUsers->count(),
-                'reposted_by_you' => $currentUser && $post->repostedByUsers->contains('id', $currentUser->id),
-                'reposted_by_user' => $post->repostedByUsers
-                    ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
-                'reposted_by_recent' => $post->repostedByUsers()
-                    ->where('user_id', '!=', $post->user_id)
-                    ->where('user_id', '!=', $currentUser->id)
-                    ->with(['followers', 'following'])
-                    ->get()
-                    ->sortByDesc(function ($user) use ($currentUser) {
-                        $isFollowed = $user->followers->contains('id', $currentUser->id);
-                        $isFollowing = $user->following->contains('id', $currentUser->id);
-                        return $isFollowed || $isFollowing ? 1 : 0;
-                    })
-                    ->values()
-                    ->take(3)
-                    ->map(function ($user) {
-                        return [
-                            'id' => $user->id,
-                            'name' => $user->name,
-                            'username' => $user->username,
-                            'profile_image' => $user->profileImage,
-                            'is_verified' => $user->is_verified,
-                        ];
-                    })
-                    ->values()
-                    ->toArray(),
-                'current_user' => [
-                    'id' => $currentUser->id,
-                    'username' => $currentUser->username,
-                    'profile_image' => $currentUser->profileImage,
-                    'name' => $currentUser->name,
-                    'is_verified' => $currentUser->is_verified,
-                ],
-            ],
-            'sort' => $sort
+            'post' => $postData,
+            'sort' => $sort,
+            'thread_chain' => $threadChain,
         ]);
     }
 
-    public function destroy($postId)
+    public function destroy(Post $post): RedirectResponse
     {
         $currentUser = Auth::user();
-        $post = Post::with(['media', 'likes', 'comments'])->findOrFail($postId);
+        $post->load(['media', 'likes', 'comments']);
         if ($currentUser->id !== $post->user_id) {
             abort(403, 'Unauthorized');
         }
 
-        foreach ($post->media as $media) {
-            if (Storage::exists($media->file_path)) {
-                Storage::delete($media->file_path);
+        DB::transaction(function () use ($post) {
+            foreach ($post->media as $media) {
+                $disk = $media->disk ?? config('filesystems.default');
+                if (Storage::disk($disk)->exists($media->file_path)) {
+                    Storage::disk($disk)->delete($media->file_path);
+                }
             }
-            $media->delete();
-        }
 
-        $post->likes()->delete();
-        $post->comments()->delete();
-        $post->hashtags()->detach();
-        $post->media()->delete();
-        $post->delete();
-
-        return redirect()->route('dashboard')->with('success', 'Post updated successfully.');
-    }
-
-
-    public function popularHashtags(Request $request)
-    {
-        $hashtags = Hashtag::withCount('posts')
-            ->orderByDesc('posts_count')
-            ->take(5)
-            ->get();
-
-        return $hashtags->map(function ($hashtag) {
-            return [
-                'id' => $hashtag->id,
-                'hashtag' => $hashtag->hashtag,
-                'uses_count' => $hashtag->posts_count,
-            ];
+            $post->likes()->delete();
+            $post->comments()->delete();
+            $post->hashtags()->detach();
+            $post->media()->delete();
+            $post->delete();
         });
-    }
 
-    public function postsByHashtag(string $hashtag): Response
-    {
-        $currentUser = Auth::user();
-
-        if (!$currentUser) {
-            abort(403, 'Unauthorized');
-        }
-
-        $hashtagModel = Hashtag::where('hashtag', $hashtag)
-            ->withCount('posts')
-            ->firstOrFail();
-
-        $posts = Post::whereHas('hashtags', function ($query) use ($hashtag) {
-            $query->where('hashtag', $hashtag);
-        })
-            ->with(['user.profileImage', 'comments', 'likes', 'media', 'hashtags', 'favorites'])
-            ->latest()
-            ->get()
-            ->map(function ($post) use ($currentUser) {
-                return [
-                    'id' => $post->id,
-                    'content' => $post->content,
-                    'created_at' => $post->created_at->format('n/j/Y'),
-                    'user' => [
-                        'id' => $post->user->id,
-                        'name' => $post->user->name,
-                        'username' => $post->user->username,
-                        'profile_image' => $post->user->profileImage,
-                        'is_verified' => $post->user->is_verified,
-                    ],
-                    'media' => $post->media->map(fn ($media) => [
-                        'file_path' => $media->file_path,
-                        'file_type' => $media->file_type,
-                        'disk' => $media->disk,
-                        'url' => $media->url,
-                    ]),
-                    'hashtags' => $post->hashtags->map(fn ($tag) => [
-                        'id' => $tag->id,
-                        'hashtag' => $tag->hashtag,
-                        'uses_count' => $tag->posts()->count(),
-                    ]),
-                    'is_private' => $post->is_private,
-                    'likes_count' => $post->likes->count(),
-                    'is_liked' => $post->likes->contains('user_id', $currentUser->id),
-                    'favorites_count' => $post->favorites->count(),
-                    'is_favorited' => $post->favorites->contains('user_id', $currentUser->id),
-                    'comments_count' => $post->comments->count(),
-                    'is_reposted' => $currentUser ? $post->repostedByUsers->contains('id', $currentUser->id) : false,
-                    'reposts_count' => $post->repostedByUsers->count(),
-                    'reposted_by_you' => $currentUser && $post->repostedByUsers->contains('id', $currentUser->id),
-                    'reposted_by_user' => $post->repostedByUsers
-                        ->firstWhere('id', '!=', $post->user_id && $post->user_id != $currentUser?->id),
-                    'reposted_by_recent' => $post->repostedByUsers()
-                        ->where('user_id', '!=', $post->user_id)
-                        ->where('user_id', '!=', $currentUser->id)
-                        ->with(['followers', 'following'])
-                        ->get()
-                        ->sortByDesc(function ($user) use ($currentUser) {
-                            $isFollowed = $user->followers->contains('id', $currentUser->id);
-                            $isFollowing = $user->following->contains('id', $currentUser->id);
-                            return $isFollowed || $isFollowing ? 1 : 0;
-                        })
-                        ->values()
-                        ->take(3)
-                        ->map(function ($user) {
-                            return [
-                                'id' => $user->id,
-                                'name' => $user->name,
-                                'username' => $user->username,
-                                'profile_image' => $user->profileImage,
-                                'is_verified' => $user->is_verified,
-                            ];
-                        })
-                        ->values()
-                        ->toArray(),
-                    'current_user' => [
-                        'id' => $currentUser->id,
-                        'username' => $currentUser->username,
-                        'profile_image' => $currentUser->profileImage,
-                        'name' => $currentUser->name,
-                        'is_verified' => $currentUser->is_verified,
-                    ],
-                ];
-            });
-
-        return Inertia::render('post/posts-by-hashtag', [
-            'user' => $currentUser,
-            'posts' => $posts,
-            'hashtag' => [
-                'id' => $hashtagModel->id,
-                'hashtag' => $hashtagModel->hashtag,
-                'uses_count' => $hashtagModel->posts_count,
-            ],
-        ]);
-    }
-
-    public function showPopularHashtags(Request $request)
-    {
-        $sort = $request->query('sort', 'likes');
-
-        $hashtags = Hashtag::withCount('posts')
-            ->with(['posts' => function ($query) {
-                $query->withCount('likes');
-            }])
-            ->get()
-            ->map(function ($hashtag) {
-                $totalLikes = $hashtag->posts->sum('likes_count');
-
-                return [
-                    'id' => $hashtag->id,
-                    'hashtag' => $hashtag->hashtag,
-                    'posts_count' => $hashtag->posts_count,
-                    'total_likes' => $totalLikes,
-                ];
-            });
-        if ($sort === 'posts') {
-            $hashtags = $hashtags->sortByDesc('posts_count')->values();
-        } else {
-            $hashtags = $hashtags->sortByDesc('total_likes')->values();
-        }
-
-        return Inertia::render('post/popular-hashtags', [
-            'hashtags' => $hashtags,
-            'sort' => $sort,
-        ]);
+        return redirect()->route('dashboard')->with('success', 'Post deleted successfully.');
     }
 
 
@@ -537,9 +381,12 @@ class PostController extends Controller
     {
         $this->authorize('update', $post);
 
+        $post->load(['poll.options', 'poll.votes']);
+
         return Inertia::render('post/edit-post', [
             'post' => [
                 'id' => $post->id,
+                'slug' => $post->slug,
                 'content' => $post->content,
                 'is_private' => $post->is_private,
                 'media' => $post->media->map(fn ($media) => [
@@ -553,68 +400,100 @@ class PostController extends Controller
                     'hashtag' => $tag->hashtag,
                 ]),
                 'parent_post_id' => $post->parent_post_id,
+                'poll' => $post->poll ? [
+                    'id' => $post->poll->id,
+                    'expires_at' => $post->poll->expires_at?->toISOString(),
+                    'is_expired' => $post->poll->isExpired(),
+                    'total_votes' => $post->poll->votes->count(),
+                    'options' => $post->poll->options->map(fn($option) => [
+                        'id' => $option->id,
+                        'text' => $option->text,
+                        'votes_count' => $post->poll->votes->where('poll_option_id', $option->id)->count(),
+                    ])->toArray(),
+                ] : null,
             ],
         ]);
     }
 
 
-    public function update(UpdatePostRequest $request, Post $post)
+    public function update(UpdatePostRequest $request, Post $post): RedirectResponse
     {
         $this->authorize('update', $post);
 
         $validated = $request->validated();
 
-        $post->update([
-            'content' => $validated['content'] ?? '',
-            'is_private' => $validated['is_private'] ?? false,
-        ]);
-
-        $removePaths = $validated['remove_media'] ?? [];
-
-        if (!empty($removePaths)) {
-            $mediaToRemove = $post->media()->whereIn('file_path', (array) $removePaths)->get();
-
-            foreach ($mediaToRemove as $media) {
-                $disk = $media->disk ?? config('filesystems.default');
-
-                if (Storage::disk($disk)->exists($media->file_path)) {
-                    Storage::disk($disk)->delete($media->file_path);
-                }
-
-                $media->delete();
-            }
-        }
-
-        if ($request->hasFile('media')) {
-            $disk = config('filesystems.default');
-            $files = $request->file('media');
-
-            foreach ($files as $file) {
-                $path = $file->store('uploads/posts', $disk);
-
-                $post->media()->create([
-                    'file_path' => $path,
-                    'file_type' => str_starts_with($file->getMimeType(), 'video') ? 'video' : 'image',
-                    'disk' => $disk,
-                ]);
-            }
-        }
-
-        $hashtags = $validated['hashtags'] ?? [];
-        $hashtagIds = [];
-
-        foreach ($hashtags as $tag) {
-            $cleanTag = ltrim($tag, '#');
-            $hashtag = \App\Models\Hashtag::firstOrCreate([
-                'hashtag' => strtolower($cleanTag)
+        DB::transaction(function () use ($request, $validated, $post) {
+            $post->update([
+                'content' => $validated['content'] ?? '',
+                'is_private' => $validated['is_private'] ?? false,
             ]);
-            $hashtagIds[] = $hashtag->id;
-        }
 
-        $post->hashtags()->sync($hashtagIds);
+            $removePaths = $validated['remove_media'] ?? [];
 
-        return to_route('post.show', $post->id)->with('success', 'Post updated successfully.');
+            if (!empty($removePaths)) {
+                $mediaToRemove = $post->media()->whereIn('file_path', (array) $removePaths)->get();
+
+                foreach ($mediaToRemove as $media) {
+                    $disk = $media->disk ?? config('filesystems.default');
+
+                    if (Storage::disk($disk)->exists($media->file_path)) {
+                        Storage::disk($disk)->delete($media->file_path);
+                    }
+
+                    $media->delete();
+                }
+            }
+
+            if ($request->hasFile('media')) {
+                $disk = config('filesystems.default');
+                $files = $request->file('media');
+
+                foreach ($files as $file) {
+                    $path = $file->store('uploads/posts', $disk);
+
+                    $post->media()->create([
+                        'file_path' => $path,
+                        'file_type' => str_starts_with($file->getMimeType(), 'video') ? 'video' : 'image',
+                        'disk' => $disk,
+                    ]);
+                }
+            }
+
+            $hashtags = $validated['hashtags'] ?? [];
+            $hashtagIds = [];
+
+            foreach ($hashtags as $tag) {
+                $cleanTag = ltrim($tag, '#');
+                $hashtag = \App\Models\Hashtag::firstOrCreate([
+                    'hashtag' => strtolower($cleanTag)
+                ]);
+                $hashtagIds[] = $hashtag->id;
+            }
+
+            $post->hashtags()->sync($hashtagIds);
+
+            if (!empty($validated['remove_poll']) && $post->poll) {
+                $post->poll->delete();
+            }
+        });
+
+        return to_route('post.show', $post->slug)->with('success', 'Post updated successfully.');
     }
 
+    public function togglePin(Post $post): RedirectResponse
+    {
+        $user = Auth::user();
 
+        if ($post->user_id !== $user->id) {
+            abort(403);
+        }
+
+        if ($user->pinned_post_id === $post->id) {
+            $user->update(['pinned_post_id' => null]);
+        } else {
+            $user->update(['pinned_post_id' => $post->id]);
+        }
+
+        return redirect()->back();
+    }
 }

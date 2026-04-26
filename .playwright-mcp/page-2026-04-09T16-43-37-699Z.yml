@@ -1,0 +1,334 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - link "Spark logo Spark" [ref=e7] [cursor=pointer]:
+          - /url: /dashboard
+          - generic [ref=e8]:
+            - img "Spark logo" [ref=e9]
+            - generic [ref=e11]: Spark
+        - button [ref=e12] [cursor=pointer]:
+          - img [ref=e13]
+      - navigation "Main" [ref=e24]:
+        - list [ref=e26]:
+          - listitem [ref=e27]:
+            - link "News" [ref=e28] [cursor=pointer]:
+              - /url: /dashboard
+          - listitem [ref=e29]:
+            - link "Following" [ref=e30] [cursor=pointer]:
+              - /url: /user/following-posts
+          - listitem [ref=e31]:
+            - link "Liked" [ref=e32] [cursor=pointer]:
+              - /url: /user/liked
+      - generic [ref=e35]:
+        - button "Search" [ref=e36] [cursor=pointer]:
+          - img [ref=e37]
+        - textbox "Search... (Ctrl+K)" [ref=e40]:
+          - /placeholder: Search...  (Ctrl+K)
+    - generic [ref=e41]:
+      - generic [ref=e42]:
+        - list [ref=e44]:
+          - listitem [ref=e45]:
+            - link "P @paragon Paragon" [ref=e46] [cursor=pointer]:
+              - /url: /user
+              - generic [ref=e47]:
+                - generic [ref=e49]: P
+                - generic [ref=e50]:
+                  - generic [ref=e52]: "@paragon"
+                  - generic [ref=e53]: Paragon
+        - list [ref=e56]:
+          - listitem [ref=e57]:
+            - link "Dashboard" [ref=e58] [cursor=pointer]:
+              - /url: /dashboard
+              - img [ref=e59]
+              - generic [ref=e62]: Dashboard
+          - listitem [ref=e63]:
+            - link "Everyone chat" [ref=e64] [cursor=pointer]:
+              - /url: /chat/everyone
+              - img [ref=e65]
+              - generic [ref=e68]: Everyone chat
+          - listitem [ref=e69]:
+            - link "User chats 1" [ref=e70] [cursor=pointer]:
+              - /url: /chat/user-chats
+              - img [ref=e71]
+              - generic [ref=e74]: User chats
+              - generic [ref=e75]: "1"
+          - listitem [ref=e76]:
+            - link "Friends" [ref=e77] [cursor=pointer]:
+              - /url: /user/friends
+              - img [ref=e78]
+              - generic [ref=e83]: Friends
+          - listitem [ref=e84]:
+            - link "Notifications 6" [ref=e85] [cursor=pointer]:
+              - /url: /user/notifications
+              - img [ref=e86]
+              - generic [ref=e89]: Notifications
+              - generic [ref=e90]: "6"
+          - listitem [ref=e91]:
+            - link "Favorites" [ref=e92] [cursor=pointer]:
+              - /url: /user/favorites
+              - img [ref=e93]
+              - generic [ref=e95]: Favorites
+          - listitem [ref=e96]:
+            - link "Reposts" [ref=e97] [cursor=pointer]:
+              - /url: /user/reposts
+              - img [ref=e98]
+              - generic [ref=e103]: Reposts
+          - listitem [ref=e104]:
+            - link "Popular hashtags" [ref=e106] [cursor=pointer]:
+              - /url: /show-popular-hashtags
+              - img [ref=e107]
+              - generic [ref=e112]: Popular hashtags
+          - listitem [ref=e113]:
+            - link "Profile" [ref=e114] [cursor=pointer]:
+              - /url: /user/paragon
+              - img [ref=e115]
+              - generic [ref=e118]: Profile
+          - listitem [ref=e119]:
+            - link "Settings" [ref=e120] [cursor=pointer]:
+              - /url: /settings/profile
+              - img [ref=e121]
+              - generic [ref=e124]: Settings
+        - generic [ref=e125]:
+          - link "Repository" [ref=e126] [cursor=pointer]:
+            - /url: https://gitlab.com/shapovalovtimur16/Spark
+            - button "Repository" [ref=e127]:
+              - img [ref=e128]
+              - text: Repository
+          - button "Log out" [ref=e130] [cursor=pointer]:
+            - img [ref=e131]
+            - text: Log out
+      - main [ref=e135]:
+        - generic [ref=e137]:
+          - generic [ref=e138]:
+            - heading "Popular hashtags" [level=1] [ref=e139]
+            - paragraph [ref=e140]: Explore trending topics by post engagement.
+          - generic [ref=e141]:
+            - combobox [ref=e142] [cursor=pointer]:
+              - option "Most Liked" [selected]
+              - option "Most Posts"
+            - button [ref=e143] [cursor=pointer]:
+              - img [ref=e144]
+        - generic [ref=e149]:
+          - link "#webdev 6 Posts 59 Likes" [ref=e150] [cursor=pointer]:
+            - /url: /posts-by-hashtag/webdev
+            - generic [ref=e151]:
+              - img [ref=e153]
+              - heading "#webdev" [level=2] [ref=e158]
+            - generic [ref=e159]:
+              - generic [ref=e160]: 6 Posts
+              - generic [ref=e161]: 59 Likes
+          - link "#tech 4 Posts 45 Likes" [ref=e162] [cursor=pointer]:
+            - /url: /posts-by-hashtag/tech
+            - generic [ref=e163]:
+              - img [ref=e165]
+              - heading "#tech" [level=2] [ref=e170]
+            - generic [ref=e171]:
+              - generic [ref=e172]: 4 Posts
+              - generic [ref=e173]: 45 Likes
+          - link "#devops 4 Posts 43 Likes" [ref=e174] [cursor=pointer]:
+            - /url: /posts-by-hashtag/devops
+            - generic [ref=e175]:
+              - img [ref=e177]
+              - heading "#devops" [level=2] [ref=e182]
+            - generic [ref=e183]:
+              - generic [ref=e184]: 4 Posts
+              - generic [ref=e185]: 43 Likes
+          - link "#gaming 4 Posts 43 Likes" [ref=e186] [cursor=pointer]:
+            - /url: /posts-by-hashtag/gaming
+            - generic [ref=e187]:
+              - img [ref=e189]
+              - heading "#gaming" [level=2] [ref=e194]
+            - generic [ref=e195]:
+              - generic [ref=e196]: 4 Posts
+              - generic [ref=e197]: 43 Likes
+          - link "#rust 4 Posts 41 Likes" [ref=e198] [cursor=pointer]:
+            - /url: /posts-by-hashtag/rust
+            - generic [ref=e199]:
+              - img [ref=e201]
+              - heading "#rust" [level=2] [ref=e206]
+            - generic [ref=e207]:
+              - generic [ref=e208]: 4 Posts
+              - generic [ref=e209]: 41 Likes
+          - link "#opensource 5 Posts 40 Likes" [ref=e210] [cursor=pointer]:
+            - /url: /posts-by-hashtag/opensource
+            - generic [ref=e211]:
+              - img [ref=e213]
+              - heading "#opensource" [level=2] [ref=e218]
+            - generic [ref=e219]:
+              - generic [ref=e220]: 5 Posts
+              - generic [ref=e221]: 40 Likes
+          - link "#linux 4 Posts 40 Likes" [ref=e222] [cursor=pointer]:
+            - /url: /posts-by-hashtag/linux
+            - generic [ref=e223]:
+              - img [ref=e225]
+              - heading "#linux" [level=2] [ref=e230]
+            - generic [ref=e231]:
+              - generic [ref=e232]: 4 Posts
+              - generic [ref=e233]: 40 Likes
+          - link "#coding 4 Posts 38 Likes" [ref=e234] [cursor=pointer]:
+            - /url: /posts-by-hashtag/coding
+            - generic [ref=e235]:
+              - img [ref=e237]
+              - heading "#coding" [level=2] [ref=e242]
+            - generic [ref=e243]:
+              - generic [ref=e244]: 4 Posts
+              - generic [ref=e245]: 38 Likes
+          - link "#laravel 5 Posts 37 Likes" [ref=e246] [cursor=pointer]:
+            - /url: /posts-by-hashtag/laravel
+            - generic [ref=e247]:
+              - img [ref=e249]
+              - heading "#laravel" [level=2] [ref=e254]
+            - generic [ref=e255]:
+              - generic [ref=e256]: 5 Posts
+              - generic [ref=e257]: 37 Likes
+          - link "#ai 4 Posts 36 Likes" [ref=e258] [cursor=pointer]:
+            - /url: /posts-by-hashtag/ai
+            - generic [ref=e259]:
+              - img [ref=e261]
+              - heading "#ai" [level=2] [ref=e266]
+            - generic [ref=e267]:
+              - generic [ref=e268]: 4 Posts
+              - generic [ref=e269]: 36 Likes
+          - link "#css 3 Posts 35 Likes" [ref=e270] [cursor=pointer]:
+            - /url: /posts-by-hashtag/css
+            - generic [ref=e271]:
+              - img [ref=e273]
+              - heading "#css" [level=2] [ref=e278]
+            - generic [ref=e279]:
+              - generic [ref=e280]: 3 Posts
+              - generic [ref=e281]: 35 Likes
+          - link "#python 3 Posts 35 Likes" [ref=e282] [cursor=pointer]:
+            - /url: /posts-by-hashtag/python
+            - generic [ref=e283]:
+              - img [ref=e285]
+              - heading "#python" [level=2] [ref=e290]
+            - generic [ref=e291]:
+              - generic [ref=e292]: 3 Posts
+              - generic [ref=e293]: 35 Likes
+          - link "#docker 3 Posts 28 Likes" [ref=e294] [cursor=pointer]:
+            - /url: /posts-by-hashtag/docker
+            - generic [ref=e295]:
+              - img [ref=e297]
+              - heading "#docker" [level=2] [ref=e302]
+            - generic [ref=e303]:
+              - generic [ref=e304]: 3 Posts
+              - generic [ref=e305]: 28 Likes
+          - link "#php 4 Posts 27 Likes" [ref=e306] [cursor=pointer]:
+            - /url: /posts-by-hashtag/php
+            - generic [ref=e307]:
+              - img [ref=e309]
+              - heading "#php" [level=2] [ref=e314]
+            - generic [ref=e315]:
+              - generic [ref=e316]: 4 Posts
+              - generic [ref=e317]: 27 Likes
+          - link "#startup 3 Posts 27 Likes" [ref=e318] [cursor=pointer]:
+            - /url: /posts-by-hashtag/startup
+            - generic [ref=e319]:
+              - img [ref=e321]
+              - heading "#startup" [level=2] [ref=e326]
+            - generic [ref=e327]:
+              - generic [ref=e328]: 3 Posts
+              - generic [ref=e329]: 27 Likes
+          - link "#react 2 Posts 25 Likes" [ref=e330] [cursor=pointer]:
+            - /url: /posts-by-hashtag/react
+            - generic [ref=e331]:
+              - img [ref=e333]
+              - heading "#react" [level=2] [ref=e338]
+            - generic [ref=e339]:
+              - generic [ref=e340]: 2 Posts
+              - generic [ref=e341]: 25 Likes
+          - link "#design 3 Posts 22 Likes" [ref=e342] [cursor=pointer]:
+            - /url: /posts-by-hashtag/design
+            - generic [ref=e343]:
+              - img [ref=e345]
+              - heading "#design" [level=2] [ref=e350]
+            - generic [ref=e351]:
+              - generic [ref=e352]: 3 Posts
+              - generic [ref=e353]: 22 Likes
+          - link "#typescript 3 Posts 22 Likes" [ref=e354] [cursor=pointer]:
+            - /url: /posts-by-hashtag/typescript
+            - generic [ref=e355]:
+              - img [ref=e357]
+              - heading "#typescript" [level=2] [ref=e362]
+            - generic [ref=e363]:
+              - generic [ref=e364]: 3 Posts
+              - generic [ref=e365]: 22 Likes
+          - link "#vim 1 Posts 8 Likes" [ref=e366] [cursor=pointer]:
+            - /url: /posts-by-hashtag/vim
+            - generic [ref=e367]:
+              - img [ref=e369]
+              - heading "#vim" [level=2] [ref=e374]
+            - generic [ref=e375]:
+              - generic [ref=e376]: 1 Posts
+              - generic [ref=e377]: 8 Likes
+          - link "#javascript 1 Posts 4 Likes" [ref=e378] [cursor=pointer]:
+            - /url: /posts-by-hashtag/javascript
+            - generic [ref=e379]:
+              - img [ref=e381]
+              - heading "#javascript" [level=2] [ref=e386]
+            - generic [ref=e387]:
+              - generic [ref=e388]: 1 Posts
+              - generic [ref=e389]: 4 Likes
+      - complementary [ref=e390]:
+        - generic [ref=e391]:
+          - generic [ref=e392]:
+            - generic [ref=e393]:
+              - img [ref=e394]
+              - text: Who to follow
+            - generic [ref=e399]:
+              - generic [ref=e400]:
+                - link "TT" [ref=e401] [cursor=pointer]:
+                  - /url: /user/qthiel
+                  - generic [ref=e403]: TT
+                - generic [ref=e404]:
+                  - link "Thurman Tillman" [ref=e405] [cursor=pointer]:
+                    - /url: /user/qthiel
+                    - generic [ref=e406]: Thurman Tillman
+                    - img [ref=e408]
+                  - paragraph [ref=e410]: "@qthiel"
+                - button "Follow" [ref=e411] [cursor=pointer]
+              - generic [ref=e412]:
+                - link "AB" [ref=e413] [cursor=pointer]:
+                  - /url: /user/erunte
+                  - generic [ref=e415]: AB
+                - generic [ref=e416]:
+                  - link "Antonietta Brakus" [ref=e417] [cursor=pointer]:
+                    - /url: /user/erunte
+                    - generic [ref=e418]: Antonietta Brakus
+                  - paragraph [ref=e419]: "@erunte"
+                - button "Follow" [ref=e420] [cursor=pointer]
+              - generic [ref=e421]:
+                - link "OR" [ref=e422] [cursor=pointer]:
+                  - /url: /user/oconner.amos
+                  - generic [ref=e424]: OR
+                - generic [ref=e425]:
+                  - link "Oran Rutherford" [ref=e426] [cursor=pointer]:
+                    - /url: /user/oconner.amos
+                    - generic [ref=e427]: Oran Rutherford
+                  - paragraph [ref=e428]: "@oconner.amos"
+                - button "Follow" [ref=e429] [cursor=pointer]
+              - generic [ref=e430]:
+                - link "ML" [ref=e431] [cursor=pointer]:
+                  - /url: /user/xabshire
+                  - generic [ref=e433]: ML
+                - generic [ref=e434]:
+                  - link "Mr. Harley Langosh" [ref=e435] [cursor=pointer]:
+                    - /url: /user/xabshire
+                    - generic [ref=e436]: Mr. Harley Langosh
+                  - paragraph [ref=e437]: "@xabshire"
+                - button "Follow" [ref=e438] [cursor=pointer]
+              - generic [ref=e439]:
+                - link "MV" [ref=e440] [cursor=pointer]:
+                  - /url: /user/adelle69
+                  - generic [ref=e442]: MV
+                - generic [ref=e443]:
+                  - link "Miss Ozella VonRueden" [ref=e444] [cursor=pointer]:
+                    - /url: /user/adelle69
+                    - generic [ref=e445]: Miss Ozella VonRueden
+                  - paragraph [ref=e446]: "@adelle69"
+                - button "Follow" [ref=e447] [cursor=pointer]
+            - link "Show more" [ref=e448] [cursor=pointer]:
+              - /url: /dashboard/users
+          - generic [ref=e450]: Spark © 2026
+  - region "Notifications alt+T"

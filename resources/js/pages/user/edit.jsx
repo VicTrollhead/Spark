@@ -117,10 +117,13 @@ export default function Edit() {
     return (
         <AppLayout>
             <Head title={translations['Edit My Profile']} />
-            <div className=" w-full max-w-7xl p-6">
-                <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">{translations['Edit Profile']}</h1>
+            <div className="border-b border-gray-200 p-6 dark:border-neutral-800">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{translations['Edit Profile']}</h1>
+            </div>
+
+            <div className="w-full max-w-7xl p-6">
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+                    <div className="rounded-xl border border-gray-100 p-4 dark:border-neutral-800">
                         <h2 className="mb-3 text-lg font-medium text-gray-900 dark:text-white">{translations['Profile Image']}</h2>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                             <div className="relative">
@@ -148,14 +151,15 @@ export default function Edit() {
                                     <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{profileImageStatus}</span>
                                 </div>
                                 <div className="flex flex-wrap items-center gap-2 w-full mt-3">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2">
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 min-w-0">
                                             <input
                                                 ref={profileInputRef}
                                                 type="file"
                                                 id="profile-image"
+                                                accept="image/jpeg,image/png,image/gif,image/webp"
                                                 onChange={handleProfileImageChange}
-                                                className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-200 hover:file:bg-gray-300 dark:file:bg-blue-700 dark:hover:file:bg-blue-800"
+                                                className="min-w-0 max-w-full truncate text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-200 hover:file:bg-gray-300 dark:file:bg-blue-700 dark:hover:file:bg-blue-800"
                                             />
                                             {data.profile_image && (
                                                 <button
@@ -202,15 +206,15 @@ export default function Edit() {
                         </div>
                     </div>
 
-                    <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+                    <div className="rounded-xl border border-gray-100 p-4 dark:border-neutral-800">
                         <h2 className="mb-3 text-lg font-medium text-gray-900 dark:text-white">{translations['Cover Image']}</h2>
                         <div className="flex flex-col gap-4">
-                            <div className="h-72 w-full object-fill object-center bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden relative">
+                            <div className="h-72 w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden relative">
                                 {!removeCoverImage && (previewCoverImage || user.cover_image) ? (
                                     <img
                                         src={previewCoverImage || getCoverImageUrl(user)}
                                         alt="Cover"
-                                        className="w-full h-full object-center object-fill"
+                                        className="w-full h-full object-cover object-center"
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-600">
@@ -228,15 +232,16 @@ export default function Edit() {
                                     <span className="text-sm text-gray-700 dark:text-gray-300 mr-2">{translations['Status']}:</span>
                                     <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{coverImageStatus}</span>
                                 </div>
-                                <div className="flex flex-wrap items-center gap-2 flex-1">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2">
+                                <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 min-w-0">
                                             <input
                                                 ref={coverInputRef}
                                                 type="file"
                                                 id="cover-image"
+                                                accept="image/jpeg,image/png,image/gif,image/webp"
                                                 onChange={handleCoverImageChange}
-                                                className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-200 hover:file:bg-gray-300 dark:file:bg-blue-700 dark:hover:file:bg-blue-800"
+                                                className="min-w-0 max-w-full truncate text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-200 hover:file:bg-gray-300 dark:file:bg-blue-700 dark:hover:file:bg-blue-800"
                                             />
                                             {data.cover_image && (
                                                 <button
@@ -283,7 +288,7 @@ export default function Edit() {
                         </div>
                     </div>
 
-                    <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+                    <div className="rounded-xl border border-gray-100 p-4 dark:border-neutral-800">
                         <h2 className="mb-4 text-lg font-medium text-gray-900 dark:text-white">{translations['User Information']}</h2>
                         <div className="space-y-4">
                             <div>
@@ -372,7 +377,7 @@ export default function Edit() {
                         </div>
                     </div>
 
-                    <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+                    <div className="rounded-xl border border-gray-100 p-4 dark:border-neutral-800">
                         <h2 className="mb-1 text-lg font-medium text-gray-900 dark:text-white">{translations['Account Settings']}</h2>
                         <div className="space-y-4">
                             <div className="flex items-center gap-3">
@@ -412,14 +417,14 @@ export default function Edit() {
                     <div className="flex justify-end gap-2">
                         <Link
                             href={`/user/${user.username}`}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                            className="rounded-full border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 dark:border-neutral-600 dark:text-gray-300 dark:hover:bg-neutral-800"
                         >
                             {translations['Cancel']}
                         </Link>
                         <Button
                             type="submit"
                             disabled={processing}
-                            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            className="rounded-full bg-blue-600 px-5 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
                         >
                             {processing ? translations['Saving...'] : translations['Save Changes']}
                         </Button>

@@ -21,3 +21,9 @@ dump:
 
 pint:
 	@docker compose exec -u www-data php ./vendor/bin/pint .
+
+db-backup:
+	@bash scripts/db-backup.sh
+
+db-restore:
+	@echo "Usage: docker compose exec -T mysql mysql -u spark_user -p12345678 spark_db < backups/FILENAME.sql"

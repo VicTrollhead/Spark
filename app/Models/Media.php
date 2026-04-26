@@ -5,11 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class Media extends Model
 {
     use HasFactory;
+
+    public const ALLOWED_IMAGE_MIMETYPES = 'image/jpeg,image/png,image/gif,image/webp';
+    public const ALLOWED_VIDEO_MIMETYPES = 'video/mp4,video/quicktime,video/webm';
+    public const ALLOWED_POST_MIMETYPES = self::ALLOWED_IMAGE_MIMETYPES.','.self::ALLOWED_VIDEO_MIMETYPES;
 
     protected $fillable = [
         'file_path',
@@ -19,23 +24,27 @@ class Media extends Model
         'mediable_type',
     ];
 
+    protected static function booted(): void
+    {
+        static::deleting(function (Media $media) {
+            $disk = $media->disk ?? config('filesystems.default');
+            try {
+                Storage::disk($disk)->delete($media->file_path);
+            } catch (\Throwable $e) {
+                Log::warning('Failed to delete media file from storage', [
+                    'media_id' => $media->id,
+                    'disk' => $disk,
+                    'file_path' => $media->file_path,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        });
+    }
+
     public function mediable(): MorphTo
     {
         return $this->morphTo();
     }
-
-//    public function getUrlAttribute()
-//    {
-//        return asset('storage/' . $this->file_path);
-//    }
-//    public function getUrlAttribute()
-//    {
-//        return Storage::disk('s3')->url($this->file_path);
-//    }
-//    public function getUrlAttribute(): string
-//    {
-//        return Storage::disk($this->disk ?? 's3')->url($this->file_path);
-//    }
 
     protected $appends = ['url'];
     public function getUrlAttribute(): string

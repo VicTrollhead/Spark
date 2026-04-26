@@ -24,10 +24,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'location',
         'website',
         'date_of_birth',
-        'is_verified',
         'email_verified_at',
         'is_private',
         'status',
+        'pinned_post_id',
     ];
 
     protected $hidden = [
@@ -45,6 +45,18 @@ class User extends Authenticatable implements MustVerifyEmail
             'date_of_birth' => 'date',
             'status' => 'string',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (User $user) {
+            // Per-item delete so Media::deleting fires and removes profile/cover from storage
+            Media::where('mediable_type', self::class)
+                ->where('mediable_id', $user->id)
+                ->get()
+                ->each
+                ->delete();
+        });
     }
 
     public function profileImage(): HasOne
@@ -97,6 +109,11 @@ class User extends Authenticatable implements MustVerifyEmail
             ->exists();
     }
 
+    public function pinnedPost()
+    {
+        return $this->belongsTo(Post::class, 'pinned_post_id');
+    }
+
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class, 'user_id');
@@ -119,7 +136,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function repostedPosts(): BelongsToMany
     {
-        return $this->belongsToMany(Post::class, 'reposts');
+        return $this->belongsToMany(Post::class, 'reposts')->withPivot('created_at');
     }
 
     public function followingPosts(): HasManyThrough

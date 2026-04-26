@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Chat;
+use App\Models\GroupChat;
 use Illuminate\Support\Facades\Broadcast;
 
 Broadcast::channel('channel_for_everyone', function ($user) {
@@ -24,6 +25,38 @@ Broadcast::channel('notifications.{userId}', function ($user, $userId) {
     return (int) $user->id === (int) $userId;
 });
 
+Broadcast::channel('group-chat.{groupChatId}', function ($user, $groupChatId) {
+    return GroupChat::where('id', $groupChatId)
+        ->whereHas('members', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
+        ->exists();
+});
+
+Broadcast::channel('feed.{userId}', function ($user, $userId) {
+    return (int) $user->id === (int) $userId;
+});
+
+Broadcast::channel('user.{userId}', function ($user) {
+    return true; // Public profile data — anyone can listen
+});
+
+Broadcast::channel('presence-online', function ($user) {
+    return [
+        'id' => $user->id,
+        'name' => $user->name,
+        'username' => $user->username,
+    ];
+});
+
 Broadcast::channel('post.{postId}', function ($user, $postId) {
-    return true;
+    $post = \App\Models\Post::find($postId);
+    if (!$post) {
+        return false;
+    }
+    if (!$post->is_private) {
+        return true;
+    }
+    return $post->user_id === $user->id
+        || $post->user->followers()->where('follower_id', $user->id)->exists();
 });

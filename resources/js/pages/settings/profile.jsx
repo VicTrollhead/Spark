@@ -22,6 +22,7 @@ export default function Profile({ mustVerifyEmail, status }) {
 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
         name: auth.user.name,
+        username: auth.user.username,
         email: auth.user.email,
     });
 
@@ -37,24 +38,30 @@ export default function Profile({ mustVerifyEmail, status }) {
             <Head title="Profile settings"/>
 
             <SettingsLayout>
-                <div className="space-y-6">
-                    <HeadingSmall title={translations["Profile information"]} description={translations["Update your name and email address"]}/>
+                <div className="space-y-4">
+                    <HeadingSmall title={translations["Profile information"] || "Profile information"} description={translations["Update your name, username, and email address"] || "Update your name, username, and email address"}/>
 
-                    <form onSubmit={submit} className="space-y-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="name">{translations["Name"]}</Label>
-
-                            <Input id="name" className="mt-1 block w-full" value={data.name} onChange={(e) => setData('name', e.target.value)} required autoComplete="name" placeholder="Full name"/>
-
-                            <InputError className="mt-2" message={errors.name}/>
+                    <form onSubmit={submit} className="space-y-4">
+                        <div className="grid gap-1.5">
+                            <Label htmlFor="name">{translations["Name"] || "Name"}</Label>
+                            <Input id="name" className="block w-full" value={data.name} onChange={(e) => setData('name', e.target.value)} required autoComplete="name" placeholder="Full name"/>
+                            <InputError message={errors.name}/>
                         </div>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">{translations["Email Address"]}</Label>
+                        <div className="grid gap-1.5">
+                            <Label htmlFor="username">{translations["Username"] || "Username"}</Label>
+                            <div className="relative">
+                                <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-gray-400">@</span>
+                                <Input id="username" className="block w-full pl-7" value={data.username} onChange={(e) => setData('username', e.target.value.replace(/[^a-zA-Z0-9_]/g, ''))} required maxLength={30} placeholder="username"/>
+                            </div>
+                            <p className="text-xs text-muted-foreground">{translations["Letters, numbers, and underscores only"] || "Letters, numbers, and underscores only"}</p>
+                            <InputError message={errors.username}/>
+                        </div>
 
-                            <Input id="email" type="email" className="mt-1 block w-full" value={data.email} onChange={(e) => setData('email', e.target.value)} required autoComplete="username" placeholder="Email address"/>
-
-                            <InputError className="mt-2" message={errors.email}/>
+                        <div className="grid gap-1.5">
+                            <Label htmlFor="email">{translations["Email Address"] || "Email Address"}</Label>
+                            <Input id="email" type="email" className="block w-full" value={data.email} onChange={(e) => setData('email', e.target.value)} required autoComplete="username" placeholder="Email address"/>
+                            <InputError message={errors.email}/>
                         </div>
 
                         {mustVerifyEmail && auth.user.email_verified_at === null && (<div>
@@ -80,6 +87,7 @@ export default function Profile({ mustVerifyEmail, status }) {
                     </form>
                 </div>
 
+                <div className="my-6 border-t border-border" />
                 <DeleteUser />
             </SettingsLayout>
         </AppLayout>);

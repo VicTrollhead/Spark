@@ -25,7 +25,7 @@ export function UserInfo({ user, showEmail = false }) {
         <div className="flex min-w-0 items-center gap-2">
             <Avatar className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full">
                 <AvatarImage src={getProfileImageUrl(user)} alt={user.name} />
-                <AvatarFallback className="rounded-lg bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
+                <AvatarFallback className="rounded-full text-lg bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
                     {getInitials(user.name)}
                 </AvatarFallback>
             </Avatar>
@@ -33,12 +33,12 @@ export function UserInfo({ user, showEmail = false }) {
                 <div className="flex min-w-0 items-center gap-1">
                     <span className="max-w-full truncate text-[14.5px] text-gray-700 dark:text-neutral-300">@{user.username}</span>
                     {user.is_verified && (
-                        <span className="flex flex-shrink-0 items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
+                        <span className="flex flex-shrink-0 items-center rounded-full bg-blue-500 p-0.5 text-xs font-medium text-white">
                             <Check className="h-3 w-3" />
                         </span>
                     )}
                 </div>
-                <span className="max-w-full truncate text-lg font-extrabold">{user.name}</span>
+                <span className="max-w-full truncate text-lg font-bold">{user.name}</span>
             </div>
         </div>
     );

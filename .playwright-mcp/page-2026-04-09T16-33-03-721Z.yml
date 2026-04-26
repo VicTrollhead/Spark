@@ -1,0 +1,371 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - link "Spark logo Spark" [ref=e7] [cursor=pointer]:
+          - /url: /dashboard
+          - generic [ref=e8]:
+            - img "Spark logo" [ref=e9]
+            - generic [ref=e11]: Spark
+        - button [ref=e12] [cursor=pointer]:
+          - img [ref=e13]
+      - navigation "Main" [ref=e24]:
+        - list [ref=e26]:
+          - listitem [ref=e27]:
+            - link "News" [ref=e28] [cursor=pointer]:
+              - /url: /dashboard
+          - listitem [ref=e29]:
+            - link "Following" [ref=e30] [cursor=pointer]:
+              - /url: /user/following-posts
+          - listitem [ref=e31]:
+            - link "Liked" [ref=e32] [cursor=pointer]:
+              - /url: /user/liked
+      - generic [ref=e35]:
+        - button "Search" [ref=e36] [cursor=pointer]:
+          - img [ref=e37]
+        - textbox "Search... (Ctrl+K)" [ref=e40]:
+          - /placeholder: Search...  (Ctrl+K)
+    - generic [ref=e41]:
+      - generic [ref=e42]:
+        - list [ref=e44]:
+          - listitem [ref=e45]:
+            - link "P @paragon Paragon" [ref=e46] [cursor=pointer]:
+              - /url: /user
+              - generic [ref=e47]:
+                - generic [ref=e49]: P
+                - generic [ref=e50]:
+                  - generic [ref=e52]: "@paragon"
+                  - generic [ref=e53]: Paragon
+        - list [ref=e56]:
+          - listitem [ref=e57]:
+            - link "Dashboard" [ref=e58] [cursor=pointer]:
+              - /url: /dashboard
+              - img [ref=e59]
+              - generic [ref=e62]: Dashboard
+          - listitem [ref=e63]:
+            - link "Everyone chat" [ref=e64] [cursor=pointer]:
+              - /url: /chat/everyone
+              - img [ref=e65]
+              - generic [ref=e68]: Everyone chat
+          - listitem [ref=e69]:
+            - link "User chats 2" [ref=e70] [cursor=pointer]:
+              - /url: /chat/user-chats
+              - img [ref=e71]
+              - generic [ref=e74]: User chats
+              - generic [ref=e75]: "2"
+          - listitem [ref=e76]:
+            - link "Friends" [ref=e77] [cursor=pointer]:
+              - /url: /user/friends
+              - img [ref=e78]
+              - generic [ref=e83]: Friends
+          - listitem [ref=e84]:
+            - link "Notifications 6" [ref=e85] [cursor=pointer]:
+              - /url: /user/notifications
+              - img [ref=e86]
+              - generic [ref=e89]: Notifications
+              - generic [ref=e90]: "6"
+          - listitem [ref=e91]:
+            - link "Favorites" [ref=e92] [cursor=pointer]:
+              - /url: /user/favorites
+              - img [ref=e93]
+              - generic [ref=e95]: Favorites
+          - listitem [ref=e96]:
+            - link "Reposts" [ref=e97] [cursor=pointer]:
+              - /url: /user/reposts
+              - img [ref=e98]
+              - generic [ref=e103]: Reposts
+          - listitem [ref=e104]:
+            - link "Popular hashtags" [ref=e105] [cursor=pointer]:
+              - /url: /show-popular-hashtags
+              - img [ref=e106]
+              - generic [ref=e111]: Popular hashtags
+          - listitem [ref=e112]:
+            - link "Profile" [ref=e113] [cursor=pointer]:
+              - /url: /user/paragon
+              - img [ref=e114]
+              - generic [ref=e117]: Profile
+          - listitem [ref=e118]:
+            - link "Settings" [ref=e119] [cursor=pointer]:
+              - /url: /settings/profile
+              - img [ref=e120]
+              - generic [ref=e123]: Settings
+        - generic [ref=e124]:
+          - link "Repository" [ref=e125] [cursor=pointer]:
+            - /url: https://gitlab.com/shapovalovtimur16/Spark
+            - button "Repository" [ref=e126]:
+              - img [ref=e127]
+              - text: Repository
+          - button "Log out" [ref=e129] [cursor=pointer]:
+            - img [ref=e130]
+            - text: Log out
+      - main [ref=e134]:
+        - generic [ref=e136]:
+          - heading "Following" [level=1] [ref=e137]
+          - generic [ref=e138]:
+            - combobox [ref=e139] [cursor=pointer]:
+              - option "Latest" [selected]
+              - option "Oldest"
+              - option "Most Followed"
+              - option "Least Followed"
+            - button [ref=e140] [cursor=pointer]:
+              - img [ref=e141]
+        - generic [ref=e146]:
+          - generic [ref=e147]:
+            - link "KL" [ref=e148] [cursor=pointer]:
+              - /url: /user/fboyle
+              - generic [ref=e150]: KL
+            - generic [ref=e151]:
+              - generic [ref=e152]:
+                - link "Kylee Legros" [ref=e153] [cursor=pointer]:
+                  - /url: /user/fboyle
+                - img [ref=e155]
+              - paragraph [ref=e157]: "@fboyle"
+              - generic [ref=e158]:
+                - generic [ref=e159]: 9 Subscribers
+                - generic [ref=e160]: You follow each other.
+            - generic [ref=e161]:
+              - button "Write" [ref=e162] [cursor=pointer]:
+                - img [ref=e163]
+              - button "Unfollow" [ref=e166] [cursor=pointer]
+          - generic [ref=e167]:
+            - link "VK" [ref=e168] [cursor=pointer]:
+              - /url: /user/arne12
+              - generic [ref=e170]: VK
+            - generic [ref=e171]:
+              - generic [ref=e172]:
+                - link "Vinnie Koelpin" [ref=e173] [cursor=pointer]:
+                  - /url: /user/arne12
+                - img [ref=e175]
+              - paragraph [ref=e177]: "@arne12"
+              - generic [ref=e178]:
+                - generic [ref=e179]: 4 Subscribers
+                - generic [ref=e180]: You follow each other.
+            - generic [ref=e181]:
+              - button "Write" [ref=e182] [cursor=pointer]:
+                - img [ref=e183]
+              - button "Unfollow" [ref=e186] [cursor=pointer]
+          - generic [ref=e187]:
+            - link "IK" [ref=e188] [cursor=pointer]:
+              - /url: /user/kunze.thurman
+              - generic [ref=e190]: IK
+            - generic [ref=e191]:
+              - link "Izaiah Kris" [ref=e193] [cursor=pointer]:
+                - /url: /user/kunze.thurman
+              - paragraph [ref=e194]: "@kunze.thurman"
+              - generic [ref=e195]:
+                - generic [ref=e196]: 7 Subscribers
+                - generic [ref=e197]: You follow each other.
+            - generic [ref=e198]:
+              - button "Write" [ref=e199] [cursor=pointer]:
+                - img [ref=e200]
+              - button "Unfollow" [ref=e203] [cursor=pointer]
+          - generic [ref=e204]:
+            - link "MA" [ref=e205] [cursor=pointer]:
+              - /url: /user/fadel.quinn
+              - generic [ref=e207]: MA
+            - generic [ref=e208]:
+              - link "Mr. Sean Abshire" [ref=e210] [cursor=pointer]:
+                - /url: /user/fadel.quinn
+              - paragraph [ref=e211]: "@fadel.quinn"
+              - generic [ref=e212]:
+                - generic [ref=e213]: 6 Subscribers
+                - generic [ref=e214]: You follow each other.
+            - generic [ref=e215]:
+              - button "Write" [ref=e216] [cursor=pointer]:
+                - img [ref=e217]
+              - button "Unfollow" [ref=e220] [cursor=pointer]
+          - generic [ref=e221]:
+            - link "JG" [ref=e222] [cursor=pointer]:
+              - /url: /user/lorena02
+              - generic [ref=e224]: JG
+            - generic [ref=e225]:
+              - link "Jimmie Gislason" [ref=e227] [cursor=pointer]:
+                - /url: /user/lorena02
+              - paragraph [ref=e228]: "@lorena02"
+              - generic [ref=e229]:
+                - generic [ref=e230]: 9 Subscribers
+                - generic [ref=e231]: You follow each other.
+            - generic [ref=e232]:
+              - button "Write" [ref=e233] [cursor=pointer]:
+                - img [ref=e234]
+              - button "Unfollow" [ref=e237] [cursor=pointer]
+          - generic [ref=e238]:
+            - link "OK" [ref=e239] [cursor=pointer]:
+              - /url: /user/dorcas44
+              - generic [ref=e241]: OK
+            - generic [ref=e242]:
+              - link "Oral Koch" [ref=e244] [cursor=pointer]:
+                - /url: /user/dorcas44
+              - paragraph [ref=e245]: "@dorcas44"
+              - generic [ref=e246]:
+                - generic [ref=e247]: 7 Subscribers
+                - generic [ref=e248]: You follow each other.
+            - generic [ref=e249]:
+              - button "Write" [ref=e250] [cursor=pointer]:
+                - img [ref=e251]
+              - button "Unfollow" [ref=e254] [cursor=pointer]
+          - generic [ref=e255]:
+            - link "RH" [ref=e256] [cursor=pointer]:
+              - /url: /user/aubree06
+              - generic [ref=e258]: RH
+            - generic [ref=e259]:
+              - link "Rylee Hagenes" [ref=e261] [cursor=pointer]:
+                - /url: /user/aubree06
+              - paragraph [ref=e262]: "@aubree06"
+              - generic [ref=e263]:
+                - generic [ref=e264]: 7 Subscribers
+                - generic [ref=e265]: You follow each other.
+            - generic [ref=e266]:
+              - button "Write" [ref=e267] [cursor=pointer]:
+                - img [ref=e268]
+              - button "Unfollow" [ref=e271] [cursor=pointer]
+          - generic [ref=e272]:
+            - link "DR" [ref=e273] [cursor=pointer]:
+              - /url: /user/triston55
+              - generic [ref=e275]: DR
+            - generic [ref=e276]:
+              - link "Dulce Ritchie" [ref=e278] [cursor=pointer]:
+                - /url: /user/triston55
+              - paragraph [ref=e279]: "@triston55"
+              - generic [ref=e280]:
+                - generic [ref=e281]: 9 Subscribers
+                - generic [ref=e282]: You follow each other.
+            - generic [ref=e283]:
+              - button "Write" [ref=e284] [cursor=pointer]:
+                - img [ref=e285]
+              - button "Unfollow" [ref=e288] [cursor=pointer]
+          - generic [ref=e289]:
+            - link "PK" [ref=e290] [cursor=pointer]:
+              - /url: /user/aurelio86
+              - generic [ref=e292]: PK
+            - generic [ref=e293]:
+              - link "Prof. Lowell Kerluke" [ref=e295] [cursor=pointer]:
+                - /url: /user/aurelio86
+              - paragraph [ref=e296]: "@aurelio86"
+              - generic [ref=e297]:
+                - generic [ref=e298]: 11 Subscribers
+                - generic [ref=e299]: You follow each other.
+            - generic [ref=e300]:
+              - button "Write" [ref=e301] [cursor=pointer]:
+                - img [ref=e302]
+              - button "Unfollow" [ref=e305] [cursor=pointer]
+          - generic [ref=e306]:
+            - link "DK" [ref=e307] [cursor=pointer]:
+              - /url: /user/xbednar
+              - generic [ref=e309]: DK
+            - generic [ref=e310]:
+              - link "Damian Kertzmann" [ref=e312] [cursor=pointer]:
+                - /url: /user/xbednar
+              - paragraph [ref=e313]: "@xbednar"
+              - generic [ref=e314]:
+                - generic [ref=e315]: 8 Subscribers
+                - generic [ref=e316]: You follow each other.
+            - generic [ref=e317]:
+              - button "Write" [ref=e318] [cursor=pointer]:
+                - img [ref=e319]
+              - button "Unfollow" [ref=e322] [cursor=pointer]
+          - generic [ref=e323]:
+            - link "IB" [ref=e324] [cursor=pointer]:
+              - /url: /user/brenden32
+              - generic [ref=e326]: IB
+            - generic [ref=e327]:
+              - link "Iva Berge" [ref=e329] [cursor=pointer]:
+                - /url: /user/brenden32
+              - paragraph [ref=e330]: "@brenden32"
+              - generic [ref=e331]:
+                - generic [ref=e332]: 7 Subscribers
+                - generic [ref=e333]: You follow each other.
+            - generic [ref=e334]:
+              - button "Write" [ref=e335] [cursor=pointer]:
+                - img [ref=e336]
+              - button "Unfollow" [ref=e339] [cursor=pointer]
+          - generic [ref=e340]:
+            - link "Super User" [ref=e341] [cursor=pointer]:
+              - /url: /user/superuser
+              - img "Super User" [ref=e343]
+            - generic [ref=e344]:
+              - generic [ref=e345]:
+                - link "Super User" [ref=e346] [cursor=pointer]:
+                  - /url: /user/superuser
+                - img [ref=e348]
+              - paragraph [ref=e350]: "@superuser"
+              - generic [ref=e351]:
+                - generic [ref=e352]: 32 Subscribers
+                - generic [ref=e353]: You follow each other.
+            - generic [ref=e354]:
+              - button "Write" [ref=e355] [cursor=pointer]:
+                - img [ref=e356]
+              - button "Unfollow" [ref=e359] [cursor=pointer]
+          - generic [ref=e360]:
+            - link "P" [ref=e361] [cursor=pointer]:
+              - /url: /user/paragon
+              - generic [ref=e363]: P
+            - generic [ref=e364]:
+              - link "Paragon" [ref=e366] [cursor=pointer]:
+                - /url: /user/paragon
+              - paragraph [ref=e367]: "@paragon"
+              - generic [ref=e368]:
+                - generic [ref=e369]: 32 Subscribers
+                - generic [ref=e370]: You follow each other.
+      - complementary [ref=e371]:
+        - generic [ref=e372]:
+          - generic [ref=e373]:
+            - generic [ref=e374]:
+              - img [ref=e375]
+              - text: Who to follow
+            - generic [ref=e380]:
+              - generic [ref=e381]:
+                - link "TT" [ref=e382] [cursor=pointer]:
+                  - /url: /user/qthiel
+                  - generic [ref=e384]: TT
+                - generic [ref=e385]:
+                  - link "Thurman Tillman" [ref=e386] [cursor=pointer]:
+                    - /url: /user/qthiel
+                    - generic [ref=e387]: Thurman Tillman
+                    - img [ref=e389]
+                  - paragraph [ref=e391]: "@qthiel"
+                - button "Follow" [ref=e392] [cursor=pointer]
+              - generic [ref=e393]:
+                - link "AB" [ref=e394] [cursor=pointer]:
+                  - /url: /user/erunte
+                  - generic [ref=e396]: AB
+                - generic [ref=e397]:
+                  - link "Antonietta Brakus" [ref=e398] [cursor=pointer]:
+                    - /url: /user/erunte
+                    - generic [ref=e399]: Antonietta Brakus
+                  - paragraph [ref=e400]: "@erunte"
+                - button "Follow" [ref=e401] [cursor=pointer]
+              - generic [ref=e402]:
+                - link "OR" [ref=e403] [cursor=pointer]:
+                  - /url: /user/oconner.amos
+                  - generic [ref=e405]: OR
+                - generic [ref=e406]:
+                  - link "Oran Rutherford" [ref=e407] [cursor=pointer]:
+                    - /url: /user/oconner.amos
+                    - generic [ref=e408]: Oran Rutherford
+                  - paragraph [ref=e409]: "@oconner.amos"
+                - button "Follow" [ref=e410] [cursor=pointer]
+              - generic [ref=e411]:
+                - link "ML" [ref=e412] [cursor=pointer]:
+                  - /url: /user/xabshire
+                  - generic [ref=e414]: ML
+                - generic [ref=e415]:
+                  - link "Mr. Harley Langosh" [ref=e416] [cursor=pointer]:
+                    - /url: /user/xabshire
+                    - generic [ref=e417]: Mr. Harley Langosh
+                  - paragraph [ref=e418]: "@xabshire"
+                - button "Follow" [ref=e419] [cursor=pointer]
+              - generic [ref=e420]:
+                - link "MV" [ref=e421] [cursor=pointer]:
+                  - /url: /user/adelle69
+                  - generic [ref=e423]: MV
+                - generic [ref=e424]:
+                  - link "Miss Ozella VonRueden" [ref=e425] [cursor=pointer]:
+                    - /url: /user/adelle69
+                    - generic [ref=e426]: Miss Ozella VonRueden
+                  - paragraph [ref=e427]: "@adelle69"
+                - button "Follow" [ref=e428] [cursor=pointer]
+            - link "Show more" [ref=e429] [cursor=pointer]:
+              - /url: /dashboard/users
+          - generic [ref=e431]: Spark © 2026
+  - region "Notifications alt+T"

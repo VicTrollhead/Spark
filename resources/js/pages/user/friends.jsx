@@ -1,29 +1,27 @@
-import { usePage, Link, Head, router } from '@inertiajs/react';
+import { usePage, Head, router } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
 import { useState } from 'react';
-import { RefreshCw, SendIcon, Check } from 'lucide-react';
+import { RefreshCw, SendIcon, Check, Users } from 'lucide-react';
+import { EmptyState } from '../../components/empty-state';
 import { getProfileImageUrl } from '../../lib/utils';
 
 export default function Friends() {
-    const { users, user, auth, translations, filters } = usePage().props;
+    const { users = [], user, auth, translations = {}, filters = {} } = usePage().props;
     const getInitials = useInitials();
     const [isLoading, setIsLoading] = useState(false);
 
     const handleReload = () => {
         setIsLoading(true);
-        router.reload();
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 1000);
+        router.reload({ onFinish: () => setIsLoading(false) });
     };
 
-    const handleFollowToggle = (targetUser, isFollowed, isPrivate, hasSentRequest) => {
+    const handleFollowToggle = (targetUser, isFollowed) => {
         let action;
         if (isFollowed) {
             action = 'unfollow';
-        } else if (isPrivate && !isFollowed) {
+        } else if (targetUser.is_private && !isFollowed) {
             action = 'follow-request';
         } else {
             action = 'follow';
@@ -40,20 +38,16 @@ export default function Friends() {
     return (
         <AppLayout>
             <Head title={translations['Friends']} />
-            <div className="p-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between ">
+
+            <div className="border-b border-gray-200 dark:border-neutral-800">
+                <div className="flex items-center justify-between p-6">
                     <h1 className="text-2xl font-bold">{translations['Friends']}</h1>
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-2">
                         <select
-                            className="px-3 w-fit py-1 border rounded-md dark:bg-neutral-900 dark:text-white"
+                            className="cursor-pointer rounded-full border border-gray-200 bg-transparent px-3 py-1.5 text-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
                             value={filters?.sort || 'latest'}
                             onChange={(e) => {
-                                router.get(route('user.friends'), {
-                                    sort: e.target.value,
-                                }, {
-                                    preserveScroll: true,
-                                    preserveState: true,
-                                });
+                                router.get(route('user.friends'), { sort: e.target.value }, { preserveScroll: true, preserveState: true });
                             }}
                         >
                             <option value="latest">{translations['Latest']}</option>
@@ -63,86 +57,76 @@ export default function Friends() {
                         </select>
                         <button
                             onClick={handleReload}
-                            className="p-2 text-sm font-semibold dark:text-white text-gray-800 border rounded-md hover:bg-gray-200 dark:hover:bg-neutral-800 transition flex items-center"
+                            className="rounded-full p-2 text-gray-500 transition hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800"
                         >
-                            <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
+                            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                         </button>
                     </div>
                 </div>
+            </div>
 
-                {users.length === 0 ? (
-                    <p className="text-gray-500 mt-10">{translations['No friends yet.']}</p>
-                ) : (
-                    <ul>
-                        {users.map((friend) => (
-                            <li key={friend.id} className="flex items-center gap-2 border-b py-2 mt-2 dark:border-gray-700">
-                                <Avatar className="h-20 w-20 border-4 border-white sm:h-28 sm:w-28 dark:border-gray-900">
+            {users.length === 0 ? (
+                <div className="py-16">
+                    <EmptyState icon={Users} title={translations['No friends yet.']} />
+                </div>
+            ) : (
+                <div className="divide-y divide-gray-100 dark:divide-neutral-800/50">
+                    {users.map((friend) => (
+                        <div
+                            key={friend.id}
+                            onClick={() => router.visit(`/user/${friend.username}`)}
+                            className="cursor-pointer px-4 sm:px-6 py-4 transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900"
+                        >
+                            <div className="flex items-center gap-3">
+                                <Avatar className="h-11 w-11 shrink-0">
                                     <AvatarImage src={getProfileImageUrl(friend)} alt={friend.name} />
-                                    <AvatarFallback className="rounded-full bg-gray-200 text-4xl text-black dark:bg-gray-700 dark:text-white">
+                                    <AvatarFallback className="rounded-full bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
                                         {getInitials(friend.name)}
                                     </AvatarFallback>
                                 </Avatar>
-                                <div className="flex flex-row justify-between w-full gap-2 items-center">
-                                    <div className="flex flex-col">
-                                        <div className="flex items-center gap-1 truncate">
-                                            <Link href={`/user/${friend.username}`} className="font-medium text-blue-500 hover:underline break-all">
-                                                {friend.name}
-                                            </Link>
-                                            {friend.is_verified && (
-                                                <div className="group relative">
-                                                    <span className="absolute -top-7 left-1/2 top -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
-                                                        Verified
-                                                    </span>
-                                                    <span className="flex items-center rounded-lg bg-blue-500 p-0.5 text-xs font-medium text-white">
-                                                        <Check className="h-3 w-3" />
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </div>
 
-                                        <p className="text-gray-500 text-[15px] dark:text-gray-400 break-all">@{friend.username}</p>
-                                        <p className="text-sm text-gray-400 dark:text-gray-500">
-                                            {friend.followers_count} {translations['Followers']}
-                                        </p>
-                                        <p className="text-green-500 text-sm font-medium mt-1">
-                                            {translations['You follow each other']}
-                                        </p>
+                                <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="truncate font-semibold text-gray-900 dark:text-white">
+                                            {friend.name}
+                                        </span>
+                                        {friend.is_verified && (
+                                            <span className="inline-flex items-center rounded-full bg-blue-500 p-0.5 text-white">
+                                                <Check className="h-2.5 w-2.5" />
+                                            </span>
+                                        )}
                                     </div>
-                                    <div className="flex flex-col gap-1">
-                                        {friend.is_friend ? (
-                                            <button
-                                                onClick={() => router.post(`/chat/user-chat/new/${friend.id}`)}
-                                                className={`sm:px-4 sm:py-2 px-3 py-1.5 flex gap-2 items-center rounded-md bg-gray-600 hover:bg-gray-500 text-white dark:bg-gray-800 dark:hover:bg-gray-700`}
-                                            >
-                                                {translations['Write']}<SendIcon className="w-4 h-4" />
-                                            </button>
-                                        ) : ''}
-                                        <button
-                                            onClick={() => handleFollowToggle(friend, friend.is_followed, friend.is_private, friend.has_sent_follow_request)}
-                                            className={`ml-auto sm:px-4 sm:py-2 px-3 py-1.5 rounded-md text-white ${
-                                                friend.has_sent_follow_request
-                                                    ? 'bg-gray-600 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700'
-                                                    : (friend.is_followed
-                                                        ? 'bg-gray-600 hover:bg-gray-500 dark:bg-gray-800 dark:hover:bg-gray-700'
-                                                        : 'bg-blue-600 hover:bg-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600')
-                                            } text-white`}
-                                        >
-                                            {friend.is_private && !friend.is_followed && !friend.has_sent_follow_request
-                                                ? translations['Send Follow Request']
-                                                : (friend.has_sent_follow_request && !friend.is_followed
-                                                    ? translations['Request Sent']
-                                                    : (friend.is_followed
-                                                        ? translations['Unfollow']
-                                                        : translations['Follow']))
-                                            }
-                                        </button>
-                                    </div>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">@{friend.username}</p>
                                 </div>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
+
+                                <div className="flex shrink-0 items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                                    <button
+                                        onClick={() => router.post(`/chat/user-chat/new/${friend.id}`)}
+                                        className="rounded-full p-2 text-gray-500 transition hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800"
+                                        title={translations['Write']}
+                                    >
+                                        <SendIcon className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        onClick={() => handleFollowToggle(friend, friend.is_followed)}
+                                        className={`rounded-full px-3 sm:px-4 py-1.5 text-sm font-medium transition ${
+                                            friend.is_followed
+                                                ? 'border border-gray-300 text-gray-700 hover:border-red-300 hover:bg-red-50 hover:text-red-600 dark:border-neutral-600 dark:text-gray-300 dark:hover:border-red-800 dark:hover:bg-red-950/30 dark:hover:text-red-400'
+                                                : 'bg-blue-500 text-white hover:bg-blue-600'
+                                        }`}
+                                    >
+                                        {friend.is_followed ? translations['Unfollow'] : translations['Follow']}
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="mt-1 ml-14 flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500">
+                                <span>{friend.followers_count} {translations['Followers']}</span>
+                                <span className="font-medium text-green-500">{translations['You follow each other']}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </AppLayout>
     );
 }
