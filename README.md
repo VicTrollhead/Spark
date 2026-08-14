@@ -26,25 +26,58 @@ Spark is a Twitter/X-style social network that goes beyond a simple clone. It su
 
 ## Screenshots
 
+### Home feed — light & dark
+
 <p align="center">
-  <img src="screenshots/feed.png" alt="Home feed" width="100%" />
+  <img src="screenshots/feed.png" alt="Home feed (light)" width="100%" />
+</p>
+<p align="center">
+  <img src="screenshots/feed-dark.png" alt="Home feed (dark)" width="100%" />
 </p>
 
-| Profile | Post detail |
-|---------|-------------|
-| ![Profile](screenshots/profile.png) | ![Post detail](screenshots/post-detail.png) |
+### Profiles & posts
 
-| Real-time chat | Notifications |
-|----------------|---------------|
-| ![Chat](screenshots/chat.png) | ![Notifications](screenshots/notifications.png) |
+| Profile | Profile (dark) |
+|---------|----------------|
+| ![Profile](screenshots/profile.png) | ![Profile dark](screenshots/profile-dark.png) |
 
-| Search | User discovery |
-|--------|----------------|
-| ![Search](screenshots/search.png) | ![Users](screenshots/users.png) |
+| Post detail | Polls |
+|-------------|-------|
+| ![Post detail](screenshots/post-detail.png) | ![Polls](screenshots/polls.png) |
 
-| Landing page | Login |
-|--------------|-------|
-| ![Welcome](screenshots/welcome.png) | ![Login](screenshots/login.png) |
+### Messaging — public, direct & group
+
+| Public chat | Direct messages |
+|-------------|-----------------|
+| ![Public chat](screenshots/chat.png) | ![Direct messages](screenshots/direct-messages.png) |
+
+| Group chat | Notifications |
+|------------|---------------|
+| ![Group chat](screenshots/group-chat.png) | ![Notifications](screenshots/notifications.png) |
+
+### Discovery
+
+| Search | Hashtag feed |
+|--------|--------------|
+| ![Search](screenshots/search.png) | ![Hashtag feed](screenshots/hashtag.png) |
+
+| User discovery | Friends |
+|----------------|---------|
+| ![Users](screenshots/users.png) | ![Friends](screenshots/friends.png) |
+
+### Onboarding & settings
+
+<p align="center">
+  <img src="screenshots/welcome.png" alt="Landing page" width="100%" />
+</p>
+
+| Login | Register |
+|-------|----------|
+| ![Login](screenshots/login.png) | ![Register](screenshots/register.png) |
+
+| Profile settings | Favorites |
+|------------------|-----------|
+| ![Settings](screenshots/settings.png) | ![Favorites](screenshots/favorites.png) |
 
 ## Features
 
