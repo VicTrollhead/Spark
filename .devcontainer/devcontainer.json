@@ -1,0 +1,32 @@
+{
+    "name": "Spark",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "php",
+    "workspaceFolder": "/var/www/html",
+    "runServices": ["web", "php", "mysql", "redis", "node"],
+    "remoteUser": "php",
+    "shutdownAction": "stopCompose",
+    "initializeCommand": "docker network inspect nginx-proxy >/dev/null 2>&1 || docker network create nginx-proxy",
+    "postCreateCommand": "composer install && php artisan migrate --force",
+    "forwardPorts": ["web:80", 5173, 8080],
+    "portsAttributes": {
+        "web:80": { "label": "nginx" },
+        "5173": { "label": "vite" },
+        "8080": { "label": "reverb" }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "bmewburn.vscode-intelephense-client",
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "bradlc.vscode-tailwindcss",
+                "EditorConfig.EditorConfig"
+            ],
+            "settings": {
+                "editor.formatOnSave": true,
+                "editor.defaultFormatter": "esbenp.prettier-vscode"
+            }
+        }
+    }
+}
