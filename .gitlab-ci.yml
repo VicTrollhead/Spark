@@ -1,0 +1,52 @@
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop"
+
+default:
+  image: lorisleiva/laravel-docker:8.4
+  cache:
+    key:
+      files:
+        - composer.lock
+        - package-lock.json
+    paths:
+      - vendor/
+      - node_modules/
+
+stages:
+  - lint
+  - test
+
+lint:
+  stage: lint
+  script:
+    - composer install --no-interaction --prefer-dist --no-progress
+    - npm ci
+    - vendor/bin/pint --test
+    - npm run format:check
+    - npx eslint .
+
+vitest:
+  stage: test
+  script:
+    - npm ci
+    - npm test
+
+phpunit:
+  stage: test
+  services:
+    - name: mysql:8.0
+      alias: mysql
+  variables:
+    MYSQL_ROOT_PASSWORD: '12345678'
+    MYSQL_DATABASE: spark_db_test
+    MYSQL_USER: spark_user
+    MYSQL_PASSWORD: '12345678'
+  script:
+    - composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader
+    - npm ci
+    - npm run build
+    - cp .env.example .env
+    - php artisan key:generate
+    - vendor/bin/phpunit
