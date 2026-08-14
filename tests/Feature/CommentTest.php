@@ -17,7 +17,7 @@ class CommentTest extends TestCase
         $user = User::factory()->create();
         $post = Post::factory()->create(['is_private' => false]);
 
-        $response = $this->actingAs($user)->post("/post/{$post->id}/comment", [
+        $response = $this->actingAs($user)->post("/post/{$post->slug}/comment", [
             'post_id' => $post->id,
             'content' => 'Great post!',
         ]);
@@ -35,7 +35,7 @@ class CommentTest extends TestCase
         $user = User::factory()->create();
         $post = Post::factory()->create();
 
-        $response = $this->actingAs($user)->post("/post/{$post->id}/comment", [
+        $response = $this->actingAs($user)->post("/post/{$post->slug}/comment", [
             'post_id' => $post->id,
             'content' => '',
         ]);
@@ -48,7 +48,7 @@ class CommentTest extends TestCase
         $user = User::factory()->create();
         $post = Post::factory()->create();
 
-        $response = $this->actingAs($user)->post("/post/{$post->id}/comment", [
+        $response = $this->actingAs($user)->post("/post/{$post->slug}/comment", [
             'post_id' => $post->id,
             'content' => str_repeat('a', 301),
         ]);
@@ -94,7 +94,7 @@ class CommentTest extends TestCase
             'post_id' => $post->id,
         ]);
 
-        $response = $this->actingAs($user)->post("/post/{$post->id}/comment", [
+        $response = $this->actingAs($user)->post("/post/{$post->slug}/comment", [
             'post_id' => $post->id,
             'content' => 'This is a reply',
             'parent_comment_id' => $parentComment->id,
@@ -113,7 +113,7 @@ class CommentTest extends TestCase
     {
         $post = Post::factory()->create();
 
-        $response = $this->post("/post/{$post->id}/comment", [
+        $response = $this->post("/post/{$post->slug}/comment", [
             'post_id' => $post->id,
             'content' => 'Hello',
         ]);
@@ -127,7 +127,7 @@ class CommentTest extends TestCase
         $commenter = User::factory()->create();
         $post = Post::factory()->create(['user_id' => $author->id]);
 
-        $this->actingAs($commenter)->post("/post/{$post->id}/comment", [
+        $this->actingAs($commenter)->post("/post/{$post->slug}/comment", [
             'post_id' => $post->id,
             'content' => 'Nice one!',
         ]);
@@ -145,7 +145,7 @@ class CommentTest extends TestCase
         $user = User::factory()->create();
         $post = Post::factory()->create(['user_id' => $user->id]);
 
-        $this->actingAs($user)->post("/post/{$post->id}/comment", [
+        $this->actingAs($user)->post("/post/{$post->slug}/comment", [
             'post_id' => $post->id,
             'content' => 'Self comment',
         ]);

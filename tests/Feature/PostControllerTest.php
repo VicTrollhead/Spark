@@ -108,7 +108,7 @@ class PostControllerTest extends TestCase
         $post = Post::factory()->create(['user_id' => $user->id]);
 
         $this->actingAs($user)
-            ->get("/post/{$post->id}")
+            ->get("/post/{$post->slug}")
             ->assertOk();
     }
 
@@ -118,7 +118,7 @@ class PostControllerTest extends TestCase
         $post = Post::factory()->create(['is_private' => false]);
 
         $this->actingAs($user)
-            ->get("/post/{$post->id}")
+            ->get("/post/{$post->slug}")
             ->assertOk();
     }
 
@@ -132,7 +132,7 @@ class PostControllerTest extends TestCase
         ]);
 
         $this->actingAs($user)
-            ->get("/post/{$post->id}")
+            ->get("/post/{$post->slug}")
             ->assertForbidden();
     }
 
@@ -149,7 +149,7 @@ class PostControllerTest extends TestCase
         $author->followers()->attach($follower->id, ['is_accepted' => true]);
 
         $this->actingAs($follower)
-            ->get("/post/{$post->id}")
+            ->get("/post/{$post->slug}")
             ->assertOk();
     }
 
@@ -158,7 +158,7 @@ class PostControllerTest extends TestCase
         $user = User::factory()->create();
         $post = Post::factory()->create(['user_id' => $user->id]);
 
-        $response = $this->actingAs($user)->delete("/post/{$post->id}");
+        $response = $this->actingAs($user)->delete("/post/{$post->slug}");
 
         $response->assertRedirect(route('dashboard'));
         $this->assertDatabaseMissing('posts', ['id' => $post->id]);
@@ -171,7 +171,7 @@ class PostControllerTest extends TestCase
         $post = Post::factory()->create(['user_id' => $otherUser->id]);
 
         $this->actingAs($user)
-            ->delete("/post/{$post->id}")
+            ->delete("/post/{$post->slug}")
             ->assertForbidden();
 
         $this->assertDatabaseHas('posts', ['id' => $post->id]);
@@ -185,12 +185,12 @@ class PostControllerTest extends TestCase
             'content' => 'Original content',
         ]);
 
-        $response = $this->actingAs($user)->patch("/post/{$post->id}/update", [
+        $response = $this->actingAs($user)->patch("/post/{$post->slug}/update", [
             'content' => 'Updated content',
             'is_private' => false,
         ]);
 
-        $response->assertRedirect(route('post.show', $post->id));
+        $response->assertRedirect(route('post.show', $post));
         $this->assertDatabaseHas('posts', [
             'id' => $post->id,
             'content' => 'Updated content',
@@ -207,7 +207,7 @@ class PostControllerTest extends TestCase
         ]);
 
         $this->actingAs($user)
-            ->patch("/post/{$post->id}/update", [
+            ->patch("/post/{$post->slug}/update", [
                 'content' => 'Hacked!',
                 'is_private' => false,
             ])

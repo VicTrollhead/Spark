@@ -36,10 +36,17 @@ vi.mock('@inertiajs/react', () => ({
 
 // Mock the hooks
 vi.mock('../hooks/use-initials.jsx', () => ({
-    useInitials: () => (name) => name ? name.split(' ').map((n) => n[0]).join('') : '?',
+    useInitials: () => (name) =>
+        name
+            ? name
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')
+            : '?',
 }));
 
 vi.mock('../lib/utils', () => ({
+    cn: (...inputs) => inputs.filter(Boolean).join(' '),
     getProfileImageUrl: (img) => img?.file_path || '/default-avatar.png',
 }));
 
@@ -66,27 +73,19 @@ describe('Notification', () => {
         expect(screen.getByText('liked your post.')).toBeTruthy();
     });
 
-    it('renders user name and username', () => {
+    it('renders user name linking to their profile', () => {
         render(<Notification notification={baseNotification} />);
-        expect(screen.getByText(/John Doe/)).toBeTruthy();
-        expect(screen.getByText(/johndoe/)).toBeTruthy();
+        const link = screen.getByRole('link', { name: /John Doe/ });
+        expect(link.getAttribute('href')).toBe('/user/johndoe');
     });
 
     it('renders follow notification', () => {
-        render(
-            <Notification
-                notification={{ ...baseNotification, type: 'follow', post: null, extra_data: null }}
-            />,
-        );
+        render(<Notification notification={{ ...baseNotification, type: 'follow', post: null, extra_data: null }} />);
         expect(screen.getByText('followed you.')).toBeTruthy();
     });
 
     it('renders comment notification with extra data', () => {
-        render(
-            <Notification
-                notification={{ ...baseNotification, type: 'comment', extra_data: 'Great post!' }}
-            />,
-        );
+        render(<Notification notification={{ ...baseNotification, type: 'comment', extra_data: 'Great post!' }} />);
         expect(screen.getByText('commented on your post:')).toBeTruthy();
     });
 });

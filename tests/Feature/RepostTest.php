@@ -17,7 +17,7 @@ class RepostTest extends TestCase
         $user = User::factory()->create();
         $post = Post::factory()->create(['is_private' => false]);
 
-        $response = $this->actingAs($user)->post("/post/{$post->id}/repost");
+        $response = $this->actingAs($user)->post("/post/{$post->slug}/repost");
 
         $response->assertRedirect();
         $this->assertDatabaseHas('reposts', [
@@ -31,7 +31,7 @@ class RepostTest extends TestCase
         $user = User::factory()->create();
         $post = Post::factory()->create(['is_private' => true]);
 
-        $response = $this->actingAs($user)->post("/post/{$post->id}/repost");
+        $response = $this->actingAs($user)->post("/post/{$post->slug}/repost");
 
         $response->assertForbidden();
         $this->assertDatabaseMissing('reposts', [
@@ -50,7 +50,7 @@ class RepostTest extends TestCase
             'post_id' => $post->id,
         ]);
 
-        $response = $this->actingAs($user)->post("/post/{$post->id}/undo");
+        $response = $this->actingAs($user)->post("/post/{$post->slug}/undo");
 
         $response->assertRedirect();
         $this->assertDatabaseMissing('reposts', [
@@ -64,8 +64,8 @@ class RepostTest extends TestCase
         $user = User::factory()->create();
         $post = Post::factory()->create(['is_private' => false]);
 
-        $this->actingAs($user)->post("/post/{$post->id}/repost");
-        $this->actingAs($user)->post("/post/{$post->id}/repost");
+        $this->actingAs($user)->post("/post/{$post->slug}/repost");
+        $this->actingAs($user)->post("/post/{$post->slug}/repost");
 
         $this->assertEquals(1, Repost::where('user_id', $user->id)->where('post_id', $post->id)->count());
     }
@@ -79,7 +79,7 @@ class RepostTest extends TestCase
             'is_private' => false,
         ]);
 
-        $this->actingAs($reposter)->post("/post/{$post->id}/repost");
+        $this->actingAs($reposter)->post("/post/{$post->slug}/repost");
 
         $this->assertDatabaseHas('notifications', [
             'user_id' => $author->id,
@@ -97,7 +97,7 @@ class RepostTest extends TestCase
             'is_private' => false,
         ]);
 
-        $this->actingAs($user)->post("/post/{$post->id}/repost");
+        $this->actingAs($user)->post("/post/{$post->slug}/repost");
 
         $this->assertDatabaseMissing('notifications', [
             'user_id' => $user->id,
@@ -110,7 +110,7 @@ class RepostTest extends TestCase
     {
         $post = Post::factory()->create(['is_private' => false]);
 
-        $response = $this->post("/post/{$post->id}/repost");
+        $response = $this->post("/post/{$post->slug}/repost");
 
         $response->assertRedirect('/login');
     }

@@ -25,11 +25,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('notifications', function (Blueprint $table) {
+            // MySQL drops the FK's auto-index once the composite covers it, so
+            // restore a plain index before dropping the composite
+            $table->index('user_id');
             $table->dropIndex(['user_id', 'is_read']);
             $table->dropIndex(['type', 'source_user_id', 'message_id']);
         });
 
         Schema::table('messages', function (Blueprint $table) {
+            $table->index('chat_id');
             $table->dropIndex(['chat_id', 'read_at']);
         });
 

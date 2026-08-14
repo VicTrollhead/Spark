@@ -8,7 +8,7 @@ export function useOnlineUsers() {
     const [onlineUserIds, setOnlineUserIds] = useState(new Set());
 
     useEffect(() => {
-        const channel = window.Echo.join('presence-online')
+        window.Echo.join('presence-online')
             .here((users) => {
                 setOnlineUserIds(new Set(users.map((u) => u.id)));
             })

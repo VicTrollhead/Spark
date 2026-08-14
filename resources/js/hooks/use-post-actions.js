@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import { router, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 export function usePostActions(post) {
@@ -37,7 +37,6 @@ export function usePostActions(post) {
     }, [post.id]);
 
     const handleLike = async () => {
-        const wasLiked = isLiked;
         setIsLiked(!isLiked);
         setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
         const action = isLiked ? `/unlike` : `/like`;
@@ -103,9 +102,14 @@ export function usePostActions(post) {
     };
 
     return {
-        isLiked, likesCount,
-        isFavorited, favoritesCount,
-        isReposted, repostsCount,
-        handleLike, handleFavorite, handleRepost,
+        isLiked,
+        likesCount,
+        isFavorited,
+        favoritesCount,
+        isReposted,
+        repostsCount,
+        handleLike,
+        handleFavorite,
+        handleRepost,
     };
 }

@@ -16,7 +16,7 @@ class PinPostTest extends TestCase
         $user = User::factory()->create();
         $post = Post::factory()->create(['user_id' => $user->id]);
 
-        $response = $this->actingAs($user)->post("/post/{$post->id}/toggle-pin");
+        $response = $this->actingAs($user)->post("/post/{$post->slug}/toggle-pin");
 
         $response->assertRedirect();
         $user->refresh();
@@ -30,7 +30,7 @@ class PinPostTest extends TestCase
 
         $user->update(['pinned_post_id' => $post->id]);
 
-        $response = $this->actingAs($user)->post("/post/{$post->id}/toggle-pin");
+        $response = $this->actingAs($user)->post("/post/{$post->slug}/toggle-pin");
 
         $response->assertRedirect();
         $user->refresh();
@@ -43,7 +43,7 @@ class PinPostTest extends TestCase
         $otherUser = User::factory()->create();
         $post = Post::factory()->create(['user_id' => $otherUser->id]);
 
-        $response = $this->actingAs($user)->post("/post/{$post->id}/toggle-pin");
+        $response = $this->actingAs($user)->post("/post/{$post->slug}/toggle-pin");
 
         $response->assertForbidden();
         $user->refresh();
@@ -58,7 +58,7 @@ class PinPostTest extends TestCase
 
         $user->update(['pinned_post_id' => $post1->id]);
 
-        $this->actingAs($user)->post("/post/{$post2->id}/toggle-pin");
+        $this->actingAs($user)->post("/post/{$post2->slug}/toggle-pin");
 
         $user->refresh();
         $this->assertEquals($post2->id, $user->pinned_post_id);
@@ -68,7 +68,7 @@ class PinPostTest extends TestCase
     {
         $post = Post::factory()->create();
 
-        $response = $this->post("/post/{$post->id}/toggle-pin");
+        $response = $this->post("/post/{$post->slug}/toggle-pin");
 
         $response->assertRedirect('/login');
     }

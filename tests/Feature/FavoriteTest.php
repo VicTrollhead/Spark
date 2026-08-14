@@ -17,7 +17,7 @@ class FavoriteTest extends TestCase
         $user = User::factory()->create();
         $post = Post::factory()->create();
 
-        $response = $this->actingAs($user)->post("/post/{$post->id}/add-favorite");
+        $response = $this->actingAs($user)->post("/post/{$post->slug}/add-favorite");
 
         $response->assertRedirect();
         $this->assertDatabaseHas('favorites', [
@@ -36,7 +36,7 @@ class FavoriteTest extends TestCase
             'post_id' => $post->id,
         ]);
 
-        $response = $this->actingAs($user)->post("/post/{$post->id}/remove-favorite");
+        $response = $this->actingAs($user)->post("/post/{$post->slug}/remove-favorite");
 
         $response->assertRedirect();
         $this->assertDatabaseMissing('favorites', [
@@ -50,8 +50,8 @@ class FavoriteTest extends TestCase
         $user = User::factory()->create();
         $post = Post::factory()->create();
 
-        $this->actingAs($user)->post("/post/{$post->id}/add-favorite");
-        $this->actingAs($user)->post("/post/{$post->id}/add-favorite");
+        $this->actingAs($user)->post("/post/{$post->slug}/add-favorite");
+        $this->actingAs($user)->post("/post/{$post->slug}/add-favorite");
 
         $this->assertEquals(1, Favorite::where('user_id', $user->id)->where('post_id', $post->id)->count());
     }
@@ -62,7 +62,7 @@ class FavoriteTest extends TestCase
         $favoriter = User::factory()->create();
         $post = Post::factory()->create(['user_id' => $author->id]);
 
-        $this->actingAs($favoriter)->post("/post/{$post->id}/add-favorite");
+        $this->actingAs($favoriter)->post("/post/{$post->slug}/add-favorite");
 
         $this->assertDatabaseHas('notifications', [
             'user_id' => $author->id,
@@ -77,7 +77,7 @@ class FavoriteTest extends TestCase
         $user = User::factory()->create();
         $post = Post::factory()->create(['user_id' => $user->id]);
 
-        $this->actingAs($user)->post("/post/{$post->id}/add-favorite");
+        $this->actingAs($user)->post("/post/{$post->slug}/add-favorite");
 
         $this->assertDatabaseMissing('notifications', [
             'user_id' => $user->id,
@@ -92,8 +92,8 @@ class FavoriteTest extends TestCase
         $favoriter = User::factory()->create();
         $post = Post::factory()->create(['user_id' => $author->id]);
 
-        $this->actingAs($favoriter)->post("/post/{$post->id}/add-favorite");
-        $this->actingAs($favoriter)->post("/post/{$post->id}/remove-favorite");
+        $this->actingAs($favoriter)->post("/post/{$post->slug}/add-favorite");
+        $this->actingAs($favoriter)->post("/post/{$post->slug}/remove-favorite");
 
         $this->assertDatabaseMissing('notifications', [
             'source_user_id' => $favoriter->id,
@@ -106,7 +106,7 @@ class FavoriteTest extends TestCase
     {
         $post = Post::factory()->create();
 
-        $response = $this->post("/post/{$post->id}/add-favorite");
+        $response = $this->post("/post/{$post->slug}/add-favorite");
 
         $response->assertRedirect('/login');
     }
