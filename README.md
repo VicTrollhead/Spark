@@ -9,6 +9,7 @@
 </p>
 
 <p align="center">
+  <img src="https://gitlab.com/shapovalovtimur16/Spark/badges/main/pipeline.svg" alt="Pipeline Status" />
   <img src="https://img.shields.io/badge/Laravel-12-FF2D20?style=flat-square&logo=laravel&logoColor=white" alt="Laravel 12" />
   <img src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React 19" />
   <img src="https://img.shields.io/badge/Inertia.js-2-6C47FF?style=flat-square" alt="Inertia.js" />
@@ -22,6 +23,28 @@
 ## Overview
 
 Spark is a Twitter/X-style social network that goes beyond a simple clone. It supports posts with media, polls, and hashtags; threaded comments; real-time chat (public, direct, and group); a full notification system; user discovery and search; and more — all wrapped in a responsive, mobile-friendly UI with dark mode and i18n support.
+
+## Screenshots
+
+<p align="center">
+  <img src="screenshots/feed.png" alt="Home feed" width="100%" />
+</p>
+
+| Profile | Post detail |
+|---------|-------------|
+| ![Profile](screenshots/profile.png) | ![Post detail](screenshots/post-detail.png) |
+
+| Real-time chat | Notifications |
+|----------------|---------------|
+| ![Chat](screenshots/chat.png) | ![Notifications](screenshots/notifications.png) |
+
+| Search | User discovery |
+|--------|----------------|
+| ![Search](screenshots/search.png) | ![Users](screenshots/users.png) |
+
+| Landing page | Login |
+|--------------|-------|
+| ![Welcome](screenshots/welcome.png) | ![Login](screenshots/login.png) |
 
 ## Features
 
@@ -91,7 +114,7 @@ Spark is a Twitter/X-style social network that goes beyond a simple clone. It su
 
 ```bash
 # Clone the repository
-git clone https://github.com/VicTrollhead/Spark.git
+git clone https://gitlab.com/shapovalovtimur16/Spark.git
 cd Spark
 
 # Copy environment file and configure
@@ -125,15 +148,15 @@ Key `.env` variables to configure:
 DB_CONNECTION=mysql
 DB_HOST=mysql
 DB_PORT=3306
-DB_DATABASE=spark
-DB_USERNAME=spark
-DB_PASSWORD=secret
+DB_DATABASE=spark_db
+DB_USERNAME=spark_user
+DB_PASSWORD=12345678
 
 # Redis
 REDIS_HOST=redis
 
-# File storage (s3 or local)
-FILESYSTEM_DISK=s3
+# File storage (local by default; set to s3 for cloud storage)
+FILESYSTEM_DISK=local
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 AWS_DEFAULT_REGION=
