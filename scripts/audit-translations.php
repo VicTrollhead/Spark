@@ -10,10 +10,9 @@
  * Usage: php scripts/audit-translations.php [--fix]
  *   --fix    Auto-add missing keys to language files with English as placeholder
  */
-
 $projectRoot = dirname(__DIR__);
-$langDir = $projectRoot . '/lang';
-$jsDir = $projectRoot . '/resources/js';
+$langDir = $projectRoot.'/lang';
+$jsDir = $projectRoot.'/resources/js';
 
 // Parse CLI args
 $fix = in_array('--fix', $argv);
@@ -25,7 +24,9 @@ $iterator = new RecursiveIteratorIterator(
 );
 
 foreach ($iterator as $file) {
-    if (!in_array($file->getExtension(), ['jsx', 'js'])) continue;
+    if (! in_array($file->getExtension(), ['jsx', 'js'])) {
+        continue;
+    }
 
     $content = file_get_contents($file->getPathname());
 
@@ -33,8 +34,8 @@ foreach ($iterator as $file) {
     preg_match_all("/translations\[(['\"])(.+?)\\1\]/", $content, $matches);
     foreach ($matches[2] as $key) {
         $usedKeys[$key] = $usedKeys[$key] ?? [];
-        $relativePath = str_replace($projectRoot . '/', '', $file->getPathname());
-        if (!in_array($relativePath, $usedKeys[$key])) {
+        $relativePath = str_replace($projectRoot.'/', '', $file->getPathname());
+        if (! in_array($relativePath, $usedKeys[$key])) {
             $usedKeys[$key][] = $relativePath;
         }
     }
@@ -47,14 +48,18 @@ foreach ($iterator as $file) {
 }
 
 // Also scan PHP files for translation usage
-$phpDirs = [$projectRoot . '/app', $projectRoot . '/resources/views'];
+$phpDirs = [$projectRoot.'/app', $projectRoot.'/resources/views'];
 foreach ($phpDirs as $dir) {
-    if (!is_dir($dir)) continue;
+    if (! is_dir($dir)) {
+        continue;
+    }
     $phpIterator = new RecursiveIteratorIterator(
         new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS)
     );
     foreach ($phpIterator as $file) {
-        if ($file->getExtension() !== 'php') continue;
+        if ($file->getExtension() !== 'php') {
+            continue;
+        }
         $content = file_get_contents($file->getPathname());
         preg_match_all("/trans_choice\(['\"]common\.(.+?)['\"],/", $content, $tcMatches);
         foreach ($tcMatches[1] as $key) {
@@ -73,7 +78,9 @@ $totalUsed = count($usedKeys);
 // 2. Load all language files
 $languages = [];
 foreach (scandir($langDir) as $lang) {
-    if ($lang === '.' || $lang === '..') continue;
+    if ($lang === '.' || $lang === '..') {
+        continue;
+    }
     $commonFile = "$langDir/$lang/common.php";
     if (file_exists($commonFile)) {
         $languages[$lang] = include $commonFile;
@@ -83,9 +90,9 @@ foreach (scandir($langDir) as $lang) {
 // 3. Compare and report
 
 echo "\n🔍 Translation Key Audit\n";
-echo str_repeat('=', 60) . "\n\n";
+echo str_repeat('=', 60)."\n\n";
 echo "Found $totalUsed translation keys used in code\n";
-echo "Languages found: " . implode(', ', array_keys($languages)) . "\n\n";
+echo 'Languages found: '.implode(', ', array_keys($languages))."\n\n";
 
 // Find missing keys per language
 $hasIssues = false;
@@ -93,14 +100,14 @@ $missingByLang = [];
 
 foreach ($languages as $lang => $keys) {
     $missing = array_diff_key($usedKeys, $keys);
-    if (!empty($missing)) {
+    if (! empty($missing)) {
         $hasIssues = true;
         $missingByLang[$lang] = $missing;
-        echo "❌ Missing in [$lang]: " . count($missing) . " keys\n";
+        echo "❌ Missing in [$lang]: ".count($missing)." keys\n";
         foreach ($missing as $key => $files) {
             echo "   - \"$key\"";
-            if (!empty($files)) {
-                echo " (used in " . basename($files[0]) . (count($files) > 1 ? " +" . (count($files) - 1) . " more" : "") . ")";
+            if (! empty($files)) {
+                echo ' (used in '.basename($files[0]).(count($files) > 1 ? ' +'.(count($files) - 1).' more' : '').')';
             }
             echo "\n";
         }
@@ -111,16 +118,16 @@ foreach ($languages as $lang => $keys) {
 }
 
 // Find unused keys (in lang files but never referenced in code)
-echo "\n" . str_repeat('-', 60) . "\n\n";
+echo "\n".str_repeat('-', 60)."\n\n";
 foreach ($languages as $lang => $keys) {
     $unused = array_diff_key($keys, $usedKeys);
     // Remove pluralization keys that might be used via trans_choice
     $unused = array_filter($unused, function ($val, $key) {
-        return !str_contains($key, '_count');
+        return ! str_contains($key, '_count');
     }, ARRAY_FILTER_USE_BOTH);
 
-    if (!empty($unused)) {
-        echo "⚠️  Potentially unused in [$lang]: " . count($unused) . " keys\n";
+    if (! empty($unused)) {
+        echo "⚠️  Potentially unused in [$lang]: ".count($unused)." keys\n";
         foreach ($unused as $key => $val) {
             echo "   - \"$key\"\n";
         }
@@ -131,8 +138,8 @@ foreach ($languages as $lang => $keys) {
 }
 
 // 4. Auto-fix if requested
-if ($fix && !empty($missingByLang)) {
-    echo "\n" . str_repeat('=', 60) . "\n";
+if ($fix && ! empty($missingByLang)) {
+    echo "\n".str_repeat('=', 60)."\n";
     echo "🔧 Auto-fix mode: adding missing keys...\n\n";
 
     foreach ($missingByLang as $lang => $missing) {
@@ -148,12 +155,12 @@ if ($fix && !empty($missingByLang)) {
         $export = var_export($existing, true);
         $export = preg_replace('/^array \(/', '[', $export);
         $export = preg_replace('/\)$/', ']', $export);
-        $export = str_replace("array (", '[', $export);
+        $export = str_replace('array (', '[', $export);
         $export = str_replace(')', ']', $export);
 
         $content = "<?php\n\n// resources/lang/$lang/common.php\nreturn $export;\n";
         file_put_contents($commonFile, $content);
-        echo "   ✅ Updated $commonFile (added " . count($missing) . " keys)\n";
+        echo "   ✅ Updated $commonFile (added ".count($missing)." keys)\n";
     }
 }
 

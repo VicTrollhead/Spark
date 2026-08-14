@@ -1,6 +1,6 @@
+import { Moon, Sun } from 'lucide-react';
 import { useAppearance } from '../hooks/use-appearance';
 import { cn } from '../lib/utils';
-import { Moon, Sun } from 'lucide-react';
 
 export default function AppearanceToggle({ className = '', ...props }) {
     const { appearance, updateAppearance } = useAppearance();
@@ -11,13 +11,13 @@ export default function AppearanceToggle({ className = '', ...props }) {
         <button
             onClick={() => updateAppearance(isDarkMode ? 'light' : 'dark')}
             className={cn(
-                'flex items-center gap-2 rounded-full bg-neutral ml-1 transition dark:bg-neutral',
-                'hover:bg-neutral-300 dark:hover:bg-neutral-700 bg-gray-100 dark:bg-neutral-800',
-                className
+                'bg-neutral dark:bg-neutral ml-1 flex items-center gap-2 rounded-full transition',
+                'bg-gray-100 hover:bg-neutral-300 dark:bg-neutral-800 dark:hover:bg-neutral-700',
+                className,
             )}
             {...props}
         >
-            {isDarkMode ? <Moon className="h-5 w-5 text-white" /> : <Sun className="h-5 w-5 text-black-500" />}
+            {isDarkMode ? <Moon className="h-5 w-5 text-white" /> : <Sun className="text-black-500 h-5 w-5" />}
         </button>
     );
 }

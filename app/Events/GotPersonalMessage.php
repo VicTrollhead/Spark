@@ -3,8 +3,8 @@
 namespace App\Events;
 
 use App\Models\Message;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -14,6 +14,7 @@ class GotPersonalMessage implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public Message $message;
+
     public int $chatId;
 
     /**
@@ -48,7 +49,7 @@ class GotPersonalMessage implements ShouldBroadcast
             ],
             'time' => $this->message->time,
             'chat_id' => $this->chatId,
-            'media' => $this->message->media->map(fn($media) => [
+            'media' => $this->message->media->map(fn ($media) => [
                 'file_path' => $media->file_path,
                 'file_type' => $media->file_type,
                 'url' => $media->url,

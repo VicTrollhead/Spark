@@ -8,4 +8,3 @@ export function useMobileNavigation() {
 
     return cleanup;
 }
-

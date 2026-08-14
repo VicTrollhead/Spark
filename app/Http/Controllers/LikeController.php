@@ -6,15 +6,14 @@ namespace App\Http\Controllers;
 
 use App\Events\PostEngagementChanged;
 use App\Models\Comment;
+use App\Models\Like;
 use App\Models\Notification;
 use App\Models\Post;
 use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Models\Like;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-
 
 class LikeController extends Controller
 {
@@ -69,9 +68,8 @@ class LikeController extends Controller
             $this->broadcastEngagement($likeable);
         }
 
-        return back()->with('success', class_basename($modelClass) . ' liked successfully.');
+        return back()->with('success', class_basename($modelClass).' liked successfully.');
     }
-
 
     public function unlike(Request $request): RedirectResponse
     {
@@ -117,9 +115,8 @@ class LikeController extends Controller
             }
         }
 
-        return back()->with('success', ucfirst($type) . ' unliked successfully.');
+        return back()->with('success', ucfirst($type).' unliked successfully.');
     }
-
 
     public function isLiked($type, $id, Request $request): RedirectResponse
     {

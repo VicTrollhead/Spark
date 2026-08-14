@@ -14,6 +14,7 @@ class GotGroupMessage implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public Message $message;
+
     public int $groupChatId;
 
     public function __construct(Message $message, int $groupChatId)
@@ -45,7 +46,7 @@ class GotGroupMessage implements ShouldBroadcast
             ],
             'time' => $this->message->time,
             'group_chat_id' => $this->groupChatId,
-            'media' => $this->message->media->map(fn($media) => [
+            'media' => $this->message->media->map(fn ($media) => [
                 'file_path' => $media->file_path,
                 'file_type' => $media->file_type,
                 'url' => $media->url,

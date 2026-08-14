@@ -25,7 +25,7 @@ class HashtagController extends Controller
             ->take(5)
             ->get();
 
-        return $hashtags->map(fn($hashtag) => [
+        return $hashtags->map(fn ($hashtag) => [
             'id' => $hashtag->id,
             'hashtag' => $hashtag->hashtag,
             'posts_count' => $hashtag->posts_count,
@@ -39,7 +39,7 @@ class HashtagController extends Controller
             ->take(5)
             ->get();
 
-        return $hashtags->map(fn($hashtag) => [
+        return $hashtags->map(fn ($hashtag) => [
             'id' => $hashtag->id,
             'hashtag' => $hashtag->hashtag,
             'uses_count' => $hashtag->posts_count,
@@ -50,7 +50,7 @@ class HashtagController extends Controller
     {
         $currentUser = Auth::user();
 
-        if (!$currentUser) {
+        if (! $currentUser) {
             abort(403, 'Unauthorized');
         }
 
@@ -64,7 +64,7 @@ class HashtagController extends Controller
             })
             ->latest()
             ->paginate(15)
-            ->through(fn($post) => formatPostForFrontend($post, $currentUser));
+            ->through(fn ($post) => formatPostForFrontend($post, $currentUser));
 
         return Inertia::render('post/posts-by-hashtag', [
             'user' => $currentUser,

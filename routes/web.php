@@ -1,6 +1,6 @@
 <?php
 
-//use App\Http\Controllers\Settings\ProfileController;
+// use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommentController;
@@ -24,13 +24,12 @@ Route::get('/', function () {
     if (auth()->check()) {
         return redirect()->route('dashboard');
     }
+
     return Inertia::render('welcome');
 })->name('home');
 
-
-
 Route::get('/api/auth/google/callback', [GoogleAuthController::class, 'googleAuth'])->name('api.auth.google.callback');
-Route::get('/api/auth/google', [GoogleAuthController::class, 'googleLogin']) ->name('api.auth.google');
+Route::get('/api/auth/google', [GoogleAuthController::class, 'googleLogin'])->name('api.auth.google');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [PostController::class, 'index'])->name('dashboard');
@@ -60,7 +59,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/is-following/{user}', [FollowController::class, 'isFollowing'])->name('isFollowing');
     Route::get('/user/{user}/followers', [FollowController::class, 'followers'])->name('user.followers');
     Route::get('/user/{user}/following', [FollowController::class, 'following'])->name('user.following');
-
 
     Route::get('/post/{post}', [PostController::class, 'show'])->name('post.show');
     Route::get('/show-popular-hashtags', [HashtagController::class, 'showPopular'])->name('showPopularHashtags');
@@ -118,37 +116,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//// 🏠 Public Routes
-//Route::get('/', function () {
+// // 🏠 Public Routes
+// Route::get('/', function () {
 //    return Inertia::render('Welcome', [
 //        'canLogin' => Route::has('login'),
 //        'canRegister' => Route::has('register'),
 //        'laravelVersion' => Application::VERSION,
 //        'phpVersion' => PHP_VERSION,
 //    ]);
-//});
+// });
 //
-//// 🔒 Dashboard - Requires Authentication & Email Verification
-//Route::middleware(['auth', 'verified'])->group(function () {
+// // 🔒 Dashboard - Requires Authentication & Email Verification
+// Route::middleware(['auth', 'verified'])->group(function () {
 //    Route::get('/dashboard', function () {
 //        return Inertia::render('Dashboard');
 //    })->name('dashboard');
@@ -159,8 +138,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 //        Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
 //        Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
 //    });
-//});
-
+// });
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

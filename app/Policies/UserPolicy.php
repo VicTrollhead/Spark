@@ -10,7 +10,7 @@ class UserPolicy
 {
     use HandlesAuthorization;
 
-    public function update(User $currentUser, User $user) : Response
+    public function update(User $currentUser, User $user): Response
     {
         return $currentUser->id === $user->id
             ? Response::allow()
@@ -19,7 +19,7 @@ class UserPolicy
 
     public function view(?User $currentUser, User $user): bool
     {
-        if (!$user->is_private) {
+        if (! $user->is_private) {
             return true;
         }
 
@@ -29,6 +29,4 @@ class UserPolicy
 
         return false;
     }
-
-
 }

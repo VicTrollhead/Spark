@@ -1,10 +1,10 @@
-import { usePage, Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
+import { Check, RefreshCw, SendIcon, Users } from 'lucide-react';
+import { useState } from 'react';
+import { EmptyState } from '../../components/empty-state';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
-import { useState } from 'react';
-import { RefreshCw, SendIcon, Check, Users } from 'lucide-react';
-import { EmptyState } from '../../components/empty-state';
 import { getProfileImageUrl } from '../../lib/utils';
 
 export default function Friends() {
@@ -27,12 +27,16 @@ export default function Friends() {
             action = 'follow';
         }
 
-        router.post(`/user/friends/${action}`, { user_id: targetUser.id }, {
-            preserveScroll: true,
-            onSuccess: () => {
-                router.reload({ only: ['users'] });
+        router.post(
+            `/user/friends/${action}`,
+            { user_id: targetUser.id },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    router.reload({ only: ['users'] });
+                },
             },
-        });
+        );
     };
 
     return (
@@ -75,7 +79,7 @@ export default function Friends() {
                         <div
                             key={friend.id}
                             onClick={() => router.visit(`/user/${friend.username}`)}
-                            className="cursor-pointer px-4 sm:px-6 py-4 transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900"
+                            className="cursor-pointer px-4 py-4 transition-colors hover:bg-gray-50 sm:px-6 dark:hover:bg-neutral-900"
                         >
                             <div className="flex items-center gap-3">
                                 <Avatar className="h-11 w-11 shrink-0">
@@ -87,9 +91,7 @@ export default function Friends() {
 
                                 <div className="min-w-0 flex-1">
                                     <div className="flex items-center gap-1.5">
-                                        <span className="truncate font-semibold text-gray-900 dark:text-white">
-                                            {friend.name}
-                                        </span>
+                                        <span className="truncate font-semibold text-gray-900 dark:text-white">{friend.name}</span>
                                         {friend.is_verified && (
                                             <span className="inline-flex items-center rounded-full bg-blue-500 p-0.5 text-white">
                                                 <Check className="h-2.5 w-2.5" />
@@ -109,7 +111,7 @@ export default function Friends() {
                                     </button>
                                     <button
                                         onClick={() => handleFollowToggle(friend, friend.is_followed)}
-                                        className={`rounded-full px-3 sm:px-4 py-1.5 text-sm font-medium transition ${
+                                        className={`rounded-full px-3 py-1.5 text-sm font-medium transition sm:px-4 ${
                                             friend.is_followed
                                                 ? 'border border-gray-300 text-gray-700 hover:border-red-300 hover:bg-red-50 hover:text-red-600 dark:border-neutral-600 dark:text-gray-300 dark:hover:border-red-800 dark:hover:bg-red-950/30 dark:hover:text-red-400'
                                                 : 'bg-blue-500 text-white hover:bg-blue-600'
@@ -120,7 +122,9 @@ export default function Friends() {
                                 </div>
                             </div>
                             <div className="mt-1 ml-14 flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500">
-                                <span>{friend.followers_count} {translations['Followers']}</span>
+                                <span>
+                                    {friend.followers_count} {translations['Followers']}
+                                </span>
                                 <span className="font-medium text-green-500">{translations['You follow each other']}</span>
                             </div>
                         </div>

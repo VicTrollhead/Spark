@@ -2,16 +2,15 @@
 
 use Illuminate\Support\Facades\Storage;
 
-if (!function_exists('resolveStorageUrl')) {
+if (! function_exists('resolveStorageUrl')) {
     /**
      * Resolves a file URL from the media object using its disk with a fallback.
-     *
-     * @param object|null $media
-     * @return string|null
      */
     function resolveStorageUrl(?object $media): ?string
     {
-        if (!$media || !isset($media->file_path)) return null;
+        if (! $media || ! isset($media->file_path)) {
+            return null;
+        }
 
         $defaultDisk = config('filesystems.default');
         $fallbackDisk = 'public';

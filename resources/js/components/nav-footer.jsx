@@ -1,7 +1,7 @@
-import { Icon } from './icon';
 import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { useForm } from '@inertiajs/react';
 import { LogOut } from 'lucide-react';
+import { Icon } from './icon';
 
 export function NavFooter({ items, className, ...props }) {
     const { post } = useForm();
@@ -12,7 +12,11 @@ export function NavFooter({ items, className, ...props }) {
                 <SidebarMenu>
                     {items.map((item) => (
                         <SidebarMenuItem key={item.title}>
-                            <SidebarMenuButton size="lg" asChild className="text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100">
+                            <SidebarMenuButton
+                                size="lg"
+                                asChild
+                                className="text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100"
+                            >
                                 <a href={item.url} target="_blank" rel="noopener noreferrer">
                                     {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
                                     <span>{item.title}</span>
@@ -21,9 +25,13 @@ export function NavFooter({ items, className, ...props }) {
                         </SidebarMenuItem>
                     ))}
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild className="text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100 text-[16px]">
-                            <button onClick={() => post(route('logout'))} className="w-full flex items-center">
-                                <LogOut className="h-5 w-5"/>
+                        <SidebarMenuButton
+                            size="lg"
+                            asChild
+                            className="text-[16px] text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100"
+                        >
+                            <button onClick={() => post(route('logout'))} className="flex w-full items-center">
+                                <LogOut className="h-5 w-5" />
                                 <span>Log out</span>
                             </button>
                         </SidebarMenuButton>

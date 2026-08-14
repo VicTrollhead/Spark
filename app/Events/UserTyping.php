@@ -13,7 +13,9 @@ class UserTyping implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public int $userId;
+
     public string $userName;
+
     public int $chatId;
 
     public function __construct(int $userId, string $userName, int $chatId)

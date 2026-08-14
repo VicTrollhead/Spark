@@ -28,14 +28,14 @@ class SearchController extends Controller
                 $posts = postBaseQuery($currentUser)
                     ->where(function ($q) use ($query) {
                         $q->where('content', 'like', "%{$query}%")
-                          ->orWhereHas('hashtags', function ($hq) use ($query) {
-                              $hq->where('hashtag', 'like', "%{$query}%");
-                          });
+                            ->orWhereHas('hashtags', function ($hq) use ($query) {
+                                $hq->where('hashtag', 'like', "%{$query}%");
+                            });
                     })
                     ->latest()
                     ->take(30)
                     ->get()
-                    ->map(fn($post) => formatPostForFrontend($post, $currentUser))
+                    ->map(fn ($post) => formatPostForFrontend($post, $currentUser))
                     ->values();
             }
 
@@ -44,11 +44,11 @@ class SearchController extends Controller
                     ->withCount('followers')
                     ->where(function ($q) use ($query) {
                         $q->where('name', 'like', "%{$query}%")
-                          ->orWhere('username', 'like', "%{$query}%");
+                            ->orWhere('username', 'like', "%{$query}%");
                     })
                     ->take(30)
                     ->get()
-                    ->map(fn($user) => [
+                    ->map(fn ($user) => [
                         'id' => $user->id,
                         'name' => $user->name,
                         'username' => $user->username,
@@ -64,7 +64,7 @@ class SearchController extends Controller
                     ->orderByDesc('posts_count')
                     ->take(30)
                     ->get()
-                    ->map(fn($tag) => [
+                    ->map(fn ($tag) => [
                         'id' => $tag->id,
                         'hashtag' => $tag->hashtag,
                         'posts_count' => $tag->posts_count,

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Events\GotPersonalMessage;
+use App\Events\MessagesRead;
 use App\Events\UserMessageCreated;
 use App\Events\UserMessageIsReadChange;
-use App\Events\MessagesRead;
 use App\Events\UserTyping;
 use App\Jobs\SendMessage;
 use App\Models\Chat;
@@ -33,7 +33,7 @@ class ChatController extends Controller
     {
         $user = Auth::user();
         $messages = Message::with(['user.profileImage'])
-            ->where('chat_id',null)
+            ->where('chat_id', null)
             ->latest()
             ->take(50)
             ->get()
@@ -54,7 +54,6 @@ class ChatController extends Controller
                 ];
             })
             ->values();
-
 
         return Inertia::render('chat/everyone-chat', [
             'user' => [
@@ -197,8 +196,6 @@ class ChatController extends Controller
         ]);
     }
 
-
-
     public function getUserChat(User $otherUser): Response
     {
         $user = Auth::user();
@@ -231,7 +228,7 @@ class ChatController extends Controller
                             'is_verified' => $message->user->is_verified,
                         ],
                         'read_at' => $message->read_at,
-                        'media' => $message->media->map(fn($media) => [
+                        'media' => $message->media->map(fn ($media) => [
                             'file_path' => $media->file_path,
                             'file_type' => $media->file_type,
                             'url' => $media->url,
@@ -270,7 +267,6 @@ class ChatController extends Controller
         return redirect()->route('chat.getUserChat', ['user' => $otherUser->id]);
     }
 
-
     public function postMessageToUserChat(Request $request): RedirectResponse|\Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
@@ -289,19 +285,21 @@ class ChatController extends Controller
             if ($request->wantsJson()) {
                 return response()->json(['error' => 'chatId or otherUserId is required.'], 422);
             }
+
             return redirect()->back()->withErrors(['chatId' => 'chatId or otherUserId is required.']);
         }
 
-        if (empty($validated['text']) && !$request->hasFile('media')) {
+        if (empty($validated['text']) && ! $request->hasFile('media')) {
             if ($request->wantsJson()) {
                 return response()->json(['error' => 'A message or file is required.'], 422);
             }
+
             return redirect()->back()->withErrors(['text' => 'A message or file is required.']);
         }
 
         $user = Auth::user();
 
-        if (!empty($validated['chatId'])) {
+        if (! empty($validated['chatId'])) {
             $chat = Chat::findOrFail($validated['chatId']);
         } else {
             $chat = Chat::firstOrCreateChat($user->id, (int) $validated['otherUserId']);
@@ -364,7 +362,7 @@ class ChatController extends Controller
         $chat = $message->chat;
 
         $recipientId = null;
-        if (!is_null($chat)){
+        if (! is_null($chat)) {
             $recipientId = $chat->user1_id === $user->id ? $chat->user2_id : $chat->user1_id;
         }
 
@@ -385,8 +383,8 @@ class ChatController extends Controller
                 $chat->save();
             }
         });
-        if (!is_null($recipientId)){
-            event(new UserMessageIsReadChange($recipientId, "delete"));
+        if (! is_null($recipientId)) {
+            event(new UserMessageIsReadChange($recipientId, 'delete'));
         }
 
         return redirect()->back()->with('success', 'The message has been deleted.');
@@ -405,6 +403,7 @@ class ChatController extends Controller
             if ($request->wantsJson()) {
                 return response()->json(['success' => true]);
             }
+
             return redirect()->back();
         }
 
@@ -419,8 +418,8 @@ class ChatController extends Controller
 
         $recipientId = $chat->user1_id === $user->id ? $chat->user2_id : $chat->user1_id;
 
-        if (!is_null($recipientId)) {
-            event(new UserMessageIsReadChange($recipientId, "read"));
+        if (! is_null($recipientId)) {
+            event(new UserMessageIsReadChange($recipientId, 'read'));
         }
 
         event(new MessagesRead($chat->id, $user->id));
@@ -431,7 +430,6 @@ class ChatController extends Controller
 
         return redirect()->back();
     }
-
 
     public function getUnreadMessagesCount(Request $request): JsonResponse
     {

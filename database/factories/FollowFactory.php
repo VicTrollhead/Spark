@@ -17,6 +17,7 @@ class FollowFactory extends Factory
      * @return array<string, mixed>
      */
     protected $model = Follow::class;
+
     public function definition(): array
     {
         return [

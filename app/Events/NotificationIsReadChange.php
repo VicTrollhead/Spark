@@ -13,6 +13,7 @@ class NotificationIsReadChange implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $notification;
+
     public $operation;
 
     public function __construct($notification, $operation)
@@ -23,7 +24,7 @@ class NotificationIsReadChange implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return new PrivateChannel('notifications.' . $this->notification->user_id);
+        return new PrivateChannel('notifications.'.$this->notification->user_id);
     }
 
     public function broadcastWith()

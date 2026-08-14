@@ -13,7 +13,9 @@ class Media extends Model
     use HasFactory;
 
     public const ALLOWED_IMAGE_MIMETYPES = 'image/jpeg,image/png,image/gif,image/webp';
+
     public const ALLOWED_VIDEO_MIMETYPES = 'video/mp4,video/quicktime,video/webm';
+
     public const ALLOWED_POST_MIMETYPES = self::ALLOWED_IMAGE_MIMETYPES.','.self::ALLOWED_VIDEO_MIMETYPES;
 
     protected $fillable = [
@@ -47,6 +49,7 @@ class Media extends Model
     }
 
     protected $appends = ['url'];
+
     public function getUrlAttribute(): string
     {
         $disk = $this->disk ?? config('filesystems.default');

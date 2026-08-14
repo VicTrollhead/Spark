@@ -1,5 +1,5 @@
-import { SidebarProvider } from './ui/sidebar';
 import { useState } from 'react';
+import { SidebarProvider } from './ui/sidebar';
 
 export function AppShell({ children, variant = 'header' }) {
     const [isOpen, setIsOpen] = useState(() => (typeof window !== 'undefined' ? localStorage.getItem('sidebar') !== 'false' : true));
@@ -22,4 +22,3 @@ export function AppShell({ children, variant = 'header' }) {
         </SidebarProvider>
     );
 }
-

@@ -20,7 +20,10 @@ export function MobileNav() {
     ];
 
     return (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-950 lg:hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        <nav
+            className="fixed right-0 bottom-0 left-0 z-50 border-t border-gray-200 bg-white lg:hidden dark:border-neutral-800 dark:bg-neutral-950"
+            style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        >
             <div className="flex items-center justify-around py-2">
                 {items.map((item) => {
                     const Icon = item.icon;

@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { MessageCircle, Users, Hash, Zap } from 'lucide-react';
+import { Hash, MessageCircle, Users, Zap } from 'lucide-react';
 import AppearanceToggle from '../components/appearance-toggle';
 import AuthLanguageToggle from '../components/ui/auth-language-toggle';
 
@@ -16,39 +16,45 @@ export default function Welcome() {
         {
             icon: MessageCircle,
             title: t('Direct & group chat', 'Direct & group chat'),
-            description: t('Message anyone or start a group conversation with typing indicators.', 'Message anyone or start a group conversation with typing indicators.'),
+            description: t(
+                'Message anyone or start a group conversation with typing indicators.',
+                'Message anyone or start a group conversation with typing indicators.',
+            ),
         },
         {
             icon: Hash,
             title: t('Hashtags & search', 'Hashtags & search'),
-            description: t('Follow trends and discover posts, users and topics instantly.', 'Follow trends and discover posts, users and topics instantly.'),
+            description: t(
+                'Follow trends and discover posts, users and topics instantly.',
+                'Follow trends and discover posts, users and topics instantly.',
+            ),
         },
         {
             icon: Users,
             title: t('Follow your people', 'Follow your people'),
-            description: t('Build a timeline around the voices you actually care about.', 'Build a timeline around the voices you actually care about.'),
+            description: t(
+                'Build a timeline around the voices you actually care about.',
+                'Build a timeline around the voices you actually care about.',
+            ),
         },
     ];
 
     return (
         <>
             <Head title={t('Welcome to Spark', 'Welcome to Spark')} />
-            <div className="relative flex min-h-dvh flex-col bg-background text-foreground">
+            <div className="bg-background text-foreground relative flex min-h-dvh flex-col">
                 <div aria-hidden className="bg-ambient" />
                 <header className="relative mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
                     <Link href="/" className="text-2xl font-bold tracking-tight">
                         Spark
                     </Link>
                     <nav className="flex items-center gap-2">
-                        <Link
-                            href={route('login')}
-                            className="rounded-full px-5 py-2 text-sm font-medium text-foreground transition hover:bg-accent"
-                        >
+                        <Link href={route('login')} className="text-foreground hover:bg-accent rounded-full px-5 py-2 text-sm font-medium transition">
                             {t('Log In', 'Log in')}
                         </Link>
                         <Link
                             href={route('register')}
-                            className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+                            className="bg-primary text-primary-foreground rounded-full px-5 py-2 text-sm font-medium transition hover:opacity-90"
                         >
                             {t('Sign up', 'Sign up')}
                         </Link>
@@ -62,23 +68,23 @@ export default function Welcome() {
                         <h1 className="max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
                             {t('Share what sparks your mind.', 'Share what sparks your mind.')}
                         </h1>
-                        <p className="mt-6 max-w-2xl text-lg text-muted-foreground">
+                        <p className="text-muted-foreground mt-6 max-w-2xl text-lg">
                             {t(
                                 'Spark is a real-time social space for short posts, live conversations and the people you want to hear from.',
-                                'Spark is a real-time social space for short posts, live conversations and the people you want to hear from.'
+                                'Spark is a real-time social space for short posts, live conversations and the people you want to hear from.',
                             )}
                         </p>
 
                         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                             <Link
                                 href={route('register')}
-                                className="rounded-full bg-primary px-8 py-3 text-base font-semibold text-primary-foreground transition hover:opacity-90"
+                                className="bg-primary text-primary-foreground rounded-full px-8 py-3 text-base font-semibold transition hover:opacity-90"
                             >
                                 {t('Create your account', 'Create your account')}
                             </Link>
                             <Link
                                 href={route('login')}
-                                className="rounded-full border border-border px-8 py-3 text-base font-semibold text-foreground transition hover:bg-accent"
+                                className="border-border text-foreground hover:bg-accent rounded-full border px-8 py-3 text-base font-semibold transition"
                             >
                                 {t('Log In', 'Log in')}
                             </Link>
@@ -89,19 +95,19 @@ export default function Welcome() {
                         {features.map(({ icon: Icon, title, description }) => (
                             <div
                                 key={title}
-                                className="rounded-2xl border border-border bg-card p-6 text-card-foreground transition hover:border-ring"
+                                className="border-border bg-card text-card-foreground hover:border-ring rounded-2xl border p-6 transition"
                             >
-                                <div className="mb-4 inline-flex rounded-full bg-accent p-3 text-accent-foreground">
+                                <div className="bg-accent text-accent-foreground mb-4 inline-flex rounded-full p-3">
                                     <Icon className="h-5 w-5" />
                                 </div>
                                 <h3 className="text-base font-semibold">{title}</h3>
-                                <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+                                <p className="text-muted-foreground mt-2 text-sm">{description}</p>
                             </div>
                         ))}
                     </section>
                 </main>
 
-                <footer className="relative mx-auto w-full max-w-6xl px-6 py-5 text-center text-sm text-muted-foreground">
+                <footer className="text-muted-foreground relative mx-auto w-full max-w-6xl px-6 py-5 text-center text-sm">
                     {t('Built with Spark.', 'Built with Spark.')}
                 </footer>
             </div>

@@ -1,20 +1,20 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
+import { useState } from 'react';
+import GoogleIcon from '../../assets/images/google_icon.png';
 import InputError from '../../components/input-error';
 import TextLink from '../../components/text-link';
 import { Button } from '../../components/ui/button';
 import { Checkbox } from '../../components/ui/checkbox';
 import { Input } from '../../components/ui/input';
-import PasswordVisibilityToggle from '../../components/ui/password-visibility-button';
 import { Label } from '../../components/ui/label';
+import PasswordVisibilityToggle from '../../components/ui/password-visibility-button';
 import AuthLayout from '../../layouts/auth-layout';
-import { useState } from 'react';
-import GoogleIcon from '../../assets/images/google_icon.png'
 
 export default function Login({ status, canResetPassword, googleClientId }) {
     const { data, setData, post, processing, errors, reset } = useForm({
-        email: "",
-        password: "",
+        email: '',
+        password: '',
         remember: false,
     });
 
@@ -25,8 +25,8 @@ export default function Login({ status, canResetPassword, googleClientId }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(route("login"), {
-            onFinish: () => reset("password"),
+        post(route('login'), {
+            onFinish: () => reset('password'),
         });
     };
 
@@ -35,9 +35,13 @@ export default function Login({ status, canResetPassword, googleClientId }) {
             <Head title={translations['Log In']} />
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-5">
-
-
-                    <Button asChild variant="default" size="default"  className="mt-4 w-full bg-white dark:bg-black hover:bg-white hover:dark:bg-black border-2 border-gray-700 hover:border-blue-500 text-black dark:text-white" tabIndex={5}>
+                    <Button
+                        asChild
+                        variant="default"
+                        size="default"
+                        className="mt-4 w-full border-2 border-gray-700 bg-white text-black hover:border-blue-500 hover:bg-white dark:bg-black dark:text-white hover:dark:bg-black"
+                        tabIndex={5}
+                    >
                         <a href={route('api.auth.google')} className="block text-center">
                             <img src={GoogleIcon} alt="Google" className="mr-2 h-5 w-5" />
                             {translations['Continue with Google']}

@@ -1,10 +1,10 @@
-import { usePage, Link, Head, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Check, RefreshCw, SendIcon, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { EmptyState } from '../../components/empty-state';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
-import { useEffect, useState } from 'react';
-import { Check, SendIcon, RefreshCw, Users } from 'lucide-react';
-import { EmptyState } from '../../components/empty-state';
 import { getProfileImageUrl } from '../../lib/utils';
 
 export default function Followers() {
@@ -27,22 +27,26 @@ export default function Followers() {
             action = 'follow';
         }
 
-        router.post(`/user/${targetUser.username}/${action}`, {}, {
-            preserveScroll: true,
-            onSuccess: () => {
-                setUsers(prevUsers =>
-                    prevUsers.map(u =>
-                        u.id === targetUser.id
-                            ? {
-                                ...u,
-                                is_followed: action === 'follow',
-                                has_sent_follow_request: action === 'follow-request',
-                            }
-                            : u
-                    )
-                );
+        router.post(
+            `/user/${targetUser.username}/${action}`,
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setUsers((prevUsers) =>
+                        prevUsers.map((u) =>
+                            u.id === targetUser.id
+                                ? {
+                                      ...u,
+                                      is_followed: action === 'follow',
+                                      has_sent_follow_request: action === 'follow-request',
+                                  }
+                                : u,
+                        ),
+                    );
+                },
             },
-        });
+        );
     };
 
     const handleReload = () => {
@@ -62,7 +66,11 @@ export default function Followers() {
                             className="cursor-pointer rounded-full border border-gray-200 bg-transparent px-3 py-1.5 text-sm dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
                             value={filters?.sort || 'latest'}
                             onChange={(e) => {
-                                router.get(route('user.followers', user.username), { sort: e.target.value }, { preserveScroll: true, preserveState: true });
+                                router.get(
+                                    route('user.followers', user.username),
+                                    { sort: e.target.value },
+                                    { preserveScroll: true, preserveState: true },
+                                );
                             }}
                         >
                             <option value="latest">{translations['Latest']}</option>
@@ -87,10 +95,7 @@ export default function Followers() {
             ) : (
                 <div className="divide-y divide-gray-100 dark:divide-neutral-800/50">
                     {users.map((follower) => (
-                        <div
-                            key={follower.id}
-                            className="px-4 sm:px-6 py-4 transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900"
-                        >
+                        <div key={follower.id} className="px-4 py-4 transition-colors hover:bg-gray-50 sm:px-6 dark:hover:bg-neutral-900">
                             <div className="flex items-center gap-3">
                                 <Link href={`/user/${follower.username}`} className="shrink-0">
                                     <Avatar className="h-11 w-11">
@@ -103,7 +108,10 @@ export default function Followers() {
 
                                 <div className="min-w-0 flex-1">
                                     <div className="flex items-center gap-1.5">
-                                        <Link href={`/user/${follower.username}`} className="truncate font-semibold text-gray-900 hover:underline dark:text-white">
+                                        <Link
+                                            href={`/user/${follower.username}`}
+                                            className="truncate font-semibold text-gray-900 hover:underline dark:text-white"
+                                        >
                                             {follower.name}
                                         </Link>
                                         {follower.is_verified && (
@@ -128,7 +136,7 @@ export default function Followers() {
                                         )}
                                         <button
                                             onClick={() => handleFollowToggle(follower, follower.is_followed || follower.has_sent_follow_request)}
-                                            className={`rounded-full px-3 sm:px-4 py-1.5 text-sm font-medium transition ${
+                                            className={`rounded-full px-3 py-1.5 text-sm font-medium transition sm:px-4 ${
                                                 follower.is_followed || follower.has_sent_follow_request
                                                     ? 'border border-gray-300 text-gray-700 hover:border-red-300 hover:bg-red-50 hover:text-red-600 dark:border-neutral-600 dark:text-gray-300 dark:hover:border-red-800 dark:hover:bg-red-950/30 dark:hover:text-red-400'
                                                     : 'bg-blue-500 text-white hover:bg-blue-600'
@@ -137,19 +145,19 @@ export default function Followers() {
                                             {follower.is_private && !follower.is_followed && !follower.has_sent_follow_request
                                                 ? translations['Send Follow Request']
                                                 : follower.has_sent_follow_request && !follower.is_followed
-                                                    ? translations['Request Sent']
-                                                    : follower.is_followed
-                                                        ? translations['Unfollow']
-                                                        : translations['Follow']}
+                                                  ? translations['Request Sent']
+                                                  : follower.is_followed
+                                                    ? translations['Unfollow']
+                                                    : translations['Follow']}
                                         </button>
                                     </div>
                                 )}
                             </div>
                             <div className="mt-1 ml-14 flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500">
-                                <span>{follower.followers_count} {translations['Followers'] || 'Followers'}</span>
-                                {follower.is_friend && (
-                                    <span className="font-medium text-green-500">{translations['You follow each other']}</span>
-                                )}
+                                <span>
+                                    {follower.followers_count} {translations['Followers'] || 'Followers'}
+                                </span>
+                                {follower.is_friend && <span className="font-medium text-green-500">{translations['You follow each other']}</span>}
                             </div>
                         </div>
                     ))}

@@ -17,13 +17,14 @@ class PostFactory extends Factory
      * @return array<string, mixed>
      */
     protected $model = Post::class;
+
     public function definition(): array
     {
         return [
             'user_id' => User::factory(),
             'content' => $this->faker->paragraph,
             'parent_post_id' => null,
-//            'media_url' => null,
+            //            'media_url' => null,
             'is_deleted' => false,
             'is_private' => false,
         ];

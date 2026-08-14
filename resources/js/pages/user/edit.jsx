@@ -1,4 +1,6 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -6,9 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Switch } from '../../components/ui/switch';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
-import { getProfileImageUrl, getCoverImageUrl } from '../../lib/utils';
-import { useEffect, useRef, useState } from 'react';
-import { X } from 'lucide-react';
+import { getCoverImageUrl, getProfileImageUrl } from '../../lib/utils';
 
 export default function Edit() {
     const { user, translations } = usePage().props;
@@ -19,8 +19,6 @@ export default function Edit() {
     const coverInputRef = useRef(null);
     const [previewProfileImage, setPreviewProfileImage] = useState(null);
     const [previewCoverImage, setPreviewCoverImage] = useState(null);
-
-
 
     const { data, setData, post, processing, errors } = useForm({
         name: user.name,
@@ -58,7 +56,6 @@ export default function Edit() {
         setPreviewCoverImage(null);
     };
 
-
     const handleProfileImageChange = (e) => {
         if (e.target.files[0]) {
             const file = e.target.files[0];
@@ -88,24 +85,21 @@ export default function Edit() {
         return `${year}-${month}-${day}`;
     }
 
-
-
     const profileImageStatus = removeProfileImage
         ? translations['Will be removed']
         : previewProfileImage
-            ? translations['Will be set']
-            : user.profile_image
-                ? translations['Set']
-                : translations['Not Set'];
+          ? translations['Will be set']
+          : user.profile_image
+            ? translations['Set']
+            : translations['Not Set'];
 
     const coverImageStatus = removeCoverImage
         ? translations['Will be removed']
         : previewCoverImage
-            ? translations['Will be set']
-            : user.cover_image
-                ? translations['Set']
-                : translations['Not Set'];
-
+          ? translations['Will be set']
+          : user.cover_image
+            ? translations['Set']
+            : translations['Not Set'];
 
     useEffect(() => {
         return () => {
@@ -125,51 +119,46 @@ export default function Edit() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="rounded-xl border border-gray-100 p-4 dark:border-neutral-800">
                         <h2 className="mb-3 text-lg font-medium text-gray-900 dark:text-white">{translations['Profile Image']}</h2>
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
                             <div className="relative">
                                 <Avatar className="h-24 w-24">
                                     {!removeProfileImage && (previewProfileImage || user.profile_image) ? (
-                                        <AvatarImage
-                                            src={previewProfileImage || getProfileImageUrl(user)}
-                                            alt={user.name}
-                                        />
+                                        <AvatarImage src={previewProfileImage || getProfileImageUrl(user)} alt={user.name} />
                                     ) : (
-                                        <AvatarFallback className="bg-gray-200 dark:bg-gray-700 text-3xl">
-                                            {getInitials(user.name)}
-                                        </AvatarFallback>
+                                        <AvatarFallback className="bg-gray-200 text-3xl dark:bg-gray-700">{getInitials(user.name)}</AvatarFallback>
                                     )}
                                 </Avatar>
                                 {removeProfileImage && (
-                                    <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 bg-opacity-50 flex items-center justify-center rounded-full">
-                                        <span className="text-sm font-medium ">{translations['Removed']}</span>
+                                    <div className="bg-opacity-50 absolute inset-0 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
+                                        <span className="text-sm font-medium">{translations['Removed']}</span>
                                     </div>
                                 )}
                             </div>
-                            <div className="flex flex-col items-center flex-1">
-                                <div className="flex items-center mb-2 w-full">
-                                    <span className="text-sm text-gray-700 dark:text-gray-300 mr-2">{translations['Status']}:</span>
+                            <div className="flex flex-1 flex-col items-center">
+                                <div className="mb-2 flex w-full items-center">
+                                    <span className="mr-2 text-sm text-gray-700 dark:text-gray-300">{translations['Status']}:</span>
                                     <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{profileImageStatus}</span>
                                 </div>
-                                <div className="flex flex-wrap items-center gap-2 w-full mt-3">
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 min-w-0">
+                                <div className="mt-3 flex w-full flex-wrap items-center gap-2">
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex min-w-0 items-center gap-2">
                                             <input
                                                 ref={profileInputRef}
                                                 type="file"
                                                 id="profile-image"
                                                 accept="image/jpeg,image/png,image/gif,image/webp"
                                                 onChange={handleProfileImageChange}
-                                                className="min-w-0 max-w-full truncate text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-200 hover:file:bg-gray-300 dark:file:bg-blue-700 dark:hover:file:bg-blue-800"
+                                                className="max-w-full min-w-0 truncate text-sm file:mr-4 file:rounded-md file:border-0 file:bg-gray-200 file:px-4 file:py-2 file:text-sm file:font-medium hover:file:bg-gray-300 dark:file:bg-blue-700 dark:hover:file:bg-blue-800"
                                             />
                                             {data.profile_image && (
                                                 <button
                                                     type="button"
                                                     onClick={() => {
-                                                        setData("profile_image", null);
+                                                        setData('profile_image', null);
                                                         setPreviewProfileImage(null);
-                                                        if (profileInputRef.current) profileInputRef.current.value = "";
+                                                        if (profileInputRef.current) profileInputRef.current.value = '';
                                                     }}
-                                                    className="shrink-0 rounded-full p-2 bg-gray-200 hover:bg-red-100 dark:bg-neutral-700 dark:hover:bg-red-900 text-gray-600 hover:text-red-600 dark:text-gray-200 dark:hover:text-red-400"
+                                                    className="shrink-0 rounded-full bg-gray-200 p-2 text-gray-600 hover:bg-red-100 hover:text-red-600 dark:bg-neutral-700 dark:text-gray-200 dark:hover:bg-red-900 dark:hover:text-red-400"
                                                     title="Clear file"
                                                 >
                                                     <X size={16} />
@@ -185,18 +174,13 @@ export default function Edit() {
                                                 variant="destructive"
                                                 size="sm"
                                                 onClick={handleProfileImageUnset}
-                                                className="dark:bg-red-600 dark:hover:bg-red-700 px-5"
+                                                className="px-5 dark:bg-red-600 dark:hover:bg-red-700"
                                             >
                                                 {translations['Remove']}
                                             </Button>
                                         )}
                                         {removeProfileImage && (
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => setRemoveProfileImage(false)}
-                                            >
+                                            <Button type="button" variant="outline" size="sm" onClick={() => setRemoveProfileImage(false)}>
                                                 {translations['Undo']}
                                             </Button>
                                         )}
@@ -209,49 +193,49 @@ export default function Edit() {
                     <div className="rounded-xl border border-gray-100 p-4 dark:border-neutral-800">
                         <h2 className="mb-3 text-lg font-medium text-gray-900 dark:text-white">{translations['Cover Image']}</h2>
                         <div className="flex flex-col gap-4">
-                            <div className="h-72 w-full bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden relative">
+                            <div className="relative h-72 w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
                                 {!removeCoverImage && (previewCoverImage || user.cover_image) ? (
                                     <img
                                         src={previewCoverImage || getCoverImageUrl(user)}
                                         alt="Cover"
-                                        className="w-full h-full object-cover object-center"
+                                        className="h-full w-full object-cover object-center"
                                     />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-600">
+                                    <div className="flex h-full w-full items-center justify-center text-gray-400 dark:text-gray-600">
                                         <span>{translations['No Cover Image']}</span>
                                     </div>
                                 )}
                                 {removeCoverImage && user.cover_image && (
-                                    <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 bg-opacity-50 flex items-center justify-center">
+                                    <div className="bg-opacity-50 absolute inset-0 flex items-center justify-center bg-gray-200 dark:bg-gray-700">
                                         <span className="text-3xl font-medium">{translations['Removed']}</span>
                                     </div>
                                 )}
                             </div>
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                                <div className="flex items-center mb-2 sm:mb-0">
-                                    <span className="text-sm text-gray-700 dark:text-gray-300 mr-2">{translations['Status']}:</span>
+                            <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+                                <div className="mb-2 flex items-center sm:mb-0">
+                                    <span className="mr-2 text-sm text-gray-700 dark:text-gray-300">{translations['Status']}:</span>
                                     <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{coverImageStatus}</span>
                                 </div>
-                                <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 min-w-0">
+                                <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex min-w-0 items-center gap-2">
                                             <input
                                                 ref={coverInputRef}
                                                 type="file"
                                                 id="cover-image"
                                                 accept="image/jpeg,image/png,image/gif,image/webp"
                                                 onChange={handleCoverImageChange}
-                                                className="min-w-0 max-w-full truncate text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-200 hover:file:bg-gray-300 dark:file:bg-blue-700 dark:hover:file:bg-blue-800"
+                                                className="max-w-full min-w-0 truncate text-sm file:mr-4 file:rounded-md file:border-0 file:bg-gray-200 file:px-4 file:py-2 file:text-sm file:font-medium hover:file:bg-gray-300 dark:file:bg-blue-700 dark:hover:file:bg-blue-800"
                                             />
                                             {data.cover_image && (
                                                 <button
                                                     type="button"
                                                     onClick={() => {
-                                                        setData("cover_image", null);
+                                                        setData('cover_image', null);
                                                         setPreviewCoverImage(null);
-                                                        if (coverInputRef.current) coverInputRef.current.value = "";
+                                                        if (coverInputRef.current) coverInputRef.current.value = '';
                                                     }}
-                                                    className="shrink-0 rounded-full p-2 bg-gray-200 hover:bg-red-100 dark:bg-neutral-700 dark:hover:bg-red-900 text-gray-600 hover:text-red-600 dark:text-gray-200 dark:hover:text-red-400"
+                                                    className="shrink-0 rounded-full bg-gray-200 p-2 text-gray-600 hover:bg-red-100 hover:text-red-600 dark:bg-neutral-700 dark:text-gray-200 dark:hover:bg-red-900 dark:hover:text-red-400"
                                                     title="Clear file"
                                                 >
                                                     <X size={16} />
@@ -267,18 +251,13 @@ export default function Edit() {
                                                 variant="destructive"
                                                 size="sm"
                                                 onClick={handleCoverImageUnset}
-                                                className="dark:bg-red-600 dark:hover:bg-red-700 px-5"
+                                                className="px-5 dark:bg-red-600 dark:hover:bg-red-700"
                                             >
                                                 {translations['Remove']}
                                             </Button>
                                         )}
                                         {removeCoverImage && (
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => setRemoveCoverImage(false)}
-                                            >
+                                            <Button type="button" variant="outline" size="sm" onClick={() => setRemoveCoverImage(false)}>
                                                 {translations['Undo']}
                                             </Button>
                                         )}
@@ -292,7 +271,7 @@ export default function Edit() {
                         <h2 className="mb-4 text-lg font-medium text-gray-900 dark:text-white">{translations['User Information']}</h2>
                         <div className="space-y-4">
                             <div>
-                                <label htmlFor="name" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                     {translations['Name']}
                                 </label>
                                 <Input
@@ -306,7 +285,7 @@ export default function Edit() {
                             </div>
 
                             <div>
-                                <label htmlFor="username" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <label htmlFor="username" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                     {translations['Username']}
                                 </label>
                                 <Input
@@ -320,7 +299,7 @@ export default function Edit() {
                             </div>
 
                             <div>
-                                <label htmlFor="bio" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <label htmlFor="bio" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                     {translations['Bio']}
                                 </label>
                                 <Input
@@ -334,7 +313,7 @@ export default function Edit() {
                             </div>
 
                             <div>
-                                <label htmlFor="location" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <label htmlFor="location" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                     {translations['Location']}
                                 </label>
                                 <Input
@@ -348,7 +327,7 @@ export default function Edit() {
                             </div>
 
                             <div>
-                                <label htmlFor="website" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <label htmlFor="website" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                     {translations['Website']}
                                 </label>
                                 <Input
@@ -362,7 +341,7 @@ export default function Edit() {
                             </div>
 
                             <div>
-                                <label htmlFor="date-of-birth" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <label htmlFor="date-of-birth" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                     {translations['Date of Birth']}
                                 </label>
                                 <Input
@@ -381,23 +360,17 @@ export default function Edit() {
                         <h2 className="mb-1 text-lg font-medium text-gray-900 dark:text-white">{translations['Account Settings']}</h2>
                         <div className="space-y-4">
                             <div className="flex items-center gap-3">
-                                <Switch
-                                    checked={data.is_private}
-                                    onChange={(value) => setData('is_private', value)}
-                                    id="private-account"
-                                />
+                                <Switch checked={data.is_private} onChange={(value) => setData('is_private', value)} id="private-account" />
                                 <div className="flex flex-col">
                                     <label htmlFor="private-account" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                         {translations['Private Account']}
                                     </label>
-                                    <p className="text-xs text-gray-500">
-                                        {translations['Only approved followers can see your posts']}
-                                    </p>
+                                    <p className="text-xs text-gray-500">{translations['Only approved followers can see your posts']}</p>
                                 </div>
                             </div>
 
                             <div>
-                                <label htmlFor="status" className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <label htmlFor="status" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                     {translations['Account Status']}
                                 </label>
                                 <Select id="status" value={data.status} onValueChange={(value) => setData('status', value)}>

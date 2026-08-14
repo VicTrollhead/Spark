@@ -1,9 +1,9 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { Check, Hash, TrendingUp, UserPlus, Users } from 'lucide-react';
+import { Check, TrendingUp, UserPlus } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useInitials } from '../hooks/use-initials';
 import { getProfileImageUrl } from '../lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 export function AppExtraSidebar() {
     const { auth, translations } = usePage().props;
@@ -37,16 +37,20 @@ export function AppExtraSidebar() {
 
     const handleFollow = (userId) => {
         setFollowingIds((prev) => new Set([...prev, userId]));
-        router.post(`/user/${users.find((u) => u.id === userId)?.username}/follow`, {}, {
-            preserveScroll: true,
-            onError: () => {
-                setFollowingIds((prev) => {
-                    const next = new Set(prev);
-                    next.delete(userId);
-                    return next;
-                });
+        router.post(
+            `/user/${users.find((u) => u.id === userId)?.username}/follow`,
+            {},
+            {
+                preserveScroll: true,
+                onError: () => {
+                    setFollowingIds((prev) => {
+                        const next = new Set(prev);
+                        next.delete(userId);
+                        return next;
+                    });
+                },
             },
-        });
+        );
     };
 
     return (
@@ -94,9 +98,7 @@ export function AppExtraSidebar() {
                                                     : 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600'
                                             }`}
                                         >
-                                            {isFollowed
-                                                ? (translations['Followed'] || 'Followed')
-                                                : (translations['Follow'] || 'Follow')}
+                                            {isFollowed ? translations['Followed'] || 'Followed' : translations['Follow'] || 'Follow'}
                                         </button>
                                     </div>
                                 );
@@ -114,7 +116,10 @@ export function AppExtraSidebar() {
                 {/* Popular hashtags */}
                 {hashtags.length > 0 && (
                     <div className="rounded-xl border border-gray-100 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-950">
-                        <Link href="/show-popular-hashtags" className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-900 hover:underline dark:text-white">
+                        <Link
+                            href="/show-popular-hashtags"
+                            className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-900 hover:underline dark:text-white"
+                        >
                             <TrendingUp className="h-4 w-4 text-blue-500" />
                             {translations['Trending'] || 'Trending'}
                         </Link>
@@ -126,9 +131,7 @@ export function AppExtraSidebar() {
                                     className="group flex items-center justify-between rounded-lg px-2 py-1.5 transition hover:bg-gray-50 dark:hover:bg-neutral-800/50"
                                 >
                                     <div className="min-w-0">
-                                        <p className="truncate text-sm font-medium text-blue-600 dark:text-blue-400">
-                                            #{hashtag.hashtag}
-                                        </p>
+                                        <p className="truncate text-sm font-medium text-blue-600 dark:text-blue-400">#{hashtag.hashtag}</p>
                                     </div>
                                     <span className="shrink-0 text-xs text-gray-400 dark:text-gray-500">
                                         {hashtag.uses_count} {hashtag.uses_count === 1 ? 'post' : 'posts'}

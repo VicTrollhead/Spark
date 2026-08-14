@@ -1,15 +1,21 @@
-import { Head, usePage, router } from '@inertiajs/react';
-import AppLayout from '../../layouts/app-layout';
-import { Bell, CheckCheck, RefreshCw } from 'lucide-react';
-import { EmptyState } from '../../components/empty-state.jsx';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Notification } from '../../components/notification.jsx';
+import { Head, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { usePullToRefresh } from '../../hooks/use-pull-to-refresh';
+import { Bell, CheckCheck, RefreshCw } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { EmptyState } from '../../components/empty-state.jsx';
+import { Notification } from '../../components/notification.jsx';
 import { useUnreadCounts } from '../../contexts/unread-counts-context';
+import { usePullToRefresh } from '../../hooks/use-pull-to-refresh';
+import AppLayout from '../../layouts/app-layout';
 
 export default function Notifications() {
-    const { auth, notifications: initialNotifications = [], translations = {}, read_count: initialReadCount = 0, unread_count: initialUnreadCount = 0 } = usePage().props;
+    const {
+        auth,
+        notifications: initialNotifications = [],
+        translations = {},
+        read_count: initialReadCount = 0,
+        unread_count: initialUnreadCount = 0,
+    } = usePage().props;
     const user = auth?.user;
     const [isLoading, setIsLoading] = useState(false);
     const [filter, setFilter] = useState(usePage().props.sort || 'unread');
@@ -25,7 +31,7 @@ export default function Notifications() {
     const fetchNotifications = useCallback(async (sort) => {
         try {
             const res = await fetch(`/user/notifications?sort=${sort || filterRef.current}`, {
-                headers: { 'Accept': 'application/json' },
+                headers: { Accept: 'application/json' },
             });
             if (res.ok) {
                 const data = await res.json();
@@ -57,9 +63,7 @@ export default function Notifications() {
         setReadCount(serverReadCount);
 
         // Update the notification item in the local list
-        setNotifications((prev) =>
-            prev.map((n) => (n.id === notificationId ? { ...n, is_read: isRead } : n)),
-        );
+        setNotifications((prev) => prev.map((n) => (n.id === notificationId ? { ...n, is_read: isRead } : n)));
     };
 
     const handleFilterChange = (value) => {
@@ -80,7 +84,7 @@ export default function Notifications() {
                 method: 'PATCH',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                 },
             });
             if (res.ok) {
@@ -108,21 +112,19 @@ export default function Notifications() {
 
             {pullDistance > 0 && (
                 <div className="flex justify-center overflow-hidden transition-all lg:hidden" style={{ height: pullDistance }}>
-                    <RefreshCw className={`h-5 w-5 text-gray-400 mt-2 ${pulling ? 'text-blue-500 animate-spin' : ''}`} />
+                    <RefreshCw className={`mt-2 h-5 w-5 text-gray-400 ${pulling ? 'animate-spin text-blue-500' : ''}`} />
                 </div>
             )}
 
             <div className="border-b border-gray-200 dark:border-neutral-800">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6">
-                    <h1 className="text-2xl font-bold">
-                        {translations['Notifications'] || 'Notifications'}
-                    </h1>
+                    <h1 className="text-2xl font-bold">{translations['Notifications'] || 'Notifications'}</h1>
                     <div className="flex items-center gap-1.5">
                         {unreadCount > 0 && (
                             <button
                                 onClick={handleMarkAllRead}
-                                className="cursor-pointer flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-blue-600 transition hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/30"
+                                className="flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1.5 text-sm text-blue-600 transition hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/30"
                             >
                                 <CheckCheck className="h-4 w-4" />
                                 <span className="hidden sm:inline">{translations['Mark all read'] || 'Mark all read'}</span>
@@ -144,7 +146,7 @@ export default function Notifications() {
                         <button
                             key={f.value}
                             onClick={() => handleFilterChange(f.value)}
-                            className={`cursor-pointer relative inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition ${
+                            className={`relative inline-flex cursor-pointer items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition ${
                                 filter === f.value
                                     ? 'bg-brand text-brand-foreground shadow-sm'
                                     : 'bg-accent text-accent-foreground hover:bg-accent/70'
@@ -152,11 +154,11 @@ export default function Notifications() {
                         >
                             {f.label}
                             {f.count > 0 && (
-                                <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-xs ${
-                                    filter === f.value
-                                        ? 'bg-white/20 text-current'
-                                        : 'bg-background text-muted-foreground'
-                                }`}>
+                                <span
+                                    className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-xs ${
+                                        filter === f.value ? 'bg-white/20 text-current' : 'bg-background text-muted-foreground'
+                                    }`}
+                                >
                                     {f.count}
                                 </span>
                             )}
@@ -181,12 +183,17 @@ export default function Notifications() {
                     <div className="py-16">
                         <EmptyState
                             icon={Bell}
-                            title={filter === 'unread'
-                                ? (translations["You're all caught up!"] || "You're all caught up!")
-                                : (translations['No notifications yet.'] || 'No notifications yet.')}
-                            description={filter === 'unread'
-                                ? (translations['No unread notifications.'] || 'No unread notifications.')
-                                : (translations["When you get notifications, they'll show up here."] || "When you get notifications, they'll show up here.")}
+                            title={
+                                filter === 'unread'
+                                    ? translations["You're all caught up!"] || "You're all caught up!"
+                                    : translations['No notifications yet.'] || 'No notifications yet.'
+                            }
+                            description={
+                                filter === 'unread'
+                                    ? translations['No unread notifications.'] || 'No unread notifications.'
+                                    : translations["When you get notifications, they'll show up here."] ||
+                                      "When you get notifications, they'll show up here."
+                            }
                         />
                     </div>
                 )}

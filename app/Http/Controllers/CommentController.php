@@ -6,12 +6,11 @@ namespace App\Http\Controllers;
 
 use App\Events\CommentCreated;
 use App\Http\Requests\StoreCommentRequest;
+use App\Models\Comment;
 use App\Models\Notification;
 use App\Models\Post;
 use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use App\Models\Comment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Redirect;
@@ -87,8 +86,8 @@ class CommentController extends Controller
             ->where('comment_id', $comment->id)
             ->delete();
 
-
         $comment->delete();
+
         return redirect()->back()->with(['message' => 'Comment deleted successfully']);
     }
 }

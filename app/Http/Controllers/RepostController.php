@@ -10,7 +10,6 @@ use App\Models\Post;
 use App\Models\Repost;
 use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class RepostController extends Controller

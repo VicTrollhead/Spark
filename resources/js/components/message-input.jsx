@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import { ImageIcon, SendIcon, X } from 'lucide-react';
+import { useRef, useState } from 'react';
 
 export default function MessageInput({ chatId, otherUserId, groupChatId, onTyping, onChatCreated }) {
     const { translations } = usePage().props;
@@ -46,7 +46,7 @@ export default function MessageInput({ chatId, otherUserId, groupChatId, onTypin
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
-                        'Accept': 'application/json',
+                        Accept: 'application/json',
                     },
                     body: formData,
                 })
@@ -68,7 +68,7 @@ export default function MessageInput({ chatId, otherUserId, groupChatId, onTypin
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
-                        'Accept': 'application/json',
+                        Accept: 'application/json',
                     },
                     body: formData,
                 })
@@ -108,7 +108,7 @@ export default function MessageInput({ chatId, otherUserId, groupChatId, onTypin
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
-                        'Accept': 'application/json',
+                        Accept: 'application/json',
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({ otherUserId, text }),
@@ -191,10 +191,7 @@ export default function MessageInput({ chatId, otherUserId, groupChatId, onTypin
                                     {files[index]?.name?.split('.').pop()}
                                 </div>
                             )}
-                            <button
-                                onClick={() => removeFile(index)}
-                                className="absolute -top-1 -right-1 rounded-full bg-red-500 p-0.5 text-white"
-                            >
+                            <button onClick={() => removeFile(index)} className="absolute -top-1 -right-1 rounded-full bg-red-500 p-0.5 text-white">
                                 <X className="h-3 w-3" />
                             </button>
                         </div>

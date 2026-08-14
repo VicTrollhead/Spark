@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { Head, usePage, Link, router } from '@inertiajs/react';
-import AppLayout from '../../layouts/app-layout';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Check, RefreshCw, Search, Users } from 'lucide-react';
-import { useInitials } from '../../hooks/use-initials.jsx';
-import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar.jsx';
+import { useState } from 'react';
 import { EmptyState } from '../../components/empty-state';
+import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar.jsx';
+import { useInitials } from '../../hooks/use-initials.jsx';
+import AppLayout from '../../layouts/app-layout';
 import { getProfileImageUrl } from '../../lib/utils';
 
 export default function SearchUsers() {
@@ -39,11 +39,9 @@ export default function SearchUsers() {
 
     const handleReload = () => {
         setIsLoading(true);
-        if (searchTextOption)
-            router.reload({ only: ['users'] });
+        if (searchTextOption) router.reload({ only: ['users'] });
         setTimeout(() => {
-            if (searchTextOption)
-                setUsersList(users);
+            if (searchTextOption) setUsersList(users);
             setIsLoading(false);
         }, 1000);
     };
@@ -80,11 +78,11 @@ export default function SearchUsers() {
 
                 <div className="px-6 pb-4">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                        <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
                         <input
                             type="text"
                             placeholder={translations['Search users by name or username']}
-                            className="w-full rounded-full border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white dark:placeholder:text-neutral-500"
+                            className="w-full rounded-full border border-gray-200 bg-gray-50 py-2.5 pr-4 pl-10 text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white dark:placeholder:text-neutral-500"
                             value={searchTextOption}
                             onChange={(e) => setSearchTextOption(e.target.value)}
                             onKeyDown={onKeyDownSearch}

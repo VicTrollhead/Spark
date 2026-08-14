@@ -1,16 +1,16 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Check, ChevronRight, Crown, LogOut, Pencil, Plus, Settings, Trash2, UserMinus, Users, X } from 'lucide-react';
+import { Check, Crown, LogOut, Pencil, Plus, Trash2, UserMinus, Users, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import MessageInput from '../../components/message-input.jsx';
 import Message from '../../components/message.jsx';
+import { OnlineIndicator } from '../../components/online-indicator';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar.jsx';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/dialog.jsx';
 import { Input } from '../../components/ui/input.jsx';
 import { useInitials } from '../../hooks/use-initials.jsx';
+import { useOnlineUsers } from '../../hooks/use-online-users';
 import AppLayout from '../../layouts/app-layout.jsx';
 import { getProfileImageUrl } from '../../lib/utils';
-import { useOnlineUsers } from '../../hooks/use-online-users';
-import { OnlineIndicator } from '../../components/online-indicator';
 
 export default function GroupChatPage() {
     const { user, group_chat, members, init_messages, translations } = usePage().props;
@@ -77,7 +77,12 @@ export default function GroupChatPage() {
     };
 
     const handleDelete = () => {
-        if (confirm(translations['Delete this group chat? All messages will be permanently removed.'] || 'Delete this group chat? All messages will be permanently removed.')) {
+        if (
+            confirm(
+                translations['Delete this group chat? All messages will be permanently removed.'] ||
+                    'Delete this group chat? All messages will be permanently removed.',
+            )
+        ) {
             router.delete(`/chat/group/${group_chat.id}`);
         }
     };
@@ -87,10 +92,14 @@ export default function GroupChatPage() {
             setShowRenameDialog(false);
             return;
         }
-        router.put(`/chat/group/${group_chat.id}`, { name: newGroupName }, {
-            preserveScroll: true,
-            onSuccess: () => setShowRenameDialog(false),
-        });
+        router.put(
+            `/chat/group/${group_chat.id}`,
+            { name: newGroupName },
+            {
+                preserveScroll: true,
+                onSuccess: () => setShowRenameDialog(false),
+            },
+        );
     };
 
     const handleRemoveMember = (memberId) => {
@@ -101,10 +110,14 @@ export default function GroupChatPage() {
     };
 
     const handleAddMembers = (memberIds) => {
-        router.post(`/chat/group/${group_chat.id}/add-members`, { member_ids: memberIds }, {
-            preserveScroll: true,
-            onSuccess: () => setShowAddMembersDialog(false),
-        });
+        router.post(
+            `/chat/group/${group_chat.id}/add-members`,
+            { member_ids: memberIds },
+            {
+                preserveScroll: true,
+                onSuccess: () => setShowAddMembersDialog(false),
+            },
+        );
     };
 
     const memberIds = members.map((m) => m.id);
@@ -114,8 +127,8 @@ export default function GroupChatPage() {
             <Head title={group_chat.name} />
             <div className="flex w-full flex-col" style={{ height: 'calc(100dvh - var(--header-h) - var(--mobile-nav-h))' }}>
                 {/* Header */}
-                <div className="flex h-14 shrink-0 w-full items-center justify-between border-b border-gray-200 bg-white px-4 dark:border-neutral-800 dark:bg-neutral-950">
-                    <div className="flex items-center gap-3 min-w-0">
+                <div className="flex h-14 w-full shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 dark:border-neutral-800 dark:bg-neutral-950">
+                    <div className="flex min-w-0 items-center gap-3">
                         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
                             <Users className="h-4 w-4" />
                         </div>
@@ -124,7 +137,10 @@ export default function GroupChatPage() {
                                 <span className="truncate text-sm font-semibold text-gray-900 dark:text-white">{group_chat.name}</span>
                                 {isCreator && (
                                     <button
-                                        onClick={() => { setNewGroupName(group_chat.name); setShowRenameDialog(true); }}
+                                        onClick={() => {
+                                            setNewGroupName(group_chat.name);
+                                            setShowRenameDialog(true);
+                                        }}
                                         className="shrink-0 rounded-full p-0.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-neutral-800"
                                     >
                                         <Pencil className="h-3 w-3" />
@@ -172,13 +188,16 @@ export default function GroupChatPage() {
                     {showPanel && (
                         <div className="w-72 shrink-0 overflow-y-auto border-l border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-950">
                             <div className="p-4">
-                                <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                                <h3 className="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
                                     {translations['Members'] || 'Members'} ({members.length})
                                 </h3>
 
                                 {isCreator && (
                                     <button
-                                        onClick={() => { setAddMemberSearch(''); setShowAddMembersDialog(true); }}
+                                        onClick={() => {
+                                            setAddMemberSearch('');
+                                            setShowAddMembersDialog(true);
+                                        }}
                                         className="mt-3 flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm text-blue-600 transition hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/30"
                                     >
                                         <Plus className="h-4 w-4" />
@@ -192,7 +211,7 @@ export default function GroupChatPage() {
                                             key={member.id}
                                             className="group flex items-center gap-2.5 rounded-lg px-2 py-2 transition hover:bg-gray-50 dark:hover:bg-neutral-900"
                                         >
-                                            <Link href={`/user/${member.username}`} className="flex items-center gap-2.5 min-w-0 flex-1">
+                                            <Link href={`/user/${member.username}`} className="flex min-w-0 flex-1 items-center gap-2.5">
                                                 <OnlineIndicator isOnline={onlineUserIds.has(member.id)}>
                                                     <Avatar className="h-8 w-8 overflow-hidden rounded-full">
                                                         <AvatarImage src={getProfileImageUrl(member)} alt={member.name} />
@@ -203,7 +222,9 @@ export default function GroupChatPage() {
                                                 </OnlineIndicator>
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex items-center gap-1">
-                                                        <span className="truncate text-sm font-medium text-gray-900 dark:text-white">{member.name}</span>
+                                                        <span className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                                                            {member.name}
+                                                        </span>
                                                         {member.is_verified && (
                                                             <span className="flex shrink-0 items-center rounded-full bg-blue-500 p-0.5 text-white">
                                                                 <Check className="h-2 w-2" />
@@ -223,7 +244,7 @@ export default function GroupChatPage() {
                                             {isCreator && member.id !== user.id && (
                                                 <button
                                                     onClick={() => handleRemoveMember(member.id)}
-                                                    className="shrink-0 rounded-full p-1 text-gray-400 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 dark:hover:bg-red-950/30"
+                                                    className="shrink-0 rounded-full p-1 text-gray-400 opacity-0 transition group-hover:opacity-100 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/30"
                                                     title={translations['Remove'] || 'Remove'}
                                                 >
                                                     <UserMinus className="h-3.5 w-3.5" />
@@ -317,7 +338,11 @@ function AddMembersDialog({ open, onOpenChange, existingMemberIds, onAdd, transl
             // Fetch available users via the chat users list
             setLoading(true);
             fetch('/chat/user-chats', {
-                headers: { 'Accept': 'application/json', 'X-Inertia': 'true', 'X-Inertia-Version': document.querySelector('meta[name="inertia-version"]')?.content || '' },
+                headers: {
+                    Accept: 'application/json',
+                    'X-Inertia': 'true',
+                    'X-Inertia-Version': document.querySelector('meta[name="inertia-version"]')?.content || '',
+                },
             })
                 .then((res) => res.json())
                 .then((data) => {
@@ -382,9 +407,7 @@ function AddMembersDialog({ open, onOpenChange, existingMemberIds, onAdd, transl
                                 >
                                     <Avatar className="h-8 w-8">
                                         <AvatarImage src={getProfileImageUrl(u)} alt={u.name} />
-                                        <AvatarFallback className="bg-gray-200 text-xs dark:bg-gray-700">
-                                            {getInitials(u.name)}
-                                        </AvatarFallback>
+                                        <AvatarFallback className="bg-gray-200 text-xs dark:bg-gray-700">{getInitials(u.name)}</AvatarFallback>
                                     </Avatar>
                                     <div className="min-w-0">
                                         <span className="text-sm font-medium text-gray-800 dark:text-white">{u.name}</span>

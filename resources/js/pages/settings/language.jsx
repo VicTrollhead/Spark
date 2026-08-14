@@ -1,12 +1,12 @@
-import { Head, router, usePage } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
+import { Head, router, usePage } from '@inertiajs/react';
 import { Check } from 'lucide-react';
 
 import HeadingSmall from '../../components/heading-small';
 
+import { useState } from 'react';
 import AppLayout from '../../layouts/app-layout';
 import SettingsLayout from '../../layouts/settings/layout';
-import { useState } from 'react';
 
 const breadcrumbs = [
     {
@@ -30,14 +30,18 @@ export default function Language() {
         if (newLocale === localeOption || switching) return;
         setSwitching(true);
         setLocaleOption(newLocale);
-        router.post(`/settings/language/${newLocale}`, {}, {
-            preserveState: false,
-            preserveScroll: true,
-            only: [],
-            onFinish: () => {
-                window.location.reload();
+        router.post(
+            `/settings/language/${newLocale}`,
+            {},
+            {
+                preserveState: false,
+                preserveScroll: true,
+                only: [],
+                onFinish: () => {
+                    window.location.reload();
+                },
             },
-        });
+        );
     };
 
     return (
@@ -46,7 +50,7 @@ export default function Language() {
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title={translations["Language"]} description={translations["Update your account's language"]} />
+                    <HeadingSmall title={translations['Language']} description={translations["Update your account's language"]} />
                     <div className="grid gap-2">
                         {languages.map((lang) => {
                             const isActive = localeOption === lang.value;
@@ -61,14 +65,16 @@ export default function Language() {
                                         isActive
                                             ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-950/20'
                                             : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 dark:border-neutral-700 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/50',
-                                        switching && 'opacity-60 cursor-wait'
+                                        switching && 'cursor-wait opacity-60',
                                     )}
                                 >
                                     <div>
-                                        <p className={cn(
-                                            'text-sm font-medium',
-                                            isActive ? 'text-blue-700 dark:text-blue-300' : 'text-gray-900 dark:text-white'
-                                        )}>
+                                        <p
+                                            className={cn(
+                                                'text-sm font-medium',
+                                                isActive ? 'text-blue-700 dark:text-blue-300' : 'text-gray-900 dark:text-white',
+                                            )}
+                                        >
                                             {translations[lang.label] || lang.label}
                                         </p>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">{lang.nativeLabel}</p>
@@ -87,4 +93,3 @@ export default function Language() {
         </AppLayout>
     );
 }
-

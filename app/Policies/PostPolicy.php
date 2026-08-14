@@ -8,10 +8,9 @@ use Illuminate\Auth\Access\Response;
 
 class PostPolicy
 {
-
     public function view(?User $user, Post $post): bool
     {
-        if (!$post->is_private) {
+        if (! $post->is_private) {
             return true;
         }
 

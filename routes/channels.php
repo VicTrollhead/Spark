@@ -51,12 +51,13 @@ Broadcast::channel('presence-online', function ($user) {
 
 Broadcast::channel('post.{postId}', function ($user, $postId) {
     $post = \App\Models\Post::find($postId);
-    if (!$post) {
+    if (! $post) {
         return false;
     }
-    if (!$post->is_private) {
+    if (! $post->is_private) {
         return true;
     }
+
     return $post->user_id === $user->id
         || $post->user->followers()->where('follower_id', $user->id)->exists();
 });

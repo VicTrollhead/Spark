@@ -22,7 +22,7 @@ class GroupChatController extends Controller
     {
         $user = Auth::user();
 
-        if (!$groupChat->members()->where('user_id', $user->id)->exists()) {
+        if (! $groupChat->members()->where('user_id', $user->id)->exists()) {
             abort(403, 'You are not a member of this group chat.');
         }
 
@@ -45,7 +45,7 @@ class GroupChatController extends Controller
                         'profile_image' => $message->user->profileImage,
                         'is_verified' => $message->user->is_verified,
                     ],
-                    'media' => $message->media->map(fn($media) => [
+                    'media' => $message->media->map(fn ($media) => [
                         'file_path' => $media->file_path,
                         'file_type' => $media->file_type,
                         'url' => $media->url,
@@ -54,7 +54,7 @@ class GroupChatController extends Controller
             })
             ->values();
 
-        $members = $groupChat->members()->with('profileImage')->get()->map(fn($member) => [
+        $members = $groupChat->members()->with('profileImage')->get()->map(fn ($member) => [
             'id' => $member->id,
             'name' => $member->name,
             'username' => $member->username,
@@ -112,17 +112,18 @@ class GroupChatController extends Controller
             'media.*.max' => 'Each attachment must be 10 MB or smaller.',
         ]);
 
-        if (empty($validated['text']) && !$request->hasFile('media')) {
+        if (empty($validated['text']) && ! $request->hasFile('media')) {
             if ($request->wantsJson()) {
                 return response()->json(['error' => 'A message or file is required.'], 422);
             }
+
             return redirect()->back()->withErrors(['text' => 'A message or file is required.']);
         }
 
         $user = Auth::user();
         $groupChat = GroupChat::findOrFail($validated['groupChatId']);
 
-        if (!$groupChat->members()->where('user_id', $user->id)->exists()) {
+        if (! $groupChat->members()->where('user_id', $user->id)->exists()) {
             abort(403, 'You are not a member of this group chat.');
         }
 

@@ -26,7 +26,7 @@ class Chat extends Model
         return $this->hasMany(Message::class);
     }
 
-    public function lastMessage() : HasOne
+    public function lastMessage(): HasOne
     {
         return $this->hasOne(Message::class, 'chat_id')->latestOfMany();
     }
@@ -51,4 +51,3 @@ class Chat extends Model
         return $this->belongsTo(User::class, 'user2_id');
     }
 }
-

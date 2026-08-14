@@ -1,21 +1,21 @@
-import { useRef, useState, useCallback, useEffect } from 'react';
-import { Head, usePage, router } from '@inertiajs/react';
-import '../echo';
-import AppLayout from '../layouts/app-layout';
-import PostComponent from './post/post-component';
-import { BarChart3, Check, FileText, Hash, Image, Pen, Plus, RefreshCw, X } from 'lucide-react';
-import { usePullToRefresh } from '../hooks/use-pull-to-refresh';
-import { EmptyState } from '../components/empty-state';
-import { PostSkeleton } from '../components/post-skeleton';
-import { useInfiniteScroll } from '../hooks/use-infinite-scroll';
-import { HashtagInput } from '../components/hashtag-input';
-import {Input} from "../components/ui/input.jsx";
-import {Switch} from "../components/ui/switch.jsx";
-import { toast } from 'sonner';
+import { Head, router, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
+import { BarChart3, Check, FileText, Hash, Image, Pen, Plus, RefreshCw, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
+import { EmptyState } from '../components/empty-state';
+import { HashtagInput } from '../components/hashtag-input';
+import { PostSkeleton } from '../components/post-skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
+import { Input } from '../components/ui/input.jsx';
+import { Switch } from '../components/ui/switch.jsx';
+import '../echo';
+import { useInfiniteScroll } from '../hooks/use-infinite-scroll';
 import { useInitials } from '../hooks/use-initials';
+import { usePullToRefresh } from '../hooks/use-pull-to-refresh';
+import AppLayout from '../layouts/app-layout';
 import { getProfileImageUrl } from '../lib/utils';
+import PostComponent from './post/post-component';
 
 const FEED_CACHE_KEY = 'dashboard_feed_cache';
 
@@ -31,7 +31,15 @@ function getRestoredFeed() {
 }
 
 export default function Dashboard() {
-    const { auth, users = [], posts: initialPosts = { data: [], next_page_url: null }, sort, translations = {}, quote_post, reply_post } = usePage().props;
+    const {
+        auth,
+        users = [],
+        posts: initialPosts = { data: [], next_page_url: null },
+        sort,
+        translations = {},
+        quote_post,
+        reply_post,
+    } = usePage().props;
 
     // Restore feed from sessionStorage on mount (handles back-navigation in Inertia SPA)
     const [restored] = useState(() => getRestoredFeed());
@@ -69,17 +77,15 @@ export default function Dashboard() {
     const getInitials = useInitials();
 
     // Parse localized variants once
-    const headingVariants = useRef(
-        (translations['compose_placeholders'] || "What's on your mind?").split('|').filter(Boolean)
-    ).current;
-    const inputVariants = useRef(
-        (translations['compose_input_placeholders'] || "What's on your mind?").split('|').filter(Boolean)
-    ).current;
+    const headingVariants = useRef((translations['compose_placeholders'] || "What's on your mind?").split('|').filter(Boolean)).current;
+    const inputVariants = useRef((translations['compose_input_placeholders'] || "What's on your mind?").split('|').filter(Boolean)).current;
 
     const pickRandom = (arr, exclude) => {
         if (arr.length <= 1) return arr[0];
         let next;
-        do { next = arr[Math.floor(Math.random() * arr.length)]; } while (next === exclude);
+        do {
+            next = arr[Math.floor(Math.random() * arr.length)];
+        } while (next === exclude);
         return next;
     };
 
@@ -117,11 +123,14 @@ export default function Dashboard() {
             // Cache feed state when navigating away (but not when sorting/reloading the dashboard itself)
             if (!url.includes('/dashboard')) {
                 try {
-                    sessionStorage.setItem(FEED_CACHE_KEY, JSON.stringify({
-                        posts: postsRef.current,
-                        nextPageUrl: nextPageUrlRef.current,
-                        scrollY: window.scrollY,
-                    }));
+                    sessionStorage.setItem(
+                        FEED_CACHE_KEY,
+                        JSON.stringify({
+                            posts: postsRef.current,
+                            nextPageUrl: nextPageUrlRef.current,
+                            scrollY: window.scrollY,
+                        }),
+                    );
                 } catch {}
             }
         });
@@ -151,13 +160,17 @@ export default function Dashboard() {
     const handleSortChange = (e) => {
         const selectedSort = e.target.value;
         setSortOption(selectedSort);
-        router.get('/dashboard', { sort: selectedSort }, {
-            preserveScroll: true,
-            onSuccess: (page) => {
-                setPosts(page.props.posts.data);
-                setNextPageUrl(page.props.posts.next_page_url);
+        router.get(
+            '/dashboard',
+            { sort: selectedSort },
+            {
+                preserveScroll: true,
+                onSuccess: (page) => {
+                    setPosts(page.props.posts.data);
+                    setNextPageUrl(page.props.posts.next_page_url);
+                },
             },
-        });
+        );
     };
 
     const handleMediaChange = (e) => {
@@ -175,7 +188,7 @@ export default function Dashboard() {
         formData.append('quote_post_id', data.quote_post_id || '');
         formData.append('is_private', data.is_private ? 1 : 0);
 
-        const contentTags = data.content.match(/#(\w+)/g)?.map(tag => tag.slice(1)) || [];
+        const contentTags = data.content.match(/#(\w+)/g)?.map((tag) => tag.slice(1)) || [];
         const manualTags = data.hashtags || [];
 
         const combinedTags = Array.from(new Set([...contentTags, ...manualTags]));
@@ -191,7 +204,7 @@ export default function Dashboard() {
         }
 
         if (showPollForm) {
-            const validOptions = pollOptions.filter(o => o.trim() !== '');
+            const validOptions = pollOptions.filter((o) => o.trim() !== '');
             if (validOptions.length >= 2) {
                 validOptions.forEach((option, index) => {
                     formData.append(`poll_options[${index}]`, option);
@@ -257,22 +270,24 @@ export default function Dashboard() {
     const loadMore = useCallback(() => {
         if (!nextPageUrl || loadingMore) return;
         setLoadingMore(true);
-        router.get(nextPageUrl, {}, {
-            preserveState: true,
-            preserveScroll: true,
-            only: ['posts'],
-            onSuccess: (page) => {
-                setPosts((prev) => [...prev, ...page.props.posts.data]);
-                setNextPageUrl(page.props.posts.next_page_url);
-                setLoadingMore(false);
-                // Restore clean URL so refresh doesn't land on ?page=N
-                const cleanUrl = sortOption && sortOption !== 'latest'
-                    ? `/dashboard?sort=${sortOption}`
-                    : '/dashboard';
-                window.history.replaceState({}, '', cleanUrl);
+        router.get(
+            nextPageUrl,
+            {},
+            {
+                preserveState: true,
+                preserveScroll: true,
+                only: ['posts'],
+                onSuccess: (page) => {
+                    setPosts((prev) => [...prev, ...page.props.posts.data]);
+                    setNextPageUrl(page.props.posts.next_page_url);
+                    setLoadingMore(false);
+                    // Restore clean URL so refresh doesn't land on ?page=N
+                    const cleanUrl = sortOption && sortOption !== 'latest' ? `/dashboard?sort=${sortOption}` : '/dashboard';
+                    window.history.replaceState({}, '', cleanUrl);
+                },
+                onError: () => setLoadingMore(false),
             },
-            onError: () => setLoadingMore(false),
-        });
+        );
     }, [nextPageUrl, loadingMore, sortOption]);
 
     const sentinelRef = useInfiniteScroll(loadMore, !!nextPageUrl && !loadingMore);
@@ -292,7 +307,7 @@ export default function Dashboard() {
 
             {pullDistance > 0 && (
                 <div className="flex justify-center overflow-hidden transition-all lg:hidden" style={{ height: pullDistance }}>
-                    <RefreshCw className={`h-5 w-5 text-gray-400 mt-2 ${pulling ? 'text-blue-500 animate-spin' : ''}`} />
+                    <RefreshCw className={`mt-2 h-5 w-5 text-gray-400 ${pulling ? 'animate-spin text-blue-500' : ''}`} />
                 </div>
             )}
 
@@ -300,7 +315,12 @@ export default function Dashboard() {
                 <form onSubmit={handlePostSubmit} className="p-4 sm:p-6">
                     {/* Header */}
                     <div className="mb-4 flex items-center gap-2">
-                        <button type="button" onClick={shufflePlaceholders} className="cursor-pointer rounded-full p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 active:rotate-12 dark:hover:bg-neutral-800 dark:hover:text-gray-300" title="Shuffle">
+                        <button
+                            type="button"
+                            onClick={shufflePlaceholders}
+                            className="cursor-pointer rounded-full p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 active:rotate-12 dark:hover:bg-neutral-800 dark:hover:text-gray-300"
+                            title="Shuffle"
+                        >
                             <Pen className="h-5 w-5" />
                         </button>
                         <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">{composePlaceholder}</h2>
@@ -320,18 +340,20 @@ export default function Dashboard() {
                             >
                                 <X size={14} />
                             </button>
-                            <p className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-1">
+                            <p className="mb-1 text-xs font-medium text-blue-600 dark:text-blue-400">
                                 {translations['Replying to'] || 'Replying to'}
                             </p>
                             <div className="flex items-center gap-2">
                                 <span className="text-sm font-semibold text-gray-900 dark:text-white">{replyingToPost.user.name}</span>
                                 {replyingToPost.user.is_verified && (
-                                    <span className="flex items-center rounded-full bg-blue-500 p-0.5 text-xs text-white"><Check className="h-2.5 w-2.5" /></span>
+                                    <span className="flex items-center rounded-full bg-blue-500 p-0.5 text-xs text-white">
+                                        <Check className="h-2.5 w-2.5" />
+                                    </span>
                                 )}
                                 <span className="text-xs text-gray-500">@{replyingToPost.user.username}</span>
                             </div>
                             {replyingToPost.content && (
-                                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{replyingToPost.content}</p>
+                                <p className="mt-1 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">{replyingToPost.content}</p>
                             )}
                         </div>
                     )}
@@ -348,35 +370,38 @@ export default function Dashboard() {
                             >
                                 <X size={14} />
                             </button>
-                            <p className="text-xs font-medium text-purple-600 dark:text-purple-400 mb-1">{translations['Quoting']}</p>
+                            <p className="mb-1 text-xs font-medium text-purple-600 dark:text-purple-400">{translations['Quoting']}</p>
                             <div className="flex items-center gap-2">
                                 <span className="text-sm font-semibold text-gray-900 dark:text-white">{quotingPost.user.name}</span>
                                 {quotingPost.user.is_verified && (
-                                    <span className="flex items-center rounded-full bg-blue-500 p-0.5 text-xs text-white"><Check className="h-2.5 w-2.5" /></span>
+                                    <span className="flex items-center rounded-full bg-blue-500 p-0.5 text-xs text-white">
+                                        <Check className="h-2.5 w-2.5" />
+                                    </span>
                                 )}
                                 <span className="text-xs text-gray-500">@{quotingPost.user.username}</span>
                             </div>
-                            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{quotingPost.content}</p>
+                            <p className="mt-1 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">{quotingPost.content}</p>
                         </div>
                     )}
 
                     {/* Main compose area */}
                     <div className="flex gap-3">
-                        <Avatar className="mt-0.5 h-12 w-12 shrink-0 hidden sm:flex">
+                        <Avatar className="mt-0.5 hidden h-12 w-12 shrink-0 sm:flex">
                             <AvatarImage src={getProfileImageUrl(auth.user)} alt={auth.user.name} />
-                            <AvatarFallback className="rounded-full text-lg bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
+                            <AvatarFallback className="rounded-full bg-gray-200 text-lg text-black dark:bg-gray-700 dark:text-white">
                                 {getInitials(auth.user.name)}
                             </AvatarFallback>
                         </Avatar>
-                        <div className="flex-1 min-w-0">
+                        <div className="min-w-0 flex-1">
                             <textarea
                                 ref={textareaRef}
                                 value={data.content}
                                 onChange={(e) => setData((prev) => ({ ...prev, content: e.target.value }))}
                                 rows={2}
-                                placeholder={replyingToPost
-                                    ? `${translations['Reply to'] || 'Reply to'} @${replyingToPost.user.username}...`
-                                    : inputPlaceholder
+                                placeholder={
+                                    replyingToPost
+                                        ? `${translations['Reply to'] || 'Reply to'} @${replyingToPost.user.username}...`
+                                        : inputPlaceholder
                                 }
                                 className="w-full resize-none border-0 bg-transparent p-0 text-[16px] text-gray-900 placeholder:text-gray-400 focus:ring-0 focus:outline-none dark:text-white dark:placeholder:text-gray-500"
                             />
@@ -422,13 +447,17 @@ export default function Dashboard() {
                                     {selectedFiles.length > 0 && (
                                         <div className="mt-1.5 flex flex-wrap gap-1.5">
                                             {selectedFiles.map((name, index) => (
-                                                <span key={index} className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-neutral-800 dark:text-gray-400" title={name}>
+                                                <span
+                                                    key={index}
+                                                    className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-neutral-800 dark:text-gray-400"
+                                                    title={name}
+                                                >
                                                     {name.length > 20 ? name.slice(0, 17) + '...' : name}
                                                 </span>
                                             ))}
                                         </div>
                                     )}
-                                    {errors['media.0'] && <p className="text-xs text-red-500 mt-1">{errors['media.0']}</p>}
+                                    {errors['media.0'] && <p className="mt-1 text-xs text-red-500">{errors['media.0']}</p>}
                                 </div>
                             )}
 
@@ -441,7 +470,11 @@ export default function Dashboard() {
                                         </span>
                                         <button
                                             type="button"
-                                            onClick={() => { setShowPollForm(false); setPollOptions(['', '']); setPollExpiresIn(''); }}
+                                            onClick={() => {
+                                                setShowPollForm(false);
+                                                setPollOptions(['', '']);
+                                                setPollExpiresIn('');
+                                            }}
                                             className="rounded-full p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-700"
                                         >
                                             <X size={14} />
@@ -453,20 +486,32 @@ export default function Dashboard() {
                                                 <input
                                                     type="text"
                                                     value={option}
-                                                    onChange={(e) => { const u = [...pollOptions]; u[index] = e.target.value; setPollOptions(u); }}
+                                                    onChange={(e) => {
+                                                        const u = [...pollOptions];
+                                                        u[index] = e.target.value;
+                                                        setPollOptions(u);
+                                                    }}
                                                     placeholder={`${translations['Option'] || 'Option'} ${index + 1}`}
                                                     className="flex-1 rounded-md border border-gray-200 bg-transparent px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-neutral-700 dark:text-white"
                                                     maxLength={100}
                                                 />
                                                 {pollOptions.length > 2 && (
-                                                    <button type="button" onClick={() => setPollOptions(pollOptions.filter((_, i) => i !== index))} className="text-gray-400 hover:text-red-500">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setPollOptions(pollOptions.filter((_, i) => i !== index))}
+                                                        className="text-gray-400 hover:text-red-500"
+                                                    >
                                                         <X size={14} />
                                                     </button>
                                                 )}
                                             </div>
                                         ))}
                                         {pollOptions.length < 6 && (
-                                            <button type="button" onClick={() => setPollOptions([...pollOptions, ''])} className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400">
+                                            <button
+                                                type="button"
+                                                onClick={() => setPollOptions([...pollOptions, ''])}
+                                                className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                                            >
                                                 <Plus size={14} /> {translations['Add option'] || 'Add option'}
                                             </button>
                                         )}
@@ -475,7 +520,7 @@ export default function Dashboard() {
                                         <select
                                             value={pollExpiresIn}
                                             onChange={(e) => setPollExpiresIn(e.target.value)}
-                                            className="cursor-pointer w-full rounded-md border border-gray-200 bg-transparent px-3 py-1.5 text-sm dark:border-neutral-700 dark:text-white"
+                                            className="w-full cursor-pointer rounded-md border border-gray-200 bg-transparent px-3 py-1.5 text-sm dark:border-neutral-700 dark:text-white"
                                         >
                                             <option value="">{translations['No expiration'] || 'No expiration'}</option>
                                             <option value="60">{translations['1 hour'] || '1 hour'}</option>
@@ -520,11 +565,15 @@ export default function Dashboard() {
                                     <div className="mx-1 h-5 w-px bg-gray-200 dark:bg-neutral-700" />
                                     <label className="flex cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-xs text-gray-400 transition hover:bg-gray-100 dark:hover:bg-neutral-800">
                                         <Switch checked={data.is_private} onChange={(val) => setData((prev) => ({ ...prev, is_private: val }))} />
-                                        <span className={data.is_private ? 'text-blue-600 dark:text-blue-400' : ''}>{data.is_private ? (translations['Private'] || 'Private') : (translations['Public'] || 'Public')}</span>
+                                        <span className={data.is_private ? 'text-blue-600 dark:text-blue-400' : ''}>
+                                            {data.is_private ? translations['Private'] || 'Private' : translations['Public'] || 'Public'}
+                                        </span>
                                     </label>
                                 </div>
                                 <div className="ml-auto flex items-center gap-2">
-                                    <span className={`text-xs tabular-nums ${data.content.length > 500 ? 'text-red-500 font-medium' : 'text-gray-300 dark:text-gray-600'}`}>
+                                    <span
+                                        className={`text-xs tabular-nums ${data.content.length > 500 ? 'font-medium text-red-500' : 'text-gray-300 dark:text-gray-600'}`}
+                                    >
                                         {data.content.length}/500
                                     </span>
                                     <button
@@ -536,7 +585,7 @@ export default function Dashboard() {
                                                 : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
                                         }`}
                                     >
-                                        {replyingToPost ? (translations['Reply'] || 'Reply') : (translations['Publish'] || 'Publish')}
+                                        {replyingToPost ? translations['Reply'] || 'Reply' : translations['Publish'] || 'Publish'}
                                     </button>
                                 </div>
                             </div>
@@ -546,7 +595,7 @@ export default function Dashboard() {
             </div>
 
             <div className="flex items-center justify-between border-b border-gray-200 p-4 sm:p-6 dark:border-neutral-800">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">{translations['Posts']}</h2>
+                <h2 className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-white">{translations['Posts']}</h2>
                 <div className="flex items-center gap-2">
                     <select
                         value={sortOption}
@@ -599,7 +648,11 @@ export default function Dashboard() {
                         </motion.div>
                     ))
                 ) : (
-                    <EmptyState icon={FileText} title={translations['No posts yet.']} description={translations["Be the first to share something!"]} />
+                    <EmptyState
+                        icon={FileText}
+                        title={translations['No posts yet.']}
+                        description={translations['Be the first to share something!']}
+                    />
                 )}
             </div>
 

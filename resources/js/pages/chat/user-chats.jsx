@@ -1,18 +1,17 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Check, MessageSquare, Plus, RefreshCw, SendIcon, Trash2, Users, X } from 'lucide-react';
-import { usePullToRefresh } from '../../hooks/use-pull-to-refresh';
-import { EmptyState } from '../../components/empty-state';
+import { Check, MessageSquare, RefreshCw, SendIcon, Trash2, Users, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { EmptyState } from '../../components/empty-state';
+import { OnlineIndicator } from '../../components/online-indicator';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
-import { Badge } from '../../components/ui/badge.jsx';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/dialog.jsx';
 import { Input } from '../../components/ui/input.jsx';
+import { useUnreadCounts } from '../../contexts/unread-counts-context';
 import { useInitials } from '../../hooks/use-initials';
+import { useOnlineUsers } from '../../hooks/use-online-users';
+import { usePullToRefresh } from '../../hooks/use-pull-to-refresh';
 import AppLayout from '../../layouts/app-layout';
 import { getProfileImageUrl } from '../../lib/utils';
-import { useOnlineUsers } from '../../hooks/use-online-users';
-import { OnlineIndicator } from '../../components/online-indicator';
-import { useUnreadCounts } from '../../contexts/unread-counts-context';
 
 export default function UserChats() {
     const { auth, chats = [], group_chats = [], users = [], translations = {} } = usePage().props;
@@ -56,8 +55,7 @@ export default function UserChats() {
     const formatMessageTime = (timestamp) => {
         const date = new Date(timestamp);
         const now = new Date();
-        const isToday =
-            date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate();
+        const isToday = date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate();
         return isToday
             ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             : date.toLocaleString([], {
@@ -95,12 +93,9 @@ export default function UserChats() {
     const filteredMemberUsers = allUsersFlat.filter(
         (u) =>
             !selectedMembers.includes(u.id) &&
-            (u.name.toLowerCase().includes(memberSearchTerm.toLowerCase()) ||
-                u.username.toLowerCase().includes(memberSearchTerm.toLowerCase())),
+            (u.name.toLowerCase().includes(memberSearchTerm.toLowerCase()) || u.username.toLowerCase().includes(memberSearchTerm.toLowerCase())),
     );
-    const visibleMemberUsers = memberSearchTerm.trim()
-        ? filteredMemberUsers
-        : filteredMemberUsers.slice(0, MAX_INITIAL_MEMBERS);
+    const visibleMemberUsers = memberSearchTerm.trim() ? filteredMemberUsers : filteredMemberUsers.slice(0, MAX_INITIAL_MEMBERS);
     const hiddenCount = memberSearchTerm.trim() ? 0 : Math.max(0, filteredMemberUsers.length - MAX_INITIAL_MEMBERS);
 
     const toggleMember = (userId) => {
@@ -118,7 +113,12 @@ export default function UserChats() {
     const handleDeleteChat = (e, chatId) => {
         e.preventDefault();
         e.stopPropagation();
-        if (confirm(translations['Delete this chat? All messages will be permanently removed.'] || 'Delete this chat? All messages will be permanently removed.')) {
+        if (
+            confirm(
+                translations['Delete this chat? All messages will be permanently removed.'] ||
+                    'Delete this chat? All messages will be permanently removed.',
+            )
+        ) {
             router.delete(`/chat/user-chat/${chatId}`, { preserveScroll: true });
         }
     };
@@ -129,7 +129,7 @@ export default function UserChats() {
 
             {pullDistance > 0 && (
                 <div className="flex justify-center overflow-hidden transition-all lg:hidden" style={{ height: pullDistance }}>
-                    <RefreshCw className={`h-5 w-5 text-gray-400 mt-2 ${pulling ? 'text-blue-500 animate-spin' : ''}`} />
+                    <RefreshCw className={`mt-2 h-5 w-5 text-gray-400 ${pulling ? 'animate-spin text-blue-500' : ''}`} />
                 </div>
             )}
 
@@ -176,8 +176,12 @@ export default function UserChats() {
                                                                     </AvatarFallback>
                                                                 </Avatar>
                                                                 <div className="text-left">
-                                                                    <span className="block text-sm font-semibold text-gray-900 dark:text-white">{user.name}</span>
-                                                                    <span className="block text-sm text-gray-500 dark:text-gray-400">@{user.username}</span>
+                                                                    <span className="block text-sm font-semibold text-gray-900 dark:text-white">
+                                                                        {user.name}
+                                                                    </span>
+                                                                    <span className="block text-sm text-gray-500 dark:text-gray-400">
+                                                                        @{user.username}
+                                                                    </span>
                                                                 </div>
                                                             </DialogClose>
                                                         ))}
@@ -189,7 +193,17 @@ export default function UserChats() {
                             </DialogContent>
                         </Dialog>
 
-                        <Dialog open={showGroupDialog} onOpenChange={(open) => { setShowGroupDialog(open); if (!open) { setGroupName(''); setSelectedMembers([]); setMemberSearchTerm(''); } }}>
+                        <Dialog
+                            open={showGroupDialog}
+                            onOpenChange={(open) => {
+                                setShowGroupDialog(open);
+                                if (!open) {
+                                    setGroupName('');
+                                    setSelectedMembers([]);
+                                    setMemberSearchTerm('');
+                                }
+                            }}
+                        >
                             <DialogTrigger asChild>
                                 <button
                                     onClick={() => setShowGroupDialog(true)}
@@ -236,7 +250,9 @@ export default function UserChats() {
                                     />
                                     <div className="flex max-h-[40vh] flex-col gap-0.5 overflow-y-auto">
                                         {visibleMemberUsers.length === 0 ? (
-                                            <p className="py-4 text-center text-sm text-gray-500">{translations['No users found'] || 'No users found'}</p>
+                                            <p className="py-4 text-center text-sm text-gray-500">
+                                                {translations['No users found'] || 'No users found'}
+                                            </p>
                                         ) : (
                                             <>
                                                 {visibleMemberUsers.map((u) => (
@@ -270,7 +286,8 @@ export default function UserChats() {
                                         disabled={!groupName.trim() || selectedMembers.length === 0}
                                         className="w-full rounded-full bg-blue-600 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-700 dark:hover:bg-blue-800"
                                     >
-                                        {translations['Create group'] || 'Create group'} {selectedMembers.length > 0 && `(${selectedMembers.length + 1} ${translations['members'] || 'members'})`}
+                                        {translations['Create group'] || 'Create group'}{' '}
+                                        {selectedMembers.length > 0 && `(${selectedMembers.length + 1} ${translations['members'] || 'members'})`}
                                     </button>
                                 </div>
                             </DialogContent>
@@ -285,7 +302,7 @@ export default function UserChats() {
                     </div>
                 </div>
 
-                <div className="flex px-6 border-b border-gray-200 dark:border-neutral-800">
+                <div className="flex border-b border-gray-200 px-6 dark:border-neutral-800">
                     <button
                         onClick={() => setActiveTab('direct')}
                         className={`px-4 py-2 text-sm font-medium transition-colors ${
@@ -311,7 +328,11 @@ export default function UserChats() {
                 {activeTab === 'direct' && (
                     <>
                         {chats.length === 0 ? (
-                            <EmptyState icon={MessageSquare} title={translations['Not chats anyone yet.']} description={translations["Start a conversation with someone!"]} />
+                            <EmptyState
+                                icon={MessageSquare}
+                                title={translations['Not chats anyone yet.']}
+                                description={translations['Start a conversation with someone!']}
+                            />
                         ) : (
                             <div className="divide-y divide-gray-100 dark:divide-neutral-800/50">
                                 {chats.map((chat) => (
@@ -336,7 +357,9 @@ export default function UserChats() {
                                                         <Check className="h-2.5 w-2.5" />
                                                     </span>
                                                 )}
-                                                <span className="hidden text-sm text-gray-500 sm:inline dark:text-gray-400">@{chat.user.username}</span>
+                                                <span className="hidden text-sm text-gray-500 sm:inline dark:text-gray-400">
+                                                    @{chat.user.username}
+                                                </span>
                                             </div>
                                             <p className="mt-0.5 truncate text-sm text-gray-500 dark:text-gray-400">
                                                 {chat.last_message ? chat.last_message.text : translations['No messages anyone yet.']}
@@ -345,7 +368,9 @@ export default function UserChats() {
                                         <div className="flex shrink-0 items-center gap-2">
                                             <div className="flex flex-col items-end gap-1">
                                                 {chat.last_message && (
-                                                    <span className="text-xs text-gray-400 dark:text-gray-500">{formatMessageTime(chat.last_message.time)}</span>
+                                                    <span className="text-xs text-gray-400 dark:text-gray-500">
+                                                        {formatMessageTime(chat.last_message.time)}
+                                                    </span>
                                                 )}
                                                 {chat.unread_count > 0 && (
                                                     <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-500 px-1.5 text-xs font-medium text-white">
@@ -355,7 +380,7 @@ export default function UserChats() {
                                             </div>
                                             <button
                                                 onClick={(e) => handleDeleteChat(e, chat.id)}
-                                                className="rounded-full p-1.5 text-gray-400 opacity-0 transition hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 dark:hover:bg-red-950/30"
+                                                className="rounded-full p-1.5 text-gray-400 opacity-0 transition group-hover:opacity-100 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/30"
                                                 title={translations['Delete chat'] || 'Delete chat'}
                                             >
                                                 <Trash2 className="h-4 w-4" />
@@ -370,8 +395,12 @@ export default function UserChats() {
 
                 {activeTab === 'groups' && (
                     <>
-                        {(!group_chats || group_chats.length === 0) ? (
-                            <EmptyState icon={Users} title={translations['No group chats yet'] || 'No group chats yet'} description={translations['Create a group chat to get started!'] || 'Create a group chat to get started!'} />
+                        {!group_chats || group_chats.length === 0 ? (
+                            <EmptyState
+                                icon={Users}
+                                title={translations['No group chats yet'] || 'No group chats yet'}
+                                description={translations['Create a group chat to get started!'] || 'Create a group chat to get started!'}
+                            />
                         ) : (
                             <div className="divide-y divide-gray-100 dark:divide-neutral-800/50">
                                 {group_chats.map((gc) => (
@@ -396,7 +425,9 @@ export default function UserChats() {
                                         </div>
                                         <div className="shrink-0">
                                             {gc.last_message && (
-                                                <span className="text-xs text-gray-400 dark:text-gray-500">{formatMessageTime(gc.last_message.time)}</span>
+                                                <span className="text-xs text-gray-400 dark:text-gray-500">
+                                                    {formatMessageTime(gc.last_message.time)}
+                                                </span>
                                             )}
                                         </div>
                                     </Link>

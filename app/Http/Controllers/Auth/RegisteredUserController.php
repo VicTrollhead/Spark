@@ -52,7 +52,7 @@ class RegisteredUserController extends Controller
             'is_verified' => false,
             'is_private' => false,
             'status' => 'active',
-            //'email_verified_at' => now(), ///!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // 'email_verified_at' => now(), ///!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         ]);
 
         event(new Registered($user));
@@ -68,7 +68,7 @@ class RegisteredUserController extends Controller
         $nouns = ['Tiger', 'Falcon', 'Panda', 'Wolf', 'Dragon', 'Hawk', 'Phoenix', 'Bear', 'Lion', 'Shark'];
 
         do {
-            $username = $adjectives[array_rand($adjectives)] . $nouns[array_rand($nouns)] . rand(1000, 9999);
+            $username = $adjectives[array_rand($adjectives)].$nouns[array_rand($nouns)].rand(1000, 9999);
         } while (User::where('username', $username)->exists());
 
         return $username;

@@ -1,9 +1,9 @@
-import { useState, useCallback } from 'react';
-import { Head, usePage, router } from '@inertiajs/react';
-import AppLayout from '../../layouts/app-layout.jsx';
-import PostComponent from './post-component.jsx';
+import { Head, router, usePage } from '@inertiajs/react';
+import { useCallback, useState } from 'react';
 import { PostSkeleton } from '../../components/post-skeleton';
 import { useInfiniteScroll } from '../../hooks/use-infinite-scroll';
+import AppLayout from '../../layouts/app-layout.jsx';
+import PostComponent from './post-component.jsx';
 
 export default function PostsByHashtag() {
     const { user, posts: initialPosts = { data: [], next_page_url: null }, hashtag, translations = {} } = usePage().props;
@@ -14,19 +14,23 @@ export default function PostsByHashtag() {
     const loadMore = useCallback(() => {
         if (!nextPageUrl || loadingMore) return;
         setLoadingMore(true);
-        router.get(nextPageUrl, {}, {
-            preserveState: true,
-            preserveScroll: true,
-            only: ['posts'],
-            onSuccess: (page) => {
-                setPosts((prev) => [...prev, ...page.props.posts.data]);
-                setNextPageUrl(page.props.posts.next_page_url);
-                setLoadingMore(false);
-                // Restore clean URL so refresh doesn't land on ?page=N
-                window.history.replaceState({}, '', `/posts-by-hashtag/${hashtag.hashtag}`);
+        router.get(
+            nextPageUrl,
+            {},
+            {
+                preserveState: true,
+                preserveScroll: true,
+                only: ['posts'],
+                onSuccess: (page) => {
+                    setPosts((prev) => [...prev, ...page.props.posts.data]);
+                    setNextPageUrl(page.props.posts.next_page_url);
+                    setLoadingMore(false);
+                    // Restore clean URL so refresh doesn't land on ?page=N
+                    window.history.replaceState({}, '', `/posts-by-hashtag/${hashtag.hashtag}`);
+                },
+                onError: () => setLoadingMore(false),
             },
-            onError: () => setLoadingMore(false),
-        });
+        );
     }, [nextPageUrl, loadingMore, hashtag.hashtag]);
 
     const sentinelRef = useInfiniteScroll(loadMore, !!nextPageUrl && !loadingMore);
@@ -35,7 +39,7 @@ export default function PostsByHashtag() {
         <AppLayout>
             <Head title={`${translations['Posts by hashtag']} #${hashtag.hashtag}`} />
 
-            <div className="border-b border-border p-6">
+            <div className="border-border border-b p-6">
                 <h1 className="text-2xl font-bold break-all">
                     {`${translations['Posts by hashtag']}  `}
                     <span className="bg-brand-gradient bg-clip-text text-transparent">{`#${hashtag.hashtag}`}</span>
@@ -46,7 +50,7 @@ export default function PostsByHashtag() {
                 {posts.length > 0 ? (
                     posts.map((post) => <PostComponent key={post.id} post={post} />)
                 ) : (
-                    <p className="text-gray-500 dark:text-gray-400 px-6 py-4">{translations['No posts by hashtag yet.']}</p>
+                    <p className="px-6 py-4 text-gray-500 dark:text-gray-400">{translations['No posts by hashtag yet.']}</p>
                 )}
             </div>
 

@@ -1,15 +1,15 @@
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Check } from 'lucide-react';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import MessageInput from '../../components/message-input.jsx';
 import Message from '../../components/message.jsx';
+import { OnlineIndicator } from '../../components/online-indicator';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar.jsx';
+import { useUnreadCounts } from '../../contexts/unread-counts-context';
 import { useInitials } from '../../hooks/use-initials.jsx';
+import { useOnlineUsers } from '../../hooks/use-online-users';
 import AppLayout from '../../layouts/app-layout.jsx';
 import { getProfileImageUrl } from '../../lib/utils';
-import { useOnlineUsers } from '../../hooks/use-online-users';
-import { OnlineIndicator } from '../../components/online-indicator';
-import { useUnreadCounts } from '../../contexts/unread-counts-context';
 
 export default function UserChat() {
     const { user, chat_id: initialChatId, init_messages, other_user, translations } = usePage().props;
@@ -36,11 +36,13 @@ export default function UserChat() {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                 },
-            }).then(() => {
-                refreshMessageCount();
-            }).catch(() => {});
+            })
+                .then(() => {
+                    refreshMessageCount();
+                })
+                .catch(() => {});
         }, 300);
     }, [chatId, refreshMessageCount]);
 
@@ -63,9 +65,10 @@ export default function UserChat() {
                     chat_id: e.chat_id,
                     read_at: null,
                     media: e.media || [],
-                    user: e.user.id === user.id
-                        ? { ...e.user, profile_image: user.profile_image, is_verified: user.is_verified }
-                        : { ...e.user, profile_image: other_user.profile_image, is_verified: other_user.is_verified },
+                    user:
+                        e.user.id === user.id
+                            ? { ...e.user, profile_image: user.profile_image, is_verified: user.is_verified }
+                            : { ...e.user, profile_image: other_user.profile_image, is_verified: other_user.is_verified },
                 };
                 const shouldScroll = isUserAtBottom();
                 setMessages((prev) => {
@@ -91,11 +94,7 @@ export default function UserChat() {
             .listen('MessagesRead', (e) => {
                 if (e.read_by_user_id !== user.id) {
                     setMessages((prev) =>
-                        prev.map((msg) =>
-                            msg.user.id === user.id && !msg.read_at
-                                ? { ...msg, read_at: new Date().toISOString() }
-                                : msg,
-                        ),
+                        prev.map((msg) => (msg.user.id === user.id && !msg.read_at ? { ...msg, read_at: new Date().toISOString() } : msg)),
                     );
                 }
             });
@@ -107,7 +106,10 @@ export default function UserChat() {
 
     const handleTyping = useCallback(() => {
         if (!chatId) return;
-        fetch(`/chat/user-chat/${chatId}/typing`, { method: 'POST', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content, 'Accept': 'application/json' } });
+        fetch(`/chat/user-chat/${chatId}/typing`, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content, Accept: 'application/json' },
+        });
     }, [chatId]);
 
     const isUserAtBottom = () => {
@@ -153,7 +155,7 @@ export default function UserChat() {
         <AppLayout>
             <Head title={`${translations['Chat with']} ${other_user.name}`} />
             <div className="flex w-full flex-col" style={{ height: 'calc(100dvh - var(--header-h) - var(--mobile-nav-h))' }}>
-                <div className="flex h-14 shrink-0 w-full items-center border-b border-gray-200 bg-white px-4 dark:border-neutral-800 dark:bg-neutral-950">
+                <div className="flex h-14 w-full shrink-0 items-center border-b border-gray-200 bg-white px-4 dark:border-neutral-800 dark:bg-neutral-950">
                     <Link href={`/user/${other_user.username}`} className="flex items-center gap-3">
                         <OnlineIndicator isOnline={onlineUserIds.has(other_user.id)}>
                             <Avatar className="h-9 w-9 overflow-hidden rounded-full">

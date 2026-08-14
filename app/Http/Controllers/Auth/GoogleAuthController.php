@@ -7,17 +7,13 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
 
-
 class GoogleAuthController extends Controller
 {
-
     public function googleLogin(): SymfonyRedirectResponse
     {
         return Socialite::driver('google')->redirect();
@@ -31,6 +27,7 @@ class GoogleAuthController extends Controller
 
         if ($user) {
             Auth::login($user);
+
             return redirect()->route('dashboard');
         }
 
@@ -39,7 +36,7 @@ class GoogleAuthController extends Controller
         $counter = 1;
 
         while (User::where('username', $username)->exists()) {
-            $username = $baseUsername . $counter;
+            $username = $baseUsername.$counter;
             $counter++;
         }
 
@@ -53,7 +50,7 @@ class GoogleAuthController extends Controller
         ]);
 
         Auth::login($user);
+
         return redirect()->route('dashboard');
     }
-
 }

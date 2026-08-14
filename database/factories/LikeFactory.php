@@ -22,7 +22,7 @@ class LikeFactory extends Factory
         ];
     }
 
-    public function forPost(Post $post = null)
+    public function forPost(?Post $post = null)
     {
         $post = $post ?? Post::factory()->create();
 
@@ -34,7 +34,7 @@ class LikeFactory extends Factory
         });
     }
 
-    public function forComment(Comment $comment = null)
+    public function forComment(?Comment $comment = null)
     {
         $comment = $comment ?? Comment::factory()->create();
 

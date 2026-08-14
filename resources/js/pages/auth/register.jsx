@@ -1,16 +1,15 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
+import GoogleIcon from '@/assets/images/google_icon.png';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import PasswordVisibilityToggle from '@/components/ui/password-visibility-button';
 import { Label } from '@/components/ui/label';
+import PasswordVisibilityToggle from '@/components/ui/password-visibility-button';
 import AuthLayout from '@/layouts/auth-layout';
 import { useState } from 'react';
-import GoogleIcon from '@/assets/images/google_icon.png';
-
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -35,14 +34,16 @@ export default function Register() {
     };
 
     return (
-        <AuthLayout
-            title={translations["Join Spark"]}
-            description={translations["Enter your details below to create your account"]}
-        >
-            <Head title={translations["Sign Up"]} />
+        <AuthLayout title={translations['Join Spark']} description={translations['Enter your details below to create your account']}>
+            <Head title={translations['Sign Up']} />
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
-                    <Button asChild variant="default" size="default" className="w-full bg-white dark:bg-black hover:bg-white hover:dark:bg-black border-2 border-gray-700 hover:border-blue-500 text-black dark:text-white">
+                    <Button
+                        asChild
+                        variant="default"
+                        size="default"
+                        className="w-full border-2 border-gray-700 bg-white text-black hover:border-blue-500 hover:bg-white dark:bg-black dark:text-white hover:dark:bg-black"
+                    >
                         <a href={route('api.auth.google')} className="block text-center">
                             <img src={GoogleIcon} alt="Google" className="mr-2 h-5 w-5" />
                             {translations['Continue with Google']}
@@ -56,7 +57,7 @@ export default function Register() {
                     </div>
 
                     <div className="grid gap-5">
-                        <Label htmlFor="name">{translations["Full Name"]}</Label>
+                        <Label htmlFor="name">{translations['Full Name']}</Label>
                         <Input
                             id="name"
                             type="text"
@@ -67,13 +68,13 @@ export default function Register() {
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                             disabled={processing}
-                            placeholder={translations["e.g. Jane Doe"]}
+                            placeholder={translations['e.g. Jane Doe']}
                         />
                         <InputError message={errors.name} className="mt-2" />
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="email">{translations["Email Address"]}</Label>
+                        <Label htmlFor="email">{translations['Email Address']}</Label>
                         <Input
                             id="email"
                             type="email"
@@ -83,23 +84,23 @@ export default function Register() {
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
                             disabled={processing}
-                            placeholder={translations["email@example.com"]}
+                            placeholder={translations['email@example.com']}
                         />
                         <InputError message={errors.email} />
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="password">{translations["Password"]}</Label>
+                        <Label htmlFor="password">{translations['Password']}</Label>
                         <div className="flex gap-1.5">
                             <Input
                                 id="password"
-                                type={passwordVisible ? "text" : "password"}
+                                type={passwordVisible ? 'text' : 'password'}
                                 required
                                 tabIndex={3}
                                 autoComplete="current-password"
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
-                                placeholder={translations["Password"]}
+                                placeholder={translations['Password']}
                             />
                             <PasswordVisibilityToggle visible={passwordVisible} onToggle={togglePasswordVisibility} />
                         </div>
@@ -107,18 +108,18 @@ export default function Register() {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">{translations["Confirm Password"]}</Label>
+                        <Label htmlFor="password_confirmation">{translations['Confirm Password']}</Label>
                         <div className="flex gap-1.5">
                             <Input
                                 id="password_confirmation"
-                                type={cpasswordVisible ? "text" : "password"}
+                                type={cpasswordVisible ? 'text' : 'password'}
                                 required
                                 tabIndex={4}
                                 autoComplete="new-password"
                                 value={data.password_confirmation}
                                 onChange={(e) => setData('password_confirmation', e.target.value)}
                                 disabled={processing}
-                                placeholder={translations["Confirm Password"]}
+                                placeholder={translations['Confirm Password']}
                             />
                             <PasswordVisibilityToggle visible={cpasswordVisible} onToggle={toggleCPasswordVisibility} />
                         </div>
@@ -127,14 +128,14 @@ export default function Register() {
 
                     <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                        {translations["Create Account"]}
+                        {translations['Create Account']}
                     </Button>
                 </div>
 
                 <div className="text-muted-foreground text-center text-sm">
-                    {translations["Already have an account?"]}{' '}
+                    {translations['Already have an account?']}{' '}
                     <TextLink href={route('login')} tabIndex={6}>
-                        {translations["Log In"]}
+                        {translations['Log In']}
                     </TextLink>
                 </div>
             </form>

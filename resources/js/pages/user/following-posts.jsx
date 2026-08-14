@@ -1,11 +1,11 @@
 import { Head, router, usePage } from '@inertiajs/react';
+import { RefreshCw } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { PostSkeleton } from '../../components/post-skeleton';
 import '../../echo';
+import { useInfiniteScroll } from '../../hooks/use-infinite-scroll';
 import AppLayout from '../../layouts/app-layout';
 import PostComponent from '../post/post-component';
-import { useEffect, useState, useCallback } from 'react';
-import { RefreshCw } from 'lucide-react';
-import { useInfiniteScroll } from '../../hooks/use-infinite-scroll';
-import { PostSkeleton } from '../../components/post-skeleton';
 
 export default function FollowingPosts() {
     const { auth, user, posts: initialPosts = { data: [], next_page_url: null }, translations = {}, filters = {} } = usePage().props;
@@ -37,15 +37,19 @@ export default function FollowingPosts() {
     };
 
     const handleSortChange = (e) => {
-        router.get(route('user.followingPosts', { username: user.username }), {
-            sort: e.target.value,
-        }, {
-            preserveScroll: true,
-            onSuccess: (page) => {
-                setPosts(page.props.posts.data);
-                setNextPageUrl(page.props.posts.next_page_url);
+        router.get(
+            route('user.followingPosts', { username: user.username }),
+            {
+                sort: e.target.value,
             },
-        });
+            {
+                preserveScroll: true,
+                onSuccess: (page) => {
+                    setPosts(page.props.posts.data);
+                    setNextPageUrl(page.props.posts.next_page_url);
+                },
+            },
+        );
     };
 
     const handleReload = () => {
@@ -64,17 +68,21 @@ export default function FollowingPosts() {
     const loadMore = useCallback(() => {
         if (!nextPageUrl || loadingMore) return;
         setLoadingMore(true);
-        router.get(nextPageUrl, {}, {
-            preserveState: true,
-            preserveScroll: true,
-            only: ['posts'],
-            onSuccess: (page) => {
-                setPosts((prev) => [...prev, ...page.props.posts.data]);
-                setNextPageUrl(page.props.posts.next_page_url);
-                setLoadingMore(false);
+        router.get(
+            nextPageUrl,
+            {},
+            {
+                preserveState: true,
+                preserveScroll: true,
+                only: ['posts'],
+                onSuccess: (page) => {
+                    setPosts((prev) => [...prev, ...page.props.posts.data]);
+                    setNextPageUrl(page.props.posts.next_page_url);
+                    setLoadingMore(false);
+                },
+                onError: () => setLoadingMore(false),
             },
-            onError: () => setLoadingMore(false),
-        });
+        );
     }, [nextPageUrl, loadingMore]);
 
     const sentinelRef = useInfiniteScroll(loadMore, !!nextPageUrl && !loadingMore);
@@ -120,7 +128,7 @@ export default function FollowingPosts() {
                 {posts.length > 0 ? (
                     posts.map((post) => <PostComponent key={post.id} post={post} />)
                 ) : (
-                    <p className="text-gray-500 dark:text-gray-400 px-6 py-4">{translations['No following posts yet.']}</p>
+                    <p className="px-6 py-4 text-gray-500 dark:text-gray-400">{translations['No following posts yet.']}</p>
                 )}
             </div>
 

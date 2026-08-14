@@ -1,30 +1,60 @@
-import { Head, usePage, Link, router } from '@inertiajs/react';
-import '../../echo';
-import {Check, Crown, FileText, Flame, Globe, Heart, Calendar, MapPin, Pencil, Pin, RefreshCw, SendIcon, Shield, Sparkles, Star, Trophy, TrendingUp, UserCheck, AlertCircle} from 'lucide-react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { motion } from 'framer-motion';
+import {
+    AlertCircle,
+    Calendar,
+    Check,
+    Crown,
+    FileText,
+    Flame,
+    Globe,
+    Heart,
+    MapPin,
+    Pencil,
+    Pin,
+    RefreshCw,
+    SendIcon,
+    Shield,
+    Sparkles,
+    Star,
+    TrendingUp,
+    Trophy,
+    UserCheck,
+} from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { EmptyState } from '../../components/empty-state';
+import { PostSkeleton } from '../../components/post-skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
+import '../../echo';
+import { useInfiniteScroll } from '../../hooks/use-infinite-scroll';
 import { useInitials } from '../../hooks/use-initials';
 import AppLayout from '../../layouts/app-layout';
+import { getCoverImageUrl, getProfileImageUrl } from '../../lib/utils';
 import PostComponent from '../post/post-component';
-import { PostSkeleton } from '../../components/post-skeleton';
-import { useInfiniteScroll } from '../../hooks/use-infinite-scroll';
-import { useState, useCallback, useEffect } from 'react';
-import { getProfileImageUrl, getCoverImageUrl } from '../../lib/utils';
-import { motion } from 'framer-motion';
 
 export default function Show() {
-    const { user, auth, posts: initialPosts = { data: [], next_page_url: null }, translations = {}, filters = {}, followers_string, following_string, pinned_post, badges = [] } = usePage().props;
+    const {
+        user,
+        auth,
+        posts: initialPosts = { data: [], next_page_url: null },
+        translations = {},
+        filters = {},
+        followers_string,
+        following_string,
+        pinned_post,
+        badges = [],
+    } = usePage().props;
 
     const badgeIcons = {
-        'pencil': Pencil,
-        'flame': Flame,
-        'trophy': Trophy,
-        'star': Star,
+        pencil: Pencil,
+        flame: Flame,
+        trophy: Trophy,
+        star: Star,
         'trending-up': TrendingUp,
-        'crown': Crown,
-        'heart': Heart,
-        'sparkles': Sparkles,
-        'shield': Shield,
+        crown: Crown,
+        heart: Heart,
+        sparkles: Sparkles,
+        shield: Shield,
     };
     const getInitials = useInitials();
     const [sort, setSort] = useState(filters?.sort || 'latest');
@@ -64,19 +94,23 @@ export default function Show() {
     const loadMore = useCallback(() => {
         if (!nextPageUrl || loadingMore) return;
         setLoadingMore(true);
-        router.get(nextPageUrl, {}, {
-            preserveState: true,
-            preserveScroll: true,
-            only: ['posts'],
-            onSuccess: (page) => {
-                setPosts((prev) => [...prev, ...page.props.posts.data]);
-                setNextPageUrl(page.props.posts.next_page_url);
-                setLoadingMore(false);
-                // Restore clean URL so refresh doesn't land on ?page=N
-                window.history.replaceState({}, '', `/user/${user.username}`);
+        router.get(
+            nextPageUrl,
+            {},
+            {
+                preserveState: true,
+                preserveScroll: true,
+                only: ['posts'],
+                onSuccess: (page) => {
+                    setPosts((prev) => [...prev, ...page.props.posts.data]);
+                    setNextPageUrl(page.props.posts.next_page_url);
+                    setLoadingMore(false);
+                    // Restore clean URL so refresh doesn't land on ?page=N
+                    window.history.replaceState({}, '', `/user/${user.username}`);
+                },
+                onError: () => setLoadingMore(false),
             },
-            onError: () => setLoadingMore(false),
-        });
+        );
     }, [nextPageUrl, loadingMore, user.username]);
 
     const sentinelRef = useInfiniteScroll(loadMore, !!nextPageUrl && !loadingMore);
@@ -84,27 +118,28 @@ export default function Show() {
     const handleFollow = () => {
         const isCurrentlyFollowing = user.is_following || hasSentRequest;
 
-        const route = isCurrentlyFollowing
-            ? 'unfollow'
-            : (user.is_private ? 'follow-request' : 'follow');
+        const route = isCurrentlyFollowing ? 'unfollow' : user.is_private ? 'follow-request' : 'follow';
 
         setIsLoading(true);
 
-        router.post(`/user/${user.username}/${route}`, {}, {
-            onSuccess: () => {
-                if (user.is_private && !isCurrentlyFollowing) {
-                    setHasSentRequest(true);
-                } else {
-                    setHasSentRequest(false);
-                }
-                setIsLoading(false);
+        router.post(
+            `/user/${user.username}/${route}`,
+            {},
+            {
+                onSuccess: () => {
+                    if (user.is_private && !isCurrentlyFollowing) {
+                        setHasSentRequest(true);
+                    } else {
+                        setHasSentRequest(false);
+                    }
+                    setIsLoading(false);
+                },
+                onError: () => {
+                    setIsLoading(false);
+                },
             },
-            onError: () => {
-                setIsLoading(false);
-            }
-        });
+        );
     };
-
 
     const handleEditProfile = () => {
         router.get(`/user/${user.username}/edit`);
@@ -120,25 +155,25 @@ export default function Show() {
             <AppLayout>
                 <Head title={`@${user.username} (${translations['Private Account']})`} />
 
-                <div className="p-6 text-center flex flex-col items-center justify-center">
-                    <Avatar className="h-24 w-24 mx-auto border-4 border-white dark:border-gray-900">
+                <div className="flex flex-col items-center justify-center p-6 text-center">
+                    <Avatar className="mx-auto h-24 w-24 border-4 border-white dark:border-gray-900">
                         <AvatarImage src={profileImageUrl || ''} alt={user.username} />
                         <AvatarFallback className="rounded-full bg-gray-200 text-4xl text-black dark:bg-gray-700 dark:text-white">
                             {getInitials(user.username)}
                         </AvatarFallback>
                     </Avatar>
 
-                    <h2 className="text-lg font-semibold mt-2 text-gray-600 dark:text-gray-400">@{user.username}</h2>
-                    <div className="flex items-center p-2 ml-2">
+                    <h2 className="mt-2 text-lg font-semibold text-gray-600 dark:text-gray-400">@{user.username}</h2>
+                    <div className="ml-2 flex items-center p-2">
                         <h1 className="text-[22px] font-bold text-gray-900 dark:text-white">{user.name}</h1>
                         {user.is_verified && (
                             <div className="group relative ml-2">
-                                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-lg bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
-                                        Verified
-                                    </span>
-                                    <span className="flex items-center rounded-full bg-blue-500 p-1 text-xs font-medium text-white">
-                                        <Check className="h-4 w-4" />
-                                    </span>
+                                <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-lg bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                    Verified
+                                </span>
+                                <span className="flex items-center rounded-full bg-blue-500 p-1 text-xs font-medium text-white">
+                                    <Check className="h-4 w-4" />
+                                </span>
                             </div>
                         )}
                     </div>
@@ -152,7 +187,6 @@ export default function Show() {
                             {hasSentRequest ? translations['Request Sent'] : translations['Follow to See More']}
                         </button>
                     )}
-
                 </div>
             </AppLayout>
         );
@@ -162,11 +196,9 @@ export default function Show() {
         <AppLayout>
             <Head title={`${user.name} (@${user.username})`} />
 
-            <div className="relative w-full bg-gray-200 h-72 dark:bg-gray-700 overflow-visible">
-                {coverImageUrl && (
-                    <img src={coverImageUrl} alt="Cover Image" className="h-full w-full object-cover object-center" />
-                )}
-                <div className="absolute bottom-[-40px] left-4 sm:bottom-[-55px] sm:left-6 z-10">
+            <div className="relative h-72 w-full overflow-visible bg-gray-200 dark:bg-gray-700">
+                {coverImageUrl && <img src={coverImageUrl} alt="Cover Image" className="h-full w-full object-cover object-center" />}
+                <div className="absolute bottom-[-40px] left-4 z-10 sm:bottom-[-55px] sm:left-6">
                     <Avatar className="h-32 w-32 border-4 border-white sm:h-36 sm:w-36 dark:border-gray-900">
                         <AvatarImage src={profileImageUrl} alt={user.name} />
                         <AvatarFallback className="rounded-full bg-gray-200 text-5xl text-black dark:bg-gray-700 dark:text-white">
@@ -174,14 +206,13 @@ export default function Show() {
                         </AvatarFallback>
                     </Avatar>
                 </div>
-
             </div>
 
-            <div className="space-y-2 p-4 sm:p-6 pt-12 sm:pt-16 overflow-x-hidden">
-                <div className="flex items-center justify-between gap-x-5 min-w-0">
+            <div className="space-y-2 overflow-x-hidden p-4 pt-12 sm:p-6 sm:pt-16">
+                <div className="flex min-w-0 items-center justify-between gap-x-5">
                     <div className="min-w-0">
-                        <div className="flex items-center mt-2">
-                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white break-words min-w-0">{user.name}</h1>
+                        <div className="mt-2 flex items-center">
+                            <h1 className="min-w-0 text-2xl font-bold break-words text-gray-900 dark:text-white">{user.name}</h1>
                             {user.is_verified && (
                                 <div className="group relative ml-2">
                                     <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-lg bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
@@ -193,7 +224,7 @@ export default function Show() {
                                 </div>
                             )}
                         </div>
-                        <p className="text-gray-500 dark:text-gray-400 mt-1 truncate">@{user.username}</p>
+                        <p className="mt-1 truncate text-gray-500 dark:text-gray-400">@{user.username}</p>
                     </div>
                     {!isOwnProfile && (
                         <div className="flex shrink-0 items-center gap-2">
@@ -202,7 +233,8 @@ export default function Show() {
                                     href={`/chat/user-chat/${user.username}`}
                                     className="flex items-center gap-2 rounded-full border border-gray-300 px-4 py-1.5 text-sm font-medium text-gray-700 transition hover:bg-gray-100 dark:border-neutral-600 dark:text-gray-300 dark:hover:bg-neutral-800"
                                 >
-                                    {translations['Message'] || 'Message'}<SendIcon className="h-4 w-4" />
+                                    {translations['Message'] || 'Message'}
+                                    <SendIcon className="h-4 w-4" />
                                 </Link>
                             )}
                             <button
@@ -211,15 +243,15 @@ export default function Show() {
                                     user.is_following
                                         ? 'border border-gray-300 text-gray-700 hover:border-red-300 hover:bg-red-50 hover:text-red-600 dark:border-neutral-600 dark:text-gray-300 dark:hover:border-red-800 dark:hover:bg-red-950/30 dark:hover:text-red-400'
                                         : hasSentRequest
-                                            ? 'border border-gray-300 text-gray-500 hover:border-red-300 hover:text-red-500 dark:border-neutral-600 dark:text-gray-400'
-                                            : 'bg-blue-500 text-white hover:bg-blue-600'
+                                          ? 'border border-gray-300 text-gray-500 hover:border-red-300 hover:text-red-500 dark:border-neutral-600 dark:text-gray-400'
+                                          : 'bg-blue-500 text-white hover:bg-blue-600'
                                 }`}
                             >
                                 {user.is_following
                                     ? translations['Unfollow']
                                     : hasSentRequest
-                                        ? (translations['Request Sent'] || 'Request Sent')
-                                        : translations['Follow']}
+                                      ? translations['Request Sent'] || 'Request Sent'
+                                      : translations['Follow']}
                             </button>
                         </div>
                     )}
@@ -235,16 +267,14 @@ export default function Show() {
                             {(!user.bio || !user.location || !user.website || !user.date_of_birth) && (
                                 <div className="flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-xs text-blue-600 dark:bg-blue-950/30 dark:text-blue-400">
                                     <AlertCircle className="h-3.5 w-3.5" />
-                                    <p className="leading-tight">
-                                        {translations['Complete your profile.']}
-                                    </p>
+                                    <p className="leading-tight">{translations['Complete your profile.']}</p>
                                 </div>
                             )}
                         </div>
                     )}
                 </div>
 
-                {user.bio && <p className="text-gray-700 dark:text-gray-300 break-words">{user.bio}</p>}
+                {user.bio && <p className="break-words text-gray-700 dark:text-gray-300">{user.bio}</p>}
 
                 <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                     {user.location && (
@@ -257,7 +287,12 @@ export default function Show() {
                     {user.website && (
                         <div className="flex items-center gap-1">
                             <Globe className="h-4 w-4" />
-                            <a href={user.website} target="_blank" rel="noopener noreferrer" className="max-w-[200px] truncate text-blue-500 hover:underline sm:max-w-xs">
+                            <a
+                                href={user.website}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="max-w-[200px] truncate text-blue-500 hover:underline sm:max-w-xs"
+                            >
                                 {user.website}
                             </a>
                         </div>
@@ -272,7 +307,7 @@ export default function Show() {
 
                     <div className="flex items-center gap-1">
                         <UserCheck className="h-4 w-4" />
-                        {translations['Joined']}{' '}{new Date(user.created_at).toLocaleDateString()}
+                        {translations['Joined']} {new Date(user.created_at).toLocaleDateString()}
                     </div>
 
                     {user.status && (
@@ -283,16 +318,20 @@ export default function Show() {
                     )}
                 </div>
 
-                <div className="flex flex-wrap gap-2 mt-4">
-                    <Link href={`/user/${user.username}/followers`} className="rounded-full bg-accent px-3 py-1.5 text-sm text-accent-foreground transition hover:bg-accent/70">
-                        <strong className="font-semibold">{followersCount}</strong>{' '}
-                        <span className="text-muted-foreground">{followers_string}</span>
+                <div className="mt-4 flex flex-wrap gap-2">
+                    <Link
+                        href={`/user/${user.username}/followers`}
+                        className="bg-accent text-accent-foreground hover:bg-accent/70 rounded-full px-3 py-1.5 text-sm transition"
+                    >
+                        <strong className="font-semibold">{followersCount}</strong> <span className="text-muted-foreground">{followers_string}</span>
                     </Link>
-                    <Link href={`/user/${user.username}/following`} className="rounded-full bg-accent px-3 py-1.5 text-sm text-accent-foreground transition hover:bg-accent/70">
-                        <strong className="font-semibold">{followingCount}</strong>{' '}
-                        <span className="text-muted-foreground">{following_string}</span>
+                    <Link
+                        href={`/user/${user.username}/following`}
+                        className="bg-accent text-accent-foreground hover:bg-accent/70 rounded-full px-3 py-1.5 text-sm transition"
+                    >
+                        <strong className="font-semibold">{followingCount}</strong> <span className="text-muted-foreground">{following_string}</span>
                     </Link>
-                    <div className="rounded-full bg-accent px-3 py-1.5 text-sm text-accent-foreground">
+                    <div className="bg-accent text-accent-foreground rounded-full px-3 py-1.5 text-sm">
                         <strong className="font-semibold">{user.total_likes}</strong>{' '}
                         <span className="text-muted-foreground">{translations['Likes']}</span>
                     </div>
@@ -326,14 +365,18 @@ export default function Show() {
                             value={sort}
                             onChange={(e) => {
                                 setSort(e.target.value);
-                                router.get(window.location.pathname, { sort: e.target.value }, {
-                                    preserveScroll: true,
-                                    preserveState: true,
-                                    onSuccess: (page) => {
-                                        setPosts(page.props.posts.data);
-                                        setNextPageUrl(page.props.posts.next_page_url);
+                                router.get(
+                                    window.location.pathname,
+                                    { sort: e.target.value },
+                                    {
+                                        preserveScroll: true,
+                                        preserveState: true,
+                                        onSuccess: (page) => {
+                                            setPosts(page.props.posts.data);
+                                            setNextPageUrl(page.props.posts.next_page_url);
+                                        },
                                     },
-                                });
+                                );
                             }}
                         >
                             <option value="latest">{translations['Latest']}</option>
@@ -353,7 +396,7 @@ export default function Show() {
 
                 {pinned_post && (
                     <div className="flex flex-col gap-1.5 px-3 pt-3 sm:px-4 sm:pt-4">
-                        <div className="flex items-center gap-1.5 pl-3 text-xs font-medium text-muted-foreground">
+                        <div className="text-muted-foreground flex items-center gap-1.5 pl-3 text-xs font-medium">
                             <Pin className="h-3.5 w-3.5" />
                             <span>{translations['Pinned'] || 'Pinned'}</span>
                         </div>
@@ -377,7 +420,7 @@ export default function Show() {
                         <EmptyState
                             icon={FileText}
                             title={translations['No posts yet.']}
-                            description={isOwnProfile ? translations["Share your first thoughts with the world!"] : null}
+                            description={isOwnProfile ? translations['Share your first thoughts with the world!'] : null}
                             actionLabel={isOwnProfile ? translations['Write your first post here'] : null}
                             actionHref={isOwnProfile ? '/dashboard' : null}
                         />

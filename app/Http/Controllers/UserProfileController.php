@@ -23,19 +23,19 @@ class UserProfileController extends Controller
 {
     use AuthorizesRequests;
 
-    public function show(Request $request, User $user = null): Response
+    public function show(Request $request, ?User $user = null): Response
     {
         $currentUser = Auth::user();
         $user = $user ?? $currentUser;
 
-        if (!$user) {
+        if (! $user) {
             abort(404, 'User not found');
         }
 
         $sort = $request->input('sort', 'latest');
         $canViewFullProfile = Gate::allows('view', $user);
         $user->loadCount(['followers', 'following', 'repostedPosts']);
-        $user->load(array_map(fn($rel) => "pinnedPost.$rel", Post::STANDARD_EAGER_LOADS));
+        $user->load(array_map(fn ($rel) => "pinnedPost.$rel", Post::STANDARD_EAGER_LOADS));
 
         $originalPostsQuery = $user->posts()
             ->with(Post::STANDARD_EAGER_LOADS)
@@ -67,11 +67,11 @@ class UserProfileController extends Controller
         $combinedPosts = $originalPosts->merge($repostedPosts);
 
         if ($sort === 'most_liked') {
-            $combinedPosts = $combinedPosts->sortByDesc(fn($post) => $post->likes->count())->values();
+            $combinedPosts = $combinedPosts->sortByDesc(fn ($post) => $post->likes->count())->values();
         } elseif ($sort === 'oldest') {
-            $combinedPosts = $combinedPosts->sortBy(fn($post) => $post->reposted_at ?? $post->created_at)->values();
+            $combinedPosts = $combinedPosts->sortBy(fn ($post) => $post->reposted_at ?? $post->created_at)->values();
         } else {
-            $combinedPosts = $combinedPosts->sortByDesc(fn($post) => $post->reposted_at ?? $post->created_at)->values();
+            $combinedPosts = $combinedPosts->sortByDesc(fn ($post) => $post->reposted_at ?? $post->created_at)->values();
         }
 
         $repostedPostIds = $user->repostedPosts()->pluck('posts.id');
@@ -85,20 +85,38 @@ class UserProfileController extends Controller
         $postsCount = $user->posts()->count();
         $badges = [];
 
-        if ($postsCount >= 1) $badges[] = ['key' => 'first_post', 'label' => 'First Post', 'icon' => 'pencil'];
-        if ($postsCount >= 10) $badges[] = ['key' => 'active_poster', 'label' => 'Active Poster', 'icon' => 'flame'];
-        if ($postsCount >= 100) $badges[] = ['key' => 'prolific', 'label' => 'Prolific', 'icon' => 'trophy'];
-        if ($user->followers_count >= 10) $badges[] = ['key' => 'rising_star', 'label' => 'Rising Star', 'icon' => 'star'];
-        if ($user->followers_count >= 100) $badges[] = ['key' => 'popular', 'label' => 'Popular', 'icon' => 'trending-up'];
-        if ($user->followers_count >= 1000) $badges[] = ['key' => 'influencer', 'label' => 'Influencer', 'icon' => 'crown'];
-        if ($totalLikes >= 50) $badges[] = ['key' => 'liked', 'label' => 'Well Liked', 'icon' => 'heart'];
-        if ($totalLikes >= 500) $badges[] = ['key' => 'beloved', 'label' => 'Beloved', 'icon' => 'sparkles'];
-        if ($user->created_at->diffInDays(now()) >= 365) $badges[] = ['key' => 'veteran', 'label' => 'Veteran', 'icon' => 'shield'];
+        if ($postsCount >= 1) {
+            $badges[] = ['key' => 'first_post', 'label' => 'First Post', 'icon' => 'pencil'];
+        }
+        if ($postsCount >= 10) {
+            $badges[] = ['key' => 'active_poster', 'label' => 'Active Poster', 'icon' => 'flame'];
+        }
+        if ($postsCount >= 100) {
+            $badges[] = ['key' => 'prolific', 'label' => 'Prolific', 'icon' => 'trophy'];
+        }
+        if ($user->followers_count >= 10) {
+            $badges[] = ['key' => 'rising_star', 'label' => 'Rising Star', 'icon' => 'star'];
+        }
+        if ($user->followers_count >= 100) {
+            $badges[] = ['key' => 'popular', 'label' => 'Popular', 'icon' => 'trending-up'];
+        }
+        if ($user->followers_count >= 1000) {
+            $badges[] = ['key' => 'influencer', 'label' => 'Influencer', 'icon' => 'crown'];
+        }
+        if ($totalLikes >= 50) {
+            $badges[] = ['key' => 'liked', 'label' => 'Well Liked', 'icon' => 'heart'];
+        }
+        if ($totalLikes >= 500) {
+            $badges[] = ['key' => 'beloved', 'label' => 'Beloved', 'icon' => 'sparkles'];
+        }
+        if ($user->created_at->diffInDays(now()) >= 365) {
+            $badges[] = ['key' => 'veteran', 'label' => 'Veteran', 'icon' => 'shield'];
+        }
 
         $page = $request->input('page', 1);
         $perPage = 15;
         $posts = new LengthAwarePaginator(
-            $combinedPosts->forPage($page, $perPage)->values()->map(fn($post) => formatPostForFrontend($post, $currentUser)),
+            $combinedPosts->forPage($page, $perPage)->values()->map(fn ($post) => formatPostForFrontend($post, $currentUser)),
             $combinedPosts->count(),
             $perPage,
             $page,
@@ -126,8 +144,8 @@ class UserProfileController extends Controller
                 'is_friend' => Auth::check() && Auth::user()->friends()->where('followee_id', $user->id)->exists(),
                 'canViewFullProfile' => $canViewFullProfile,
                 'has_sent_follow_request' => Auth::check() && auth()->user()->pendingFollowRequests()
-                        ->where('followee_id', $user->id)
-                        ->exists(),
+                    ->where('followee_id', $user->id)
+                    ->exists(),
                 'total_likes' => $totalLikes,
             ],
             'posts' => $posts,
@@ -144,6 +162,7 @@ class UserProfileController extends Controller
     public function edit(User $user): Response
     {
         $this->authorize('update', $user);
+
         return Inertia::render('user/edit', [
             'user' => [
                 'id' => $user->id,
@@ -185,8 +204,7 @@ class UserProfileController extends Controller
                 ]);
 
                 $media->save();
-            }
-            elseif ($request->boolean('remove_profile_image') && $user->profileImage) {
+            } elseif ($request->boolean('remove_profile_image') && $user->profileImage) {
                 Storage::disk($disk)->delete($user->profileImage->file_path);
                 $user->profileImage()->delete();
             }
@@ -208,8 +226,7 @@ class UserProfileController extends Controller
                 ]);
 
                 $media->save();
-            }
-            elseif ($request->boolean('remove_cover_image') && $user->coverImage) {
+            } elseif ($request->boolean('remove_cover_image') && $user->coverImage) {
                 Storage::disk($disk)->delete($user->coverImage->file_path);
                 $user->coverImage()->delete();
             }

@@ -82,8 +82,7 @@ class DatabaseSeeder extends Seeder
             'python', 'docker', 'vim', 'rust', 'gaming',
         ];
 
-        $hashtags = collect($hashtagNames)->map(fn ($tag) =>
-            Hashtag::create(['hashtag' => $tag])
+        $hashtags = collect($hashtagNames)->map(fn ($tag) => Hashtag::create(['hashtag' => $tag])
         );
 
         // ── 3. FOLLOW GRAPH ───────────────────────────────────────
@@ -180,7 +179,7 @@ class DatabaseSeeder extends Seeder
             'New framework just dropped. Time to rewrite everything from scratch.',
             'Why do all my brilliant ideas come at 2 AM when I should be sleeping?',
             'Refactored a 500-line function into 10 small ones. Feels therapeutic.',
-            "Reading through legacy code is like archeology but less fun.",
+            'Reading through legacy code is like archeology but less fun.',
             'Deployed on a Friday. Living dangerously.',
             'The real programming language was the friends we made along the way.',
             'Just wrote a regex that actually works on the first try. Peak life achievement.',
@@ -188,7 +187,7 @@ class DatabaseSeeder extends Seeder
             'TypeScript generics are either beautiful or terrifying depending on the hour.',
             "Remember: a PR with 1000 lines changed will get 'LGTM' in 5 minutes.",
             'The documentation says it should work. The documentation lies.',
-            "Hot take: most microservices should just be functions.",
+            'Hot take: most microservices should just be functions.',
             'Spent 4 hours debugging. The issue was a missing semicolon.',
             'Writing tests after the fact is like putting on a seatbelt after the crash.',
             'Open source maintainers deserve more appreciation.',
@@ -423,7 +422,9 @@ class DatabaseSeeder extends Seeder
 
         $allUsers->each(function ($user) use ($allPublicPosts) {
             $favCount = rand(0, min(8, $allPublicPosts->count()));
-            if ($favCount === 0) return;
+            if ($favCount === 0) {
+                return;
+            }
 
             $allPublicPosts->random($favCount)->each(function ($post) use ($user) {
                 Favorite::create([
@@ -439,10 +440,14 @@ class DatabaseSeeder extends Seeder
         $allUsers->each(function ($user) use ($allPublicPosts) {
             // Don't repost your own posts
             $eligible = $allPublicPosts->where('user_id', '!=', $user->id)->values();
-            if ($eligible->isEmpty()) return;
+            if ($eligible->isEmpty()) {
+                return;
+            }
 
             $repostCount = rand(0, min(5, $eligible->count()));
-            if ($repostCount === 0) return;
+            if ($repostCount === 0) {
+                return;
+            }
 
             $eligible->random($repostCount)->each(function ($post) use ($user) {
                 Repost::create([
@@ -528,8 +533,10 @@ class DatabaseSeeder extends Seeder
             $u2 = $allUsers->where('id', '!=', $u1->id)->random();
 
             // Normalize pair to avoid duplicates
-            $key = min($u1->id, $u2->id) . '-' . max($u1->id, $u2->id);
-            if (isset($chatPairs[$key])) continue;
+            $key = min($u1->id, $u2->id).'-'.max($u1->id, $u2->id);
+            if (isset($chatPairs[$key])) {
+                continue;
+            }
             $chatPairs[$key] = true;
 
             $chat = Chat::create([
@@ -576,7 +583,9 @@ class DatabaseSeeder extends Seeder
             $key2 = max($superUser->id, $otherUser->id);
 
             $exists = Chat::where('user1_id', $key1)->where('user2_id', $key2)->exists();
-            if ($exists) return;
+            if ($exists) {
+                return;
+            }
 
             $chat = Chat::create([
                 'user1_id' => $key1,
@@ -616,7 +625,9 @@ class DatabaseSeeder extends Seeder
             $key2 = max($paragon->id, $otherUser->id);
 
             $exists = Chat::where('user1_id', $key1)->where('user2_id', $key2)->exists();
-            if ($exists) return;
+            if ($exists) {
+                return;
+            }
 
             $chat = Chat::create([
                 'user1_id' => $key1,
@@ -712,7 +723,9 @@ class DatabaseSeeder extends Seeder
         // Comment notifications
         $comments->random(min(15, $comments->count()))->each(function ($comment) {
             $post = Post::find($comment->post_id);
-            if (! $post || $comment->user_id === $post->user_id) return;
+            if (! $post || $comment->user_id === $post->user_id) {
+                return;
+            }
 
             Notification::create([
                 'user_id' => $post->user_id,
@@ -748,7 +761,9 @@ class DatabaseSeeder extends Seeder
         // Repost notifications
         Repost::inRandomOrder()->limit(15)->get()->each(function ($repost) {
             $post = Post::find($repost->post_id);
-            if (! $post || $repost->user_id === $post->user_id) return;
+            if (! $post || $repost->user_id === $post->user_id) {
+                return;
+            }
 
             Notification::create([
                 'user_id' => $post->user_id,
@@ -762,7 +777,9 @@ class DatabaseSeeder extends Seeder
         // Favorite notifications
         Favorite::inRandomOrder()->limit(15)->get()->each(function ($fav) {
             $post = Post::find($fav->post_id);
-            if (! $post || $fav->user_id === $post->user_id) return;
+            if (! $post || $fav->user_id === $post->user_id) {
+                return;
+            }
 
             Notification::create([
                 'user_id' => $post->user_id,

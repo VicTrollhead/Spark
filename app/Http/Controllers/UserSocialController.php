@@ -32,12 +32,12 @@ class UserSocialController extends Controller
                 break;
             case 'following':
                 if ($currentUser) {
-                    $usersQuery->whereHas('followers', fn($query) => $query->where('follower_id', $currentUser->id));
+                    $usersQuery->whereHas('followers', fn ($query) => $query->where('follower_id', $currentUser->id));
                 }
                 break;
             case 'followers':
                 if ($currentUser) {
-                    $usersQuery->whereHas('following', fn($query) => $query->where('followee_id', $currentUser->id));
+                    $usersQuery->whereHas('following', fn ($query) => $query->where('followee_id', $currentUser->id));
                 }
                 break;
             case 'mutual_subscribers':
@@ -97,12 +97,12 @@ class UserSocialController extends Controller
                 break;
             case 'following':
                 if ($currentUser) {
-                    $usersQuery->whereHas('followers', fn($query) => $query->where('follower_id', $currentUser->id));
+                    $usersQuery->whereHas('followers', fn ($query) => $query->where('follower_id', $currentUser->id));
                 }
                 break;
             case 'followers':
                 if ($currentUser) {
-                    $usersQuery->whereHas('following', fn($query) => $query->where('followee_id', $currentUser->id));
+                    $usersQuery->whereHas('following', fn ($query) => $query->where('followee_id', $currentUser->id));
                 }
                 break;
             case 'mutual_subscribers':
@@ -152,7 +152,7 @@ class UserSocialController extends Controller
 
         $excludedUserIds = collect([
             $authUser->following()->pluck('users.id'),
-            [$authUser->id]
+            [$authUser->id],
         ])->flatten();
 
         $users = User::with('profileImage')

@@ -1,24 +1,24 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { UserCheck, Users, ShieldCheck } from "lucide-react";
+import { motion } from 'framer-motion';
+import { UserCheck, Users } from 'lucide-react';
+import { useState } from 'react';
 
 export default function FollowLayout({ children }) {
-    const [activeTab, setActiveTab] = useState("followers");
+    const [activeTab, setActiveTab] = useState('followers');
 
     const tabs = [
-        { key: "followers", label: "Followers", icon: <Users className="w-5 h-5" /> },
-        { key: "following", label: "Following", icon: <UserCheck className="w-5 h-5" /> },
+        { key: 'followers', label: 'Followers', icon: <Users className="h-5 w-5" /> },
+        { key: 'following', label: 'Following', icon: <UserCheck className="h-5 w-5" /> },
     ];
 
     return (
         <div className="flex h-full">
-            <div className="flex flex-col space-y-2 border-r border-gray-700 p-4 w-1/4 min-w-[180px]">
+            <div className="flex w-1/4 min-w-[180px] flex-col space-y-2 border-r border-gray-700 p-4">
                 {tabs.map((tab) => (
                     <button
                         key={tab.key}
                         onClick={() => setActiveTab(tab.key)}
-                        className={`flex items-center gap-2 px-4 py-3 rounded-md text-white transition ${
-                            activeTab === tab.key ? "bg-blue-500" : "hover:bg-gray-800"
+                        className={`flex items-center gap-2 rounded-md px-4 py-3 text-white transition ${
+                            activeTab === tab.key ? 'bg-blue-500' : 'hover:bg-gray-800'
                         }`}
                     >
                         {tab.icon}

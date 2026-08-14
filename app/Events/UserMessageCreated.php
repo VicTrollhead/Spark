@@ -2,9 +2,7 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -15,6 +13,7 @@ class UserMessageCreated implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $message;
+
     public $userId;
 
     public function __construct($message, $userId)
@@ -25,7 +24,7 @@ class UserMessageCreated implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return new PrivateChannel('user-chats.' . $this->userId);
+        return new PrivateChannel('user-chats.'.$this->userId);
     }
 
     public function broadcastWith()

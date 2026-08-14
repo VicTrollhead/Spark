@@ -25,9 +25,7 @@ export default function PopularHashtags() {
                 <div className="flex items-center justify-between p-6">
                     <div>
                         <h1 className="text-2xl font-bold">{translations['Popular hashtags']}</h1>
-                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            {translations['Explore trending topics by post engagement.']}
-                        </p>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{translations['Explore trending topics by post engagement.']}</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <select
@@ -63,8 +61,12 @@ export default function PopularHashtags() {
                                 <h2 className="text-lg font-semibold text-blue-500">#{hashtag.hashtag}</h2>
                             </div>
                             <div className="flex items-center gap-4 text-sm text-gray-400 dark:text-gray-500">
-                                <span>{hashtag.posts_count} {translations['Posts']}</span>
-                                <span>{hashtag.total_likes} {translations['Likes']}</span>
+                                <span>
+                                    {hashtag.posts_count} {translations['Posts']}
+                                </span>
+                                <span>
+                                    {hashtag.total_likes} {translations['Likes']}
+                                </span>
                             </div>
                         </Link>
                     ))}

@@ -13,8 +13,11 @@ class FollowChanged implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public int $targetUserId;
+
     public string $action;
+
     public int $followerCount;
+
     public int $followingCount;
 
     public function __construct(int $targetUserId, string $action, int $followerCount, int $followingCount)
@@ -28,7 +31,7 @@ class FollowChanged implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('user.' . $this->targetUserId),
+            new PrivateChannel('user.'.$this->targetUserId),
         ];
     }
 

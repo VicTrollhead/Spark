@@ -14,8 +14,7 @@ export default function Message({ userId, message }) {
         const date = new Date(timestamp);
         const now = new Date();
 
-        const isToday =
-            date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate();
+        const isToday = date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate();
 
         return isToday
             ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -52,15 +51,15 @@ export default function Message({ userId, message }) {
         if (mediaItems.length === 0) return null;
         return (
             <div className={`flex flex-wrap gap-1 ${mediaItems.length === 1 ? '' : 'max-w-xs'}`}>
-                {mediaItems.map((media, i) => (
+                {mediaItems.map((media, i) =>
                     media.file_type === 'video' ? (
                         <video key={i} src={media.url} controls className="max-h-48 max-w-full rounded-md" />
                     ) : (
                         <a key={i} href={media.url} target="_blank" rel="noopener noreferrer">
                             <img src={media.url} alt="" className="max-h-48 max-w-full rounded-md object-cover" />
                         </a>
-                    )
-                ))}
+                    ),
+                )}
             </div>
         );
     };
@@ -88,16 +87,17 @@ export default function Message({ userId, message }) {
                                 )}
                             </div>
 
-                            <div className="flex w-fit max-w-full flex-col gap-1 rounded-2xl bg-brand-gradient px-4 py-2 text-lg break-words text-white shadow-sm">
+                            <div className="bg-brand-gradient flex w-fit max-w-full flex-col gap-1 rounded-2xl px-4 py-2 text-lg break-words text-white shadow-sm">
                                 {renderMedia()}
                                 {message.text && <span className="break-words whitespace-pre-wrap">{message.text}</span>}
                                 <span className="flex items-center justify-end gap-1 text-xs text-blue-100 dark:text-white">
                                     {formatMessageTime(message.time)}
-                                    {message.chat_id && (
-                                        message.read_at
-                                            ? <CheckCheck className="h-3.5 w-3.5 text-blue-200" />
-                                            : <Check className="h-3.5 w-3.5 text-blue-200/60" />
-                                    )}
+                                    {message.chat_id &&
+                                        (message.read_at ? (
+                                            <CheckCheck className="h-3.5 w-3.5 text-blue-200" />
+                                        ) : (
+                                            <Check className="h-3.5 w-3.5 text-blue-200/60" />
+                                        ))}
                                 </span>
                             </div>
                         </div>
@@ -137,7 +137,7 @@ export default function Message({ userId, message }) {
                                     </AvatarFallback>
                                 </Avatar>
                             </Link>
-                            <div className="w-fit max-w-full rounded-2xl bg-muted px-4 py-2 text-lg break-words text-foreground shadow-sm">
+                            <div className="bg-muted text-foreground w-fit max-w-full rounded-2xl px-4 py-2 text-lg break-words shadow-sm">
                                 {renderMedia()}
                                 {message.text && <span className="break-words whitespace-pre-wrap">{message.text}</span>}
                             </div>

@@ -19,7 +19,7 @@ class UserContentController extends Controller
     {
         $currentUser = Auth::user();
 
-        if (!$currentUser) {
+        if (! $currentUser) {
             abort(403, 'Unauthorized');
         }
 
@@ -33,12 +33,12 @@ class UserContentController extends Controller
             $sortDirection = $sort === 'oldest' ? 'oldest' : 'latest';
             $favoritedPostsQuery->$sortDirection();
             $posts = $favoritedPostsQuery->paginate(15)
-                ->through(fn($post) => formatPostForFrontend($post, $currentUser));
+                ->through(fn ($post) => formatPostForFrontend($post, $currentUser));
         } else {
             $allPosts = $favoritedPostsQuery->get();
 
             $allPosts = match ($sort) {
-                'most_liked' => $allPosts->sortByDesc(fn($post) => $post->likes->count())->values(),
+                'most_liked' => $allPosts->sortByDesc(fn ($post) => $post->likes->count())->values(),
                 'reposted_friends' => $allPosts->filter(function ($post) use ($currentUser) {
                     return $currentUser->following->contains('id', $post->user_id);
                 })->values(),
@@ -48,7 +48,7 @@ class UserContentController extends Controller
             $page = $request->input('page', 1);
             $perPage = 15;
             $posts = new LengthAwarePaginator(
-                $allPosts->forPage($page, $perPage)->values()->map(fn($post) => formatPostForFrontend($post, $currentUser)),
+                $allPosts->forPage($page, $perPage)->values()->map(fn ($post) => formatPostForFrontend($post, $currentUser)),
                 $allPosts->count(),
                 $perPage,
                 $page,
@@ -69,7 +69,7 @@ class UserContentController extends Controller
     {
         $currentUser = Auth::user();
 
-        if (!$currentUser) {
+        if (! $currentUser) {
             abort(403, 'Unauthorized');
         }
 
@@ -102,7 +102,7 @@ class UserContentController extends Controller
         }
 
         $posts = $likedQuery->paginate(15)
-            ->through(fn($post) => formatPostForFrontend($post, $currentUser));
+            ->through(fn ($post) => formatPostForFrontend($post, $currentUser));
 
         return Inertia::render('user/liked', [
             'user' => $currentUser,
@@ -117,7 +117,7 @@ class UserContentController extends Controller
     {
         $currentUser = Auth::user();
 
-        if (!$currentUser) {
+        if (! $currentUser) {
             abort(403, 'Unauthorized');
         }
 
@@ -139,7 +139,7 @@ class UserContentController extends Controller
         }
 
         $posts = $query->paginate(15)
-            ->through(fn($post) => formatPostForFrontend($post, $currentUser));
+            ->through(fn ($post) => formatPostForFrontend($post, $currentUser));
 
         return Inertia::render('user/following-posts', [
             'user' => $currentUser,
@@ -150,12 +150,12 @@ class UserContentController extends Controller
         ]);
     }
 
-    public function reposts(Request $request, User $user = null): Response
+    public function reposts(Request $request, ?User $user = null): Response
     {
         $currentUser = Auth::user();
         $user = $user ?? $currentUser;
 
-        if (!$user) {
+        if (! $user) {
             abort(404, 'User not found');
         }
 
@@ -177,7 +177,7 @@ class UserContentController extends Controller
 
         $allPosts = match ($sort) {
             'oldest' => $allPosts->sortBy('reposted_at')->values(),
-            'most_liked' => $allPosts->sortByDesc(fn($post) => $post->likes->count())->values(),
+            'most_liked' => $allPosts->sortByDesc(fn ($post) => $post->likes->count())->values(),
             'reposted_friends' => $allPosts->filter(function ($post) use ($currentUser) {
                 return $currentUser->following->contains('id', $post->user_id);
             })->values(),
@@ -187,7 +187,7 @@ class UserContentController extends Controller
         $page = $request->input('page', 1);
         $perPage = 15;
         $posts = new LengthAwarePaginator(
-            $allPosts->forPage($page, $perPage)->values()->map(fn($post) => formatPostForFrontend($post, $currentUser)),
+            $allPosts->forPage($page, $perPage)->values()->map(fn ($post) => formatPostForFrontend($post, $currentUser)),
             $allPosts->count(),
             $perPage,
             $page,

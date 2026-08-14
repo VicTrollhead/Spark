@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('notifications', function (Blueprint $table) {
-            $table->enum('type', ['like', 'repost', 'follow', 'comment', 'mention', 'favorite','follow_request','message'])->nullable()->change();
+            $table->enum('type', ['like', 'repost', 'follow', 'comment', 'mention', 'favorite', 'follow_request', 'message'])->nullable()->change();
         });
     }
 

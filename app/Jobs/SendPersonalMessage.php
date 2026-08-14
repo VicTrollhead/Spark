@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Models\Message;
 use App\Events\GotPersonalMessage;
+use App\Models\Message;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
@@ -15,6 +15,7 @@ class SendPersonalMessage implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public Message $message;
+
     public int $chatId;
 
     /**

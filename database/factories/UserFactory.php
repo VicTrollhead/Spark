@@ -22,8 +22,8 @@ class UserFactory extends Factory
      *
      * @return array<string, mixed>
      */
-
     protected $model = User::class;
+
     public function definition(): array
     {
         return [
@@ -31,10 +31,10 @@ class UserFactory extends Factory
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => /*static::$password ??=*/ Hash::make('password'),
+            'password' => /* static::$password ??= */ Hash::make('password'),
             'bio' => $this->faker->sentence(),
-//            'profile_image_url' => $this->faker->imageUrl(200, 200, 'people'),
-//            'cover_image_url' => $this->faker->imageUrl(600, 200, 'nature'),
+            //            'profile_image_url' => $this->faker->imageUrl(200, 200, 'people'),
+            //            'cover_image_url' => $this->faker->imageUrl(600, 200, 'nature'),
             'location' => $this->faker->city(),
             'website' => $this->faker->url(),
             'date_of_birth' => $this->faker->date(),
@@ -55,4 +55,3 @@ class UserFactory extends Factory
         ]);
     }
 }
-

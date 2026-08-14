@@ -1,39 +1,53 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft, BarChart3, Bookmark, Check, EllipsisVertical, EyeOff, Heart, Link2, MessageCircle, MessagesSquare, Pencil, Pin, Quote, RefreshCw, Repeat, Reply, Trash2, X } from 'lucide-react';
-import { EmptyState } from '../../components/empty-state';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+    ArrowLeft,
+    BarChart3,
+    Bookmark,
+    Check,
+    EllipsisVertical,
+    EyeOff,
+    Heart,
+    Link2,
+    MessageCircle,
+    MessagesSquare,
+    Pencil,
+    Pin,
+    Quote,
+    RefreshCw,
+    Repeat,
+    Reply,
+    Trash2,
+    X,
+} from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
+import { Comment } from '../../components/comment.jsx';
+import { EmptyState } from '../../components/empty-state';
+import { LinkifiedContent } from '../../components/linkified-content';
+import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
+import { Button } from '../../components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../components/ui/dialog';
+import { useDropdown } from '../../hooks/use-dropdown';
+import { useInitials } from '../../hooks/use-initials';
+import { usePostActions } from '../../hooks/use-post-actions';
+import AppLayout from '../../layouts/app-layout';
+import { fullDate, timeAgo } from '../../lib/time';
+import { getMediaUrl, getProfileImageUrl } from '../../lib/utils';
+import PostComponent from './post-component';
 
 const dropdownVariants = {
     hidden: { opacity: 0, scale: 0.95, y: -4 },
     visible: { opacity: 1, scale: 1, y: 0 },
     exit: { opacity: 0, scale: 0.95, y: -4 },
 };
-import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
-import { useInitials } from '../../hooks/use-initials';
-import { usePostActions } from '../../hooks/use-post-actions';
-import { useDropdown } from '../../hooks/use-dropdown';
-import AppLayout from '../../layouts/app-layout';
-import PostComponent from './post-component';
-import {Comment} from "../../components/comment.jsx";
-import { LinkifiedContent } from '../../components/linkified-content';
-import { getProfileImageUrl, getMediaUrl } from '../../lib/utils';
-import { timeAgo, fullDate } from '../../lib/time';
-import { toast } from 'sonner';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../components/ui/dialog';
-import { Button } from '../../components/ui/button';
 
 export default function Show() {
     const { post, auth, sort, translations = {}, thread_chain = [] } = usePage().props;
     const getInitials = useInitials();
-    const { isLiked, likesCount, isFavorited, favoritesCount, isReposted, repostsCount, handleLike, handleFavorite, handleRepost } = usePostActions(post);
-    const {
-        data,
-        setData,
-        processing,
-        reset,
-        errors,
-    } = useForm({
+    const { isLiked, likesCount, isFavorited, favoritesCount, isReposted, repostsCount, handleLike, handleFavorite, handleRepost } =
+        usePostActions(post);
+    const { data, setData, processing, reset, errors } = useForm({
         content: '',
         post_id: post.id,
         parent_comment_id: null,
@@ -52,13 +66,14 @@ export default function Show() {
         if (!pollData || pollData.is_expired) return;
         const prevData = { ...pollData };
         const oldVoteOptionId = pollData.user_vote_option_id;
-        const newOptions = pollData.options.map(o => ({
+        const newOptions = pollData.options.map((o) => ({
             ...o,
-            votes_count: o.id === optionId
-                ? o.votes_count + (oldVoteOptionId === optionId ? 0 : 1)
-                : o.id === oldVoteOptionId
-                    ? o.votes_count - 1
-                    : o.votes_count,
+            votes_count:
+                o.id === optionId
+                    ? o.votes_count + (oldVoteOptionId === optionId ? 0 : 1)
+                    : o.id === oldVoteOptionId
+                      ? o.votes_count - 1
+                      : o.votes_count,
         }));
         setPollData({
             ...pollData,
@@ -66,10 +81,14 @@ export default function Show() {
             total_votes: oldVoteOptionId ? pollData.total_votes : pollData.total_votes + 1,
             options: newOptions,
         });
-        router.post(`/poll/${pollData.id}/vote`, { option_id: optionId }, {
-            preserveScroll: true,
-            onError: () => setPollData(prevData),
-        });
+        router.post(
+            `/poll/${pollData.id}/vote`,
+            { option_id: optionId },
+            {
+                preserveScroll: true,
+                onError: () => setPollData(prevData),
+            },
+        );
     };
     const [sortOption, setSortOption] = useState(sort || 'latest');
     const isOwnPost = auth.user && auth.user.id === post.user.id;
@@ -155,8 +174,7 @@ export default function Show() {
     };
 
     const handleKeyDown = (e) => {
-        if(e.key === 'Enter' && !e.shiftKey)
-        {
+        if (e.key === 'Enter' && !e.shiftKey) {
             handleCommentSubmit(e);
         }
     };
@@ -169,7 +187,7 @@ export default function Show() {
             <Head title={`${translations['Post by']} @${post.user.username}`} />
 
             {/* Back navigation bar */}
-            <div className="sticky top-16 z-30 flex items-center gap-3 border-b border-gray-200 bg-white/80 px-3 sm:px-4 py-3 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-950/80">
+            <div className="sticky top-16 z-30 flex items-center gap-3 border-b border-gray-200 bg-white/80 px-3 py-3 backdrop-blur-sm sm:px-4 dark:border-neutral-800 dark:bg-neutral-950/80">
                 <button
                     onClick={() => {
                         const referrer = document.referrer;
@@ -190,9 +208,7 @@ export default function Show() {
 
             {thread_chain && thread_chain.length > 0 && (
                 <div className="border-b border-gray-200 dark:border-neutral-800">
-                    <div className="px-4 pt-4 pb-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {translations['Thread']}
-                    </div>
+                    <div className="px-4 pt-4 pb-2 text-sm font-medium text-gray-500 dark:text-gray-400">{translations['Thread']}</div>
                     {thread_chain.map((threadPost) => (
                         <div
                             key={threadPost.id}
@@ -202,7 +218,7 @@ export default function Show() {
                             }}
                             className="relative block cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900/50"
                         >
-                            <div className="absolute left-[2.35rem] top-[4.5rem] bottom-0 w-0.5 bg-gray-300 dark:bg-neutral-600" />
+                            <div className="absolute top-[4.5rem] bottom-0 left-[2.35rem] w-0.5 bg-gray-300 dark:bg-neutral-600" />
                             <PostComponent post={threadPost} compact />
                         </div>
                     ))}
@@ -211,7 +227,7 @@ export default function Show() {
 
             <div className="p-4 sm:p-6">
                 <div className="flex justify-between">
-                    <div className="flex items-center space-x-3 -ml-2">
+                    <div className="-ml-2 flex items-center space-x-3">
                         <Avatar className="h-14 w-14 text-xl">
                             <AvatarImage src={profileImageUrl} alt={post.user.name} />
                             <AvatarFallback className="bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white">
@@ -228,12 +244,12 @@ export default function Show() {
                                 </Link>
                                 {post.user.is_verified && (
                                     <div className="group relative">
-                                            <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
-                                                Verified
-                                            </span>
+                                        <span className="absolute -top-7 left-1/2 -translate-x-1/2 scale-0 transform rounded-md bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100">
+                                            Verified
+                                        </span>
                                         <span className="flex items-center rounded-full bg-blue-500 p-0.5 text-xs font-medium text-white">
-                                                <Check className="h-3 w-3" />
-                                            </span>
+                                            <Check className="h-3 w-3" />
+                                        </span>
                                     </div>
                                 )}
                             </div>
@@ -242,7 +258,11 @@ export default function Show() {
                     </div>
                     {isOwnPost && (
                         <div className="relative" ref={optionsRef}>
-                            <button onClick={toggleOptions} aria-label={translations['Options']} className="cursor-pointer text-gray-500 hover:text-gray-700 dark:text-white dark:hover:text-gray-300">
+                            <button
+                                onClick={toggleOptions}
+                                aria-label={translations['Options']}
+                                className="cursor-pointer text-gray-500 hover:text-gray-700 dark:text-white dark:hover:text-gray-300"
+                            >
                                 <EllipsisVertical className="h-6 w-6" />
                             </button>
                             <AnimatePresence>
@@ -270,7 +290,9 @@ export default function Show() {
                                             className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-neutral-600"
                                         >
                                             <Pin className="h-4 w-4" />
-                                            {post.is_pinned ? (translations['Unpin from profile'] || 'Unpin from profile') : (translations['Pin to profile'] || 'Pin to profile')}
+                                            {post.is_pinned
+                                                ? translations['Unpin from profile'] || 'Unpin from profile'
+                                                : translations['Pin to profile'] || 'Pin to profile'}
                                         </button>
                                         <button
                                             onClick={() => {
@@ -325,15 +347,24 @@ export default function Show() {
                 )}
 
                 <div className="mt-4">
-                    <p className="text-xl text-gray-800 dark:text-gray-200 max-w-7xl break-words"><LinkifiedContent content={post.content} /></p>
+                    <p className="max-w-7xl text-xl break-words text-gray-800 dark:text-gray-200">
+                        <LinkifiedContent content={post.content} />
+                    </p>
                     {post.media.length > 0 && (
                         <div className="mt-2 grid grid-cols-1 gap-3 py-1 sm:grid-cols-2">
                             {post.media.map((file, index) => {
                                 const uniqueKey = file.id ? `${post.id}-${file.id}` : `${post.id}-${file.file_path}-${index}`;
                                 const mediaUrl = getMediaUrl(file);
                                 return file.file_type === 'image' ? (
-                                    <div key={uniqueKey} className="relative flex w-full items-center justify-center overflow-hidden rounded-lg border dark:border-gray-700">
-                                        <img src={mediaUrl} alt="Post Media" className="cursor-pointer object-contain transition-transform duration-300 hover:scale-102" />
+                                    <div
+                                        key={uniqueKey}
+                                        className="relative flex w-full items-center justify-center overflow-hidden rounded-lg border dark:border-gray-700"
+                                    >
+                                        <img
+                                            src={mediaUrl}
+                                            alt="Post Media"
+                                            className="cursor-pointer object-contain transition-transform duration-300 hover:scale-102"
+                                        />
                                     </div>
                                 ) : (
                                     <div key={uniqueKey} className="relative w-full overflow-hidden rounded-lg border dark:border-gray-700">
@@ -357,22 +388,32 @@ export default function Show() {
                     )}
 
                     {post.quote_post && (
-                        <Link href={`/post/${post.quote_post.slug}`} className="mt-3 block overflow-hidden rounded-xl border border-gray-100 p-3 transition hover:bg-gray-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50">
+                        <Link
+                            href={`/post/${post.quote_post.slug}`}
+                            className="mt-3 block overflow-hidden rounded-xl border border-gray-100 p-3 transition hover:bg-gray-50 dark:border-neutral-800 dark:hover:bg-neutral-800/50"
+                        >
                             <div className="flex min-w-0 items-center gap-2">
                                 <Avatar className="h-5 w-5">
                                     <AvatarImage src={getProfileImageUrl(post.quote_post.user)} alt={post.quote_post.user.name} />
-                                    <AvatarFallback className="text-[10px] bg-gray-200 text-black dark:bg-gray-700 dark:text-white">{getInitials(post.quote_post.user.name)}</AvatarFallback>
+                                    <AvatarFallback className="bg-gray-200 text-[10px] text-black dark:bg-gray-700 dark:text-white">
+                                        {getInitials(post.quote_post.user.name)}
+                                    </AvatarFallback>
                                 </Avatar>
                                 <span className="truncate text-sm font-semibold text-gray-900 dark:text-white">{post.quote_post.user.name}</span>
                                 {post.quote_post.user.is_verified && (
-                                    <span className="flex items-center rounded-full bg-blue-500 p-0.5 text-xs text-white"><Check className="h-2.5 w-2.5" /></span>
+                                    <span className="flex items-center rounded-full bg-blue-500 p-0.5 text-xs text-white">
+                                        <Check className="h-2.5 w-2.5" />
+                                    </span>
                                 )}
                                 <span className="truncate text-xs text-gray-500">@{post.quote_post.user.username}</span>
-                                <span className="shrink-0 text-xs text-gray-400" title={fullDate(post.quote_post.raw_created_at || post.quote_post.created_at)}>
+                                <span
+                                    className="shrink-0 text-xs text-gray-400"
+                                    title={fullDate(post.quote_post.raw_created_at || post.quote_post.created_at)}
+                                >
                                     {timeAgo(post.quote_post.raw_created_at || post.quote_post.created_at)}
                                 </span>
                             </div>
-                            <p className="mt-1 text-sm text-gray-700 dark:text-gray-300 line-clamp-3 break-words">{post.quote_post.content}</p>
+                            <p className="mt-1 line-clamp-3 text-sm break-words text-gray-700 dark:text-gray-300">{post.quote_post.content}</p>
                             {post.quote_post.media?.length > 0 && post.quote_post.media[0]?.file_type === 'image' && (
                                 <img src={getMediaUrl(post.quote_post.media[0])} alt="" className="mt-2 h-32 w-full rounded-md object-cover" />
                             )}
@@ -384,17 +425,13 @@ export default function Show() {
                             <div className="mb-2 flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-400">
                                 <BarChart3 className="h-4 w-4" />
                                 {translations['Poll'] || 'Poll'}
-                                {pollData.is_expired && (
-                                    <span className="ml-1 text-xs text-red-500">({translations['Expired'] || 'Expired'})</span>
-                                )}
+                                {pollData.is_expired && <span className="ml-1 text-xs text-red-500">({translations['Expired'] || 'Expired'})</span>}
                             </div>
                             <div className="space-y-2">
                                 {pollData.options.map((option) => {
                                     const hasVoted = pollData.user_vote_option_id != null;
                                     const isSelected = pollData.user_vote_option_id === option.id;
-                                    const percentage = pollData.total_votes > 0
-                                        ? Math.round((option.votes_count / pollData.total_votes) * 100)
-                                        : 0;
+                                    const percentage = pollData.total_votes > 0 ? Math.round((option.votes_count / pollData.total_votes) * 100) : 0;
                                     const showResults = hasVoted || pollData.is_expired;
 
                                     return (
@@ -410,24 +447,25 @@ export default function Show() {
                                         >
                                             {showResults && (
                                                 <div
-                                                    className="absolute inset-y-0 left-0 bg-blue-100 dark:bg-blue-900/30 transition-all duration-300"
+                                                    className="absolute inset-y-0 left-0 bg-blue-100 transition-all duration-300 dark:bg-blue-900/30"
                                                     style={{ width: `${percentage}%` }}
                                                 />
                                             )}
                                             <div className="relative flex items-center justify-between">
-                                                <span className={`${isSelected ? 'font-medium text-blue-700 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                                                <span
+                                                    className={`${isSelected ? 'font-medium text-blue-700 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'}`}
+                                                >
                                                     {option.text}
                                                 </span>
-                                                {showResults && (
-                                                    <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">{percentage}%</span>
-                                                )}
+                                                {showResults && <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">{percentage}%</span>}
                                             </div>
                                         </button>
                                     );
                                 })}
                             </div>
                             <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                {pollData.total_votes} {pollData.total_votes === 1 ? (translations['vote'] || 'vote') : (translations['votes'] || 'votes')}
+                                {pollData.total_votes}{' '}
+                                {pollData.total_votes === 1 ? translations['vote'] || 'vote' : translations['votes'] || 'votes'}
                                 {pollData.expires_at && !pollData.is_expired && (
                                     <span className="ml-1">
                                         &middot; {translations['Ends'] || 'Ends'} {new Date(pollData.expires_at).toLocaleDateString()}
@@ -440,8 +478,13 @@ export default function Show() {
                     <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{displayTime}</p>
                 </div>
 
-                <div className="text-md mt-3 flex flex-wrap items-center gap-3 sm:gap-5 text-gray-600 dark:text-gray-400">
-                    <motion.button whileTap={{ scale: 0.9 }} onClick={handleLike} aria-label={isLiked ? translations['Unlike'] : translations['Like']} className={`flex items-center gap-1 transition-colors ${isLiked ? 'text-red-500' : 'hover:text-red-500'}`}>
+                <div className="text-md mt-3 flex flex-wrap items-center gap-3 text-gray-600 sm:gap-5 dark:text-gray-400">
+                    <motion.button
+                        whileTap={{ scale: 0.9 }}
+                        onClick={handleLike}
+                        aria-label={isLiked ? translations['Unlike'] : translations['Like']}
+                        className={`flex items-center gap-1 transition-colors ${isLiked ? 'text-red-500' : 'hover:text-red-500'}`}
+                    >
                         <Heart className="h-6 w-6" fill={isLiked ? 'currentColor' : 'none'} />
                         <strong>{likesCount}</strong>
                     </motion.button>
@@ -449,7 +492,12 @@ export default function Show() {
                         <MessageCircle className="h-6 w-6" />
                         <strong>{post.comments_count}</strong>
                     </div>
-                    <motion.button whileTap={{ scale: 0.9 }} onClick={handleFavorite} aria-label={isFavorited ? translations['Remove from favorites'] : translations['Add to favorites']} className={`flex items-center gap-1 transition-colors ${isFavorited ? 'text-yellow-500' : 'hover:text-yellow-500'}`}>
+                    <motion.button
+                        whileTap={{ scale: 0.9 }}
+                        onClick={handleFavorite}
+                        aria-label={isFavorited ? translations['Remove from favorites'] : translations['Add to favorites']}
+                        className={`flex items-center gap-1 transition-colors ${isFavorited ? 'text-yellow-500' : 'hover:text-yellow-500'}`}
+                    >
                         <Bookmark className="h-6 w-6" fill={isFavorited ? 'currentColor' : 'none'} />
                         <strong>{favoritesCount}</strong>
                     </motion.button>
@@ -466,18 +514,30 @@ export default function Show() {
                         </motion.button>
                     )}
                     {!post.is_private && (
-                        <motion.button whileTap={{ scale: 0.9 }} onClick={() => router.visit(`/dashboard?quote=${post.slug}`)} aria-label={translations['Quote']} className="flex items-center gap-1 transition-colors hover:text-purple-500">
-                            <Quote className="h-5 w-5" /><span>{post.quotes_count || 0}</span>
+                        <motion.button
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => router.visit(`/dashboard?quote=${post.slug}`)}
+                            aria-label={translations['Quote']}
+                            className="flex items-center gap-1 transition-colors hover:text-purple-500"
+                        >
+                            <Quote className="h-5 w-5" />
+                            <span>{post.quotes_count || 0}</span>
                         </motion.button>
                     )}
-                    <motion.button whileTap={{ scale: 0.9 }} onClick={() => router.visit(`/dashboard?reply=${post.slug}`)} aria-label={translations['Reply'] || 'Reply'} className="flex items-center gap-1 transition-colors hover:text-blue-500">
-                        <Reply className="h-5 w-5" /><span>{post.replies_count || 0}</span>
+                    <motion.button
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => router.visit(`/dashboard?reply=${post.slug}`)}
+                        aria-label={translations['Reply'] || 'Reply'}
+                        className="flex items-center gap-1 transition-colors hover:text-blue-500"
+                    >
+                        <Reply className="h-5 w-5" />
+                        <span>{post.replies_count || 0}</span>
                     </motion.button>
                     <motion.button
                         whileTap={{ scale: 0.9 }}
                         onClick={handleCopyLink}
                         aria-label={translations['Copy link'] || 'Copy link'}
-                        className="flex items-center gap-1 transition-colors hover:text-blue-500 ml-auto"
+                        className="ml-auto flex items-center gap-1 transition-colors hover:text-blue-500"
                     >
                         <Link2 className="h-5 w-5" />
                     </motion.button>
@@ -503,34 +563,31 @@ export default function Show() {
                         onChange={(e) => setData('content', e.target.value)}
                         onKeyDown={handleKeyDown}
                         rows={3}
-                        placeholder={replyingTo
-                            ? `${translations['Reply to'] || 'Reply to'} @${replyingTo.user.username}...`
-                            : (translations['Write a comment...'] || 'Write a comment...')
+                        placeholder={
+                            replyingTo
+                                ? `${translations['Reply to'] || 'Reply to'} @${replyingTo.user.username}...`
+                                : translations['Write a comment...'] || 'Write a comment...'
                         }
                         className="resize-none rounded-md bg-gray-100 p-3 text-neutral-950 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-neutral-900 dark:text-white dark:focus:ring-blue-600"
                     />
                     {errors.content && <p className="text-sm text-red-500">{errors.content}</p>}
                     <div className="flex items-center justify-between">
-                        <span className={`text-xs ${data.content.length > 500 ? 'text-red-500' : 'text-gray-400'}`}>
-                            {data.content.length}/500
-                        </span>
+                        <span className={`text-xs ${data.content.length > 500 ? 'text-red-500' : 'text-gray-400'}`}>{data.content.length}/500</span>
                         <button
                             type="submit"
                             disabled={!data.content || processing}
                             className={`rounded-full px-5 py-2 text-sm font-medium text-white ${
-                                data.content
-                                    ? 'bg-blue-600 hover:bg-blue-700'
-                                    : 'cursor-not-allowed bg-gray-400 dark:bg-neutral-700'
+                                data.content ? 'bg-blue-600 hover:bg-blue-700' : 'cursor-not-allowed bg-gray-400 dark:bg-neutral-700'
                             }`}
                         >
-                            {replyingTo ? (translations['Reply'] || 'Reply') : translations['Publish']}
+                            {replyingTo ? translations['Reply'] || 'Reply' : translations['Publish']}
                         </button>
                     </div>
                 </form>
             </div>
 
             <div className="flex items-center justify-between border-b border-gray-200 p-4 sm:p-6 dark:border-neutral-800">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-lg font-semibold text-gray-900 sm:text-xl dark:text-white">
                     {translations['Comments']} ({post.comments_count})
                 </h2>
                 <div className="flex items-center gap-2">
@@ -559,9 +616,9 @@ export default function Show() {
                 <div className="flex flex-col gap-3 px-3 py-3 sm:px-4 sm:py-4">
                     {post.comments.length > 0 ? (
                         (() => {
-                            const topLevel = post.comments.filter(c => !c.parent_comment_id);
+                            const topLevel = post.comments.filter((c) => !c.parent_comment_id);
                             const repliesByParent = {};
-                            post.comments.forEach(c => {
+                            post.comments.forEach((c) => {
                                 if (c.parent_comment_id) {
                                     if (!repliesByParent[c.parent_comment_id]) repliesByParent[c.parent_comment_id] = [];
                                     repliesByParent[c.parent_comment_id].push(c);
@@ -571,7 +628,7 @@ export default function Show() {
                                 <div key={comment.id}>
                                     <Comment comment={comment} auth_user={auth.user} onReply={handleReply} />
                                     {repliesByParent[comment.id]?.length > 0 && (
-                                        <div className="ml-6 border-l-2 border-blue-200 pl-4 dark:border-blue-900/50 md:ml-10">
+                                        <div className="ml-6 border-l-2 border-blue-200 pl-4 md:ml-10 dark:border-blue-900/50">
                                             {repliesByParent[comment.id].map((reply) => (
                                                 <div key={reply.id}>
                                                     <Comment comment={reply} auth_user={auth.user} onReply={handleReply} />
@@ -583,7 +640,11 @@ export default function Show() {
                             ));
                         })()
                     ) : (
-                        <EmptyState icon={MessagesSquare} title={translations['No comments yet.']} description={translations["Start the conversation!"]} />
+                        <EmptyState
+                            icon={MessagesSquare}
+                            title={translations['No comments yet.']}
+                            description={translations['Start the conversation!']}
+                        />
                     )}
                 </div>
             </div>
@@ -594,14 +655,15 @@ export default function Show() {
                     <DialogHeader>
                         <DialogTitle>{translations['Delete post'] || 'Delete post'}</DialogTitle>
                         <DialogDescription>
-                            {translations['Are you sure you want to delete this post? This action cannot be undone.'] || 'Are you sure you want to delete this post? This action cannot be undone.'}
+                            {translations['Are you sure you want to delete this post? This action cannot be undone.'] ||
+                                'Are you sure you want to delete this post? This action cannot be undone.'}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
                             {translations['Cancel'] || 'Cancel'}
                         </Button>
-                        <Button variant="destructive" onClick={handleDelete} className="bg-red-600 hover:bg-red-700 text-white">
+                        <Button variant="destructive" onClick={handleDelete} className="bg-red-600 text-white hover:bg-red-700">
                             {translations['Delete'] || 'Delete'}
                         </Button>
                     </DialogFooter>

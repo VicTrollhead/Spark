@@ -1,16 +1,9 @@
-import { NavMain } from './nav-main';
-import { NavUser } from './nav-user';
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarHeader,
-    SidebarMenuButton,
-    SidebarSeparator
-} from './ui/sidebar';
 import { useForm, usePage } from '@inertiajs/react';
 import { Bookmark, Folder, Hash, Home, LogOut, Mail, MessagesSquareIcon, Repeat, Settings, User, Users } from 'lucide-react';
 import { useUnreadCounts } from '../contexts/unread-counts-context';
+import { NavMain } from './nav-main';
+import { NavUser } from './nav-user';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenuButton, SidebarSeparator } from './ui/sidebar';
 
 export function AppSidebar() {
     const { auth, translations } = usePage().props;
@@ -77,9 +70,10 @@ export function AppSidebar() {
 
     return (
         <Sidebar
-                 variant="inset"
-                 collapsible="none"
-                 className="bg-transparent fixed top-16 left-0 w-[17rem] h-[calc(100vh-4rem)] shadow-lg hidden lg:flex">
+            variant="inset"
+            collapsible="none"
+            className="fixed top-16 left-0 hidden h-[calc(100vh-4rem)] w-[17rem] bg-transparent shadow-lg lg:flex"
+        >
             <SidebarHeader>
                 <NavUser />
             </SidebarHeader>
@@ -89,18 +83,19 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <SidebarSeparator/>
+                <SidebarSeparator />
                 <a className="flex cursor-pointer" href="https://gitlab.com/shapovalovtimur16/Spark">
                     <SidebarMenuButton size="lg" className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group cursor-pointer">
-                        <Folder/>
+                        <Folder />
                         {translations['Repository']}
                     </SidebarMenuButton>
                 </a>
                 <SidebarMenuButton
                     onClick={() => post(route('logout'))}
                     size="lg"
-                    className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group cursor-pointer">
-                    <LogOut/>
+                    className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group cursor-pointer"
+                >
+                    <LogOut />
                     {translations['Log out']}
                 </SidebarMenuButton>
             </SidebarFooter>

@@ -32,7 +32,7 @@ class LanguageController extends Controller
     {
         App::setLocale($newLang);
         Cookie::queue('locale', $newLang, 60 * 24 * 365);
+
         return redirect()->back();
     }
-
 }

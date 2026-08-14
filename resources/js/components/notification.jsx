@@ -1,10 +1,10 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { AtSign, Bookmark, Check, Heart, MessageCircle, Quote, Reply, Repeat, Users, MessagesSquareIcon } from 'lucide-react';
+import { AtSign, Bookmark, Check, Heart, MessageCircle, MessagesSquareIcon, Quote, Repeat, Reply, Users } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar.jsx';
+import { useUnreadCounts } from '../contexts/unread-counts-context';
 import { useInitials } from '../hooks/use-initials.jsx';
 import { getProfileImageUrl } from '../lib/utils';
-import { useUnreadCounts } from '../contexts/unread-counts-context';
 
 export function Notification({ notification, onReadChange }) {
     const { translations } = usePage().props;
@@ -19,7 +19,7 @@ export function Notification({ notification, onReadChange }) {
                 method: 'PATCH',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                 },
             });
             if (res.ok) {
@@ -46,11 +46,7 @@ export function Notification({ notification, onReadChange }) {
     };
 
     const handleFollowRequest = (action) => {
-        router.post(
-            `/user/${sourceUser.id}/${notification.id}/${action}`,
-            {},
-            { preserveScroll: true },
-        );
+        router.post(`/user/${sourceUser.id}/${notification.id}/${action}`, {}, { preserveScroll: true });
     };
 
     const [swipeX, setSwipeX] = useState(0);
@@ -105,18 +101,30 @@ export function Notification({ notification, onReadChange }) {
 
     const getTypeIcon = (type) => {
         switch (type) {
-            case 'like': return { icon: Heart, bg: 'bg-red-100 text-red-500 dark:bg-red-950 dark:text-red-400', fill: true };
-            case 'repost': return { icon: Repeat, bg: 'bg-green-100 text-green-600 dark:bg-green-950 dark:text-green-400' };
-            case 'comment': return { icon: MessageCircle, bg: 'bg-blue-100 text-blue-500 dark:bg-blue-950 dark:text-blue-400' };
-            case 'comment_reply': return { icon: Reply, bg: 'bg-blue-100 text-blue-500 dark:bg-blue-950 dark:text-blue-400' };
-            case 'follow': return { icon: Users, bg: 'bg-purple-100 text-purple-500 dark:bg-purple-950 dark:text-purple-400' };
-            case 'follow_request': return { icon: Users, bg: 'bg-purple-100 text-purple-500 dark:bg-purple-950 dark:text-purple-400' };
-            case 'favorite': return { icon: Bookmark, bg: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-950 dark:text-yellow-400' };
-            case 'reply': return { icon: Reply, bg: 'bg-cyan-100 text-cyan-500 dark:bg-cyan-950 dark:text-cyan-400' };
-            case 'quote': return { icon: Quote, bg: 'bg-purple-100 text-purple-500 dark:bg-purple-950 dark:text-purple-400' };
-            case 'mention': return { icon: AtSign, bg: 'bg-orange-100 text-orange-500 dark:bg-orange-950 dark:text-orange-400' };
-            case 'message': return { icon: MessagesSquareIcon, bg: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300' };
-            default: return { icon: MessageCircle, bg: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400' };
+            case 'like':
+                return { icon: Heart, bg: 'bg-red-100 text-red-500 dark:bg-red-950 dark:text-red-400', fill: true };
+            case 'repost':
+                return { icon: Repeat, bg: 'bg-green-100 text-green-600 dark:bg-green-950 dark:text-green-400' };
+            case 'comment':
+                return { icon: MessageCircle, bg: 'bg-blue-100 text-blue-500 dark:bg-blue-950 dark:text-blue-400' };
+            case 'comment_reply':
+                return { icon: Reply, bg: 'bg-blue-100 text-blue-500 dark:bg-blue-950 dark:text-blue-400' };
+            case 'follow':
+                return { icon: Users, bg: 'bg-purple-100 text-purple-500 dark:bg-purple-950 dark:text-purple-400' };
+            case 'follow_request':
+                return { icon: Users, bg: 'bg-purple-100 text-purple-500 dark:bg-purple-950 dark:text-purple-400' };
+            case 'favorite':
+                return { icon: Bookmark, bg: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-950 dark:text-yellow-400' };
+            case 'reply':
+                return { icon: Reply, bg: 'bg-cyan-100 text-cyan-500 dark:bg-cyan-950 dark:text-cyan-400' };
+            case 'quote':
+                return { icon: Quote, bg: 'bg-purple-100 text-purple-500 dark:bg-purple-950 dark:text-purple-400' };
+            case 'mention':
+                return { icon: AtSign, bg: 'bg-orange-100 text-orange-500 dark:bg-orange-950 dark:text-orange-400' };
+            case 'message':
+                return { icon: MessagesSquareIcon, bg: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300' };
+            default:
+                return { icon: MessageCircle, bg: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400' };
         }
     };
 
@@ -126,21 +134,30 @@ export function Notification({ notification, onReadChange }) {
                 return notification.extra_data
                     ? translations['liked your comment.'] || 'liked your comment.'
                     : translations['liked your post.'] || 'liked your post.';
-            case 'repost': return translations['reposted your post.'] || 'reposted your post.';
-            case 'comment': return translations['commented on your post:'] || 'commented on your post:';
-            case 'comment_reply': return translations['replied to your comment:'] || 'replied to your comment:';
+            case 'repost':
+                return translations['reposted your post.'] || 'reposted your post.';
+            case 'comment':
+                return translations['commented on your post:'] || 'commented on your post:';
+            case 'comment_reply':
+                return translations['replied to your comment:'] || 'replied to your comment:';
             case 'follow': {
                 if (notification.extra_data === 'pending') return translations['has sent you a follow request.'] || 'sent you a follow request.';
                 if (notification.extra_data === 'accepted') return translations['accepted your follow request.'] || 'accepted your follow request.';
                 if (notification.extra_data === 'rejected') return translations['rejected your follow request.'] || 'rejected your follow request.';
                 return translations['followed you.'] || 'followed you.';
             }
-            case 'reply': return translations['replied to your post:'] || 'replied to your post:';
-            case 'quote': return translations['quoted your post:'] || 'quoted your post:';
-            case 'favorite': return translations['favorited your post.'] || 'favorited your post.';
-            case 'mention': return translations['mentioned you.'] || 'mentioned you.';
-            case 'message': return translations['sent you a message:'] || 'sent you a message:';
-            default: return translations['interacted with you.'] || 'interacted with you.';
+            case 'reply':
+                return translations['replied to your post:'] || 'replied to your post:';
+            case 'quote':
+                return translations['quoted your post:'] || 'quoted your post:';
+            case 'favorite':
+                return translations['favorited your post.'] || 'favorited your post.';
+            case 'mention':
+                return translations['mentioned you.'] || 'mentioned you.';
+            case 'message':
+                return translations['sent you a message:'] || 'sent you a message:';
+            default:
+                return translations['interacted with you.'] || 'interacted with you.';
         }
     };
 
@@ -148,21 +165,22 @@ export function Notification({ notification, onReadChange }) {
     const TypeIcon = typeInfo.icon;
 
     const renderUserLink = (username, name) => (
-        <Link
-            href={`/user/${username}`}
-            className="font-semibold text-gray-900 hover:underline dark:text-white"
-        >
+        <Link href={`/user/${username}`} className="font-semibold text-gray-900 hover:underline dark:text-white">
             {name}
         </Link>
     );
 
-    const hasExtraContent = notification.extra_data && ['comment', 'comment_reply', 'like', 'mention', 'message', 'reply', 'quote'].includes(notification.type);
+    const hasExtraContent =
+        notification.extra_data && ['comment', 'comment_reply', 'like', 'mention', 'message', 'reply', 'quote'].includes(notification.type);
     const showExtraData = hasExtraContent && !(notification.type === 'like' && !notification.extra_data);
 
     return (
         <div className="relative overflow-hidden">
             {swipeX < 0 && (
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center justify-end bg-gray-200 px-4 text-gray-500 dark:bg-neutral-700 dark:text-gray-300" style={{ width: Math.min(Math.abs(swipeX), 120) }}>
+                <div
+                    className="pointer-events-none absolute inset-y-0 right-0 flex items-center justify-end bg-gray-200 px-4 text-gray-500 dark:bg-neutral-700 dark:text-gray-300"
+                    style={{ width: Math.min(Math.abs(swipeX), 120) }}
+                >
                     <Check className="h-5 w-5" />
                 </div>
             )}
@@ -180,20 +198,22 @@ export function Notification({ notification, onReadChange }) {
             >
                 {/* Unread dot */}
                 {!notification.is_read && (
-                    <div className="absolute left-1.5 top-1/2 -translate-y-1/2 sm:left-2">
+                    <div className="absolute top-1/2 left-1.5 -translate-y-1/2 sm:left-2">
                         <div className="h-2 w-2 rounded-full bg-blue-500" />
                     </div>
                 )}
 
                 {/* Avatar with type icon badge */}
-                <div className="relative shrink-0 ml-2 sm:ml-0">
+                <div className="relative ml-2 shrink-0 sm:ml-0">
                     <Avatar className="h-12 w-12 sm:h-14 sm:w-14">
                         <AvatarImage src={getProfileImageUrl(sourceUser)} alt={sourceUser.name} />
                         <AvatarFallback className="rounded-full bg-gray-200 text-black dark:bg-gray-700 dark:text-white">
                             {getInitials(sourceUser.name)}
                         </AvatarFallback>
                     </Avatar>
-                    <div className={`absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white dark:border-neutral-950 ${typeInfo.bg}`}>
+                    <div
+                        className={`absolute -right-1 -bottom-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white dark:border-neutral-950 ${typeInfo.bg}`}
+                    >
                         <TypeIcon className="h-3.5 w-3.5" fill={typeInfo.fill ? 'currentColor' : 'none'} />
                     </div>
                 </div>
@@ -211,9 +231,7 @@ export function Notification({ notification, onReadChange }) {
                     </p>
 
                     {showExtraData && (
-                        <p className="mt-1 line-clamp-2 break-words text-[14px] text-gray-500 dark:text-gray-400">
-                            "{notification.extra_data}"
-                        </p>
+                        <p className="mt-1 line-clamp-2 text-[14px] break-words text-gray-500 dark:text-gray-400">"{notification.extra_data}"</p>
                     )}
 
                     {/* Follow request buttons */}
@@ -222,14 +240,14 @@ export function Notification({ notification, onReadChange }) {
                             <button
                                 type="button"
                                 onClick={() => handleFollowRequest('accept-request')}
-                                className="rounded-full bg-blue-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-600 transition"
+                                className="rounded-full bg-blue-500 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-blue-600"
                             >
                                 {translations['Accept'] || 'Accept'}
                             </button>
                             <button
                                 type="button"
                                 onClick={() => handleFollowRequest('reject-request')}
-                                className="rounded-full border border-gray-300 px-4 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-neutral-600 dark:text-gray-300 dark:hover:bg-neutral-800 transition"
+                                className="rounded-full border border-gray-300 px-4 py-1.5 text-sm font-medium text-gray-700 transition hover:bg-gray-100 dark:border-neutral-600 dark:text-gray-300 dark:hover:bg-neutral-800"
                             >
                                 {translations['Decline'] || 'Decline'}
                             </button>
@@ -242,11 +260,7 @@ export function Notification({ notification, onReadChange }) {
                 {/* Post thumbnail (if post has media) */}
                 {post?.media?.length > 0 && post.media[0].file_type?.startsWith('image') && (
                     <div className="hidden shrink-0 sm:block">
-                        <img
-                            src={post.media[0].url || `/storage/${post.media[0].file_path}`}
-                            alt=""
-                            className="h-16 w-16 rounded-lg object-cover"
-                        />
+                        <img src={post.media[0].url || `/storage/${post.media[0].file_path}`} alt="" className="h-16 w-16 rounded-lg object-cover" />
                     </div>
                 )}
             </div>

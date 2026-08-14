@@ -2,7 +2,6 @@
 
 namespace App\Events;
 
-use App\Models\Post;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -14,6 +13,7 @@ class PostCreated implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public array $post;
+
     private array $followerIds;
 
     public function __construct(array $post, array $followerIds)
@@ -28,7 +28,7 @@ class PostCreated implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return array_map(
-            fn($id) => new PrivateChannel('feed.' . $id),
+            fn ($id) => new PrivateChannel('feed.'.$id),
             $this->followerIds
         );
     }

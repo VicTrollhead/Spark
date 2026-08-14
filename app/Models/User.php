@@ -100,7 +100,6 @@ class User extends Authenticatable implements MustVerifyEmail
             });
     }
 
-
     public function isFollowing(User $user): bool
     {
         return $this->following()
@@ -166,5 +165,4 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(User::class, 'follows', 'follower_id', 'followee_id')
             ->wherePivot('is_accepted', false);
     }
-
 }

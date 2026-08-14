@@ -13,8 +13,11 @@ class PostEngagementChanged implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public int $postId;
+
     public int $likesCount;
+
     public int $favoritesCount;
+
     public int $repostsCount;
 
     public function __construct(int $postId, int $likesCount, int $favoritesCount, int $repostsCount)
@@ -28,7 +31,7 @@ class PostEngagementChanged implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('post.' . $this->postId),
+            new PrivateChannel('post.'.$this->postId),
         ];
     }
 

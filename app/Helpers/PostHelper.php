@@ -4,14 +4,16 @@ use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Database\Eloquent\Builder;
 
-if (!function_exists('notifyMentionedUsers')) {
+if (! function_exists('notifyMentionedUsers')) {
     function notifyMentionedUsers(string $content, int $sourceUserId, ?int $postId = null, ?int $commentId = null): void
     {
         preg_match_all('/@([\w.]+)/', $content, $matches);
-        $matches[1] = array_map(fn($u) => rtrim($u, '.'), $matches[1]);
+        $matches[1] = array_map(fn ($u) => rtrim($u, '.'), $matches[1]);
         $usernames = array_unique($matches[1] ?? []);
 
-        if (empty($usernames)) return;
+        if (empty($usernames)) {
+            return;
+        }
 
         $users = User::whereIn('username', $usernames)
             ->where('id', '!=', $sourceUserId)
@@ -30,14 +32,13 @@ if (!function_exists('notifyMentionedUsers')) {
     }
 }
 
-if (!function_exists('formatPostForFrontend')) {
+if (! function_exists('formatPostForFrontend')) {
     /**
      * Transform an Eloquent Post model into a frontend-ready array.
      *
      * Expects $post to have eager-loaded relations from postBaseQuery().
      *
      * @param  \App\Models\Post  $post
-     * @param  \App\Models\User|null  $currentUser
      * @return array<string, mixed>
      */
     function formatPostForFrontend($post, ?User $currentUser): array
@@ -56,11 +57,11 @@ if (!function_exists('formatPostForFrontend')) {
                 'profile_image' => $post->user->profileImage,
                 'is_verified' => $post->user->is_verified,
             ],
-            'hashtags' => $post->hashtags->map(fn($tag) => [
+            'hashtags' => $post->hashtags->map(fn ($tag) => [
                 'id' => $tag->id,
                 'hashtag' => $tag->hashtag,
             ]),
-            'media' => $post->media->map(fn($media) => [
+            'media' => $post->media->map(fn ($media) => [
                 'file_path' => $media->file_path,
                 'file_type' => $media->file_type,
                 'disk' => $media->disk,
@@ -89,7 +90,7 @@ if (!function_exists('formatPostForFrontend')) {
                     'profile_image' => $post->quotePost->user->profileImage,
                     'is_verified' => $post->quotePost->user->is_verified,
                 ],
-                'media' => $post->quotePost->media->take(1)->map(fn($media) => [
+                'media' => $post->quotePost->media->take(1)->map(fn ($media) => [
                     'file_path' => $media->file_path,
                     'file_type' => $media->file_type,
                     'disk' => $media->disk,
@@ -110,9 +111,9 @@ if (!function_exists('formatPostForFrontend')) {
             'reposted_by_you' => $currentUser && $post->repostedByUsers->contains('id', $currentUser->id),
             'reposted_by_recent' => $post->repostedByUsers
                 ->where('id', '!=', $post->user_id)
-                ->when($currentUser, fn($collection) => $collection->where('id', '!=', $currentUser->id))
+                ->when($currentUser, fn ($collection) => $collection->where('id', '!=', $currentUser->id))
                 ->take(3)
-                ->map(fn($user) => [
+                ->map(fn ($user) => [
                     'id' => $user->id,
                     'name' => $user->name,
                     'username' => $user->username,
@@ -136,7 +137,7 @@ if (!function_exists('formatPostForFrontend')) {
                 'user_vote_option_id' => $currentUser
                     ? $post->poll->votes->where('user_id', $currentUser->id)->first()?->poll_option_id
                     : null,
-                'options' => $post->poll->options->map(fn($option) => [
+                'options' => $post->poll->options->map(fn ($option) => [
                     'id' => $option->id,
                     'text' => $option->text,
                     'votes_count' => $post->poll->votes->where('poll_option_id', $option->id)->count(),
@@ -146,14 +147,11 @@ if (!function_exists('formatPostForFrontend')) {
     }
 }
 
-if (!function_exists('postBaseQuery')) {
+if (! function_exists('postBaseQuery')) {
     /**
      * Build a base Post query with all relations eager-loaded and visibility filtering applied.
      *
      * Returns posts that are public, owned by the current user, or owned by users the current user follows.
-     *
-     * @param  \App\Models\User|null  $currentUser
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     function postBaseQuery(?User $currentUser): Builder
     {

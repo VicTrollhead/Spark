@@ -28,9 +28,9 @@ import {
     Users,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useUnreadCounts } from '../contexts/unread-counts-context';
 import { getProfileImageUrl } from '../lib/utils.js';
 import AppLogo from './app-logo';
-import { useUnreadCounts } from '../contexts/unread-counts-context';
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
@@ -223,7 +223,9 @@ export function AppHeader({ breadcrumbs = [] }) {
                                                     {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
                                                     <span>{item.title}</span>
                                                     {item.count && item.count !== 0 ? (
-                                                        <Badge className="bg-neutral-500 text-white dark:bg-neutral-300 dark:text-neutral-900">{item.count}</Badge>
+                                                        <Badge className="bg-neutral-500 text-white dark:bg-neutral-300 dark:text-neutral-900">
+                                                            {item.count}
+                                                        </Badge>
                                                     ) : (
                                                         ''
                                                     )}
@@ -234,7 +236,11 @@ export function AppHeader({ breadcrumbs = [] }) {
                                                 <Folder className="h-5 w-5" />
                                                 <span>{translations['Repository']}</span>
                                             </a>
-                                            <button type="button" onClick={handleLogout} className="flex w-full cursor-pointer items-center space-x-2">
+                                            <button
+                                                type="button"
+                                                onClick={handleLogout}
+                                                className="flex w-full cursor-pointer items-center space-x-2"
+                                            >
                                                 <LogOut className="mr-2 h-5 w-5" />
                                                 {translations['Log out']}
                                             </button>
@@ -301,7 +307,12 @@ export function AppHeader({ breadcrumbs = [] }) {
                                 >
                                     <Search className="h-5 w-5" />
                                 </button>
-                                <Input ref={searchInputRef} placeholder={`${translations['Search...']}  (Ctrl+K)`} className="w-full" onKeyDown={onKeyDownSearch} />
+                                <Input
+                                    ref={searchInputRef}
+                                    placeholder={`${translations['Search...']}  (Ctrl+K)`}
+                                    className="w-full"
+                                    onKeyDown={onKeyDownSearch}
+                                />
                             </div>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { usePage } from '@inertiajs/react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 const UnreadCountsContext = createContext({
     unreadNotifications: 0,

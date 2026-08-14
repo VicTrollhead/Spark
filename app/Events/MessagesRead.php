@@ -13,6 +13,7 @@ class MessagesRead implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public int $chatId;
+
     public int $readByUserId;
 
     public function __construct(int $chatId, int $readByUserId)

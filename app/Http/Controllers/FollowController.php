@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Events\FollowChanged;
+use App\Models\Follow;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationService;
@@ -12,11 +13,9 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Models\Follow;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
 
 class FollowController extends Controller
 {
@@ -61,7 +60,7 @@ class FollowController extends Controller
             'type' => 'follow',
         ]);
 
-        if (!$user->is_private) {
+        if (! $user->is_private) {
             $this->broadcastFollowChanged($user, 'followed');
         }
 
@@ -159,9 +158,6 @@ class FollowController extends Controller
         ]);
     }
 
-
-
-
     public function following(Request $request, User $user): Response
     {
         $authUser = Auth::user();
@@ -212,12 +208,10 @@ class FollowController extends Controller
                 'name' => $user->name,
                 'username' => $user->username,
                 'profile_image' => $user->profileImage,
-                'is_verified' => $user->is_verified
+                'is_verified' => $user->is_verified,
             ],
         ]);
     }
-
-
 
     public function acceptRequest(User $sourceUser, Notification $notification): RedirectResponse
     {

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Resources;
+
 use App\Support\Carbon;
 use Illuminate\Database\Eloquent;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -28,4 +29,3 @@ class BaseJsonResource extends JsonResource
         return filled($value) ? Number::fileSize($value, 2) : $value;
     }
 }
-

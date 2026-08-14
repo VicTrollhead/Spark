@@ -9,21 +9,22 @@ use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Models\Comment;
 use App\Models\Media;
+use App\Models\Post;
+use App\Services\NotificationService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Models\Post;
-use App\Services\NotificationService;
-use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
     use AuthorizesRequests;
+
     public function index(Request $request): Response
     {
         $currentUser = Auth::user();
@@ -88,8 +89,7 @@ class PostController extends Controller
                 break;
         }
 
-
-        $posts = $postsQuery->paginate(15)->through(fn($post) => formatPostForFrontend($post, $currentUser));
+        $posts = $postsQuery->paginate(15)->through(fn ($post) => formatPostForFrontend($post, $currentUser));
 
         $quotePost = null;
         if ($quoteSlug = $request->query('quote')) {
@@ -139,13 +139,12 @@ class PostController extends Controller
         ]);
     }
 
-
     public function store(StorePostRequest $request): RedirectResponse
     {
         $validated = $request->validated();
 
         // Ensure the user can view the quoted post
-        if (!empty($validated['quote_post_id'])) {
+        if (! empty($validated['quote_post_id'])) {
             $quotedPost = Post::findOrFail($validated['quote_post_id']);
             if (Gate::denies('view', $quotedPost)) {
                 abort(403, 'You cannot quote this post.');
@@ -188,7 +187,7 @@ class PostController extends Controller
             foreach ($hashtags as $tag) {
                 $cleanTag = ltrim($tag, '#');
                 $hashtag = \App\Models\Hashtag::firstOrCreate([
-                    'hashtag' => strtolower($cleanTag)
+                    'hashtag' => strtolower($cleanTag),
                 ]);
 
                 $hashtagIds[] = $hashtag->id;
@@ -196,8 +195,8 @@ class PostController extends Controller
 
             $post->hashtags()->sync($hashtagIds);
 
-            if (!empty($validated['poll_options'])) {
-                $expiresAt = !empty($validated['poll_expires_in'])
+            if (! empty($validated['poll_options'])) {
+                $expiresAt = ! empty($validated['poll_expires_in'])
                     ? now()->addMinutes($validated['poll_expires_in'])
                     : null;
 
@@ -213,14 +212,14 @@ class PostController extends Controller
             return ['mediaUrls' => $mediaUrls, 'post' => $post];
         });
 
-        if (!empty($validated['content'])) {
+        if (! empty($validated['content'])) {
             notifyMentionedUsers($validated['content'], Auth::id(), $mediaUrls['post']->id);
         }
 
         $createdPost = $mediaUrls['post'];
 
         // Notify parent post author when someone replies
-        if (!empty($validated['parent_post_id'])) {
+        if (! empty($validated['parent_post_id'])) {
             $parentPost = Post::find($validated['parent_post_id']);
             if ($parentPost && $parentPost->user_id !== Auth::id()) {
                 NotificationService::create([
@@ -234,7 +233,7 @@ class PostController extends Controller
         }
 
         // Notify quoted post author when someone quotes their post
-        if (!empty($validated['quote_post_id'])) {
+        if (! empty($validated['quote_post_id'])) {
             $quotedPost = Post::find($validated['quote_post_id']);
             if ($quotedPost && $quotedPost->user_id !== Auth::id()) {
                 NotificationService::create([
@@ -257,14 +256,12 @@ class PostController extends Controller
         // Include the author so their other tabs/devices also see it
         $followerIds[] = $currentUser->id;
 
-        if (!empty($followerIds)) {
+        if (! empty($followerIds)) {
             broadcast(new PostCreated($formattedPost, $followerIds))->toOthers();
         }
 
         return redirect()->route('dashboard')->with('success', 'Post created successfully!')->with('mediaUrls', $mediaUrls['mediaUrls']);
     }
-
-
 
     public function show(Post $post, Request $request): Response
     {
@@ -375,8 +372,6 @@ class PostController extends Controller
         return redirect()->route('dashboard')->with('success', 'Post deleted successfully.');
     }
 
-
-
     public function edit(Post $post): Response
     {
         $this->authorize('update', $post);
@@ -405,7 +400,7 @@ class PostController extends Controller
                     'expires_at' => $post->poll->expires_at?->toISOString(),
                     'is_expired' => $post->poll->isExpired(),
                     'total_votes' => $post->poll->votes->count(),
-                    'options' => $post->poll->options->map(fn($option) => [
+                    'options' => $post->poll->options->map(fn ($option) => [
                         'id' => $option->id,
                         'text' => $option->text,
                         'votes_count' => $post->poll->votes->where('poll_option_id', $option->id)->count(),
@@ -414,7 +409,6 @@ class PostController extends Controller
             ],
         ]);
     }
-
 
     public function update(UpdatePostRequest $request, Post $post): RedirectResponse
     {
@@ -430,7 +424,7 @@ class PostController extends Controller
 
             $removePaths = $validated['remove_media'] ?? [];
 
-            if (!empty($removePaths)) {
+            if (! empty($removePaths)) {
                 $mediaToRemove = $post->media()->whereIn('file_path', (array) $removePaths)->get();
 
                 foreach ($mediaToRemove as $media) {
@@ -465,14 +459,14 @@ class PostController extends Controller
             foreach ($hashtags as $tag) {
                 $cleanTag = ltrim($tag, '#');
                 $hashtag = \App\Models\Hashtag::firstOrCreate([
-                    'hashtag' => strtolower($cleanTag)
+                    'hashtag' => strtolower($cleanTag),
                 ]);
                 $hashtagIds[] = $hashtag->id;
             }
 
             $post->hashtags()->sync($hashtagIds);
 
-            if (!empty($validated['remove_poll']) && $post->poll) {
+            if (! empty($validated['remove_poll']) && $post->poll) {
                 $post->poll->delete();
             }
         });

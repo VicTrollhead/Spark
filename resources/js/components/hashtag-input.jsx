@@ -1,7 +1,7 @@
-import React, { useState, useImperativeHandle, forwardRef, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { X } from 'lucide-react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 
 export const HashtagInput = forwardRef(function HashtagInput({ onChange, placeholder, value = [] }, ref) {
     const [input, setInput] = useState('');
@@ -61,4 +61,3 @@ export const HashtagInput = forwardRef(function HashtagInput({ onChange, placeho
         </div>
     );
 });
-

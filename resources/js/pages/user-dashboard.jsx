@@ -1,8 +1,8 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Check, RefreshCw, Users } from 'lucide-react';
 import { useState } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { EmptyState } from '../components/empty-state';
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { useInitials } from '../hooks/use-initials';
 import AppLayout from '../layouts/app-layout';
 import { getProfileImageUrl } from '../lib/utils';

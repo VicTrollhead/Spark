@@ -80,7 +80,7 @@ class NotificationController extends Controller
                         'profile_image' => $post->user->profileImage,
                         'is_verified' => $post->user->is_verified,
                     ],
-                    'media' => $post->media->map(fn($m) => [
+                    'media' => $post->media->map(fn ($m) => [
                         'file_path' => $m->file_path,
                         'file_type' => $m->file_type,
                         'disk' => $m->disk,
@@ -107,7 +107,7 @@ class NotificationController extends Controller
                 'name' => $currentUser->name,
                 'username' => $currentUser->username,
                 'profile_image' => $currentUser->profileImage,
-                'is_verified' => $currentUser->is_verified
+                'is_verified' => $currentUser->is_verified,
             ],
             'notifications' => $formattedNotifications,
             'sort' => $sort,
@@ -122,7 +122,7 @@ class NotificationController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $wasUnread = !$notification->is_read;
+        $wasUnread = ! $notification->is_read;
         $notification->is_read = true;
         $notification->save();
 
@@ -132,6 +132,7 @@ class NotificationController extends Controller
 
         if ($request->wantsJson()) {
             $userId = Auth::id();
+
             return response()->json([
                 'unread_count' => Notification::where('user_id', $userId)->where('is_read', false)->count(),
                 'read_count' => Notification::where('user_id', $userId)->where('is_read', true)->count(),
@@ -157,6 +158,7 @@ class NotificationController extends Controller
 
         if ($request->wantsJson()) {
             $userId = Auth::id();
+
             return response()->json([
                 'unread_count' => Notification::where('user_id', $userId)->where('is_read', false)->count(),
                 'read_count' => Notification::where('user_id', $userId)->where('is_read', true)->count(),

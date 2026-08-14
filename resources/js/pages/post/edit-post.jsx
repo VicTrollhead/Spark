@@ -1,12 +1,12 @@
-import { Head, useForm, usePage, Link } from '@inertiajs/react';
-import AppLayout from '../../layouts/app-layout';
-import { Input } from '../../components/ui/input';
-import { Button } from '../../components/ui/button';
-import { Switch } from '../../components/ui/switch';
+import { getMediaUrl } from '@/lib/utils';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { BarChart3, X } from 'lucide-react';
 import { useState } from 'react';
 import { HashtagInput } from '../../components/hashtag-input.jsx';
-import { BarChart3, X } from 'lucide-react';
-import { getMediaUrl } from '@/lib/utils';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Switch } from '../../components/ui/switch';
+import AppLayout from '../../layouts/app-layout';
 
 export default function EditPost() {
     const { post, auth, translations } = usePage().props;
@@ -14,7 +14,13 @@ export default function EditPost() {
     const [removedMediaPaths, setRemovedMediaPaths] = useState([]);
     const [pollRemoved, setPollRemoved] = useState(false);
 
-    const { data, setData, post: submit, processing, errors } = useForm({
+    const {
+        data,
+        setData,
+        post: submit,
+        processing,
+        errors,
+    } = useForm({
         content: post.content || '',
         is_private: post.is_private || false,
         media: null,
@@ -31,7 +37,7 @@ export default function EditPost() {
         formData.append('is_private', data.is_private ? '1' : '0');
         formData.append('_method', 'PATCH');
 
-        removedMediaPaths.forEach(path => {
+        removedMediaPaths.forEach((path) => {
             formData.append('remove_media[]', path);
         });
 
@@ -39,7 +45,7 @@ export default function EditPost() {
             formData.append('remove_poll', '1');
         }
 
-        data.hashtags.forEach(tag => {
+        data.hashtags.forEach((tag) => {
             formData.append('hashtags[]', tag);
         });
 
@@ -66,7 +72,7 @@ export default function EditPost() {
     const canUpdate =
         (data.content && data.content.trim() !== '') ||
         (data.media && data.media.length > 0) ||
-        (post.media?.some(m => !removedMediaPaths.includes(m.file_path)));
+        post.media?.some((m) => !removedMediaPaths.includes(m.file_path));
 
     return (
         <AppLayout
@@ -82,8 +88,7 @@ export default function EditPost() {
             </div>
 
             <div className="p-6">
-
-                <div className="flex items-center justify-start my-3">
+                <div className="my-3 flex items-center justify-start">
                     <label className="text-sm text-gray-700 dark:text-gray-200">
                         {translations['Private (Only for followers)'] || 'Private (Only for followers)'}
                     </label>
@@ -97,13 +102,13 @@ export default function EditPost() {
                             value={data.content}
                             onChange={(e) => setData('content', e.target.value)}
                             rows={5}
-                            className={`w-full rounded-md border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                            className={`w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white ${
                                 errors.content ? 'border-red-500' : ''
                             }`}
                         />
                         <div className="mt-1 flex items-center justify-between">
-                            {errors.content ? <div className="text-red-500 text-sm">{errors.content}</div> : <div />}
-                            <span className={`text-xs ${data.content.length > 500 ? 'text-red-500 font-medium' : 'text-gray-400'}`}>
+                            {errors.content ? <div className="text-sm text-red-500">{errors.content}</div> : <div />}
+                            <span className={`text-xs ${data.content.length > 500 ? 'font-medium text-red-500' : 'text-gray-400'}`}>
                                 {data.content.length}/500
                             </span>
                         </div>
@@ -114,20 +119,20 @@ export default function EditPost() {
                             <div className="mb-3 flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-400">
                                 <BarChart3 className="h-4 w-4" />
                                 {translations['Poll'] || 'Poll'}
-                                {post.poll.is_expired && (
-                                    <span className="ml-1 text-xs text-red-500">({translations['Expired'] || 'Expired'})</span>
-                                )}
+                                {post.poll.is_expired && <span className="ml-1 text-xs text-red-500">({translations['Expired'] || 'Expired'})</span>}
                                 <span className="ml-auto text-xs text-gray-400">
-                                    {post.poll.total_votes} {post.poll.total_votes === 1 ? (translations['vote'] || 'vote') : (translations['votes'] || 'votes')}
+                                    {post.poll.total_votes}{' '}
+                                    {post.poll.total_votes === 1 ? translations['vote'] || 'vote' : translations['votes'] || 'votes'}
                                 </span>
                             </div>
                             <div className="space-y-2">
                                 {post.poll.options.map((option) => {
-                                    const percentage = post.poll.total_votes > 0
-                                        ? Math.round((option.votes_count / post.poll.total_votes) * 100)
-                                        : 0;
+                                    const percentage = post.poll.total_votes > 0 ? Math.round((option.votes_count / post.poll.total_votes) * 100) : 0;
                                     return (
-                                        <div key={option.id} className="relative overflow-hidden rounded-md border border-gray-200 px-3 py-2 text-sm dark:border-neutral-700">
+                                        <div
+                                            key={option.id}
+                                            className="relative overflow-hidden rounded-md border border-gray-200 px-3 py-2 text-sm dark:border-neutral-700"
+                                        >
                                             <div
                                                 className="absolute inset-y-0 left-0 bg-blue-100 dark:bg-blue-900/30"
                                                 style={{ width: `${percentage}%` }}
@@ -168,18 +173,18 @@ export default function EditPost() {
                                 {post.media
                                     .filter((m) => !removedMediaPaths.includes(m.file_path))
                                     .map((m) => (
-                                        <div key={m.file_path} className="relative rounded-md overflow-hidden border dark:border-gray-700 group">
+                                        <div key={m.file_path} className="group relative overflow-hidden rounded-md border dark:border-gray-700">
                                             {m.file_type.includes('image') ? (
                                                 <img
                                                     src={getMediaUrl(m)}
                                                     alt=""
-                                                    className="h-40 w-full object-contain bg-gray-100 dark:bg-neutral-800"
+                                                    className="h-40 w-full bg-gray-100 object-contain dark:bg-neutral-800"
                                                 />
                                             ) : (
                                                 <video
                                                     src={getMediaUrl(m)}
                                                     controls
-                                                    className="h-40 w-full object-contain bg-gray-100 dark:bg-neutral-800"
+                                                    className="h-40 w-full bg-gray-100 object-contain dark:bg-neutral-800"
                                                 />
                                             )}
 
@@ -190,8 +195,7 @@ export default function EditPost() {
                                                     setRemovedMediaPaths(updated);
                                                     setData('remove_media', updated);
                                                 }}
-
-                                                className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded-md text-xs hover:bg-red-700"
+                                                className="absolute top-2 right-2 rounded-md bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-700"
                                             >
                                                 {translations['Remove']}
                                             </button>
@@ -203,9 +207,7 @@ export default function EditPost() {
 
                     <div className="flex flex-row flex-wrap gap-4 xl:flex-nowrap">
                         <div className="flex w-full flex-col items-start gap-y-2">
-                            <label className="block text-sm text-gray-700 dark:text-gray-200">
-                                {translations['Hashtags']}
-                            </label>
+                            <label className="block text-sm text-gray-700 dark:text-gray-200">{translations['Hashtags']}</label>
                             <HashtagInput
                                 placeholder={translations['Add hashtag...']}
                                 initialHashtags={(post.hashtags || []).map((h) => h.hashtag)}
@@ -219,7 +221,7 @@ export default function EditPost() {
                                 {translations['Upload Media (Images or Videos)']}
                             </label>
 
-                            <div className="mt-3 w-full max-w-full flex items-center gap-2">
+                            <div className="mt-3 flex w-full max-w-full items-center gap-2">
                                 <Input
                                     type="file"
                                     multiple
@@ -231,7 +233,7 @@ export default function EditPost() {
                                     <button
                                         type="button"
                                         onClick={clearMediaInput}
-                                        className="shrink-0 rounded-full p-2 bg-gray-200 hover:bg-red-100 dark:bg-neutral-700 dark:hover:bg-red-900 text-gray-600 hover:text-red-600 dark:text-gray-200 dark:hover:text-red-400"
+                                        className="shrink-0 rounded-full bg-gray-200 p-2 text-gray-600 hover:bg-red-100 hover:text-red-600 dark:bg-neutral-700 dark:text-gray-200 dark:hover:bg-red-900 dark:hover:text-red-400"
                                         title="Clear media"
                                     >
                                         <X size={16} />
@@ -240,7 +242,7 @@ export default function EditPost() {
                             </div>
 
                             {data.media && data.media.length > 0 && (
-                                <ul className="mt-2 list-disc pl-4 text-sm text-gray-500 space-y-1 overflow-hidden break-all">
+                                <ul className="mt-2 list-disc space-y-1 overflow-hidden pl-4 text-sm break-all text-gray-500">
                                     {Array.from(data.media).map((file, index) => (
                                         <li key={index} className="max-w-6xl" title={file.name}>
                                             {file.name}
@@ -249,12 +251,9 @@ export default function EditPost() {
                                 </ul>
                             )}
 
-                            {errors['media.0'] && (
-                                <p className="text-sm text-red-500 mt-1">{errors['media.0']}</p>
-                            )}
+                            {errors['media.0'] && <p className="mt-1 text-sm text-red-500">{errors['media.0']}</p>}
                         </div>
                     </div>
-
 
                     <div className="flex justify-end gap-2">
                         <Link
