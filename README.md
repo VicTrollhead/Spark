@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="public/spark-light.svg" alt="Spark" width="80" />
-</p>
-
 <h1 align="center">Spark</h1>
 
 <p align="center">
@@ -37,32 +33,32 @@ Spark is a Twitter/X-style social network that goes beyond a simple clone. It su
 
 ### Profiles & posts
 
-| Profile | Profile (dark) |
-|---------|----------------|
+| Profile                             | Profile (dark)                                |
+| ----------------------------------- | --------------------------------------------- |
 | ![Profile](screenshots/profile.png) | ![Profile dark](screenshots/profile-dark.png) |
 
-| Post detail | Polls |
-|-------------|-------|
+| Post detail                                 | Polls                           |
+| ------------------------------------------- | ------------------------------- |
 | ![Post detail](screenshots/post-detail.png) | ![Polls](screenshots/polls.png) |
 
 ### Messaging — public, direct & group
 
-| Public chat | Direct messages |
-|-------------|-----------------|
+| Public chat                          | Direct messages                                     |
+| ------------------------------------ | --------------------------------------------------- |
 | ![Public chat](screenshots/chat.png) | ![Direct messages](screenshots/direct-messages.png) |
 
-| Group chat | Notifications |
-|------------|---------------|
+| Group chat                                | Notifications                                   |
+| ----------------------------------------- | ----------------------------------------------- |
 | ![Group chat](screenshots/group-chat.png) | ![Notifications](screenshots/notifications.png) |
 
 ### Discovery
 
-| Search | Hashtag feed |
-|--------|--------------|
+| Search                            | Hashtag feed                             |
+| --------------------------------- | ---------------------------------------- |
 | ![Search](screenshots/search.png) | ![Hashtag feed](screenshots/hashtag.png) |
 
-| User discovery | Friends |
-|----------------|---------|
+| User discovery                  | Friends                             |
+| ------------------------------- | ----------------------------------- |
 | ![Users](screenshots/users.png) | ![Friends](screenshots/friends.png) |
 
 ### Onboarding & settings
@@ -71,17 +67,18 @@ Spark is a Twitter/X-style social network that goes beyond a simple clone. It su
   <img src="screenshots/welcome.png" alt="Landing page" width="100%" />
 </p>
 
-| Login | Register |
-|-------|----------|
+| Login                           | Register                              |
+| ------------------------------- | ------------------------------------- |
 | ![Login](screenshots/login.png) | ![Register](screenshots/register.png) |
 
-| Profile settings | Favorites |
-|------------------|-----------|
+| Profile settings                      | Favorites                               |
+| ------------------------------------- | --------------------------------------- |
 | ![Settings](screenshots/settings.png) | ![Favorites](screenshots/favorites.png) |
 
 ## Features
 
 ### Posts & Content
+
 - **Rich posts** — text, images, videos, hashtags, and mentions
 - **Polls** — create polls with multiple options, expiration times, and live vote counts
 - **Quote posts** — share posts with your own commentary
@@ -90,6 +87,7 @@ Spark is a Twitter/X-style social network that goes beyond a simple clone. It su
 - **Post management** — edit, delete, pin to profile
 
 ### Social
+
 - **Follow system** — follow/unfollow, follow requests for private accounts
 - **Engagement** — like, repost, and favorite (bookmark) posts
 - **Comments** — threaded replies with likes and sorting options
@@ -97,23 +95,27 @@ Spark is a Twitter/X-style social network that goes beyond a simple clone. It su
 - **User discovery** — browse users with multiple sorting options (popular, mutual, recent)
 
 ### Messaging
+
 - **Direct messages** — private 1-on-1 chats with media support
 - **Group chats** — create groups, add members, share media
 - **Public chat** — community-wide chatroom
 - **Real-time delivery** — typing indicators, read receipts, live message updates
 
 ### Notifications
+
 - Real-time notifications for likes, comments, replies, follows, mentions, reposts, favorites, and messages
 - Auto mark-as-read on navigation
 - Filter and sort (unread, read, latest, oldest)
 
 ### Search & Discovery
+
 - Full-text search across posts, users, and hashtags
 - Trending hashtags (7-day window)
 - Popular hashtags leaderboard
 - Multi-tab search results
 
 ### User Experience
+
 - **Dark/light theme** with system preference detection
 - **Internationalization** — English, Ukrainian, and German
 - **Mobile-first responsive design** with bottom navigation
@@ -123,18 +125,18 @@ Spark is a Twitter/X-style social network that goes beyond a simple clone. It su
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| **Backend** | Laravel 12, PHP 8.2+ |
-| **Frontend** | React 19, Inertia.js 2, Tailwind CSS 4 |
-| **UI Components** | Radix UI / shadcn, Lucide Icons, Framer Motion |
-| **Real-time** | Laravel Reverb (WebSockets), Laravel Echo |
-| **Database** | MySQL 8 |
-| **Cache & Queue** | Redis |
-| **File Storage** | AWS S3 (configurable, local fallback) |
-| **Auth** | Laravel Fortify + Google OAuth (Socialite) |
+| Layer               | Technology                                          |
+| ------------------- | --------------------------------------------------- |
+| **Backend**         | Laravel 12, PHP 8.2+                                |
+| **Frontend**        | React 19, Inertia.js 2, Tailwind CSS 4              |
+| **UI Components**   | Radix UI / shadcn, Lucide Icons, Framer Motion      |
+| **Real-time**       | Laravel Reverb (WebSockets), Laravel Echo           |
+| **Database**        | MySQL 8                                             |
+| **Cache & Queue**   | Redis                                               |
+| **File Storage**    | AWS S3 (configurable, local fallback)               |
+| **Auth**            | Laravel Fortify + Google OAuth (Socialite)          |
 | **Dev Environment** | Docker Compose (Nginx, PHP-FPM, MySQL, Redis, Node) |
-| **Testing** | PHPUnit (backend), Vitest (frontend) |
+| **Testing**         | PHPUnit (backend), Vitest (frontend)                |
 
 ## Getting Started
 
@@ -289,16 +291,17 @@ Spark uses **Inertia.js** — there are no separate API routes. Controllers retu
 
 Docker Compose provides the full stack:
 
-| Service | Role | Port |
-|---------|------|------|
-| **web** | Nginx reverse proxy | 80 (via nginx-proxy) |
-| **php** | PHP-FPM application | 8080 |
-| **mysql** | Database | 2345 → 3306 |
-| **redis** | Cache, queue, sessions | 6379 |
-| **node** | Vite dev server | 5173 |
-| **db-backup** | On-demand MySQL backups | — |
+| Service       | Role                    | Port                 |
+| ------------- | ----------------------- | -------------------- |
+| **web**       | Nginx reverse proxy     | 80 (via nginx-proxy) |
+| **php**       | PHP-FPM application     | 8080                 |
+| **mysql**     | Database                | 2345 → 3306          |
+| **redis**     | Cache, queue, sessions  | 6379                 |
+| **node**      | Vite dev server         | 5173                 |
+| **db-backup** | On-demand MySQL backups | —                    |
 
 > **Note:** The `web` service expects an external Docker network called `nginx-proxy` for local domain routing. Create it with:
+>
 > ```bash
 > docker network create nginx-proxy
 > ```
